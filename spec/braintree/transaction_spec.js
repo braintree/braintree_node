@@ -1,17 +1,10 @@
 require('../spec_helper');
-var braintree = require('../../lib/braintree');
 
 vows.describe('Transaction').addBatch({
   'create': {
     'for a minimal case': {
       topic: function () {
-        var gateway = braintree.connect({
-          environment: braintree.Environment.Development,
-          merchantId: 'integration_merchant_id',
-          publicKey: 'integration_public_key',
-          privateKey: 'integration_private_key'
-        });
-        gateway.transaction.sale({
+        specHelper.defaultGateway.transaction.sale({
           amount: '5.00',
           creditCard: {
             number: '5105105105105100',
@@ -30,13 +23,7 @@ vows.describe('Transaction').addBatch({
 
     'when processor declined': {
       topic: function () {
-        var gateway = braintree.connect({
-          environment: braintree.Environment.Development,
-          merchantId: 'integration_merchant_id',
-          publicKey: 'integration_public_key',
-          privateKey: 'integration_private_key'
-        });
-        gateway.transaction.sale({
+        specHelper.defaultGateway.transaction.sale({
           amount: '2000.00',
           creditCard: {
             number: '5105105105105100',
@@ -55,13 +42,7 @@ vows.describe('Transaction').addBatch({
 
     'with errors': {
       topic: function () {
-        var gateway = braintree.connect({
-          environment: braintree.Environment.Development,
-          merchantId: 'integration_merchant_id',
-          publicKey: 'integration_public_key',
-          privateKey: 'integration_private_key'
-        });
-        gateway.transaction.sale({
+        specHelper.defaultGateway.transaction.sale({
           creditCard: {
             number: '5105105105105100'
           }
@@ -102,13 +83,7 @@ vows.describe('Transaction').addBatch({
     'when voiding an authorized transaction': {
       topic: function () {
         var callback = this.callback;
-        var gateway = braintree.connect({
-          environment: braintree.Environment.Development,
-          merchantId: 'integration_merchant_id',
-          publicKey: 'integration_public_key',
-          privateKey: 'integration_private_key'
-        });
-        gateway.transaction.sale(
+        specHelper.defaultGateway.transaction.sale(
           {
             amount: '5.00',
             creditCard: {
@@ -117,7 +92,7 @@ vows.describe('Transaction').addBatch({
             }
           },
           function (err, response) {
-            gateway.transaction.void(response.transaction.id, callback);
+            specHelper.defaultGateway.transaction.void(response.transaction.id, callback);
           }
         )
       },

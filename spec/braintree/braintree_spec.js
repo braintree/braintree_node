@@ -1,5 +1,4 @@
 require('../spec_helper');
-var braintree = require('../../lib/braintree');
 
 vows.describe('Braintree').addBatch({
   'version': {

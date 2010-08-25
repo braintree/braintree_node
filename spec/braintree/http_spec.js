@@ -1,18 +1,11 @@
 require('../spec_helper');
-var braintree = require('../../lib/braintree');
 var Config = require('../../lib/braintree/config').Config;
 var Http = require('../../lib/braintree/http').Http;
 
 vows.describe('Http').addBatch({
   'UnexpectedError': {
     topic: function () {
-      var config = Config({
-        environment: braintree.Environment.Development,
-        merchantId: 'integration_merchant_id',
-        publicKey: 'integration_public_key',
-        privateKey: 'integration_private_key'
-      });
-      var http = Http(config);
+      var http = Http(Config(specHelper.defaultConfig));
       http.post('/test/error', '', this.callback);
     },
     'returns the UnexpectedError': function (err, response) {
