@@ -79,6 +79,55 @@ vows.describe('Transaction').addBatch({
     }
   },
 
+  'submitForSettlement': {
+    'when submitting an authorized transaction for settlement': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.transaction.sale(
+          {
+            amount: '5.00',
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, callback);
+          }
+        )
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'sets the status to submitted_for_settlement': function (err, response) { assert.equal(response.transaction.status, 'submitted_for_settlement'); },
+    },
+
+    'when transaction cannot be submitted for settlement': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.transaction.sale(
+          {
+            amount: '5.00',
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            },
+            options: {
+              submitForSettlement: true
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, callback);
+          }
+        )
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is not succesful': function (err, response) { assert.equal(response.success, false); },
+      'has error 91507 on base': function (err, response) {
+        assert.equal(response.errors.for('transaction').on('base').code, '91507');
+      }
+    }
+  },
+
   'void': {
     'when voiding an authorized transaction': {
       topic: function () {
@@ -99,6 +148,31 @@ vows.describe('Transaction').addBatch({
       'does not have an error': function (err, response) { assert.isNull(err); },
       'is succesful': function (err, response) { assert.equal(response.success, true); },
       'sets the status to voided': function (err, response) { assert.equal(response.transaction.status, 'voided'); },
+    },
+
+    'when transaction cannot be voided': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.transaction.sale(
+          {
+            amount: '5.00',
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.transaction.void(response.transaction.id, function (err, response) {
+              specHelper.defaultGateway.transaction.void(response.transaction.id, callback);
+            });
+          }
+        )
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is not succesful': function (err, response) { assert.equal(response.success, false); },
+      'has error 91504 on base': function (err, response) {
+        assert.equal(response.errors.for('transaction').on('base').code, '91504');
+      }
     }
   }
 }).export(module);
