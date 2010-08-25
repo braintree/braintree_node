@@ -96,5 +96,34 @@ vows.describe('Transaction').addBatch({
         assert.include(errorCodes, '81709');
       }
     }
+  },
+
+  'void': {
+    'when voiding an authorized transaction': {
+      topic: function () {
+        var callback = this.callback;
+        var gateway = braintree.connect({
+          environment: braintree.Environment.Development,
+          merchantId: 'integration_merchant_id',
+          publicKey: 'integration_public_key',
+          privateKey: 'integration_private_key'
+        });
+        gateway.transaction.sale(
+          {
+            amount: '5.00',
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, response) {
+            gateway.transaction.void(response.transaction.id, callback);
+          }
+        )
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'sets the status to voided': function (err, response) { assert.equal(response.transaction.status, 'voided'); },
+    }
   }
 }).export(module);
