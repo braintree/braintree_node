@@ -2,7 +2,7 @@ require('../spec_helper');
 
 var _ = require('underscore')._;
 
-vows.describe('Transaction').addBatch({
+vows.describe('TransactionGateway').addBatch({
   'credit': {
     'for a minimal case': {
       topic: function () {
