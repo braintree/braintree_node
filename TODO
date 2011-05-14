@@ -1,4 +1,4 @@
-== Gateway ==
+== TODO ==
 
 Do we want to return json root for nested arrays?
 
@@ -6,6 +6,12 @@ e.g.
 {customer: {firstName: 'Dan', creditCards: [{creditCard: {...}}]}}
 or
 {customer: {firstName: 'Dan', creditCards: [{...}]}}
+
+---
+
+* do we want to add a _details suffix?
+* keep version below 1.0 until it's fully featured
+* use the node library to start builing v3 of api?
 
 == Features ==
 
@@ -23,7 +29,7 @@ or
   [ ] submit for settlement
 [ ] customers
   [x] create
-  [ ] with credit card
+  [x] with credit card
   [ ] with credit card and billing address
   [x] update
   [x] delete

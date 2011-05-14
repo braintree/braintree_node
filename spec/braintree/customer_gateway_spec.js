@@ -70,6 +70,86 @@ vows.describe('CustomerGateway').addBatch({
       }
     },
 
+    'with credit card and billing address': {
+      topic: function () {
+        specHelper.defaultGateway.customer.create({
+          firstName: 'John',
+          lastName: 'Smith',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2012',
+            billingAddress: {
+              streetAddress: '123 Fake St',
+              extendedAddress: 'Suite 403',
+              locality: 'Chicago',
+              region: 'IL',
+              postalCode: '60607',
+              countryName: 'United States of America'
+            }
+          }
+        }, this.callback);
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'has customer attributes': function (err, response) {
+        assert.equal(response.customer.firstName, 'John');
+        assert.equal(response.customer.lastName, 'Smith');
+      },
+      'has credit card attributes': function (err, response) {
+        assert.equal(response.customer.creditCards.length, 1);
+        assert.equal(response.customer.creditCards[0].expirationMonth, '05');
+        assert.equal(response.customer.creditCards[0].expirationYear, '2012');
+        assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100');
+      },
+      'has billing address attributes': function (err, response) {
+        assert.equal(response.customer.creditCards.length, 1);
+        var billingAddress = response.customer.creditCards[0].billingAddress;
+        assert.equal(billingAddress.streetAddress, '123 Fake St');
+        assert.equal(billingAddress.extendedAddress, 'Suite 403');
+        assert.equal(billingAddress.locality, 'Chicago');
+        assert.equal(billingAddress.region, 'IL');
+        assert.equal(billingAddress.postalCode, '60607');
+        assert.equal(billingAddress.countryName, 'United States of America');
+      }
+    },
+
+    'with credit card and billing address with errors': {
+      topic: function () {
+        specHelper.defaultGateway.customer.create({
+          creditCard: {
+            number: 'invalid card number',
+            expirationDate: '05/2012',
+            billingAddress: {
+              countryName: 'invalid country'
+            }
+          }
+        }, this.callback);
+      },
+      'is unsuccessful': function (err, response) { assert.equal(response.success, false); },
+      'has a unified message': function (err, response) {
+        assert.equal(response.message, 'Credit card number is invalid.\nCountry name is not an accepted country.');
+      },
+      'has a nested error on creditCard.number': function (err, response) {
+        assert.equal(
+          response.errors.for('customer').for('creditCard').on('number').code,
+          '81715'
+        );
+      },
+      'has a nested error on creditCard.billingAddress.countryName': function (err, response) {
+        assert.equal(
+          response.errors.for('customer').for('creditCard').for('billingAddress').on('countryName').code,
+          '91803'
+        );
+      },
+      'returns deepErrors': function (err, response) {
+        var errorCodes = _.map(response.errors.deepErrors(), function (error) { return error.code; });
+        assert.equal(errorCodes.length, 2);
+        assert.include(errorCodes, '81715');
+        assert.include(errorCodes, '91803');
+      }
+    },
+
+
     'with errors': {
       topic: function () {
         specHelper.defaultGateway.customer.create({
