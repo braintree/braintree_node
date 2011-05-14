@@ -70,6 +70,64 @@ vows.describe('CreditCardGateway').addBatch({
     }
   },
 
+  'delete': {
+    'the delete response': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/2014'
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.creditCard.delete(
+              response.customer.creditCards[0].token, callback
+            );
+          }
+        );
+      },
+      'does not have an error': function (err) { assert.isNull(err); },
+    },
+
+    'deletes the creditCard': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/2014'
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.creditCard.delete(
+              response.customer.creditCards[0].token,
+              function (err) {
+                specHelper.defaultGateway.creditCard.find(
+                  response.customer.creditCards[0].token, callback
+                );
+              }
+            );
+          }
+        );
+      },
+      'returning a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
+
+    'when the credit card cannot be found': {
+      topic: function () {
+        specHelper.defaultGateway.creditCard.delete('nonexistent_token', this.callback);
+      },
+      'returns a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
+  },
+
   'find': {
     'when found': {
       topic: function () {

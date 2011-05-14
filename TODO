@@ -35,11 +35,11 @@ or
   [x] delete
   [x] find
 [ ] credit cards
-  [ ] create
+  [x] create
   [ ] create with billing address
   [ ] update
-  [ ] delete
-  [ ] find
+  [x] delete
+  [x] find
 [ ] subscriptions
   [ ] find
   [ ] create
