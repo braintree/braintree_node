@@ -49,6 +49,50 @@ vows.describe('CustomerGateway').addBatch({
     }
   },
 
+  'delete': {
+    'the delete response': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {},
+          function (err, response) {
+            specHelper.defaultGateway.customer.delete(response.customer.id, callback);
+          }
+        );
+      },
+      'does not have an error': function (err) { assert.isNull(err); },
+    },
+
+    'deletes the customer': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {},
+          function (err, response) {
+            specHelper.defaultGateway.customer.delete(
+              response.customer.id,
+              function (err) {
+                specHelper.defaultGateway.customer.find(response.customer.id, callback);
+              }
+            );
+          }
+        );
+      },
+      'returning a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
+
+    'when customer cannot be found': {
+      topic: function () {
+        specHelper.defaultGateway.customer.delete('nonexistent_customer', this.callback);
+      },
+      'returns a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
+  },
+
   'find': {
     'when found': {
       topic: function () {
