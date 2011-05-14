@@ -19,6 +19,31 @@ vows.describe('CustomerGateway').addBatch({
       }
     },
 
+    'with credit card': {
+      topic: function () {
+        specHelper.defaultGateway.customer.create({
+          firstName: 'John',
+          lastName: 'Smith',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2012'
+          }
+        }, this.callback);
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'has customer attributes': function (err, response) {
+        assert.equal(response.customer.firstName, 'John');
+        assert.equal(response.customer.lastName, 'Smith');
+      },
+      'has credit card attributes': function (err, response) {
+        assert.equal(response.customer.creditCards.length, 1);
+        assert.equal(response.customer.creditCards[0].expirationMonth, '05');
+        assert.equal(response.customer.creditCards[0].expirationYear, '2012');
+        assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100');
+      }
+    },
+
     'with errors': {
       topic: function () {
         specHelper.defaultGateway.customer.create({

@@ -1,0 +1,49 @@
+== Gateway ==
+
+Do we want to return json root for nested arrays?
+
+e.g.
+{customer: {firstName: 'Dan', creditCards: [{creditCard: {...}}]}}
+or
+{customer: {firstName: 'Dan', creditCards: [{...}]}}
+
+== Features ==
+
+[ ] transactions
+  [x] find
+  [x] sale
+  [x] credit
+  [x] void
+  [x] submit for settlement
+  [ ] refund
+  [ ] custom fields
+  [ ] create from vault records
+  [ ] options
+  [ ] store in vault
+  [ ] submit for settlement
+[ ] customers
+  [x] create
+  [ ] with credit card
+  [ ] with credit card and billing address
+  [x] update
+  [x] delete
+  [x] find
+[ ] credit cards
+  [ ] create
+  [ ] with billing address
+  [ ] update
+  [ ] delete
+  [ ] find
+[ ] subscriptions
+  [ ] find
+  [ ] create
+  [ ] update
+  [ ] cancel
+[ ] verify ssl certs
+[ ] transparent redirect
+  [ ] transaction
+  [ ] customer
+  [ ] credit card
+  [ ] validate query string hash
+  [ ] check http_status in TR redirect
+paging
