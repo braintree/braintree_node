@@ -19,6 +19,21 @@ vows.describe('CustomerGateway').addBatch({
       }
     },
 
+    'with a custom field': {
+      topic: function () {
+        specHelper.defaultGateway.customer.create({
+          customFields: {
+            storeMe: 'custom value'
+          }
+        }, this.callback);
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'has custom fields in response': function (err, response) {
+        assert.equal(response.customer.customFields.storeMe, 'custom value');
+      }
+    },
+
     'with credit card': {
       topic: function () {
         specHelper.defaultGateway.customer.create({

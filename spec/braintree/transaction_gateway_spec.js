@@ -82,6 +82,26 @@ vows.describe('TransactionGateway').addBatch({
       }
     },
 
+    'with a custom field': {
+      topic: function () {
+        specHelper.defaultGateway.transaction.sale({
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          },
+          customFields: {
+            storeMe: 'custom value'
+          }
+        }, this.callback);
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'has custom fields in response': function (err, response) {
+        assert.equal(response.transaction.customFields.storeMe, 'custom value');
+      }
+    },
+
     'when processor declined': {
       topic: function () {
         specHelper.defaultGateway.transaction.sale({

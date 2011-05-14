@@ -30,7 +30,7 @@ or
 [ ] customers
   [x] create
   [x] with credit card
-  [ ] with credit card and billing address
+  [x] with credit card and billing address
   [x] update
   [x] delete
   [x] find
@@ -52,4 +52,6 @@ or
   [ ] credit card
   [ ] validate query string hash
   [ ] check http_status in TR redirect
-paging
+[ ] paging
+[ ] handle all http status errors
+
