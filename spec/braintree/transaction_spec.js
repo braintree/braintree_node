@@ -1,5 +1,7 @@
 require('../spec_helper');
 
+var _ = require('underscore')._;
+
 vows.describe('Transaction').addBatch({
   'create': {
     'for a minimal case': {
