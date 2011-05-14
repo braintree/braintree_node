@@ -47,5 +47,36 @@ vows.describe('CustomerGateway').addBatch({
         assert.include(errorCodes, '81604');
       }
     }
-  }
+  },
+
+  'find': {
+    'when found': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            firstName: 'John',
+            lastName: 'Smith'
+          },
+          function (err, response) {
+            specHelper.defaultGateway.customer.find(response.customer.id, callback);
+          }
+        );
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'returns customer details': function (err, customer) {
+        assert.equal(customer.firstName, 'John');
+        assert.equal(customer.lastName, 'Smith');
+      }
+    },
+
+    'when not found': {
+      topic: function () {
+        specHelper.defaultGateway.customer.find('nonexistent_customer', this.callback);
+      },
+      'returns a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
+  },
 }).export(module);
