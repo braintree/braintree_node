@@ -2,6 +2,31 @@ require('../spec_helper');
 
 var _ = require('underscore')._;
 
+var createTransactionToRefund = function (callback) {
+  var callback = callback;
+  specHelper.defaultGateway.transaction.sale(
+    {
+      amount: '5.00',
+      creditCard: {
+        number: '5105105105105100',
+        expirationDate: '05/12'
+      },
+      options: { submitForSettlement: true }
+    },
+    function (err, result) {
+      specHelper.defaultGateway._gateway.http.put(
+        '/transactions/' + result.transaction.id + '/settle',
+        null,
+        function (err, settleResult) {
+          specHelper.defaultGateway.transaction.find(result.transaction.id, function (err, transaction) {
+            callback(transaction);
+          });
+        }
+      );
+    }
+  )
+};
+
 vows.describe('TransactionGateway').addBatch({
   'credit': {
     'for a minimal case': {
@@ -305,6 +330,51 @@ vows.describe('TransactionGateway').addBatch({
         assert.equal(err.type, braintree.errorTypes.notFoundError);
       }
     },
+  },
+
+  'refund': {
+    'when the transaction can be refunded': {
+      topic: function () {
+        var callback = this.callback;
+        createTransactionToRefund(function (transaction) {
+          specHelper.defaultGateway.transaction.refund(transaction.id, callback);
+        });
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'creates a credit with a reference to the refunded transaction': function (err, response) {
+        assert.equal(response.transaction.type, 'credit');
+        assert.match(response.transaction.refund_id, /^\w+$/);
+      },
+    },
+
+    'when transaction cannot be refunded': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.transaction.sale(
+          {
+            amount: '5.00',
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            },
+            options: {
+              submitForSettlement: true
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.transaction.refund(response.transaction.id, callback);
+          }
+        )
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is not succesful': function (err, response) { assert.equal(response.success, false); },
+      'has error 91507 on base': function (err, response) {
+        assert.equal(response.errors.for('transaction').on('base').code, '91506');
+      }
+    }
   },
 
   'submitForSettlement': {
