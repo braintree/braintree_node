@@ -11,11 +11,10 @@ or
 
 * do we want to add a _details suffix?
 * keep version below 1.0 until it's fully featured
-* use the node library to start builing v3 of api?
 * do feature comparison to ruby library
 * write the docs
 
-== Features ==
+== Features for Release 0.2 ==
 
 [ ] transactions
   [x] find
@@ -25,10 +24,10 @@ or
   [x] submit for settlement
   [ ] refund
   [x] custom fields
-  [ ] create from vault records
-  [ ] options
-    [ ] store in vault
-    [ ] submit for settlement
+  [x] create from vault records
+  [x] options
+    [x] store in vault
+    [x] submit for settlement
 [ ] customers
   [x] create
   [x] with credit card
@@ -36,10 +35,15 @@ or
   [x] update
   [x] delete
   [x] find
+  [ ] update and add new credit card
+  [ ] update and add new credit card with billing address
+  [ ] update existing credit card
+  [ ] update existing credit card and billing address
 [ ] credit cards
   [x] create
   [ ] create with billing address
-  [ ] update
+  [x] update
+  [ ] update existing billing address
   [x] delete
   [x] find
 [ ] subscriptions
@@ -54,8 +58,15 @@ or
   [ ] credit card
   [ ] validate query string hash
   [ ] check http_status in TR redirect
-[ ] paging
 [ ] handle all http status errors
 [ ] verifications
+
+== Features for Release 0.3 ==
+
+[ ] transaction search
+[ ] vault search
+[ ] subscription search
+[ ] paging for search
+[ ] constants for enums
 
 

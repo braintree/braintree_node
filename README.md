@@ -1,6 +1,6 @@
 ## Overview
 
-This is a node.js library for integrating with the Braintree gateway. It is a work in progress, very much alpha. Feedback is appreciated.
+This is a node.js library for integrating with the Braintree gateway. It is a work in progress, very much beta. Feedback is appreciated.
 It can be used in the sandbox environment, [contact us](mailto:support@getbraintree.com) if you're interested in using
 it in production.
 
@@ -12,7 +12,7 @@ it in production.
 
 ## Dependencies
 
-* node 0.2.0
+* node 0.4.7
 * underscore.js
 
 ## Quick Start

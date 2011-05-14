@@ -82,6 +82,121 @@ vows.describe('TransactionGateway').addBatch({
       }
     },
 
+    'using a customer from the vault': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            firstName: 'Adam',
+            lastName: 'Jones',
+            creditCard: {
+              cardholderName: 'Adam Jones',
+              number: '5105105105105100',
+              expirationDate: '05/2014'
+            }
+          },
+          function (err, result) {
+            specHelper.defaultGateway.transaction.sale({
+              customer_id: result.customer.id,
+              amount: '100.00'
+            }, callback);
+          }
+        );
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is a sale': function (err, response) { assert.equal(response.transaction.type, 'sale'); },
+      'snapshots customer details': function (err, response) {
+        assert.equal(response.transaction.customer.firstName, 'Adam');
+        assert.equal(response.transaction.customer.lastName, 'Jones');
+      },
+      'snapshots credit card details': function (err, response) {
+        assert.equal(response.transaction.creditCard.cardholderName, 'Adam Jones');
+        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+        assert.equal(response.transaction.creditCard.expirationDate, '05/2014');
+      }
+    },
+
+    'using a credit card from the vault': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            firstName: 'Adam',
+            lastName: 'Jones',
+            creditCard: {
+              cardholderName: 'Adam Jones',
+              number: '5105105105105100',
+              expirationDate: '05/2014'
+            }
+          },
+          function (err, result) {
+            specHelper.defaultGateway.transaction.sale({
+              payment_method_token: result.customer.creditCards[0].token,
+              amount: '100.00'
+            }, callback);
+          }
+        );
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is a sale': function (err, response) { assert.equal(response.transaction.type, 'sale'); },
+      'snapshots customer details': function (err, response) {
+        assert.equal(response.transaction.customer.firstName, 'Adam');
+        assert.equal(response.transaction.customer.lastName, 'Jones');
+      },
+      'snapshots credit card details': function (err, response) {
+        assert.equal(response.transaction.creditCard.cardholderName, 'Adam Jones');
+        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+        assert.equal(response.transaction.creditCard.expirationDate, '05/2014');
+      }
+    },
+
+    'with the submit for settlement option': {
+      topic: function () {
+        specHelper.defaultGateway.transaction.sale({
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          },
+          options: {
+            submitForSettlement: true
+          }
+        }, this.callback);
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'submits the transaction for settlement': function (err, response) {
+        assert.equal(response.transaction.status, 'submitted_for_settlement');
+      }
+    },
+
+    'with the store in vault option': {
+      topic: function () {
+        specHelper.defaultGateway.transaction.sale({
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          },
+          options: {
+            storeInVault: true
+          }
+        }, this.callback);
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'stores the customer and credit card in the vault': function (err, response) {
+        assert.match(response.transaction.customer.id, /^\d+$/);
+        assert.match(response.transaction.creditCard.token, /^\w+$/);
+      }
+    },
+
     'with a custom field': {
       topic: function () {
         specHelper.defaultGateway.transaction.sale({
