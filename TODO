@@ -22,11 +22,11 @@ or
   [x] void
   [x] submit for settlement
   [ ] refund
-  [ ] custom fields
+  [x] custom fields
   [ ] create from vault records
   [ ] options
-  [ ] store in vault
-  [ ] submit for settlement
+    [ ] store in vault
+    [ ] submit for settlement
 [ ] customers
   [x] create
   [x] with credit card
@@ -36,7 +36,7 @@ or
   [x] find
 [ ] credit cards
   [ ] create
-  [ ] with billing address
+  [ ] create with billing address
   [ ] update
   [ ] delete
   [ ] find
@@ -54,4 +54,6 @@ or
   [ ] check http_status in TR redirect
 [ ] paging
 [ ] handle all http status errors
+[ ] verifications
+
 
