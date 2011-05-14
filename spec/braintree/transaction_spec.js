@@ -81,6 +81,38 @@ vows.describe('Transaction').addBatch({
     }
   },
 
+  'find': {
+    'when found': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.transaction.sale(
+          {
+            amount: '5.00',
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.transaction.find(response.transaction.id, callback);
+          }
+        );
+      },
+      'returns transaction details': function (err, transaction) {
+        assert.equal('5.00', transaction.amount);
+      }
+    },
+
+    'when not found': {
+      topic: function () {
+        specHelper.defaultGateway.transaction.find('nonexistent_transaction', this.callback);
+      },
+      'returns a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
+  },
+
   'submitForSettlement': {
     'when submitting an authorized transaction for settlement': {
       topic: function () {
