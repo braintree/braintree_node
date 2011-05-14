@@ -70,4 +70,40 @@ vows.describe('CreditCardGateway').addBatch({
     }
   },
 
+  'find': {
+    'when found': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/2014'
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.creditCard.find(
+              response.customer.creditCards[0].token,
+              callback
+            );
+          }
+        );
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'returns credit card details': function (err, creditCard) {
+        assert.equal(creditCard.maskedNumber, '510510******5100');
+        assert.equal(creditCard.expirationDate, '05/2014');
+      }
+    },
+
+    'when not found': {
+      topic: function () {
+        specHelper.defaultGateway.creditCard.find('nonexistent_token', this.callback);
+      },
+      'returns a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
+  },
+
 }).export(module);
