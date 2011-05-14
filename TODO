@@ -16,13 +16,13 @@ or
 
 == Features for Release 0.2 ==
 
-[ ] transactions
+[x] transactions
   [x] find
   [x] sale
   [x] credit
   [x] void
   [x] submit for settlement
-  [ ] refund
+  [x] refund
   [x] custom fields
   [x] create from vault records
   [x] options

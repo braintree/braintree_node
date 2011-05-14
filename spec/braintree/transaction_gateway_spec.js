@@ -350,6 +350,24 @@ vows.describe('TransactionGateway').addBatch({
       },
     },
 
+    'for a partial amount': {
+      topic: function () {
+        var callback = this.callback;
+        createTransactionToRefund(function (transaction) {
+          specHelper.defaultGateway.transaction.refund(transaction.id, '1.00', callback);
+        });
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'creates a credit for the given amount': function (err, response) {
+        assert.equal(response.transaction.type, 'credit');
+        assert.match(response.transaction.refund_id, /^\w+$/);
+        assert.equal(response.transaction.amount, '1.00');
+      },
+    },
+
     'when transaction cannot be refunded': {
       topic: function () {
         var callback = this.callback;
