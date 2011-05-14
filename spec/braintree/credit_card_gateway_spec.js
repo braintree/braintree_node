@@ -164,4 +164,83 @@ vows.describe('CreditCardGateway').addBatch({
     },
   },
 
+  'update': {
+    'for a minimal case': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              cardholderName: 'Old Cardholder Name',
+              number: '5105105105105100',
+              expirationDate: '05/2014'
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.creditCard.update(
+              response.customer.creditCards[0].token,
+              {
+                cardholderName: 'New Cardholder Name',
+                number: '4111111111111111',
+                expirationDate: '12/2015'
+              },
+              callback
+            );
+          }
+        );
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'has updated credit card attributes': function (err, response) {
+        assert.equal(response.creditCard.cardholderName, 'New Cardholder Name');
+        assert.equal(response.creditCard.maskedNumber, '411111******1111');
+        assert.equal(response.creditCard.expirationDate, '12/2015');
+      }
+    },
+
+    'with errors': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/2014'
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.creditCard.update(
+              response.customer.creditCards[0].token,
+              {
+                number: 'invalid'
+              },
+              callback
+            );
+          }
+        );
+      },
+      'is unsuccessful': function (err, response) { assert.equal(response.success, false); },
+      'has a unified message': function (err, response) {
+        assert.equal(response.message, 'Credit card number must be 12-19 digits.');
+      },
+      'has an error on number': function (err, response) {
+        assert.equal(
+          response.errors.for('creditCard').on('number').code,
+          '81716'
+        );
+      },
+      'has an attribute on ValidationError objects': function (err, response) {
+        assert.equal(
+          response.errors.for('creditCard').on('number').attribute,
+          'number'
+        );
+      },
+      'returns deepErrors': function (err, response) {
+        var errorCodes = _.map(response.errors.deepErrors(), function (error) { return error.code; });
+        assert.equal(1, errorCodes.length);
+        assert.include(errorCodes, '81716');
+      }
+    }
+  },
+
 }).export(module);

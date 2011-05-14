@@ -12,6 +12,8 @@ or
 * do we want to add a _details suffix?
 * keep version below 1.0 until it's fully featured
 * use the node library to start builing v3 of api?
+* do feature comparison to ruby library
+* write the docs
 
 == Features ==
 
