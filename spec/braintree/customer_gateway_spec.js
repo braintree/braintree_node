@@ -44,6 +44,32 @@ vows.describe('CustomerGateway').addBatch({
       }
     },
 
+    'with credit card with errors': {
+      topic: function () {
+        specHelper.defaultGateway.customer.create({
+          creditCard: {
+            number: 'invalid card number',
+            expirationDate: '05/2012'
+          }
+        }, this.callback);
+      },
+      'is unsuccessful': function (err, response) { assert.equal(response.success, false); },
+      'has a unified message': function (err, response) {
+        assert.equal(response.message, 'Credit card number is invalid.');
+      },
+      'has a nested error on creditCard.number': function (err, response) {
+        assert.equal(
+          response.errors.for('customer').for('creditCard').on('number').code,
+          '81715'
+        );
+      },
+      'returns deepErrors': function (err, response) {
+        var errorCodes = _.map(response.errors.deepErrors(), function (error) { return error.code; });
+        assert.equal(errorCodes.length, 1);
+        assert.include(errorCodes, '81715');
+      }
+    },
+
     'with errors': {
       topic: function () {
         specHelper.defaultGateway.customer.create({
