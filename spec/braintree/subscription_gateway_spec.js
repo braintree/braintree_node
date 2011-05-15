@@ -131,4 +131,45 @@ vows.describe('SubscriptionGateway').addBatch({
       },
     }
   },
+
+  'find': {
+    'when subscription can be found': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, result) {
+            specHelper.defaultGateway.subscription.create(
+              {
+                paymentMethodToken: result.customer.creditCards[0].token,
+                planId: specHelper.plans.trialless.id
+              },
+              function (err, result) {
+                specHelper.defaultGateway.subscription.find(result.subscription.id, callback);
+              }
+            );
+          }
+        );
+      },
+      'does not have an error': function (err, subscription) { assert.isNull(err); },
+      'returns the subscription': function (err, subscription) {
+        assert.equal(subscription.planId, specHelper.plans.trialless.id);
+        assert.equal(subscription.price, specHelper.plans.trialless.price);
+        assert.equal(subscription.status, 'Active');
+      }
+    },
+    'when the subscription cannot be found': {
+      topic: function () {
+        specHelper.defaultGateway.subscription.find('nonexistent_subscription', this.callback);
+      },
+      'has a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      },
+    }
+  }
 }).export(module);
