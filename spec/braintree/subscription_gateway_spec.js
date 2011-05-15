@@ -3,6 +3,79 @@ require('../spec_helper');
 var _ = require('underscore')._;
 
 vows.describe('SubscriptionGateway').addBatch({
+  'cancel': {
+    'when the subscription can be canceled': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, result) {
+            specHelper.defaultGateway.subscription.create(
+              {
+                paymentMethodToken: result.customer.creditCards[0].token,
+                planId: specHelper.plans.trialless.id
+              },
+              function (err, result) {
+                specHelper.defaultGateway.subscription.cancel(result.subscription.id, callback);
+              }
+            );
+          }
+        );
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'cancels the subscription': function (err, result) {
+        assert.equal(result.subscription.status, 'Canceled');
+      }
+    },
+    'when the subscription cannot be canceled': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, result) {
+            specHelper.defaultGateway.subscription.create(
+              {
+                paymentMethodToken: result.customer.creditCards[0].token,
+                planId: specHelper.plans.trialless.id
+              },
+              function (err, result) {
+                specHelper.defaultGateway.subscription.cancel(result.subscription.id, function (err, result) {
+                  specHelper.defaultGateway.subscription.cancel(result.subscription.id, callback);
+                });
+              }
+            );
+          }
+        );
+      },
+      'is unsuccessful': function (err, response) { assert.equal(response.success, false); },
+      'has a unified message': function (err, response) {
+        assert.equal(response.message, 'Subscription has already been canceled.');
+      },
+      'has an error on base': function (err, response) {
+        assert.equal(response.errors.for('subscription').on('status').code, '81905');
+      },
+    },
+    'when the subscription cannot be found': {
+      topic: function () {
+        specHelper.defaultGateway.subscription.cancel('nonexistent_subscription', this.callback);
+      },
+      'has a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      },
+    }
+  },
+
   'create': {
     'using a payment method token': {
       topic: function () {

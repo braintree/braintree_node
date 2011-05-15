@@ -48,9 +48,9 @@ or
   [x] find
 [ ] subscriptions
   [ ] find
-  [ ] create
+  [x] create
   [ ] update
-  [ ] cancel
+  [x] cancel
 [ ] verify ssl certs
 [ ] transparent redirect
   [ ] transaction
