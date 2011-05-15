@@ -17,7 +17,12 @@ var defaultConfig = {
 
 var defaultGateway = braintree.connect(defaultConfig);
 
+var plans = {
+  trialless: {id: 'integration_trialless_plan', price: '12.34'}
+};
+
 GLOBAL.specHelper = {
   defaultConfig: defaultConfig,
-  defaultGateway: defaultGateway
+  defaultGateway: defaultGateway,
+  plans: plans
 }
