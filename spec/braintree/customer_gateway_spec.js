@@ -387,7 +387,7 @@ vows.describe('CustomerGateway').addBatch({
       }
     },
 
-    'with updating ane existing card': {
+    'with updating an existing card': {
       topic: function () {
         var callback = this.callback;
         specHelper.defaultGateway.customer.create(
@@ -430,6 +430,67 @@ vows.describe('CustomerGateway').addBatch({
         assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100');
         assert.equal(response.customer.creditCards[0].cardholderName, 'New Cardholder Name');
         assert.equal(response.customer.creditCards[0].expirationDate, '05/2014');
+      }
+    },
+
+    'with updating an existing card and billing address': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            firstName: 'Old First Name',
+            lastName: 'Old Last Name',
+            creditCard: {
+              cardholderName: 'Old Cardholder Name',
+              number: '4111111111111111',
+              expirationDate: '04/2014',
+              billingAddress: {
+                streetAddress: '123 Old St',
+                locality: 'Old City'
+              }
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.customer.update(
+              response.customer.id,
+              {
+                firstName: 'New First Name',
+                lastName: 'New Last Name',
+                creditCard: {
+                  cardholderName: 'New Cardholder Name',
+                  number: '5105105105105100',
+                  expirationDate: '05/2014',
+                  options: { updateExistingToken: response.customer.creditCards[0].token },
+                  billingAddress: {
+                    streetAddress: '123 New St',
+                    locality: 'New City',
+                    options: { updateExisting: true }
+                  }
+                }
+              },
+              callback
+            )
+          }
+        );
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'updates the customer': function (err, response) {
+        assert.equal(response.customer.firstName, 'New First Name');
+        assert.equal(response.customer.lastName, 'New Last Name');
+      },
+      'updates the credit card': function (err, response) {
+        assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100');
+        assert.equal(response.customer.creditCards[0].cardholderName, 'New Cardholder Name');
+        assert.equal(response.customer.creditCards[0].expirationDate, '05/2014');
+      },
+      'updates the billing address': function (err, response) {
+        assert.equal(response.customer.addresses.length, 1);
+        var billingAddress = response.customer.creditCards[0].billingAddress;
+        assert.equal(billingAddress.streetAddress, '123 New St');
+        assert.equal(billingAddress.locality, 'New City');
       }
     },
 

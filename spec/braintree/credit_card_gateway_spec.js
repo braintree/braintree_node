@@ -29,6 +29,45 @@ vows.describe('CreditCardGateway').addBatch({
       }
     },
 
+    'with billing address': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            firstName: 'John',
+            lastName: 'Smith'
+          },
+          function (err, response) {
+            specHelper.defaultGateway.creditCard.create({
+              customerId: response.customer.id,
+              number: '5105105105105100',
+              expirationDate: '05/2012',
+              billingAddress: {
+                streetAddress: '123 Fake St',
+                locality: 'Chicago',
+                region: 'IL',
+                postalCode: '60607'
+              }
+            }, callback);
+          }
+        );
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'has credit card attributes': function (err, response) {
+        assert.equal(response.creditCard.maskedNumber, '510510******5100');
+        assert.equal(response.creditCard.expirationDate, '05/2012');
+      },
+      'creates a billing address': function (err, response) {
+        assert.equal(response.creditCard.billingAddress.streetAddress, '123 Fake St');
+        assert.equal(response.creditCard.billingAddress.locality, 'Chicago');
+        assert.equal(response.creditCard.billingAddress.region, 'IL');
+        assert.equal(response.creditCard.billingAddress.postalCode, '60607');
+      }
+    },
+
     'with errors': {
       topic: function () {
         var callback = this.callback;
@@ -195,6 +234,58 @@ vows.describe('CreditCardGateway').addBatch({
         assert.equal(response.creditCard.cardholderName, 'New Cardholder Name');
         assert.equal(response.creditCard.maskedNumber, '411111******1111');
         assert.equal(response.creditCard.expirationDate, '12/2015');
+      }
+    },
+
+    'with updating the billing address': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              cardholderName: 'Old Cardholder Name',
+              number: '5105105105105100',
+              expirationDate: '05/2014',
+              billingAddress: {
+                streetAddress: '123 Old St',
+                locality: 'Old City',
+                region: 'Old Region'
+              }
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.creditCard.update(
+              response.customer.creditCards[0].token,
+              {
+                cardholderName: 'New Cardholder Name',
+                number: '4111111111111111',
+                expirationDate: '12/2015',
+                billingAddress: {
+                  streetAddress: '123 New St',
+                  locality: 'New City',
+                  region: 'New Region',
+                  options: { updateExisting: true }
+                }
+              },
+              callback
+            );
+          }
+        );
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'has updated credit card attributes': function (err, response) {
+        assert.equal(response.creditCard.cardholderName, 'New Cardholder Name');
+        assert.equal(response.creditCard.maskedNumber, '411111******1111');
+        assert.equal(response.creditCard.expirationDate, '12/2015');
+      },
+      'updates the billing address': function (err, response) {
+        var billingAddress = response.creditCard.billingAddress;
+        assert.equal(billingAddress.streetAddress, '123 New St');
+        assert.equal(billingAddress.locality, 'New City');
+        assert.equal(billingAddress.region, 'New Region');
       }
     },
 
