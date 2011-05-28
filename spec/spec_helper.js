@@ -1,4 +1,5 @@
 var http = require('http'),
+    Util = require('../lib/braintree/util').Util,
     querystring = require('../vendor/querystring.node.js/querystring');
 
 GLOBAL.sys = require('sys');
@@ -33,7 +34,7 @@ var plans = {
   trialless: {id: 'integration_trialless_plan', price: '12.34'}
 };
 
-var simulateTrFormPost = function (url, trData, formData, callback) {
+var simulateTrFormPost = function (url, trData, inputFormData, callback) {
   var client = http.createClient(
     specHelper.defaultGateway._gateway.config.environment.port,
     specHelper.defaultGateway._gateway.config.environment.server,
@@ -43,7 +44,7 @@ var simulateTrFormPost = function (url, trData, formData, callback) {
     'Content-Type': 'application/x-www-form-urlencoded',
     'Host': 'localhost'
   };
-  // inspect(querystring.stringify(formData));
+  var formData = Util.convertObjectKeysToUnderscores(inputFormData);
   formData.tr_data = trData;
   var requestBody = querystring.stringify(formData);
   headers['Content-Length'] = requestBody.length.toString();
