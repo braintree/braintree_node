@@ -12,6 +12,37 @@ vows.describe('Http').addBatch({
       'returns a ServerError': function (err, response) {
         assert.equal(err.type, braintree.errorTypes.serverError);
       }
+    },
+
+    'can hit the sandbox': {
+      topic: function () {
+        var http = Http(Config({
+          environment: braintree.Environment.Sandbox,
+          merchantId: 'node',
+          publicKey: 'node',
+          privateKey: 'node'
+        }));
+        http.get('/not_found', this.callback);
+      },
+      'gets a not found errors': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    }
+  },
+
+  'can hit production': {
+    topic: function () {
+      var http = Http(Config({
+        environment: braintree.Environment.Production,
+        merchantId: 'node',
+        publicKey: 'node',
+        privateKey: 'node'
+      }));
+      http.get('/not_found', this.callback);
+    },
+    'gets a not found errors': function (err, response) {
+      assert.equal(err.type, braintree.errorTypes.notFoundError);
     }
   }
+
 }).export(module);
