@@ -174,5 +174,83 @@ vows.describe('SubscriptionGateway').addBatch({
         assert.equal(err.type, braintree.errorTypes.notFoundError);
       },
     }
+  },
+
+  'update': {
+    'when the subscription can be updated': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, result) {
+            specHelper.defaultGateway.subscription.create(
+              {
+                paymentMethodToken: result.customer.creditCards[0].token,
+                planId: specHelper.plans.trialless.id,
+                price: '5.00'
+              },
+              function (err, result) {
+                specHelper.defaultGateway.subscription.update(
+                  result.subscription.id,
+                  { price: '8.00' },
+                  callback
+                );
+              }
+            );
+          }
+        );
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'updates the subscription': function (err, result) {
+        assert.equal(result.subscription.price, '8.00');
+      }
+    },
+
+    'when the subscription cannot be updated': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, result) {
+            specHelper.defaultGateway.subscription.create(
+              {
+                paymentMethodToken: result.customer.creditCards[0].token,
+                planId: specHelper.plans.trialless.id,
+                price: '5.00'
+              },
+              function (err, result) {
+                specHelper.defaultGateway.subscription.update(
+                  result.subscription.id,
+                  { price: 'invalid' },
+                  callback
+                );
+              }
+            );
+          }
+        );
+      },
+      'is not succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, false);
+      },
+      'returns validation errors': function (err, result) {
+        assert.equal(result.errors.for('subscription').on('price').message, 'Price is an invalid format.');
+        assert.equal(result.errors.for('subscription').on('price').code, '81904');
+      }
+    },
   }
 }).export(module);
+
