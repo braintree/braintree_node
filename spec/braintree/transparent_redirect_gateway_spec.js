@@ -207,5 +207,53 @@ vows.describe('TransparentRedirectGateway').addBatch({
         assert.equal(result.creditCard.maskedNumber, '510510******5100');
       }
     },
+  },
+
+  'updateCreditCard': {
+    'generating data to update a credit card': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            firstName: 'Customer First Name',
+            creditCard: {
+              cardholderName: 'Old Cardholder Name',
+              number: '5105105105105100',
+              expirationDate: '05/2017'
+            }
+          },
+          function (err, result) {
+            specHelper.simulateTrFormPost(
+              specHelper.defaultGateway.transparentRedirect.url,
+              specHelper.defaultGateway.transparentRedirect.updateCreditCardData({
+                redirectUrl: 'http://www.example.com',
+                paymentMethodToken: result.customer.creditCards[0].token,
+                creditCard: {
+                  cardholderName: 'New Cardholder Name'
+                }
+              }),
+              {
+                creditCard: {
+                  number: '4111111111111111',
+                }
+              },
+              function (err, result) {
+                specHelper.defaultGateway.transparentRedirect.confirm(result, callback);
+              }
+            );
+          }
+        );
+      },
+      'is successful': function (err, result) {
+        assert.isNull(err);
+        assert.equal(result.success, true);
+      },
+      'uses data submitted in tr_data': function (err, result) {
+        assert.equal(result.creditCard.cardholderName, 'New Cardholder Name');
+      },
+      'uses data submitted in form params': function (err, result) {
+        assert.equal(result.creditCard.maskedNumber, '411111******1111');
+      }
+    },
   }
 }).export(module);
