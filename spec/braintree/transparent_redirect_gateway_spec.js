@@ -255,5 +255,16 @@ vows.describe('TransparentRedirectGateway').addBatch({
         assert.equal(result.creditCard.maskedNumber, '411111******1111');
       }
     },
+  },
+
+  'confirm': {
+    'when the hash is not the expected value': {
+      topic: function () {
+        specHelper.defaultGateway.transparentRedirect.confirm('a=b&hash=invalid', this.callback);
+      },
+      'calls the callback with an error': function (err, result) {
+        assert.equal(err.type, braintree.errorTypes.invalidTransparentRedirectHashError);
+      }
+    }
   }
 }).export(module);
