@@ -84,4 +84,44 @@ vows.describe('TransparentRedirectGateway').addBatch({
       }
     }
   },
+
+  'updateCustomerData': {
+    'updating a customer': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            firstName: 'Old First Name',
+            lastName: 'Old Last Name'
+          },
+          function (err, result) {
+            specHelper.simulateTrFormPost(
+              specHelper.defaultGateway.transparentRedirect.url,
+              specHelper.defaultGateway.transparentRedirect.updateCustomerData({
+                redirectUrl: 'http://www.example.com',
+                customerId: result.customer.id,
+                customer: {
+                  firstName: 'New First Name'
+                }
+              }),
+              {customer: {lastName: 'New Last Name'}},
+              function (err, result) {
+                specHelper.defaultGateway.transparentRedirect.confirm(result, callback);
+              }
+            );
+          }
+        );
+      },
+      'is successful': function (err, result) {
+        assert.isNull(err);
+        assert.equal(result.success, true);
+      },
+      'uses data submitted in tr_data': function (err, result) {
+        assert.equal(result.customer.firstName, 'New First Name');
+      },
+      'uses data submitted in form params': function (err, result) {
+        assert.equal(result.customer.lastName, 'New Last Name');
+      }
+    }
+  },
 }).export(module);
