@@ -165,5 +165,47 @@ vows.describe('TransparentRedirectGateway').addBatch({
         assert.equal(result.transaction.creditCard.maskedNumber, '510510******5100');
       }
     },
+  },
+
+  'createCreditCard': {
+    'generating data to create a credit card': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          { firstName: 'Customer First Name' },
+          function (err, result) {
+            specHelper.simulateTrFormPost(
+              specHelper.defaultGateway.transparentRedirect.url,
+              specHelper.defaultGateway.transparentRedirect.createCreditCardData({
+                redirectUrl: 'http://www.example.com',
+                creditCard: {
+                  customerId: result.customer.id,
+                  cardholderName: 'Dan'
+                }
+              }),
+              {
+                creditCard: {
+                  number: '5105105105105100',
+                  expirationDate: '05/2017'
+                }
+              },
+              function (err, result) {
+                specHelper.defaultGateway.transparentRedirect.confirm(result, callback);
+              }
+            );
+          }
+        );
+      },
+      'is successful': function (err, result) {
+        assert.isNull(err);
+        assert.equal(result.success, true);
+      },
+      'uses data submitted in tr_data': function (err, result) {
+        assert.equal(result.creditCard.cardholderName, 'Dan');
+      },
+      'uses data submitted in form params': function (err, result) {
+        assert.equal(result.creditCard.maskedNumber, '510510******5100');
+      }
+    },
   }
 }).export(module);
