@@ -2,6 +2,11 @@ GLOBAL.sys = require('sys');
 GLOBAL.vows = require('vows');
 GLOBAL.assert = require('assert');
 
+GLOBAL.assert.isEmptyArray = function (array) {
+  assert.isArray(array);
+  assert.equal(array.length, 0);
+};
+
 GLOBAL.inspect = function (object) {
   sys.puts(sys.inspect(object));
 };
