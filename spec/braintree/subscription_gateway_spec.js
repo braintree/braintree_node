@@ -121,7 +121,10 @@ vows.describe('SubscriptionGateway').addBatch({
       },
       'is unsuccessful': function (err, response) { assert.equal(response.success, false); },
       'has a unified message': function (err, response) {
-        assert.equal(response.message, 'Payment method token is invalid.\nPlan ID is invalid.');
+        var messages = response.message.split("\n");
+        assert.equal(messages.length, 2);
+        assert.include(messages, 'Payment method token is invalid.');
+        assert.include(messages, 'Plan ID is invalid.');
       },
       'has an error on plan id': function (err, response) {
         assert.equal(response.errors.for('subscription').on('planId').code, '91904');
