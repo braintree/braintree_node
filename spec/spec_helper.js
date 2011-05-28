@@ -1,3 +1,6 @@
+var http = require('http'),
+    querystring = require('../vendor/querystring.node.js/querystring');
+
 GLOBAL.sys = require('sys');
 GLOBAL.vows = require('vows');
 GLOBAL.assert = require('assert');
@@ -22,12 +25,40 @@ var defaultConfig = {
 
 var defaultGateway = braintree.connect(defaultConfig);
 
+var multiplyString = function (string, times) {
+  return (new Array(times+1)).join(string);
+};
+
 var plans = {
   trialless: {id: 'integration_trialless_plan', price: '12.34'}
+};
+
+var simulateTrFormPost = function (url, trData, formData, callback) {
+  var client = http.createClient(
+    specHelper.defaultGateway._gateway.config.environment.port,
+    specHelper.defaultGateway._gateway.config.environment.server,
+    specHelper.defaultGateway._gateway.config.environment.ssl
+  );
+  var headers = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Host': 'localhost'
+  };
+  // inspect(querystring.stringify(formData));
+  formData.tr_data = trData;
+  var requestBody = querystring.stringify(formData);
+  headers['Content-Length'] = requestBody.length.toString();
+  var request = client.request('POST', url, headers);
+  request.write(requestBody);
+  request.end();
+  request.on('response', function (response) {
+    callback(null, response.headers.location.split('?', 2)[1]);
+  });
 };
 
 GLOBAL.specHelper = {
   defaultConfig: defaultConfig,
   defaultGateway: defaultGateway,
-  plans: plans
+  multiplyString: multiplyString,
+  plans: plans,
+  simulateTrFormPost: simulateTrFormPost
 }
