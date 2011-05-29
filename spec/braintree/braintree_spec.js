@@ -5,8 +5,8 @@ var braintree = specHelper.braintree;
 vows.describe('Braintree').addBatch({
   'version': {
     topic: braintree.version,
-    'is 0.1.0': function (version) {
-      assert.equal(version, '0.1.0');
+    'is 0.2.0': function (version) {
+      assert.equal(version, '0.2.0');
     }
   },
 
