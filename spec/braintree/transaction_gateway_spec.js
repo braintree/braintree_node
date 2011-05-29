@@ -63,19 +63,19 @@ vows.describe('TransactionGateway').addBatch({
       },
       'has an error on amount': function (err, response) {
         assert.equal(
-          response.errors.for('transaction').on('amount').code,
+          response.errors.for('transaction').on('amount')[0].code,
           '81502'
         );
       },
       'has an attribute on ValidationError objects': function (err, response) {
         assert.equal(
-          response.errors.for('transaction').on('amount').attribute,
+          response.errors.for('transaction').on('amount')[0].attribute,
           'amount'
         );
       },
       'has a nested error on creditCard.expirationDate': function (err, response) {
         assert.equal(
-          response.errors.for('transaction').for('creditCard').on('expirationDate').code,
+          response.errors.for('transaction').for('creditCard').on('expirationDate')[0].code,
           '81709'
         );
       },
@@ -276,19 +276,19 @@ vows.describe('TransactionGateway').addBatch({
       },
       'has an error on amount': function (err, response) {
         assert.equal(
-          response.errors.for('transaction').on('amount').code,
+          response.errors.for('transaction').on('amount')[0].code,
           '81502'
         );
       },
       'has an attribute on ValidationError objects': function (err, response) {
         assert.equal(
-          response.errors.for('transaction').on('amount').attribute,
+          response.errors.for('transaction').on('amount')[0].attribute,
           'amount'
         );
       },
       'has a nested error on creditCard.expirationDate': function (err, response) {
         assert.equal(
-          response.errors.for('transaction').for('creditCard').on('expirationDate').code,
+          response.errors.for('transaction').for('creditCard').on('expirationDate')[0].code,
           '81709'
         );
       },
@@ -391,7 +391,7 @@ vows.describe('TransactionGateway').addBatch({
       'does not have an error': function (err, response) { assert.isNull(err); },
       'is not succesful': function (err, response) { assert.equal(response.success, false); },
       'has error 91507 on base': function (err, response) {
-        assert.equal(response.errors.for('transaction').on('base').code, '91506');
+        assert.equal(response.errors.for('transaction').on('base')[0].code, '91506');
       }
     }
   },
@@ -440,7 +440,7 @@ vows.describe('TransactionGateway').addBatch({
       'does not have an error': function (err, response) { assert.isNull(err); },
       'is not succesful': function (err, response) { assert.equal(response.success, false); },
       'has error 91507 on base': function (err, response) {
-        assert.equal(response.errors.for('transaction').on('base').code, '91507');
+        assert.equal(response.errors.for('transaction').on('base')[0].code, '91507');
       }
     }
   },
@@ -488,7 +488,7 @@ vows.describe('TransactionGateway').addBatch({
       'does not have an error': function (err, response) { assert.isNull(err); },
       'is not succesful': function (err, response) { assert.equal(response.success, false); },
       'has error 91504 on base': function (err, response) {
-        assert.equal(response.errors.for('transaction').on('base').code, '91504');
+        assert.equal(response.errors.for('transaction').on('base')[0].code, '91504');
       }
     }
   }

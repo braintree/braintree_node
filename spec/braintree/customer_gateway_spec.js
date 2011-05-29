@@ -75,7 +75,7 @@ vows.describe('CustomerGateway').addBatch({
       },
       'has a nested error on creditCard.number': function (err, response) {
         assert.equal(
-          response.errors.for('customer').for('creditCard').on('number').code,
+          response.errors.for('customer').for('creditCard').on('number')[0].code,
           '81715'
         );
       },
@@ -147,13 +147,13 @@ vows.describe('CustomerGateway').addBatch({
       },
       'has a nested error on creditCard.number': function (err, response) {
         assert.equal(
-          response.errors.for('customer').for('creditCard').on('number').code,
+          response.errors.for('customer').for('creditCard').on('number')[0].code,
           '81715'
         );
       },
       'has a nested error on creditCard.billingAddress.countryName': function (err, response) {
         assert.equal(
-          response.errors.for('customer').for('creditCard').for('billingAddress').on('countryName').code,
+          response.errors.for('customer').for('creditCard').for('billingAddress').on('countryName')[0].code,
           '91803'
         );
       },
@@ -178,13 +178,13 @@ vows.describe('CustomerGateway').addBatch({
       },
       'has an error on email': function (err, response) {
         assert.equal(
-          response.errors.for('customer').on('email').code,
+          response.errors.for('customer').on('email')[0].code,
           '81604'
         );
       },
       'has an attribute on ValidationError objects': function (err, response) {
         assert.equal(
-          response.errors.for('customer').on('email').attribute,
+          response.errors.for('customer').on('email')[0].attribute,
           'email'
         );
       },
@@ -526,13 +526,13 @@ vows.describe('CustomerGateway').addBatch({
       },
       'has an error on email': function (err, response) {
         assert.equal(
-          response.errors.for('customer').on('email').code,
+          response.errors.for('customer').on('email')[0].code,
           '81604'
         );
       },
       'has an attribute on ValidationError objects': function (err, response) {
         assert.equal(
-          response.errors.for('customer').on('email').attribute,
+          response.errors.for('customer').on('email')[0].attribute,
           'email'
         );
       }

@@ -92,13 +92,13 @@ vows.describe('CreditCardGateway').addBatch({
       },
       'has an error on number': function (err, response) {
         assert.equal(
-          response.errors.for('creditCard').on('number').code,
+          response.errors.for('creditCard').on('number')[0].code,
           '81716'
         );
       },
       'has an attribute on ValidationError objects': function (err, response) {
         assert.equal(
-          response.errors.for('creditCard').on('number').attribute,
+          response.errors.for('creditCard').on('number')[0].attribute,
           'number'
         );
       },
@@ -317,13 +317,13 @@ vows.describe('CreditCardGateway').addBatch({
       },
       'has an error on number': function (err, response) {
         assert.equal(
-          response.errors.for('creditCard').on('number').code,
+          response.errors.for('creditCard').on('number')[0].code,
           '81716'
         );
       },
       'has an attribute on ValidationError objects': function (err, response) {
         assert.equal(
-          response.errors.for('creditCard').on('number').attribute,
+          response.errors.for('creditCard').on('number')[0].attribute,
           'number'
         );
       },

@@ -64,7 +64,7 @@ vows.describe('SubscriptionGateway').addBatch({
         assert.equal(response.message, 'Subscription has already been canceled.');
       },
       'has an error on base': function (err, response) {
-        assert.equal(response.errors.for('subscription').on('status').code, '81905');
+        assert.equal(response.errors.for('subscription').on('status')[0].code, '81905');
       },
     },
     'when the subscription cannot be found': {
@@ -128,10 +128,10 @@ vows.describe('SubscriptionGateway').addBatch({
         assert.include(messages, 'Plan ID is invalid.');
       },
       'has an error on plan id': function (err, response) {
-        assert.equal(response.errors.for('subscription').on('planId').code, '91904');
+        assert.equal(response.errors.for('subscription').on('planId')[0].code, '91904');
       },
       'has an error on payment method token': function (err, response) {
-        assert.equal(response.errors.for('subscription').on('paymentMethodToken').code, '91903');
+        assert.equal(response.errors.for('subscription').on('paymentMethodToken')[0].code, '91903');
       },
     }
   },
@@ -248,8 +248,8 @@ vows.describe('SubscriptionGateway').addBatch({
         assert.equal(response.success, false);
       },
       'returns validation errors': function (err, result) {
-        assert.equal(result.errors.for('subscription').on('price').message, 'Price is an invalid format.');
-        assert.equal(result.errors.for('subscription').on('price').code, '81904');
+        assert.equal(result.errors.for('subscription').on('price')[0].message, 'Price is an invalid format.');
+        assert.equal(result.errors.for('subscription').on('price')[0].code, '81904');
       }
     },
   }

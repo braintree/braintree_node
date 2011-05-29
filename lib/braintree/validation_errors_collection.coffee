@@ -9,7 +9,9 @@ ValidationErrorsCollection = (errorAttributes) ->
 
   buildErrors = (errors) ->
     for item in errors
-      my.validationErrors[Util.toCamelCase(item.attribute)] = ValidationError(item)
+      key = Util.toCamelCase(item.attribute)
+      my.validationErrors[key] or= []
+      my.validationErrors[key].push ValidationError(item)
 
   for key, val of errorAttributes
     if key is 'errors'
@@ -22,7 +24,7 @@ ValidationErrorsCollection = (errorAttributes) ->
     deepErrors: () ->
       deepErrors = []
       for key, val of my.validationErrors
-        deepErrors.push(val)
+        deepErrors = deepErrors.concat(val)
 
       for key, val of my.errorCollections
         deepErrors = deepErrors.concat(val.deepErrors())
