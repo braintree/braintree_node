@@ -1,6 +1,6 @@
 http = require('http')
 Util = require('../lib/braintree/util').Util
-querystring = require('../vendor/querystring.node.js/querystring')
+querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
 sys = require('sys')
 
 GLOBAL.vows = require('vows')

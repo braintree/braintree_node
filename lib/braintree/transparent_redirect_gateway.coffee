@@ -1,6 +1,6 @@
 Digest = require('./digest').Digest
 Util = require('./util').Util
-querystring = require('../../vendor/querystring.node.js/querystring')
+querystring = require('../../vendor/querystring.node.js.511d6a2/querystring')
 dateFormat = require('dateformat')
 CreditCardGateway = require('./credit_card_gateway').CreditCardGateway
 CustomerGateway = require('./customer_gateway').CustomerGateway
