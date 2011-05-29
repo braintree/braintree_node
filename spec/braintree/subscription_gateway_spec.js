@@ -301,6 +301,68 @@ vows.describe('SubscriptionGateway').addBatch({
     }
   },
 
+  'retryCharge': {
+    'with an existing subscription': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          callback
+        );
+      },
+      'with only specifying subscription id': {
+        topic: function (result) {
+          var callback = this.callback;
+          specHelper.defaultGateway.subscription.create({
+            paymentMethodToken: result.customer.creditCards[0].token,
+            planId: specHelper.plans.trialless.id
+          }, function (err, result) {
+            specHelper.makePastDue(result.subscription, function (err, result) {
+              specHelper.defaultGateway.subscription.retryCharge(result.subscription.id, callback)
+            });
+          });
+        },
+        'it successful': function (err, result) {
+          assert.isNull(err);
+          assert.equal(result.success, true);
+        },
+        'returns the transaction': function (err, result) {
+          assert.equal(result.transaction.amount, specHelper.plans.trialless.price);
+          assert.equal(result.transaction.type, 'sale');
+          assert.equal(result.transaction.status, 'authorized');
+        }
+      },
+
+      'with specifying subscription id and amount': {
+        topic: function (result) {
+          var callback = this.callback;
+          specHelper.defaultGateway.subscription.create({
+            paymentMethodToken: result.customer.creditCards[0].token,
+            planId: specHelper.plans.trialless.id
+          }, function (err, result) {
+            specHelper.makePastDue(result.subscription, function (err, result) {
+              specHelper.defaultGateway.subscription.retryCharge(result.subscription.id, '6.00', callback)
+            });
+          });
+        },
+        'it successful': function (err, result) {
+          assert.isNull(err);
+          assert.equal(result.success, true);
+        },
+        'returns the transaction': function (err, result) {
+          assert.equal(result.transaction.amount, '6.00');
+          assert.equal(result.transaction.type, 'sale');
+          assert.equal(result.transaction.status, 'authorized');
+        }
+      }
+    }
+  },
+
   'update': {
     'when the subscription can be updated': {
       topic: function () {

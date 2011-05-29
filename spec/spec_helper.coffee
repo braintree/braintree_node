@@ -40,6 +40,13 @@ addOns = {
   increase20: 'increase_20'
 }
 
+makePastDue = (subscription, callback) ->
+  defaultGateway._gateway.http.put(
+    "/subscriptions/#{subscription.id}/make_past_due?days_past_due=1",
+    null,
+    callback
+  )
+
 simulateTrFormPost = (url, trData, inputFormData, callback) ->
   client = http.createClient(
     specHelper.defaultGateway._gateway.config.environment.port,
@@ -66,6 +73,7 @@ GLOBAL.specHelper = {
   braintree: braintree
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
+  makePastDue: makePastDue
   multiplyString: multiplyString
   plans: plans
   simulateTrFormPost: simulateTrFormPost

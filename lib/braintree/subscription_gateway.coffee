@@ -1,5 +1,6 @@
 Subscription = require('./subscription').Subscription
 ErrorResponse = require('./error_response').ErrorResponse
+TransactionGateway = require('./transaction_gateway').TransactionGateway
 
 SubscriptionGateway = (gateway) ->
   my = { gateway: gateway }
@@ -27,9 +28,15 @@ SubscriptionGateway = (gateway) ->
       else if (response.apiErrorResponse)
         callback(null, ErrorResponse(response.apiErrorResponse))
 
-  update = (subscription_id, attributes, callback) ->
+  retryCharge = (subscriptionId, amount..., callback) ->
+    TransactionGateway(my.gateway).sale({
+      amount: amount[0],
+      subscriptionId: subscriptionId
+    }, callback)
+
+  update = (subscriptionId, attributes, callback) ->
     my.gateway.http.put(
-      '/subscriptions/' + subscription_id,
+      "/subscriptions/#{subscriptionId}",
       { subscription: attributes },
       responseHandler(callback)
     )
@@ -38,6 +45,7 @@ SubscriptionGateway = (gateway) ->
     cancel: cancel,
     create: create,
     find: find,
+    retryCharge: retryCharge
     update: update
   }
 
