@@ -91,6 +91,7 @@ vows.describe('SubscriptionGateway').addBatch({
           callback
         );
       },
+
       'for a minimal case': {
         topic: function (result) {
           var callback = this.callback;
@@ -109,6 +110,27 @@ vows.describe('SubscriptionGateway').addBatch({
         'returns transactions': function (err, response) {
           assert.match(response.subscription.transactions[0].id, /^\w{6,7}$/);
           assert.equal(response.subscription.transactions[0].creditCard.maskedNumber, '510510******5100');
+        }
+      },
+
+      'when the transaction is declined': {
+        topic: function (result) {
+          var callback = this.callback;
+          var token = result.customer.creditCards[0].token;
+          specHelper.defaultGateway.subscription.create({
+            paymentMethodToken: token,
+            planId: specHelper.plans.trialless.id,
+            price: '2000.00'
+          }, callback);
+        },
+        'is not succesful': function (err, result) {
+          assert.isNull(err);
+          assert.equal(result.success, false);
+        },
+        'returns the transaction on the result': function (err, result) {
+          assert.match(result.transaction.id, /^\w{6,7}$/);
+          assert.equal(result.transaction.status, 'processor_declined');
+          assert.equal(result.transaction.creditCard.maskedNumber, '510510******5100');
         }
       },
 
