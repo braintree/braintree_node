@@ -1,6 +1,5 @@
 sys = require('sys')
 xml = require('o3-xml')
-_ = require('underscore')
 Util = require('./util').Util
 
 XmlParser = ->
