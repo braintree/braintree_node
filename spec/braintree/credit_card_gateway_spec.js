@@ -1,6 +1,7 @@
 require('../spec_helper');
 
-var _ = require('underscore')._;
+var _ = require('underscore')._,
+    braintree = specHelper.braintree;
 
 vows.describe('CreditCardGateway').addBatch({
   'create': {

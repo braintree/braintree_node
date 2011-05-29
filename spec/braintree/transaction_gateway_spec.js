@@ -1,6 +1,7 @@
 require('../spec_helper');
 
-var _ = require('underscore')._;
+var _ = require('underscore')._,
+    braintree = specHelper.braintree;
 
 var createTransactionToRefund = function (callback) {
   var callback = callback;

@@ -15,7 +15,7 @@ GLOBAL.inspect = function (object) {
   sys.puts(sys.inspect(object));
 };
 
-GLOBAL.braintree = require('./../lib/braintree');
+var braintree = require('./../lib/braintree');
 
 var defaultConfig = {
   environment: braintree.Environment.Development,
@@ -57,6 +57,7 @@ var simulateTrFormPost = function (url, trData, inputFormData, callback) {
 };
 
 GLOBAL.specHelper = {
+  braintree: braintree,
   defaultConfig: defaultConfig,
   defaultGateway: defaultGateway,
   multiplyString: multiplyString,
