@@ -8,5 +8,5 @@
   "main"          : "./lib/braintree",
   "repository"    : { "type": "git", "url" : "https://github.com/braintree/braintree_node.git" },
   "dependencies"  : {},
-  "engines"       : { "node": ">=0.4.7" }
+  "engines"       : { "node": "~0.4.7" }
 }
