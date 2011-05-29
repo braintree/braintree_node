@@ -60,6 +60,47 @@ vows.describe('CustomerGateway').addBatch({
       }
     },
 
+    'with a successful verification': {
+      topic: function () {
+        specHelper.defaultGateway.customer.create({
+          firstName: 'John',
+          lastName: 'Smith',
+          creditCard: {
+            number: '5555555555554444',
+            expirationDate: '05/2012',
+            options: { verifyCard: true }
+          }
+        }, this.callback);
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+    },
+
+    'with a unsuccessful verification': {
+      topic: function () {
+        specHelper.defaultGateway.customer.create({
+          firstName: 'John',
+          lastName: 'Smith',
+          creditCard: {
+            number: '6011000990139424',
+            expirationDate: '05/2012',
+            options: { verifyCard: true }
+          }
+        }, this.callback);
+      },
+      'is not succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, false);
+      },
+      'returns the verification': function (err, response) {
+        assert.equal(response.verification.status, 'processor_declined');
+        assert.equal(response.verification.processorResponseCode, '2000');
+        assert.equal(response.verification.processorResponseText, 'Do Not Honor');
+      }
+    },
+
     'with credit card with errors': {
       topic: function () {
         specHelper.defaultGateway.customer.create({

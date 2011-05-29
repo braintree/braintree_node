@@ -69,3 +69,18 @@ should be minimal. We're using [semantic versioning](http://semver.org/).
         }
       }
     );
+
+## Maintainers
+
+The Braintree Node library is maintained by the Braintree dev team.
+
+* [Dan Manges](https://github.com/dan-manges)
+* [Patrick Schless](https://github.com/plainlystated)
+* [Paul Gross](https://github.com/pgr0ss)
+* [Drew Olson](https://github.com/drewolson)
+* [Hammer](https://github.com/thehammer)
+* [Paul Hinze](https://github.com/phinze)
+* [Ali Aghareza](https://github.com/aghareza)
+* [Tony Pitluga](https://github.com/pitluga)
+* [Ben Mills](https://github.com/benmills)
+
