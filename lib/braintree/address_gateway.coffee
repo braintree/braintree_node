@@ -8,23 +8,19 @@ AddressGateway = (gateway) ->
     delete(attributes.customerId)
     my.gateway.http.post("/customers/#{customerId}/addresses", {address: attributes}, responseHandler(callback))
 
-  # destroy = (token, callback) ->
-  #   my.gateway.http.delete('/payment_methods/' + token, callback)
+  destroy = (customerId, id, callback) ->
+    my.gateway.http.delete("/customers/#{customerId}/addresses/#{id}", callback)
 
-  # find = (token, callback) ->
-  #   callback = callback
-  #   my.gateway.http.get('/payment_methods/' + token, (err, response) ->
-  #     return callback(err, null) if err
-  #     callback(null, CreditCard(response.creditCard))
-  #   )
+  find = (customerId, id, callback) ->
+    callback = callback
+    my.gateway.http.get("/customers/#{customerId}/addresses/#{id}" , (err, response) ->
+      return callback(err, null) if err
+      callback(null, response.address)
+    )
 
 
-  # update = (token, attributes, callback) ->
-  #   my.gateway.http.put(
-  #     '/payment_methods/' + token,
-  #     {creditCard: attributes},
-  #     responseHandler(callback)
-  #   )
+  update = (customerId, id, attributes, callback) ->
+    my.gateway.http.put("/customers/#{customerId}/addresses/#{id}", {address: attributes}, responseHandler(callback))
 
   responseHandler = (callback) ->
     return (err, response) ->
@@ -33,15 +29,14 @@ AddressGateway = (gateway) ->
       if (response.address)
         response.success = true
         callback(null, response)
-      # else if (response.apiErrorResponse)
-      #   callback(null, ErrorResponse(response.apiErrorResponse))
+      else if (response.apiErrorResponse)
+        callback(null, ErrorResponse(response.apiErrorResponse))
 
   {
     create: create,
-    # delete: destroy,
-    # find: find,
-    # responseHandler: responseHandler,
-    # update: update
+    delete: destroy,
+    find: find,
+    update: update
   }
 
 exports.AddressGateway = AddressGateway
