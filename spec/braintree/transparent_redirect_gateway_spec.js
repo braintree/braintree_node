@@ -276,6 +276,24 @@ vows.describe('TransparentRedirectGateway').addBatch({
       }
     },
 
+    'on http status 403': {
+      topic: function () {
+        specHelper.defaultGateway.transparentRedirect.confirm('http_status=403&hash=irrelevant', this.callback);
+      },
+      'returns an authorization error': function (err, result) {
+        assert.equal(err.type, braintree.errorTypes.authorizationError);
+      }
+    },
+
+    'on http status 426': {
+      topic: function () {
+        specHelper.defaultGateway.transparentRedirect.confirm('http_status=426&hash=irrelevant', this.callback);
+      },
+      'returns an upgrade required error': function (err, result) {
+        assert.equal(err.type, braintree.errorTypes.upgradeRequired);
+      }
+    },
+
     'on http status 500': {
       topic: function () {
         specHelper.defaultGateway.transparentRedirect.confirm('http_status=500&hash=irrelevant', this.callback);

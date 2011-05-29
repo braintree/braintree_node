@@ -14,6 +14,16 @@ vows.describe('Http').addBatch({
       }
     },
 
+    'when the http response status is 503': {
+      topic: function () {
+        var http = Http(Config(specHelper.defaultConfig));
+        http.post('/test/maintenance', '', this.callback);
+      },
+      'returns a down for maintenance error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError);
+      }
+    },
+
     'can hit the sandbox': {
       topic: function () {
         var http = Http(Config({
