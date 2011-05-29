@@ -16,6 +16,15 @@ vows.describe('Util').addBatch({
       }
     },
 
+    'objects containing date values': {
+      topic: Util.convertObjectKeysToUnderscores({
+        someDate: new Date()
+      }),
+      'does not affect the date': function (result) {
+        assert.instanceOf(result.some_date, Date);
+      }
+    },
+
     'object with an array with objects with camel case keys': {
       topic: Util.convertObjectKeysToUnderscores({
         topLevel: {

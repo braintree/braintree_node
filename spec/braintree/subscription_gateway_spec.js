@@ -1,4 +1,5 @@
 require('../spec_helper');
+dateFormat = require('dateformat')
 
 var _ = require('underscore')._,
     braintree = specHelper.braintree;
@@ -111,6 +112,31 @@ vows.describe('SubscriptionGateway').addBatch({
           assert.match(response.subscription.transactions[0].id, /^\w{6,7}$/);
           assert.equal(response.subscription.transactions[0].creditCard.maskedNumber, '510510******5100');
         }
+      },
+
+      'when setting the first billing date': {
+        topic: function (result) {
+          var callback = this.callback;
+          var token = result.customer.creditCards[0].token;
+          var firstBillingDate = new Date();
+          firstBillingDate.setFullYear(firstBillingDate.getFullYear() + 1);
+          specHelper.defaultGateway.subscription.create({
+            paymentMethodToken: token,
+            planId: specHelper.plans.trialless.id,
+            firstBillingDate: firstBillingDate
+          }, callback);
+        },
+        'is succesful': function (err, response) {
+          assert.isNull(err);
+          assert.equal(response.success, true);
+        },
+        'has the expected first billing date': function (err, response) {
+          var expectedDate = new Date();
+          expectedDate.setFullYear(expectedDate.getFullYear() + 1);
+          var expectedDateString = dateFormat(expectedDate, 'yyyy-mm-dd');
+
+          assert.equal(response.subscription.firstBillingDate, expectedDateString);
+        },
       },
 
       'when the transaction is declined': {
