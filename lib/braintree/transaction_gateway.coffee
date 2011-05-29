@@ -33,17 +33,23 @@ TransactionGateway = (gateway) ->
       attributes.type = 'credit'
       create(attributes, callback)
 
-    refund: (transaction_id, amount_or_callback, callback_or_null) ->
-      amount = if typeof(amount_or_callback) is 'function' then null else amount_or_callback
-      callback = if typeof(amount_or_callback) is 'function' then amount_or_callback else callback_or_null
-      my.gateway.http.post('/transactions/' + transaction_id + '/refund', {transaction: {amount: amount}}, responseHandler(callback))
+    refund: (transactionId, amount..., callback) ->
+      my.gateway.http.post(
+        "/transactions/#{transactionId}/refund",
+        { transaction: { amount: amount[0] } },
+        responseHandler(callback)
+      )
 
     sale: (attributes, callback) ->
       attributes.type = 'sale'
       create(attributes, callback)
 
-    submitForSettlement: (transaction_id, callback) ->
-      my.gateway.http.put('/transactions/' + transaction_id + '/submit_for_settlement', null, responseHandler(callback))
+    submitForSettlement: (transactionId, amount..., callback) ->
+      my.gateway.http.put(
+        "/transactions/#{transactionId}/submit_for_settlement",
+        { transaction: { amount: amount[0] } },
+        responseHandler(callback)
+      )
 
     void: (transaction_id, callback) ->
       my.gateway.http.put('/transactions/' + transaction_id + '/void', null, responseHandler(callback))

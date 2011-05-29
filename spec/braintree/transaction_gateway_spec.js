@@ -413,9 +413,44 @@ vows.describe('TransactionGateway').addBatch({
           }
         )
       },
-      'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
-      'sets the status to submitted_for_settlement': function (err, response) { assert.equal(response.transaction.status, 'submitted_for_settlement'); },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'sets the status to submitted_for_settlement': function (err, response) {
+        assert.equal(response.transaction.status, 'submitted_for_settlement');
+      },
+      'submits the entire amount for settlement': function (err, response) {
+        assert.equal(response.transaction.amount, '5.00');
+      }
+    },
+
+    'when submitted a partial amount for settlement': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.transaction.sale(
+          {
+            amount: '5.00',
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/12'
+            }
+          },
+          function (err, response) {
+            specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, '3.00', callback);
+          }
+        )
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+      'sets the status to submitted_for_settlement': function (err, response) {
+        assert.equal(response.transaction.status, 'submitted_for_settlement');
+      },
+      'submits the specified amount for settlement': function (err, response) {
+        assert.equal(response.transaction.amount, '3.00');
+      }
     },
 
     'when transaction cannot be submitted for settlement': {
