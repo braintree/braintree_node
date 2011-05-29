@@ -283,6 +283,15 @@ vows.describe('TransparentRedirectGateway').addBatch({
       'returns a server error': function (err, result) {
         assert.equal(err.type, braintree.errorTypes.serverError);
       }
+    },
+
+    'on http status 503': {
+      topic: function () {
+        specHelper.defaultGateway.transparentRedirect.confirm('http_status=503&hash=irrelevant', this.callback);
+      },
+      'returns a down for maintenance error': function (err, result) {
+        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError);
+      }
     }
   }
 }).export(module);
