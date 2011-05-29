@@ -213,6 +213,10 @@ vows.describe('CustomerGateway').addBatch({
         assert.equal(errorCodes.length, 2);
         assert.include(errorCodes, '81715');
         assert.include(errorCodes, '91803');
+      },
+      'returns params': function (err, response) {
+        assert.equal(response.params.customer.creditCard.expirationDate, '05/2012');
+        assert.equal(response.params.customer.creditCard.billingAddress.countryName, 'invalid country');
       }
     },
 
