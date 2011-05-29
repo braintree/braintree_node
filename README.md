@@ -1,25 +1,37 @@
 ## Overview
 
-This is a node.js library for integrating with the Braintree gateway. It is a work in progress, very much beta. Feedback is appreciated.
-It can be used in the sandbox environment, [contact us](mailto:support@getbraintree.com) if you're interested in using
-it in production.
+This is a Node.js library for integrating with the Braintree gateway.
+
+The library is a work in progress and a few features are still missing. Until
+we hit version 1.0 we may break backwards compatibility, but the changes
+should be minimal. We're using [semantic versioning](http://semver.org/).
+[Email us](mailto:support@braintreepayments.com) if you have any questions.
 
 ## Installing
 
-* clone this repo somewhere in your require.paths
+### From NPM
+
+* npm install braintree
+* braintree = require('braintree')
+
+### From Source
+
+* clone the latest tag somewhere in your require.paths
 * require 'braintree-node/lib/braintree'
-* npm coming soon!
 
 ## Dependencies
 
-* node 0.4.7
-* underscore.js
+* node 0.4.x
+
+## Not Yet Implemented
+
+* search APIs (transactions, vault, subscriptions)
 
 ## Quick Start
 
     var sys = require('sys'),
         _ = require('underscore')._,
-        braintree = require('braintree-node/lib/braintree');
+        braintree = require('braintree');
 
     var gateway = braintree.connect({
       environment: braintree.Environment.Sandbox,
