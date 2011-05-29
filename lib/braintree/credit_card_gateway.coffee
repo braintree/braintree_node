@@ -44,5 +44,4 @@ CreditCardGateway = (gateway) ->
     update: update
   }
 
-exports.CreditCardGateway = CreditCardGateway;
-
+exports.CreditCardGateway = CreditCardGateway
