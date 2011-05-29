@@ -20,6 +20,16 @@ vows.describe('CustomerGateway').addBatch({
       }
     },
 
+    'a blank customer': {
+      topic: function () {
+        specHelper.defaultGateway.customer.create({}, this.callback);
+      },
+      'is succesful': function (err, response) {
+        assert.isNull(err);
+        assert.equal(response.success, true);
+      },
+    },
+
     'with a custom field': {
       topic: function () {
         specHelper.defaultGateway.customer.create({
