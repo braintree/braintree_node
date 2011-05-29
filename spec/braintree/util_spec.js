@@ -18,6 +18,13 @@ vows.describe('Util').addBatch({
   },
 
   'toCamelCase': {
+    'string with underscores': {
+      topic: Util.toCamelCase('one_two_three'),
+      'is converted to camel case': function (result) {
+        assert.equal(result, 'oneTwoThree');
+      }
+    },
+
     'string with hyphens': {
       topic: Util.toCamelCase('one-two-three'),
       'is converted to camel case': function (result) {

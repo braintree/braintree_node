@@ -9,7 +9,7 @@ Util = {
     newObj
 
   toCamelCase: (string) ->
-    string.replace(/(\-[a-z0-9])/g, (match) -> match.toUpperCase().replace('-',''))
+    string.replace(/([\-\_][a-z0-9])/g, (match) -> match.toUpperCase().replace('-','').replace('_',''))
 
   toUnderscore: (string) ->
     string.replace(/([A-Z])/g, (match) -> "_" + match.toLowerCase())
