@@ -106,6 +106,78 @@ vows.describe('SubscriptionGateway').addBatch({
           assert.equal(response.subscription.planId, specHelper.plans.trialless.id);
           assert.equal(response.subscription.price, specHelper.plans.trialless.price);
         }
+      },
+
+      'with inheriting addons and discounts': {
+        topic: function (result) {
+          var callback = this.callback;
+          specHelper.defaultGateway.subscription.create({
+            paymentMethodToken: result.customer.creditCards[0].token,
+            planId: specHelper.plans.addonDiscountPlan.id
+
+          }, callback);
+        },
+        'is successful': function (err, result) {
+          assert.isNull(err);
+          assert.equal(result.success, true);
+        },
+        'inherits add ons': function (err, result) {
+          var addons = _.sortBy(result.subscription.addOns, function (a) { return a.id; });
+          assert.equal(addons.length, 2);
+
+          assert.equal(addons[0].id, 'increase_10');
+          assert.equal(addons[0].amount, '10.00');
+          assert.equal(addons[0].quantity, 1);
+          assert.equal(addons[0].numberOfBillingCycles, null);
+          assert.equal(addons[0].neverExpires, 'true');
+
+          assert.equal(addons[1].id, 'increase_20');
+          assert.equal(addons[1].amount, '20.00');
+          assert.equal(addons[1].quantity, 1);
+          assert.equal(addons[1].numberOfBillingCycles, null);
+          assert.equal(addons[1].neverExpires, 'true');
+        },
+        'inherits discounts': function (err, result) {
+          var discounts = _.sortBy(result.subscription.discounts, function (d) { return d.id; });
+          assert.equal(discounts.length, 2);
+
+          assert.equal(discounts[0].id, 'discount_11');
+          assert.equal(discounts[0].amount, '11.00');
+          assert.equal(discounts[0].quantity, 1);
+          assert.equal(discounts[0].numberOfBillingCycles, null);
+          assert.equal(discounts[0].neverExpires, 'true');
+
+          assert.equal(discounts[1].id, 'discount_7');
+          assert.equal(discounts[1].amount, '7.00');
+          assert.equal(discounts[1].quantity, 1);
+          assert.equal(discounts[1].numberOfBillingCycles, null);
+          assert.equal(discounts[1].neverExpires, 'true');
+        }
+      },
+
+      'with validation errors on updates': {
+        topic: function (result) {
+          var callback = this.callback;
+          specHelper.defaultGateway.subscription.create({
+            paymentMethodToken: result.customer.creditCards[0].token,
+            planId: specHelper.plans.addonDiscountPlan.id,
+            addOns: {
+              update: [
+                { existingId: specHelper.addOns.increase10, amount: 'invalid' },
+                { existingId: specHelper.addOns.increase20, quantity: -10 }
+              ]
+            }
+
+          }, callback);
+        },
+        'is not successful': function (err, result) {
+          assert.isNull(err);
+          assert.equal(result.success, false);
+        },
+        'has errors accessible by array index': function (err, result) {
+          assert.equal(result.errors.for('subscription').for('addOns').for('update').forIndex(0).on('amount')[0].code, '92002');
+          assert.equal(result.errors.for('subscription').for('addOns').for('update').forIndex(1).on('quantity')[0].code, '92001');
+        }
       }
     },
 

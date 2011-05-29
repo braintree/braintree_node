@@ -2,12 +2,13 @@ sys = require('sys')
 http = require('http')
 https = require('https')
 Buffer = require('buffer').Buffer
+
 braintree = require('../braintree')
 XmlParser = require('./xml_parser').XmlParser
 exceptions = require('./exceptions')
+Util = require('./util').Util
 
 Http = (config) ->
-
   my = { config: config }
 
   request = (method, url, body, callback) ->
@@ -26,7 +27,7 @@ Http = (config) ->
       }
     }
     if body
-      requestBody = JSON.stringify(body)
+      requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(body))
       options.headers['Content-Length'] = requestBody.length.toString()
 
     theRequest = client.request(options, (response) ->

@@ -28,7 +28,16 @@ multiplyString = (string, times) ->
   (new Array(times+1)).join(string)
 
 plans = {
-  trialless: {id: 'integration_trialless_plan', price: '12.34'}
+  trialless: { id: 'integration_trialless_plan', price: '12.34' }
+  addonDiscountPlan: {
+    id: 'integration_plan_with_add_ons_and_discounts',
+    price: '9.99'
+  }
+}
+
+addOns = {
+  increase10: 'increase_10'
+  increase20: 'increase_20'
 }
 
 simulateTrFormPost = (url, trData, inputFormData, callback) ->
@@ -53,6 +62,7 @@ simulateTrFormPost = (url, trData, inputFormData, callback) ->
   )
 
 GLOBAL.specHelper = {
+  addOns: addOns
   braintree: braintree
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway

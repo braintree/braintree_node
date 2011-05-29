@@ -15,6 +15,24 @@ vows.describe('Util').addBatch({
         assert.equal(result.top_level.nested_one.nested_two, 'aValue');
       }
     },
+
+    'object with an array with objects with camel case keys': {
+      topic: Util.convertObjectKeysToUnderscores({
+        topLevel: {
+          things: [
+            { camelOne: 'value1', camelTwo: 'value2' },
+            { camelOne: 'value3', camelTwo: 'value4' }
+          ]
+        }
+      }),
+      'converts array items to underscores': function (result) {
+        assert.isArray(result.top_level.things);
+        assert.equal(result.top_level.things[0].camel_one, 'value1');
+        assert.equal(result.top_level.things[0].camel_two, 'value2');
+        assert.equal(result.top_level.things[1].camel_one, 'value3');
+        assert.equal(result.top_level.things[1].camel_two, 'value4');
+      }
+    }
   },
 
   'toCamelCase': {

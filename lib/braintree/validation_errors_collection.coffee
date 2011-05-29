@@ -32,7 +32,7 @@ ValidationErrorsCollection = (errorAttributes) ->
       deepErrors
 
     for: (name) -> my.errorCollections[name]
-
+    forIndex: (index) -> my.errorCollections["index#{index}"]
     on: (name) -> my.validationErrors[name]
   }
 
