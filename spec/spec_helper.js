@@ -2,7 +2,6 @@ var http = require('http'),
     Util = require('../lib/braintree/util').Util,
     querystring = require('../vendor/querystring.node.js/querystring');
 
-GLOBAL.sys = require('sys');
 GLOBAL.vows = require('vows');
 GLOBAL.assert = require('assert');
 
