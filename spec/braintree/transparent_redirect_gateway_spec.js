@@ -265,6 +265,24 @@ vows.describe('TransparentRedirectGateway').addBatch({
       'calls the callback with an error': function (err, result) {
         assert.equal(err.type, braintree.errorTypes.invalidTransparentRedirectHashError);
       }
+    },
+
+    'on http status 401': {
+      topic: function () {
+        specHelper.defaultGateway.transparentRedirect.confirm('http_status=401&hash=none', this.callback);
+      },
+      'returns an authentication error': function (err, result) {
+        assert.equal(err.type, braintree.errorTypes.authenticationError);
+      }
+    },
+
+    'on http status 500': {
+      topic: function () {
+        specHelper.defaultGateway.transparentRedirect.confirm('http_status=500&hash=irrelevant', this.callback);
+      },
+      'returns a server error': function (err, result) {
+        assert.equal(err.type, braintree.errorTypes.serverError);
+      }
     }
   }
 }).export(module);
