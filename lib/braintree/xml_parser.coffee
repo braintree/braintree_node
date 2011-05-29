@@ -12,7 +12,10 @@ XmlParser = ->
       if child.nodeType isnt TEXT_NODE
         name = Util.toCamelCase(child.nodeName)
         if child.childNodes.length is 1 && child.childNodes[0].nodeType is TEXT_NODE
-          obj[name] = child.childNodes[0].nodeValue
+          if child.attributes.length is 1 && child.attributes[0].name is 'type' && child.attributes[0].value is 'boolean'
+            obj[name] = if child.childNodes[0].nodeValue is 'true' then true else false
+          else
+            obj[name] = child.childNodes[0].nodeValue
         else if child.childNodes.length is 0 && child.attributes.length is 1 && child.attributes[0].name is 'nil'
           obj[name] = null
         else if child.childNodes.length is 0 && child.attributes.length is 1 && child.attributes[0].name is 'type' && child.attributes[0].value is 'array'

@@ -133,13 +133,13 @@ vows.describe('SubscriptionGateway').addBatch({
           assert.equal(addons[0].amount, '10.00');
           assert.equal(addons[0].quantity, 1);
           assert.equal(addons[0].numberOfBillingCycles, null);
-          assert.equal(addons[0].neverExpires, 'true');
+          assert.equal(addons[0].neverExpires, true);
 
           assert.equal(addons[1].id, 'increase_20');
           assert.equal(addons[1].amount, '20.00');
           assert.equal(addons[1].quantity, 1);
           assert.equal(addons[1].numberOfBillingCycles, null);
-          assert.equal(addons[1].neverExpires, 'true');
+          assert.equal(addons[1].neverExpires, true);
         },
         'inherits discounts': function (err, result) {
           var discounts = _.sortBy(result.subscription.discounts, function (d) { return d.id; });
@@ -149,13 +149,13 @@ vows.describe('SubscriptionGateway').addBatch({
           assert.equal(discounts[0].amount, '11.00');
           assert.equal(discounts[0].quantity, 1);
           assert.equal(discounts[0].numberOfBillingCycles, null);
-          assert.equal(discounts[0].neverExpires, 'true');
+          assert.equal(discounts[0].neverExpires, true);
 
           assert.equal(discounts[1].id, 'discount_7');
           assert.equal(discounts[1].amount, '7.00');
           assert.equal(discounts[1].quantity, 1);
           assert.equal(discounts[1].numberOfBillingCycles, null);
-          assert.equal(discounts[1].neverExpires, 'true');
+          assert.equal(discounts[1].neverExpires, true);
         }
       },
 

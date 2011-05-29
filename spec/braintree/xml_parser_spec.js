@@ -86,6 +86,10 @@ vows.describe('XmlParser').addBatch({
       'parses nil values': function (result) {
         assert.equal(result.customer.lastName, null);
       },
+      'parses boolean values': function (result) {
+        assert.equal(result.customer.creditCards[0].default, true);
+        assert.equal(result.customer.creditCards[0].expired, false);
+      },
       'parses empty arrays': function (result) {
         assert.equal(result.customer.addresses.length, 0);
         assert.isEmptyArray(result.customer.addresses);
