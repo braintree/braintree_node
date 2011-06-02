@@ -1,5 +1,5 @@
-Customer = require('./customer').Customer
-ErrorResponse = require('./error_response').ErrorResponse
+{Customer} = require('./customer')
+{ErrorResponse} = require('./error_response')
 
 CustomerGateway = (gateway) ->
   my = { gateway: gateway }

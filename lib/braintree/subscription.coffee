@@ -1,4 +1,4 @@
-Transaction = require('./transaction').Transaction
+{Transaction} = require('./transaction')
 
 Subscription = (attributes) ->
   that = {}

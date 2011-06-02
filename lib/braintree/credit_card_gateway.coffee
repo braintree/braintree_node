@@ -1,5 +1,5 @@
-CreditCard = require('./credit_card').CreditCard
-ErrorResponse = require('./error_response').ErrorResponse
+{CreditCard} = require('./credit_card')
+{ErrorResponse} = require('./error_response')
 
 CreditCardGateway = (gateway) ->
   my = { gateway: gateway }

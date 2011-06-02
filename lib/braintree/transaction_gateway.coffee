@@ -1,5 +1,5 @@
-Transaction = require('./transaction').Transaction
-ErrorResponse = require('./error_response').ErrorResponse
+{Transaction} = require('./transaction')
+{ErrorResponse} = require('./error_response')
 
 TransactionGateway = (gateway) ->
   my = { gateway: gateway }

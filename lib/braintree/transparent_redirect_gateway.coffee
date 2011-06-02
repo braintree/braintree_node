@@ -1,10 +1,10 @@
-Digest = require('./digest').Digest
-Util = require('./util').Util
+{Digest} = require('./digest')
+{Util} = require('./util')
 querystring = require('../../vendor/querystring.node.js.511d6a2/querystring')
 dateFormat = require('dateformat')
-CreditCardGateway = require('./credit_card_gateway').CreditCardGateway
-CustomerGateway = require('./customer_gateway').CustomerGateway
-TransactionGateway = require('./transaction_gateway').TransactionGateway
+{CreditCardGateway} = require('./credit_card_gateway')
+{CustomerGateway} = require('./customer_gateway')
+{TransactionGateway} = require('./transaction_gateway')
 exceptions = require('./exceptions')
 
 TransparentRedirectGateway = (gateway) ->

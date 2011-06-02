@@ -1,6 +1,6 @@
 sys = require('sys')
 xml = require('o3-xml')
-Util = require('./util').Util
+{Util} = require('./util')
 
 XmlParser = ->
   TEXT_NODE = 3

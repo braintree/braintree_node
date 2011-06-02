@@ -1,6 +1,6 @@
-Subscription = require('./subscription').Subscription
-ErrorResponse = require('./error_response').ErrorResponse
-TransactionGateway = require('./transaction_gateway').TransactionGateway
+{Subscription} = require('./subscription')
+{ErrorResponse} = require('./error_response')
+{TransactionGateway} = require('./transaction_gateway')
 
 SubscriptionGateway = (gateway) ->
   my = { gateway: gateway }

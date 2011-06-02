@@ -1,4 +1,4 @@
-CreditCard = require('./credit_card').CreditCard
+{CreditCard} = require('./credit_card')
 
 Customer = (attributes) ->
   that = {}

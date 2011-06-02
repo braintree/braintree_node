@@ -1,5 +1,5 @@
-Transaction = require('./transaction').Transaction
-ValidationErrorsCollection = require('./validation_errors_collection').ValidationErrorsCollection
+{Transaction} = require('./transaction')
+{ValidationErrorsCollection} = require('./validation_errors_collection')
 
 ErrorResponse = (attributes) ->
   that = {}

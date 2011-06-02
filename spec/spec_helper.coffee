@@ -1,5 +1,5 @@
 http = require('http')
-Util = require('../lib/braintree/util').Util
+{Util} = require('../lib/braintree/util')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
 sys = require('sys')
 

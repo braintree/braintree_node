@@ -1,5 +1,5 @@
-Util = require('./util').Util
-ValidationError = require('./validation_error').ValidationError
+{Util} = require('./util')
+{ValidationError} = require('./validation_error')
 
 ValidationErrorsCollection = (errorAttributes) ->
   my = {

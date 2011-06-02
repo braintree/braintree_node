@@ -1,4 +1,4 @@
-ErrorResponse = require('./error_response').ErrorResponse
+{ErrorResponse} = require('./error_response')
 
 AddressGateway = (gateway) ->
   my = { gateway: gateway }

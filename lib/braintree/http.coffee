@@ -1,12 +1,12 @@
 sys = require('sys')
 http = require('http')
 https = require('https')
-Buffer = require('buffer').Buffer
+{Buffer} = require('buffer')
 
 braintree = require('../braintree')
-XmlParser = require('./xml_parser').XmlParser
+{XmlParser} = require('./xml_parser')
 exceptions = require('./exceptions')
-Util = require('./util').Util
+{Util} = require('./util')
 
 Http = (config) ->
   my = { config: config }

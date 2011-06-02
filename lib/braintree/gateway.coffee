@@ -1,4 +1,4 @@
-Http = require('./http').Http
+{Http} = require('./http')
 
 Gateway = (config) ->
   {
