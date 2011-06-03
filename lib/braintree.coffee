@@ -16,7 +16,7 @@ connect = (config) ->
   {
     _gateway: gateway,
     address: new AddressGateway(gateway)
-    creditCard: CreditCardGateway(gateway)
+    creditCard: new CreditCardGateway(gateway)
     customer: CustomerGateway(gateway)
     subscription: SubscriptionGateway(gateway)
     transaction: TransactionGateway(gateway)

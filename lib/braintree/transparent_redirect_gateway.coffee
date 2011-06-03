@@ -65,7 +65,7 @@ TransparentRedirectGateway = (gateway) ->
       when KIND.CREATE_CUSTOMER, KIND.UPDATE_CUSTOMER
         confirmCallback = CustomerGateway(my.gateway).responseHandler(callback)
       when KIND.CREATE_CREDIT_CARD, KIND.UPDATE_CREDIT_CARD
-        confirmCallback = CreditCardGateway(my.gateway).responseHandler(callback)
+        confirmCallback = new CreditCardGateway(my.gateway).responseHandler(callback)
       when KIND.CREATE_TRANSACTION
         confirmCallback = TransactionGateway(my.gateway).responseHandler(callback)
     my.gateway.http.post('/transparent_redirect_requests/' + params.id + '/confirm', null, confirmCallback)
