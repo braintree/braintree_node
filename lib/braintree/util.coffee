@@ -1,5 +1,5 @@
-Util = {
-  convertObjectKeysToUnderscores: (obj) ->
+class Util
+  @convertObjectKeysToUnderscores: (obj) ->
     newObj = {}
     for key, value of obj
       newKey = Util.toUnderscore(key)
@@ -16,11 +16,10 @@ Util = {
         newObj[newKey] = value
     newObj
 
-  toCamelCase: (string) ->
+  @toCamelCase: (string) ->
     string.replace(/([\-\_][a-z0-9])/g, (match) -> match.toUpperCase().replace('-','').replace('_',''))
 
-  toUnderscore: (string) ->
+  @toUnderscore: (string) ->
     string.replace(/([A-Z])/g, (match) -> "_" + match.toLowerCase())
-}
 
 exports.Util = Util
