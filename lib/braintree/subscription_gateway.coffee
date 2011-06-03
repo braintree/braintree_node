@@ -16,7 +16,7 @@ class SubscriptionGateway
       if err
         callback(err, null)
       else
-        callback(null, Subscription(response.subscription))
+        callback(null, new Subscription(response.subscription))
 
   responseHandler: (callback) ->
     (err, response) ->
@@ -24,7 +24,7 @@ class SubscriptionGateway
 
       if response.subscription
         response.success = true
-        response.subscription = Subscription(response.subscription)
+        response.subscription = new Subscription(response.subscription)
         callback(null, response)
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))

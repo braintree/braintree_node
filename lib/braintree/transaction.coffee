@@ -1,10 +1,9 @@
 {CreditCard} = require('./credit_card')
 
-Transaction = (attributes) ->
-  that = {}
-  for key, value of attributes
-    that[key] = value
-  that.creditCard = new CreditCard(attributes.creditCard)
-  that
+class Transaction
+  constructor: (attributes) ->
+    for key, value of attributes
+      @[key] = value
+    @creditCard = new CreditCard(attributes.creditCard)
 
 exports.Transaction = Transaction

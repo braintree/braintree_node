@@ -16,7 +16,7 @@ class TransactionGateway
       if err
         callback(err, null)
       else
-        callback(null, Transaction(response.transaction))
+        callback(null, new Transaction(response.transaction))
 
   refund: (transactionId, amount..., callback) ->
     @gateway.http.post("/transactions/#{transactionId}/refund", {transaction: {amount: amount[0]}}, @responseHandler(callback))
@@ -27,7 +27,7 @@ class TransactionGateway
 
       if (response.transaction)
         response.success = true
-        response.transaction = Transaction(response.transaction)
+        response.transaction = new Transaction(response.transaction)
         callback(null, response)
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))

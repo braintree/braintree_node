@@ -1,10 +1,9 @@
 {Transaction} = require('./transaction')
 
-Subscription = (attributes) ->
-  that = {}
-  for key, value of attributes
-    that[key] = value
-  that.transactions = (Transaction(transactionAttributes) for transactionAttributes in attributes.transactions)
-  that
+class Subscription
+  constructor: (attributes) ->
+    for key, value of attributes
+      @[key] = value
+    @transactions = (new Transaction(transactionAttributes) for transactionAttributes in attributes.transactions)
 
 exports.Subscription = Subscription
