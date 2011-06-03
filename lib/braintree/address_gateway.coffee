@@ -28,7 +28,8 @@ class AddressGateway
 
       if (response.address)
         response.success = true
-        callback(null, new Address(response))
+        response.address = new Address(response.address)
+        callback(null, response)
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
 
