@@ -15,7 +15,7 @@ var createTransactionToRefund = function (callback) {
       options: { submitForSettlement: true }
     },
     function (err, result) {
-      specHelper.defaultGateway._gateway.http.put(
+      specHelper.defaultGateway.http.put(
         '/transactions/' + result.transaction.id + '/settle',
         null,
         function (err, settleResult) {

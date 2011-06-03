@@ -41,7 +41,7 @@ addOns = {
 }
 
 makePastDue = (subscription, callback) ->
-  defaultGateway._gateway.http.put(
+  defaultGateway.http.put(
     "/subscriptions/#{subscription.id}/make_past_due?days_past_due=1",
     null,
     callback
@@ -49,9 +49,9 @@ makePastDue = (subscription, callback) ->
 
 simulateTrFormPost = (url, trData, inputFormData, callback) ->
   client = http.createClient(
-    specHelper.defaultGateway._gateway.config.environment.port,
-    specHelper.defaultGateway._gateway.config.environment.server,
-    specHelper.defaultGateway._gateway.config.environment.ssl
+    specHelper.defaultGateway.config.environment.port,
+    specHelper.defaultGateway.config.environment.server,
+    specHelper.defaultGateway.config.environment.ssl
   )
   headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
