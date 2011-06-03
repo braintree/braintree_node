@@ -5,7 +5,7 @@
   "keywords"            : ["payments"],
   "homepage"            : "http://github.com/braintree/braintree_node",
   "author"              : "Braintree <code@braintreepayments.com> (http://www.braintreepayments.com)",
-  "main"                : "./lib/braintree",
+  "main"                : "./lib/braintree.js",
   "repository"          : { "type": "git", "url" : "https://github.com/braintree/braintree_node.git" },
   "dependencies"        : {},
   "engines"             : { "node": "~0.4.7" },

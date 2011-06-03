@@ -13,7 +13,7 @@ GLOBAL.assert.isEmptyArray = (array) ->
 GLOBAL.inspect = (object) ->
   sys.puts(sys.inspect(object))
 
-braintree = require('./../lib/braintree')
+braintree = require('./../lib/braintree.js')
 
 defaultConfig = {
   environment: braintree.Environment.Development
