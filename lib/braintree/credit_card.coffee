@@ -1,7 +1,8 @@
-class CreditCard
+{AttributeSetter} = require('./attribute_setter')
+
+class CreditCard extends AttributeSetter
   constructor: (attributes) ->
-    for key, value of attributes
-      @[key] = value
+    super attributes
     @maskedNumber = "#{@bin}******#{@last4}"
     @expirationDate = "#{@expirationMonth}/#{@expirationYear}"
 

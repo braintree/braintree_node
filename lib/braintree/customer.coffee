@@ -1,9 +1,9 @@
+{AttributeSetter} = require('./attribute_setter')
 {CreditCard} = require('./credit_card')
 
-class Customer
+class Customer extends AttributeSetter
   constructor: (attributes) ->
-    for key, value of attributes
-      @[key] = value
+    super attributes
     @creditCards = (new CreditCard(cardAttributes) for cardAttributes in attributes.creditCards)
 
 exports.Customer = Customer
