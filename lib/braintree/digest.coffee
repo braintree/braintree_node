@@ -1,20 +1,18 @@
 sys = require('sys')
 crypto = require('crypto')
 
-Digest = ->
-  sha1 = (data) ->
-    hash = crypto.createHash('sha1')
-    hash.update(data)
-    hash.digest()
+class Digest
+  @hexdigest: (privateKey, string) ->
+    new Digest().hmacSha1(privateKey, string)
 
-  hmacSha1 = (key, data) ->
-    hmac = crypto.createHmac('sha1', sha1(key))
+  hmacSha1: (key, data) ->
+    hmac = crypto.createHmac('sha1', @sha1(key))
     hmac.update(data)
     hmac.digest('hex')
 
-  { hmacSha1: hmacSha1 }
-
-Digest.hexdigest = (privateKey, string) ->
-  Digest().hmacSha1(privateKey, string)
+  sha1: (data) ->
+    hash = crypto.createHash('sha1')
+    hash.update(data)
+    hash.digest()
 
 exports.Digest = Digest
