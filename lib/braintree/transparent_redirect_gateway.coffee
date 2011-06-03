@@ -7,79 +7,67 @@ dateFormat = require('dateformat')
 {TransactionGateway} = require('./transaction_gateway')
 exceptions = require('./exceptions')
 
-TransparentRedirectGateway = (gateway) ->
-  KIND = {
+class TransparentRedirectGateway
+  KIND =
     CREATE_CUSTOMER: 'create_customer'
     UPDATE_CUSTOMER: 'update_customer'
     CREATE_CREDIT_CARD: 'create_payment_method'
     UPDATE_CREDIT_CARD: 'update_payment_method'
     CREATE_TRANSACTION: 'create_transaction'
-  }
 
-  my = { gateway: gateway }
+  constructor: (@gateway) ->
+    @url = "#{@gateway.config.baseMerchantPath}/transparent_redirect_requests"
 
-  generateTrData = (inputData) ->
+  generateTrData: (inputData) ->
     data = Util.convertObjectKeysToUnderscores(inputData)
-    data.api_version = my.gateway.config.apiVersion
+    data.api_version = @gateway.config.apiVersion
     data.time = dateFormat(new Date(), 'yyyymmddHHMMss', true)
-    data.public_key = my.gateway.config.publicKey
+    data.public_key = @gateway.config.publicKey
     dataSegment = querystring.stringify(data)
-    trDataHash = Digest.hexdigest(gateway.config.privateKey, dataSegment)
+    trDataHash = Digest.hexdigest(@gateway.config.privateKey, dataSegment)
     trDataHash + "|" + dataSegment
 
-  createCreditCardData = (data) ->
+  createCreditCardData: (data) ->
     data.kind = KIND.CREATE_CREDIT_CARD
-    generateTrData(data)
+    @generateTrData(data)
 
-  updateCreditCardData = (data) ->
+  updateCreditCardData: (data) ->
     data.kind = KIND.UPDATE_CREDIT_CARD
-    generateTrData(data)
+    @generateTrData(data)
 
-  createCustomerData = (data) ->
+  createCustomerData: (data) ->
     data.kind = KIND.CREATE_CUSTOMER
-    generateTrData(data)
+    @generateTrData(data)
 
-  updateCustomerData = (data) ->
+  updateCustomerData: (data) ->
     data.kind = KIND.UPDATE_CUSTOMER
-    generateTrData(data)
+    @generateTrData(data)
 
-  transactionData = (data) ->
+  transactionData: (data) ->
     data.kind = KIND.CREATE_TRANSACTION
-    generateTrData(data)
+    @generateTrData(data)
 
-  validateQueryString = (queryString) ->
+  validateQueryString: (queryString) ->
     matches = queryString.match(/^(.+)&hash=(.+?)$/)
-    (Digest.hexdigest(gateway.config.privateKey, matches[1]) is matches[2])
+    (Digest.hexdigest(@gateway.config.privateKey, matches[1]) is matches[2])
 
-  confirm = (queryString, callback) ->
+  confirm: (queryString, callback) ->
     statusMatch = queryString.match(/http_status=(\d+)/)
     if statusMatch && statusMatch[1]
-      error = my.gateway.http.checkHttpStatus(statusMatch[1])
+      error = @gateway.http.checkHttpStatus(statusMatch[1])
       return callback(error, null) if error
-    if !validateQueryString(queryString)
+    if !@validateQueryString(queryString)
       return callback(exceptions.InvalidTransparentRedirectHashError(), null)
     params = querystring.parse(queryString)
     confirmCallback = null
 
     switch params.kind
       when KIND.CREATE_CUSTOMER, KIND.UPDATE_CUSTOMER
-        confirmCallback = new CustomerGateway(my.gateway).responseHandler(callback)
+        confirmCallback = new CustomerGateway(@gateway).responseHandler(callback)
       when KIND.CREATE_CREDIT_CARD, KIND.UPDATE_CREDIT_CARD
-        confirmCallback = new CreditCardGateway(my.gateway).responseHandler(callback)
+        confirmCallback = new CreditCardGateway(@gateway).responseHandler(callback)
       when KIND.CREATE_TRANSACTION
-        confirmCallback = new TransactionGateway(my.gateway).responseHandler(callback)
-    my.gateway.http.post('/transparent_redirect_requests/' + params.id + '/confirm', null, confirmCallback)
-
-  url = gateway.config.baseMerchantPath + '/transparent_redirect_requests'
-
-  {
-    confirm: confirm
-    createCreditCardData: createCreditCardData
-    createCustomerData: createCustomerData
-    transactionData: transactionData
-    updateCreditCardData: updateCreditCardData
-    updateCustomerData: updateCustomerData
-    url: url
-  }
+        confirmCallback = new TransactionGateway(@gateway).responseHandler(callback)
+    @gateway.http.post('/transparent_redirect_requests/' + params.id + '/confirm', null, confirmCallback)
 
 exports.TransparentRedirectGateway = TransparentRedirectGateway

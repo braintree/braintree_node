@@ -20,7 +20,7 @@ connect = (config) ->
     customer: new CustomerGateway(gateway)
     subscription: new SubscriptionGateway(gateway)
     transaction: new TransactionGateway(gateway)
-    transparentRedirect: TransparentRedirectGateway(gateway)
+    transparentRedirect: new TransparentRedirectGateway(gateway)
   }
 
 exports.connect = connect
