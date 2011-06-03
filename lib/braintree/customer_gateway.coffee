@@ -1,7 +1,7 @@
+{Gateway} = require('./gateway')
 {Customer} = require('./customer')
-{ErrorResponse} = require('./error_response')
 
-class CustomerGateway
+class CustomerGateway extends Gateway
   constructor: (@gateway) ->
 
   create: (attributes, callback) ->
@@ -21,14 +21,6 @@ class CustomerGateway
     @gateway.http.put("/customers/#{customerId}", {customer: attributes}, @responseHandler(callback))
 
   responseHandler: (callback) ->
-    (err, response) ->
-      return callback(err, response) if err
-
-      if (response.customer)
-        response.success = true
-        response.customer = new Customer(response.customer)
-        callback(null, response)
-      else if (response.apiErrorResponse)
-        callback(null, new ErrorResponse(response.apiErrorResponse))
+    @createResponseHandler("customer", Customer, callback)
 
 exports.CustomerGateway = CustomerGateway

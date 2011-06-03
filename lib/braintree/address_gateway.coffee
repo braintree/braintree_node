@@ -1,7 +1,7 @@
+{Gateway} = require('./gateway')
 {Address} = require('./address')
-{ErrorResponse} = require('./error_response')
 
-class AddressGateway
+class AddressGateway extends Gateway
   constructor: (@gateway) ->
 
   create: (attributes, callback) ->
@@ -23,14 +23,6 @@ class AddressGateway
     @gateway.http.put("/customers/#{customerId}/addresses/#{id}", {address: attributes}, @responseHandler(callback))
 
   responseHandler: (callback) ->
-    (err, response) ->
-      return callback(err, response) if err
-
-      if (response.address)
-        response.success = true
-        response.address = new Address(response.address)
-        callback(null, response)
-      else if (response.apiErrorResponse)
-        callback(null, new ErrorResponse(response.apiErrorResponse))
+    @createResponseHandler("address", Address, callback)
 
 exports.AddressGateway = AddressGateway

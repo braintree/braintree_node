@@ -1,7 +1,7 @@
+{Gateway} = require('./gateway')
 {CreditCard} = require('./credit_card')
-{ErrorResponse} = require('./error_response')
 
-class CreditCardGateway
+class CreditCardGateway extends Gateway
   constructor: (@gateway) ->
 
   create: (attributes, callback) ->
@@ -21,14 +21,6 @@ class CreditCardGateway
     @gateway.http.put("/payment_methods/#{token}", {creditCard: attributes}, @responseHandler(callback))
 
   responseHandler: (callback) ->
-    (err, response) ->
-      return callback(err, response) if err
-
-      if (response.creditCard)
-        response.success = true
-        response.creditCard = new CreditCard(response.creditCard)
-        callback(null, response)
-      else if (response.apiErrorResponse)
-        callback(null, new ErrorResponse(response.apiErrorResponse))
+    @createResponseHandler("creditCard", CreditCard, callback)
 
 exports.CreditCardGateway = CreditCardGateway

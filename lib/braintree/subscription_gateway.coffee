@@ -1,8 +1,8 @@
+{Gateway} = require('./gateway')
 {Subscription} = require('./subscription')
-{ErrorResponse} = require('./error_response')
 {TransactionGateway} = require('./transaction_gateway')
 
-class SubscriptionGateway
+class SubscriptionGateway extends Gateway
   constructor: (@gateway) ->
 
   create: (attributes, callback) ->
@@ -19,15 +19,7 @@ class SubscriptionGateway
         callback(null, new Subscription(response.subscription))
 
   responseHandler: (callback) ->
-    (err, response) ->
-      return callback(err, response) if err
-
-      if response.subscription
-        response.success = true
-        response.subscription = new Subscription(response.subscription)
-        callback(null, response)
-      else if (response.apiErrorResponse)
-        callback(null, new ErrorResponse(response.apiErrorResponse))
+    @createResponseHandler("subscription", Subscription, callback)
 
   retryCharge: (subscriptionId, amount..., callback) ->
     new TransactionGateway(@gateway).sale
