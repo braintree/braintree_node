@@ -30,7 +30,7 @@ class SubscriptionGateway
         callback(null, ErrorResponse(response.apiErrorResponse))
 
   retryCharge: (subscriptionId, amount..., callback) ->
-    TransactionGateway(@gateway).sale
+    new TransactionGateway(@gateway).sale
       amount: amount[0],
       subscriptionId: subscriptionId
     , callback

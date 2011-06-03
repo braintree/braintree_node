@@ -1,19 +1,27 @@
 {Transaction} = require('./transaction')
 {ErrorResponse} = require('./error_response')
 
-TransactionGateway = (gateway) ->
-  my = { gateway: gateway }
+class TransactionGateway
+  constructor: (@gateway) ->
 
-  create = (attributes, callback) ->
-    my.gateway.http.post('/transactions', {transaction: attributes}, responseHandler(callback))
+  create: (attributes, callback) ->
+    @gateway.http.post('/transactions', {transaction: attributes}, @responseHandler(callback))
 
-  find = (transaction_id, callback) ->
-    my.gateway.http.get('/transactions/' + transaction_id, (err, response) ->
-      return callback(err, null) if err
-      callback(null, Transaction(response.transaction))
-    )
+  credit: (attributes, callback) ->
+    attributes.type = 'credit'
+    @create(attributes, callback)
 
-  responseHandler = (callback) ->
+  find: (transactionId, callback) ->
+    @gateway.http.get "/transactions/#{transactionId}", (err, response) ->
+      if err
+        callback(err, null)
+      else
+        callback(null, Transaction(response.transaction))
+
+  refund: (transactionId, amount..., callback) ->
+    @gateway.http.post("/transactions/#{transactionId}/refund", {transaction: {amount: amount[0]}}, @responseHandler(callback))
+
+  responseHandler: (callback) ->
     (err, response) ->
       return callback(err, response) if err
 
@@ -24,35 +32,17 @@ TransactionGateway = (gateway) ->
       else if (response.apiErrorResponse)
         callback(null, ErrorResponse(response.apiErrorResponse))
 
-  {
-    find: find
+  sale: (attributes, callback) ->
+    attributes.type = 'sale'
+    @create(attributes, callback)
 
-    responseHandler: responseHandler
+  submitForSettlement: (transactionId, amount..., callback) ->
+    @gateway.http.put("/transactions/#{transactionId}/submit_for_settlement",
+      {transaction: {amount: amount[0]}},
+      @responseHandler(callback)
+    )
 
-    credit: (attributes, callback) ->
-      attributes.type = 'credit'
-      create(attributes, callback)
-
-    refund: (transactionId, amount..., callback) ->
-      my.gateway.http.post(
-        "/transactions/#{transactionId}/refund",
-        { transaction: { amount: amount[0] } },
-        responseHandler(callback)
-      )
-
-    sale: (attributes, callback) ->
-      attributes.type = 'sale'
-      create(attributes, callback)
-
-    submitForSettlement: (transactionId, amount..., callback) ->
-      my.gateway.http.put(
-        "/transactions/#{transactionId}/submit_for_settlement",
-        { transaction: { amount: amount[0] } },
-        responseHandler(callback)
-      )
-
-    void: (transaction_id, callback) ->
-      my.gateway.http.put('/transactions/' + transaction_id + '/void', null, responseHandler(callback))
-  }
+  void: (transactionId, callback) ->
+    @gateway.http.put("/transactions/#{transactionId}/void", null, @responseHandler(callback))
 
 exports.TransactionGateway = TransactionGateway
