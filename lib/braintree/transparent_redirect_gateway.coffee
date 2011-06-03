@@ -63,7 +63,7 @@ TransparentRedirectGateway = (gateway) ->
 
     switch params.kind
       when KIND.CREATE_CUSTOMER, KIND.UPDATE_CUSTOMER
-        confirmCallback = CustomerGateway(my.gateway).responseHandler(callback)
+        confirmCallback = new CustomerGateway(my.gateway).responseHandler(callback)
       when KIND.CREATE_CREDIT_CARD, KIND.UPDATE_CREDIT_CARD
         confirmCallback = new CreditCardGateway(my.gateway).responseHandler(callback)
       when KIND.CREATE_TRANSACTION
