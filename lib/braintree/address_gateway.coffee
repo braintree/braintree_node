@@ -1,3 +1,4 @@
+{Address} = require('./address')
 {ErrorResponse} = require('./error_response')
 
 class AddressGateway
@@ -27,7 +28,7 @@ class AddressGateway
 
       if (response.address)
         response.success = true
-        callback(null, response)
+        callback(null, new Address(response))
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
 
