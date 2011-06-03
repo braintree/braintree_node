@@ -1,13 +1,12 @@
 {Transaction} = require('./transaction')
 {ValidationErrorsCollection} = require('./validation_errors_collection')
 
-ErrorResponse = (attributes) ->
-  that = {}
-  for key, value of attributes
-    that[key] = value
-  that.success = false
-  that.errors = ValidationErrorsCollection(attributes.errors)
-  that.transaction = Transaction(attributes.transaction) if attributes.transaction
-  that
+class ErrorResponse
+  constructor: (attributes) ->
+    for key, value of attributes
+      @[key] = value
+    @success = false
+    @errors = ValidationErrorsCollection(attributes.errors)
+    @transaction = new Transaction(attributes.transaction) if attributes.transaction
 
 exports.ErrorResponse = ErrorResponse

@@ -27,7 +27,7 @@ class SubscriptionGateway
         response.subscription = Subscription(response.subscription)
         callback(null, response)
       else if (response.apiErrorResponse)
-        callback(null, ErrorResponse(response.apiErrorResponse))
+        callback(null, new ErrorResponse(response.apiErrorResponse))
 
   retryCharge: (subscriptionId, amount..., callback) ->
     new TransactionGateway(@gateway).sale

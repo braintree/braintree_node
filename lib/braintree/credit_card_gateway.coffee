@@ -29,6 +29,6 @@ class CreditCardGateway
         response.creditCard = new CreditCard(response.creditCard)
         callback(null, response)
       else if (response.apiErrorResponse)
-        callback(null, ErrorResponse(response.apiErrorResponse))
+        callback(null, new ErrorResponse(response.apiErrorResponse))
 
 exports.CreditCardGateway = CreditCardGateway

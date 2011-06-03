@@ -30,7 +30,7 @@ class TransactionGateway
         response.transaction = Transaction(response.transaction)
         callback(null, response)
       else if (response.apiErrorResponse)
-        callback(null, ErrorResponse(response.apiErrorResponse))
+        callback(null, new ErrorResponse(response.apiErrorResponse))
 
   sale: (attributes, callback) ->
     attributes.type = 'sale'

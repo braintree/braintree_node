@@ -29,6 +29,6 @@ class AddressGateway
         response.success = true
         callback(null, response)
       else if (response.apiErrorResponse)
-        callback(null, ErrorResponse(response.apiErrorResponse))
+        callback(null, new ErrorResponse(response.apiErrorResponse))
 
 exports.AddressGateway = AddressGateway

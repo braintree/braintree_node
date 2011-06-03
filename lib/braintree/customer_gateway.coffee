@@ -29,6 +29,6 @@ class CustomerGateway
         response.customer = new Customer(response.customer)
         callback(null, response)
       else if (response.apiErrorResponse)
-        callback(null, ErrorResponse(response.apiErrorResponse))
+        callback(null, new ErrorResponse(response.apiErrorResponse))
 
 exports.CustomerGateway = CustomerGateway
