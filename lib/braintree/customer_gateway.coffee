@@ -15,7 +15,7 @@ class CustomerGateway
       if err
         callback(err, null)
       else
-        callback(null, Customer(response.customer))
+        callback(null, new Customer(response.customer))
 
   update: (customerId, attributes, callback) ->
     @gateway.http.put("/customers/#{customerId}", {customer: attributes}, @responseHandler(callback))
@@ -26,7 +26,7 @@ class CustomerGateway
 
       if (response.customer)
         response.success = true
-        response.customer = Customer(response.customer)
+        response.customer = new Customer(response.customer)
         callback(null, response)
       else if (response.apiErrorResponse)
         callback(null, ErrorResponse(response.apiErrorResponse))
