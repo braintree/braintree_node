@@ -6,7 +6,7 @@ class ErrorResponse
     for key, value of attributes
       @[key] = value
     @success = false
-    @errors = ValidationErrorsCollection(attributes.errors)
+    @errors = new ValidationErrorsCollection(attributes.errors)
     @transaction = new Transaction(attributes.transaction) if attributes.transaction
 
 exports.ErrorResponse = ErrorResponse
