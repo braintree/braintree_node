@@ -6,7 +6,7 @@
 {TransactionGateway} = require("./transaction_gateway")
 {TransparentRedirectGateway} = require("./transparent_redirect_gateway")
 
-class Gateway
+class BraintreeGateway
   constructor: (@config) ->
     @http = new Http(@config)
     @address = new AddressGateway(this)
@@ -16,4 +16,4 @@ class Gateway
     @transaction = new TransactionGateway(this)
     @transparentRedirect = new TransparentRedirectGateway(this)
 
-exports.Gateway = Gateway
+exports.BraintreeGateway = BraintreeGateway

@@ -1,11 +1,11 @@
 sys = require "sys"
 {Config} = require("./braintree/config")
 {Environment} = require("./braintree/environment")
-{Gateway} = require("./braintree/gateway")
+{BraintreeGateway} = require("./braintree/braintree_gateway")
 errorTypes = require("./braintree/error_types")
 
 connect = (config) ->
-  new Gateway(new Config(config))
+  new BraintreeGateway(new Config(config))
 
 exports.connect = connect
 exports.version = '0.2.0'
