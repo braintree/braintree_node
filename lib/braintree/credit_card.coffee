@@ -1,9 +1,8 @@
-CreditCard = (attributes) ->
-  that = {}
-  for key, value of attributes
-    that[key] = value
-  that.maskedNumber = that.bin + '******' + that.last4
-  that.expirationDate = that.expirationMonth + '/' + that.expirationYear
-  that
+class CreditCard
+  constructor: (attributes) ->
+    for key, value of attributes
+      @[key] = value
+    @maskedNumber = "#{@bin}******#{@last4}"
+    @expirationDate = "#{@expirationMonth}/#{@expirationYear}"
 
 exports.CreditCard = CreditCard

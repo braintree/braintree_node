@@ -15,7 +15,7 @@ class CreditCardGateway
       if err
         callback(err, null)
       else
-        callback(null, CreditCard(response.creditCard))
+        callback(null, new CreditCard(response.creditCard))
 
   update: (token, attributes, callback) ->
     @gateway.http.put("/payment_methods/#{token}", {creditCard: attributes}, @responseHandler(callback))
@@ -26,7 +26,7 @@ class CreditCardGateway
 
       if (response.creditCard)
         response.success = true
-        response.creditCard = CreditCard(response.creditCard)
+        response.creditCard = new CreditCard(response.creditCard)
         callback(null, response)
       else if (response.apiErrorResponse)
         callback(null, ErrorResponse(response.apiErrorResponse))
