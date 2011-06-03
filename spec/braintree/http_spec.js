@@ -8,7 +8,7 @@ vows.describe('Http').addBatch({
   'request': {
     'when the http response status is 500': {
       topic: function () {
-        var http = Http(new Config(specHelper.defaultConfig));
+        var http = new Http(new Config(specHelper.defaultConfig));
         http.post('/test/error', '', this.callback);
       },
       'returns a ServerError': function (err, response) {
@@ -18,7 +18,7 @@ vows.describe('Http').addBatch({
 
     'when the http response status is 503': {
       topic: function () {
-        var http = Http(new Config(specHelper.defaultConfig));
+        var http = new Http(new Config(specHelper.defaultConfig));
         http.post('/test/maintenance', '', this.callback);
       },
       'returns a down for maintenance error': function (err, response) {
@@ -28,7 +28,7 @@ vows.describe('Http').addBatch({
 
     'can hit the sandbox': {
       topic: function () {
-        var http = Http(new Config({
+        var http = new Http(new Config({
           environment: braintree.Environment.Sandbox,
           merchantId: 'node',
           publicKey: 'node',
@@ -44,7 +44,7 @@ vows.describe('Http').addBatch({
 
   'can hit production': {
     topic: function () {
-      var http = Http(new Config({
+      var http = new Http(new Config({
         environment: braintree.Environment.Production,
         merchantId: 'node',
         publicKey: 'node',

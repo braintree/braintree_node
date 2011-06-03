@@ -1,9 +1,7 @@
 {Http} = require('./http')
 
-Gateway = (config) ->
-  {
-    config: config,
-    http: Http(config)
-  }
+class Gateway
+  constructor: (@config) ->
+    @http = new Http(@config)
 
 exports.Gateway = Gateway
