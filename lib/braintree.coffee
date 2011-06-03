@@ -18,7 +18,7 @@ connect = (config) ->
     address: new AddressGateway(gateway)
     creditCard: new CreditCardGateway(gateway)
     customer: new CustomerGateway(gateway)
-    subscription: SubscriptionGateway(gateway)
+    subscription: new SubscriptionGateway(gateway)
     transaction: TransactionGateway(gateway)
     transparentRedirect: TransparentRedirectGateway(gateway)
   }
