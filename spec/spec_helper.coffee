@@ -47,6 +47,13 @@ makePastDue = (subscription, callback) ->
     callback
   )
 
+settleTransaction = (transaction, callback) ->
+  defaultGateway.http.put(
+    "/transactions/#{transaction.id}/settle",
+    null,
+    callback
+  )
+
 simulateTrFormPost = (url, trData, inputFormData, callback) ->
   client = http.createClient(
     specHelper.defaultGateway.config.environment.port,
@@ -68,13 +75,26 @@ simulateTrFormPost = (url, trData, inputFormData, callback) ->
     callback(null, response.headers.location.split('?', 2)[1])
   )
 
+dateToMdy = (date) ->
+  year = date.getFullYear().toString()
+  month = (date.getMonth() + 1).toString()
+  day = date.getDate().toString()
+  if month.length == 1
+    month = "0" + month
+  if day.length == 1
+    day = "0" + day
+  formattedDate = year + '-' + month + '-' + day
+  return formattedDate
+
 GLOBAL.specHelper = {
   addOns: addOns
   braintree: braintree
+  dateToMdy: dateToMdy
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
   makePastDue: makePastDue
   multiplyString: multiplyString
   plans: plans
+  settleTransaction: settleTransaction
   simulateTrFormPost: simulateTrFormPost
 }
