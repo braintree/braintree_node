@@ -47,9 +47,9 @@ makePastDue = (subscription, callback) ->
     callback
   )
 
-settleTransaction = (transaction, callback) ->
+settleTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "/transactions/#{transaction.id}/settle",
+    "/transactions/#{transactionId}/settle",
     null,
     callback
   )

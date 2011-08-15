@@ -104,7 +104,7 @@ vows.describe('SettlementBatchSummaryGateway').addBatch({
 
       'groups by the custom field': function (err, response) {
         var records = response.settlementBatchSummary.records
-        assert.ok(records[0]['storeMe']);
+        assert.ok(records[0]['store_me']);
       }
     }
   }

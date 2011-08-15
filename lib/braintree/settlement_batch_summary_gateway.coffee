@@ -1,4 +1,5 @@
 {Gateway} = require('./gateway')
+{Util} = require('./util')
 {SettlementBatchSummary} = require('./settlement_batch_summary')
 
 class SettlementBatchSummaryGateway extends Gateway
@@ -8,10 +9,20 @@ class SettlementBatchSummaryGateway extends Gateway
     @gateway.http.post(
       "/settlement_batch_summary",
       {settlementBatchSummary: criteria},
-      @responseHandler(callback)
+      @responseHandler(criteria, callback)
     )
 
-  responseHandler: (callback) ->
-    @createResponseHandler("settlementBatchSummary", SettlementBatchSummary, callback)
+  responseHandler: (criteria, callback) ->
+    @createResponseHandler "settlementBatchSummary", SettlementBatchSummary, (err, response) =>
+      callback(null, @underscoreCustomField(criteria, response))
+
+  underscoreCustomField: (criteria, response) ->
+    if response.success and ('groupByCustomField' of criteria)
+      camelCustomField = Util.toCamelCase(criteria.groupByCustomField)
+      for record in response.settlementBatchSummary.records
+        record[criteria.groupByCustomField] = record[camelCustomField]
+        record[camelCustomField] = null
+
+    response
 
 exports.SettlementBatchSummaryGateway = SettlementBatchSummaryGateway

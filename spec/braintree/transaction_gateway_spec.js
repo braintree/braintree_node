@@ -15,15 +15,11 @@ var createTransactionToRefund = function (callback) {
       options: { submitForSettlement: true }
     },
     function (err, result) {
-      specHelper.defaultGateway.http.put(
-        '/transactions/' + result.transaction.id + '/settle',
-        null,
-        function (err, settleResult) {
-          specHelper.defaultGateway.transaction.find(result.transaction.id, function (err, transaction) {
-            callback(transaction);
-          });
-        }
-      );
+      specHelper.settleTransaction(result.transaction.id, function (err, settleResult) {
+        specHelper.defaultGateway.transaction.find(result.transaction.id, function (err, transaction) {
+          callback(transaction);
+        });
+      });
     }
   )
 };
