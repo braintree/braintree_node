@@ -289,6 +289,9 @@ vows.describe('SubscriptionGateway').addBatch({
         assert.equal(subscription.planId, specHelper.plans.trialless.id);
         assert.equal(subscription.price, specHelper.plans.trialless.price);
         assert.equal(subscription.status, 'Active');
+      },
+      'contains the current billing cycle': function(err, subscription) {
+        assert.equal(subscription.currentBillingCycle, 1);
       }
     },
     'when the subscription cannot be found': {
