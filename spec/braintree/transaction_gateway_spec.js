@@ -522,5 +522,49 @@ vows.describe('TransactionGateway').addBatch({
         assert.equal(response.errors.for('transaction').on('base')[0].code, '91504');
       }
     }
+  },
+  'cloneTransaction': {
+    'for a minimal case': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.transaction.sale({
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          }
+        }, function (err, result) {
+          specHelper.defaultGateway.transaction.cloneTransaction(result.transaction.id, {amount: "123.45"}, callback);
+        });
+      },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
+      'it copies fields': function(err, response) {
+        transaction = response.transaction;
+        assert.equal(transaction.amount, "123.45");
+        assert.equal(transaction.creditCard.maskedNumber, "510510******5100");
+        assert.equal(transaction.creditCard.expirationDate, "05/2012");
+      }
+    },
+    'with validation errors': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.transaction.credit({
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          }
+        }, function (err, result) {
+          specHelper.defaultGateway.transaction.cloneTransaction(result.transaction.id, {amount: "123.45"}, callback);
+        });
+      },
+      'is unsuccessful': function (err, response) { assert.equal(response.success, false); },
+      'has an error on base': function (err, response) {
+        assert.equal(
+          response.errors.for('transaction').on('base')[0].code,
+          '91543'
+        );
+      }
+    }
   }
 }).export(module);
