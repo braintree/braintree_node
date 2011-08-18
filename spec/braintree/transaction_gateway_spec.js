@@ -537,7 +537,10 @@ vows.describe('TransactionGateway').addBatch({
           specHelper.defaultGateway.transaction.cloneTransaction(result.transaction.id, {amount: "123.45"}, callback);
         });
       },
-      'is successful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) {
+        assert.equal(response.success, true);
+        assert.equal(response.transaction.status, "authorized");
+      },
       'it copies fields': function(err, response) {
         transaction = response.transaction;
         assert.equal(transaction.amount, "123.45");
@@ -564,6 +567,24 @@ vows.describe('TransactionGateway').addBatch({
           response.errors.for('transaction').on('base')[0].code,
           '91543'
         );
+      }
+    },
+    'with submitForSettlement': {
+      topic: function () {
+        var callback = this.callback;
+        specHelper.defaultGateway.transaction.sale({
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          }
+        }, function (err, result) {
+          specHelper.defaultGateway.transaction.cloneTransaction(result.transaction.id, {amount: "123.45", options: {submitForSettlement: "true"}}, callback);
+        });
+      },
+      'is successful': function (err, response) {
+        assert.equal(response.success, true);
+        assert.equal(response.transaction.status, "submitted_for_settlement");
       }
     }
   }
