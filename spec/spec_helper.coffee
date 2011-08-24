@@ -1,5 +1,5 @@
 http = require('http')
-Util = require('../lib/braintree/util').Util
+{Util} = require('../lib/braintree/util')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
 sys = require('sys')
 
@@ -13,7 +13,7 @@ GLOBAL.assert.isEmptyArray = (array) ->
 GLOBAL.inspect = (object) ->
   sys.puts(sys.inspect(object))
 
-braintree = require('./../lib/braintree')
+braintree = require('./../lib/braintree.js')
 
 defaultConfig = {
   environment: braintree.Environment.Development
@@ -41,17 +41,24 @@ addOns = {
 }
 
 makePastDue = (subscription, callback) ->
-  defaultGateway._gateway.http.put(
+  defaultGateway.http.put(
     "/subscriptions/#{subscription.id}/make_past_due?days_past_due=1",
+    null,
+    callback
+  )
+
+settleTransaction = (transactionId, callback) ->
+  defaultGateway.http.put(
+    "/transactions/#{transactionId}/settle",
     null,
     callback
   )
 
 simulateTrFormPost = (url, trData, inputFormData, callback) ->
   client = http.createClient(
-    specHelper.defaultGateway._gateway.config.environment.port,
-    specHelper.defaultGateway._gateway.config.environment.server,
-    specHelper.defaultGateway._gateway.config.environment.ssl
+    specHelper.defaultGateway.config.environment.port,
+    specHelper.defaultGateway.config.environment.server,
+    specHelper.defaultGateway.config.environment.ssl
   )
   headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -68,13 +75,26 @@ simulateTrFormPost = (url, trData, inputFormData, callback) ->
     callback(null, response.headers.location.split('?', 2)[1])
   )
 
+dateToMdy = (date) ->
+  year = date.getFullYear().toString()
+  month = (date.getMonth() + 1).toString()
+  day = date.getDate().toString()
+  if month.length == 1
+    month = "0" + month
+  if day.length == 1
+    day = "0" + day
+  formattedDate = year + '-' + month + '-' + day
+  return formattedDate
+
 GLOBAL.specHelper = {
   addOns: addOns
   braintree: braintree
+  dateToMdy: dateToMdy
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
   makePastDue: makePastDue
   multiplyString: multiplyString
   plans: plans
+  settleTransaction: settleTransaction
   simulateTrFormPost: simulateTrFormPost
 }

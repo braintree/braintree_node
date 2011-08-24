@@ -133,7 +133,7 @@ vows.describe('SubscriptionGateway').addBatch({
         'has the expected first billing date': function (err, response) {
           var expectedDate = new Date();
           expectedDate.setFullYear(expectedDate.getFullYear() + 1);
-          var expectedDateString = dateFormat(expectedDate, 'yyyy-mm-dd');
+          var expectedDateString = dateFormat(expectedDate, 'yyyy-mm-dd', true);
 
           assert.equal(response.subscription.firstBillingDate, expectedDateString);
         },

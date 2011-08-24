@@ -1,47 +1,26 @@
-Customer = require('./customer').Customer
-ErrorResponse = require('./error_response').ErrorResponse
+{Gateway} = require('./gateway')
+{Customer} = require('./customer')
 
-CustomerGateway = (gateway) ->
-  my = { gateway: gateway }
+class CustomerGateway extends Gateway
+  constructor: (@gateway) ->
 
-  create = (attributes, callback) ->
-    my.gateway.http.post('/customers', {customer: attributes}, responseHandler(callback))
+  create: (attributes, callback) ->
+    @gateway.http.post('/customers', {customer: attributes}, @responseHandler(callback))
 
-  destroy = (customer_id, callback) ->
-    my.gateway.http.delete('/customers/' + customer_id, callback)
+  delete: (customerId, callback) ->
+    @gateway.http.delete("/customers/#{customerId}", callback)
 
-  find = (customer_id, callback) ->
-    callback = callback
-    my.gateway.http.get('/customers/' + customer_id, (err, response) ->
-      return callback(err, null) if err
-      callback(null, Customer(response.customer))
-    )
+  find: (customerId, callback) ->
+    @gateway.http.get "/customers/#{customerId}", (err, response) ->
+      if err
+        callback(err, null)
+      else
+        callback(null, new Customer(response.customer))
 
-  update = (customer_id, attributes, callback) ->
-    my.gateway.http.put(
-      '/customers/' + customer_id,
-      { customer: attributes },
-      responseHandler(callback)
-    )
+  update: (customerId, attributes, callback) ->
+    @gateway.http.put("/customers/#{customerId}", {customer: attributes}, @responseHandler(callback))
 
-  responseHandler = (callback) ->
-    (err, response) ->
-      return callback(err, response) if err
-
-      if (response.customer)
-        response.success = true
-        response.customer = Customer(response.customer)
-        callback(null, response)
-      else if (response.apiErrorResponse)
-        callback(null, ErrorResponse(response.apiErrorResponse))
-
-  {
-    create: create,
-    delete: destroy,
-    find: find,
-    responseHandler: responseHandler,
-    update: update
-  }
+  responseHandler: (callback) ->
+    @createResponseHandler("customer", Customer, callback)
 
 exports.CustomerGateway = CustomerGateway
-

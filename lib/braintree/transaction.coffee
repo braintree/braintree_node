@@ -1,10 +1,9 @@
-CreditCard = require('./credit_card').CreditCard
+{AttributeSetter} = require('./attribute_setter')
+{CreditCard} = require('./credit_card')
 
-Transaction = (attributes) ->
-  that = {}
-  for key, value of attributes
-    that[key] = value
-  that.creditCard = CreditCard(attributes.creditCard)
-  that
+class Transaction extends AttributeSetter
+  constructor: (attributes) ->
+    super attributes
+    @creditCard = new CreditCard(attributes.creditCard)
 
 exports.Transaction = Transaction

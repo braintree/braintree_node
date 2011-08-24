@@ -1,10 +1,9 @@
-Transaction = require('./transaction').Transaction
+{AttributeSetter} = require('./attribute_setter')
+{Transaction} = require('./transaction')
 
-Subscription = (attributes) ->
-  that = {}
-  for key, value of attributes
-    that[key] = value
-  that.transactions = (Transaction(transactionAttributes) for transactionAttributes in attributes.transactions)
-  that
+class Subscription extends AttributeSetter
+  constructor: (attributes) ->
+    super attributes
+    @transactions = (new Transaction(transactionAttributes) for transactionAttributes in attributes.transactions)
 
 exports.Subscription = Subscription

@@ -4,7 +4,7 @@ var ValidationErrorsCollection = require('../../lib/braintree/validation_errors_
 vows.describe('ValidationErrorsCollection').addBatch({
   'on': {
     'with multiple errors on a single attribute': {
-      topic: ValidationErrorsCollection({
+      topic: new ValidationErrorsCollection({
         errors: [
           {attribute: 'foo', code: '1'},
           {attribute: 'foo', code: '2'},

@@ -1,39 +1,41 @@
-Util = require('./util').Util
-ValidationError = require('./validation_error').ValidationError
+{Util} = require('./util')
+{ValidationError} = require('./validation_error')
 
-ValidationErrorsCollection = (errorAttributes) ->
-  my = {
-    validationErrors: {},
-    errorCollections: {}
-  }
+class ValidationErrorsCollection
+  constructor: (errorAttributes) ->
+    @validationErrors = {}
+    @errorCollections = {}
 
-  buildErrors = (errors) ->
+    for key, val of errorAttributes
+      if key is 'errors'
+        @buildErrors(val)
+      else
+        @errorCollections[key] = new ValidationErrorsCollection(val)
+
+  buildErrors: (errors) ->
     for item in errors
       key = Util.toCamelCase(item.attribute)
-      my.validationErrors[key] or= []
-      my.validationErrors[key].push ValidationError(item)
+      @validationErrors[key] or= []
+      @validationErrors[key].push(new ValidationError(item))
 
-  for key, val of errorAttributes
-    if key is 'errors'
-      buildErrors(val)
-    else
-      my.errorCollections[key] = ValidationErrorsCollection(val)
+  deepErrors: ->
+    errors = []
 
+    for key, val of @validationErrors
+      errors = errors.concat(val)
 
-  {
-    deepErrors: () ->
-      deepErrors = []
-      for key, val of my.validationErrors
-        deepErrors = deepErrors.concat(val)
+    for key, val of @errorCollections
+      errors = errors.concat(val.deepErrors())
 
-      for key, val of my.errorCollections
-        deepErrors = deepErrors.concat(val.deepErrors())
+    errors
 
-      deepErrors
+  for: (name) ->
+    @errorCollections[name]
 
-    for: (name) -> my.errorCollections[name]
-    forIndex: (index) -> my.errorCollections["index#{index}"]
-    on: (name) -> my.validationErrors[name]
-  }
+  forIndex: (index) ->
+    @errorCollections["index#{index}"]
+
+  on: (name) ->
+    @validationErrors[name]
 
 exports.ValidationErrorsCollection = ValidationErrorsCollection

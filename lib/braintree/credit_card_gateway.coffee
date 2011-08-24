@@ -1,47 +1,26 @@
-CreditCard = require('./credit_card').CreditCard
-ErrorResponse = require('./error_response').ErrorResponse
+{Gateway} = require('./gateway')
+{CreditCard} = require('./credit_card')
 
-CreditCardGateway = (gateway) ->
-  my = { gateway: gateway }
+class CreditCardGateway extends Gateway
+  constructor: (@gateway) ->
 
-  create = (attributes, callback) ->
-    my.gateway.http.post('/payment_methods', {creditCard: attributes}, responseHandler(callback))
+  create: (attributes, callback) ->
+    @gateway.http.post('/payment_methods', {creditCard: attributes}, @responseHandler(callback))
 
-  destroy = (token, callback) ->
-    my.gateway.http.delete('/payment_methods/' + token, callback)
+  delete: (token, callback) ->
+    @gateway.http.delete("/payment_methods/#{token}", callback)
 
-  find = (token, callback) ->
-    callback = callback
-    my.gateway.http.get('/payment_methods/' + token, (err, response) ->
-      return callback(err, null) if err
-      callback(null, CreditCard(response.creditCard))
-    )
+  find: (token, callback) ->
+    @gateway.http.get "/payment_methods/#{token}", (err, response) ->
+      if err
+        callback(err, null)
+      else
+        callback(null, new CreditCard(response.creditCard))
 
+  update: (token, attributes, callback) ->
+    @gateway.http.put("/payment_methods/#{token}", {creditCard: attributes}, @responseHandler(callback))
 
-  update = (token, attributes, callback) ->
-    my.gateway.http.put(
-      '/payment_methods/' + token,
-      {creditCard: attributes},
-      responseHandler(callback)
-    )
-
-  responseHandler = (callback) ->
-    return (err, response) ->
-      return callback(err, response) if err
-
-      if (response.creditCard)
-        response.success = true
-        response.creditCard = CreditCard(response.creditCard)
-        callback(null, response)
-      else if (response.apiErrorResponse)
-        callback(null, ErrorResponse(response.apiErrorResponse))
-
-  {
-    create: create,
-    delete: destroy,
-    find: find,
-    responseHandler: responseHandler,
-    update: update
-  }
+  responseHandler: (callback) ->
+    @createResponseHandler("creditCard", CreditCard, callback)
 
 exports.CreditCardGateway = CreditCardGateway
