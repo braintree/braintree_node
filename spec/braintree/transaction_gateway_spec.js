@@ -534,7 +534,7 @@ vows.describe('TransactionGateway').addBatch({
             expirationDate: '05/12'
           }
         }, function (err, result) {
-          specHelper.defaultGateway.transaction.cloneTransaction(result.transaction.id, {amount: "123.45"}, callback);
+          specHelper.defaultGateway.transaction.cloneTransaction(result.transaction.id, {amount: "123.45", options: {submitForSettlement: "false"}}, callback);
         });
       },
       'is successful': function (err, response) {
@@ -566,6 +566,12 @@ vows.describe('TransactionGateway').addBatch({
         assert.equal(
           response.errors.for('transaction').on('base')[0].code,
           '91543'
+        );
+      },
+      'has an error on submitForSettlement': function (err, response) {
+        assert.equal(
+          response.errors.for('transaction').on('submitForSettlement')[0].code,
+          '91544'
         );
       }
     },
