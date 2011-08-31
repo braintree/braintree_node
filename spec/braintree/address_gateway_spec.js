@@ -88,7 +88,7 @@ vows.describe('AddressGateway').addBatch({
         );
       },
       'deletes the address': function (err, address) {
-        assert.isNull(address);
+        assert.isUndefined(address);
         assert.equal(err.type, braintree.errorTypes.notFoundError);
       }
     }
@@ -136,7 +136,7 @@ vows.describe('AddressGateway').addBatch({
         assert.equal(err.type, braintree.errorTypes.notFoundError);
       },
       'does not return an address': function (err, address) {
-        assert.isNull(address);
+        assert.isUndefined(address);
       }
     }
   },
