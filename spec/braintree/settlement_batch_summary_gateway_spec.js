@@ -51,7 +51,7 @@ vows.describe('SettlementBatchSummaryGateway').addBatch({
           }
         }, function (err, response) {
           specHelper.settleTransaction(response.transaction.id, function (err, response) {
-            formattedDate = specHelper.dateToMdy(new Date());
+            formattedDate = specHelper.dateToMdy(specHelper.nowInEastern());
             specHelper.defaultGateway.settlementBatchSummary.generate(
               {settlementDate: formattedDate},
               callback
@@ -89,7 +89,7 @@ vows.describe('SettlementBatchSummaryGateway').addBatch({
           }
         }, function (err, response) {
           specHelper.settleTransaction(response.transaction.id, function (err, response) {
-            formattedDate = specHelper.dateToMdy(new Date);
+            formattedDate = specHelper.dateToMdy(specHelper.nowInEastern());
             specHelper.defaultGateway.settlementBatchSummary.generate(
               {settlementDate: formattedDate, groupByCustomField: "store_me"},
               callback

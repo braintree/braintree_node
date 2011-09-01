@@ -86,6 +86,11 @@ dateToMdy = (date) ->
   formattedDate = year + '-' + month + '-' + day
   return formattedDate
 
+nowInEastern = ->
+  now = new Date
+  eastern = now.getTime() - (5*60*60*1000)
+  return new Date(eastern)
+
 GLOBAL.specHelper = {
   addOns: addOns
   braintree: braintree
@@ -94,6 +99,7 @@ GLOBAL.specHelper = {
   defaultGateway: defaultGateway
   makePastDue: makePastDue
   multiplyString: multiplyString
+  nowInEastern: nowInEastern
   plans: plans
   settleTransaction: settleTransaction
   simulateTrFormPost: simulateTrFormPost
