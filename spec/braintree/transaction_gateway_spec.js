@@ -567,12 +567,6 @@ vows.describe('TransactionGateway').addBatch({
           response.errors.for('transaction').on('base')[0].code,
           '91543'
         );
-      },
-      'has an error on submitForSettlement': function (err, response) {
-        assert.equal(
-          response.errors.for('transaction').on('submitForSettlement')[0].code,
-          '91544'
-        );
       }
     },
     'with submitForSettlement': {
