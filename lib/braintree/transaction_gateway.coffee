@@ -5,6 +5,9 @@
 class TransactionGateway extends Gateway
   constructor: (@gateway) ->
 
+  cloneTransaction: (transactionId, attributes, callback) ->
+    @gateway.http.post("/transactions/#{transactionId}/clone", {transactionClone: attributes}, @responseHandler(callback))
+
   create: (attributes, callback) ->
     @gateway.http.post('/transactions', {transaction: attributes}, @responseHandler(callback))
 
