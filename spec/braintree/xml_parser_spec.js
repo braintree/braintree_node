@@ -8,7 +8,7 @@ var CUSTOMER_XML = [
 '  <merchant-id>integration_merchant_id</merchant-id>',
 '  <first-name>Dan</first-name>',
 '  <last-name nil="true"></last-name>',
-'  <company nil="true"></company>',
+'  <company></company>',
 '  <email nil="true"></email>',
 '  <phone nil="true"></phone>',
 '  <fax nil="true"></fax>',
@@ -85,6 +85,9 @@ vows.describe('XmlParser').addBatch({
       },
       'parses nil values': function (result) {
         assert.equal(result.customer.lastName, null);
+      },
+      'parses empty values': function (result) {
+        assert.equal(result.customer.company, '');
       },
       'parses boolean values': function (result) {
         assert.equal(result.customer.creditCards[0].default, true);

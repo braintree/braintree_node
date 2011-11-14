@@ -25,6 +25,8 @@ class XmlParser
           obj[name] = []
         else if child.attributes.length is 1 && child.attributes[0].name is 'type' && child.attributes[0].value is 'array'
           obj[name] = (@convertNodeToObject(arrayItem)[Util.toCamelCase(arrayItem.nodeName)] for arrayItem in child.childNodes when arrayItem.nodeType isnt TEXT_NODE)
+        else if child.childNodes.length is 0 && child.attributes.length is 0
+          obj[name] = ''
         else
           obj[name] = @convertNodeToObject(child)[Util.toCamelCase(child.nodeName)]
     object[Util.toCamelCase(node.nodeName)] = obj
