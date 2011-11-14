@@ -202,6 +202,15 @@ vows.describe('CreditCardGateway').addBatch({
         assert.equal(err.type, braintree.errorTypes.notFoundError);
       }
     },
+
+    'when the id is whitespace': {
+      topic: function () {
+        specHelper.defaultGateway.creditCard.find(" ", this.callback);
+      },
+      'returns a not found error': function (err, address) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
   },
 
   'update': {

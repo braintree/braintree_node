@@ -302,7 +302,18 @@ vows.describe('CustomerGateway').addBatch({
         specHelper.defaultGateway.customer.create(
           {
             firstName: 'John',
-            lastName: 'Smith'
+            lastName: 'Smith',
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/2014',
+              billingAddress: {
+                company: '',
+                streetAddress: '123 E Fake St',
+                locality: 'Chicago',
+                region: 'IL',
+                postalCode: '60607'
+              }
+            }
           },
           function (err, response) {
             specHelper.defaultGateway.customer.find(response.customer.id, callback);
@@ -313,7 +324,12 @@ vows.describe('CustomerGateway').addBatch({
       'returns customer details': function (err, customer) {
         assert.equal(customer.firstName, 'John');
         assert.equal(customer.lastName, 'Smith');
-      }
+      },
+      'returns the billing address details, including empty strings': function (err, customer) {
+        var billingAddress = customer.creditCards[0].billingAddress;
+        assert.equal(billingAddress.streetAddress, '123 E Fake St');
+        assert.equal(billingAddress.company, '');
+      },
     },
 
     'when not found': {
@@ -321,6 +337,15 @@ vows.describe('CustomerGateway').addBatch({
         specHelper.defaultGateway.customer.find('nonexistent_customer', this.callback);
       },
       'returns a not found error': function (err, response) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
+
+    'when the id is whitespace': {
+      topic: function () {
+        specHelper.defaultGateway.customer.find(" ", this.callback);
+      },
+      'returns a not found error': function (err, address) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
       }
     },
@@ -440,7 +465,7 @@ vows.describe('CustomerGateway').addBatch({
         assert.equal(billingAddress.region, 'IL');
         assert.equal(billingAddress.postalCode, '60607');
         assert.equal(response.customer.addresses[0].streetAddress, '123 E Fake St');
-      }
+      },
     },
 
     'with updating an existing card': {

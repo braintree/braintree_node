@@ -138,7 +138,26 @@ vows.describe('AddressGateway').addBatch({
       'does not return an address': function (err, address) {
         assert.isNull(address);
       }
+    },
+
+    'when the customer id is whitespace': {
+      topic: function () {
+        specHelper.defaultGateway.address.find(" ", "id", this.callback);
+      },
+      'returns a not found error': function (err, address) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
+
+    'when the address id is whitespace': {
+      topic: function () {
+        specHelper.defaultGateway.address.find("blah", "\t ", this.callback);
+      },
+      'returns a not found error': function (err, address) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
     }
+
   },
 
   'update': {

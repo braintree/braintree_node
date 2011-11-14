@@ -1,5 +1,6 @@
 {Gateway} = require('./gateway')
 {Address} = require('./address')
+exceptions = require('./exceptions')
 
 class AddressGateway extends Gateway
   constructor: (@gateway) ->
@@ -13,11 +14,14 @@ class AddressGateway extends Gateway
     @gateway.http.delete("/customers/#{customerId}/addresses/#{id}", callback)
 
   find: (customerId, id, callback) ->
-    @gateway.http.get "/customers/#{customerId}/addresses/#{id}", (err, response) ->
-      if err
-        callback(err, null)
-      else
-        callback(null, response.address)
+    if(customerId.trim() == '' || id.trim() == '')
+      callback(exceptions.NotFoundError(), null)
+    else
+      @gateway.http.get "/customers/#{customerId}/addresses/#{id}", (err, response) ->
+        if err
+          callback(err, null)
+        else
+          callback(null, response.address)
 
   update: (customerId, id, attributes, callback) ->
     @gateway.http.put("/customers/#{customerId}/addresses/#{id}", {address: attributes}, @responseHandler(callback))

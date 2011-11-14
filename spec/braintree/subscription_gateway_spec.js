@@ -301,7 +301,16 @@ vows.describe('SubscriptionGateway').addBatch({
       'has a not found error': function (err, response) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
       },
-    }
+    },
+
+    'when the id is whitespace': {
+      topic: function () {
+        specHelper.defaultGateway.subscription.find(" ", this.callback);
+      },
+      'returns a not found error': function (err, address) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+      }
+    },
   },
 
   'retryCharge': {

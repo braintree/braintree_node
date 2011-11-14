@@ -1,6 +1,7 @@
 {Gateway} = require('./gateway')
 {Transaction} = require('./transaction')
 {ErrorResponse} = require('./error_response')
+exceptions = require('./exceptions')
 
 class TransactionGateway extends Gateway
   constructor: (@gateway) ->
@@ -16,11 +17,14 @@ class TransactionGateway extends Gateway
     @create(attributes, callback)
 
   find: (transactionId, callback) ->
-    @gateway.http.get "/transactions/#{transactionId}", (err, response) ->
-      if err
-        callback(err, null)
-      else
-        callback(null, new Transaction(response.transaction))
+    if(transactionId.trim() == '')
+      callback(exceptions.NotFoundError(), null)
+    else
+      @gateway.http.get "/transactions/#{transactionId}", (err, response) ->
+        if err
+          callback(err, null)
+        else
+          callback(null, new Transaction(response.transaction))
 
   refund: (transactionId, amount..., callback) ->
     @gateway.http.post("/transactions/#{transactionId}/refund", {transaction: {amount: amount[0]}}, @responseHandler(callback))
