@@ -53,7 +53,7 @@ class Http
 
     if body
       requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(body))
-      options.headers['Content-Length'] = requestBody.length.toString()
+      options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString()
 
     theRequest = client.request(options, (response) =>
       body = ''
