@@ -20,6 +20,21 @@ vows.describe('CustomerGateway').addBatch({
       }
     },
 
+    'for a minimal case with two-byte characters': {
+      topic: function () {
+        specHelper.defaultGateway.customer.create({
+          firstName: 'Jöhn',
+          lastName: 'Smith'
+        }, this.callback);
+      },
+      'does not have an error': function (err, response) { assert.isNull(err); },
+      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'has customer attributes': function (err, response) {
+        assert.equal(response.customer.firstName, 'Jöhn');
+        assert.equal(response.customer.lastName, 'Smith');
+      }
+    },
+
     'a blank customer': {
       topic: function () {
         specHelper.defaultGateway.customer.create({}, this.callback);
