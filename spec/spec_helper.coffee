@@ -1,7 +1,6 @@
 http = require('http')
 {Util} = require('../lib/braintree/util')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
-sys = require('sys')
 
 GLOBAL.vows = require('vows')
 GLOBAL.assert = require('assert')
@@ -11,7 +10,7 @@ GLOBAL.assert.isEmptyArray = (array) ->
   assert.equal(array.length, 0)
 
 GLOBAL.inspect = (object) ->
-  sys.puts(sys.inspect(object))
+  console.dir(object)
 
 braintree = require('./../lib/braintree.js')
 

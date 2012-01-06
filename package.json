@@ -12,7 +12,7 @@
   "bundledDependencies" : [ "dateformat" ],
   "dependencies" : {
     "coffee-script" : "~1.1",
-    "o3-xml"        : "~0.1.0"
+    "xml2js" : ">=0.1.13"
   },
   "devDependencies" : {
     "underscore" : "=1.1.6",

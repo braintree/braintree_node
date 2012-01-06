@@ -1,4 +1,3 @@
-sys = require('sys')
 crypto = require('crypto')
 
 class Digest
