@@ -6,7 +6,7 @@ class XmlParser
 
   @parse: (text, callback) ->
     unless callback?
-      throw "No parse callback provided (ABC)"
+      throw "XmlParser.parse called without a callback."
     new XmlParser().parse(text, callback)
 
   convertNodeToObject: (node) ->
