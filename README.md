@@ -23,7 +23,7 @@ should be minimal. We're using [semantic versioning](http://semver.org/).
 
 * node ~0.4.7
 * coffee-script ~1.1
-* o3-xml ~0.1.0
+* dom-js ~0.0.6
 
 ## Not Yet Implemented
 
@@ -36,7 +36,7 @@ should be minimal. We're using [semantic versioning](http://semver.org/).
 
 ## Quick Start
 
-    var sys = require('sys'),
+    var util = require('util'),
         braintree = require('braintree');
 
     var gateway = braintree.connect({
@@ -56,9 +56,9 @@ should be minimal. We're using [semantic versioning](http://semver.org/).
       if (err) throw err;
 
       if (result.success) {
-        sys.puts('Transaction ID: ' + result.transaction.id);
+        util.log('Transaction ID: ' + result.transaction.id);
       } else {
-        sys.puts(result.message);
+        util.log(result.message);
       }
     });
 
