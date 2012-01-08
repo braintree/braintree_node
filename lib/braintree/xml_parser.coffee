@@ -1,39 +1,42 @@
-sys = require('sys')
-xml = require('o3-xml')
+{DomJS} = require("dom-js")
 {Util} = require('./util')
 
 class XmlParser
   TEXT_NODE = 3
 
-  @parse: (text) ->
-    new XmlParser().parse(text)
+  @parse: (text, callback) ->
+    unless callback?
+      throw "XmlParser.parse called without a callback."
+    new XmlParser().parse(text, callback)
 
   convertNodeToObject: (node) ->
     object = {}
     obj = {}
-    for child in node.childNodes
-      if child.nodeType isnt TEXT_NODE
-        name = Util.toCamelCase(child.nodeName)
-        if child.childNodes.length is 1 && child.childNodes[0].nodeType is TEXT_NODE
-          if child.attributes.length is 1 && child.attributes[0].name is 'type' && child.attributes[0].value is 'boolean'
-            obj[name] = if child.childNodes[0].nodeValue is 'true' then true else false
+    
+    for child in node.children
+      unless typeof child.text == "string"
+        name = Util.toCamelCase child.name
+        if child.children.length is 1 and typeof child.children[0].text == "string"
+          if child.attributes?.type == 'boolean'
+            obj[name] = child.children[0].text == 'true'
           else
-            obj[name] = child.childNodes[0].nodeValue
-        else if child.childNodes.length is 0 && child.attributes.length is 1 && child.attributes[0].name is 'nil'
+            obj[name] = child.children[0].text
+        else if child.children.length is 0 and child.attributes.nil?
           obj[name] = null
-        else if child.childNodes.length is 0 && child.attributes.length is 1 && child.attributes[0].name is 'type' && child.attributes[0].value is 'array'
+        else if child.children.length is 0 and child.attributes.type == 'array'
           obj[name] = []
-        else if child.attributes.length is 1 && child.attributes[0].name is 'type' && child.attributes[0].value is 'array'
-          obj[name] = (@convertNodeToObject(arrayItem)[Util.toCamelCase(arrayItem.nodeName)] for arrayItem in child.childNodes when arrayItem.nodeType isnt TEXT_NODE)
-        else if child.childNodes.length is 0 && child.attributes.length is 0
+        else if child.attributes.type == 'array'
+          obj[name] = (@convertNodeToObject(arrayItem)[Util.toCamelCase(arrayItem.name)] for arrayItem in child.children when typeof arrayItem.text != "string")
+        else if child.children.length == 0 and (for own key of child.attributes then key).length == 0
           obj[name] = ''
         else
-          obj[name] = @convertNodeToObject(child)[Util.toCamelCase(child.nodeName)]
-    object[Util.toCamelCase(node.nodeName)] = obj
+          obj[name] = @convertNodeToObject(child)[Util.toCamelCase(child.name)]
+    object[Util.toCamelCase(node.name)] = obj
     object
 
-  parse: (body) ->
-    doc = xml.parseFromString(body)
-    @convertNodeToObject(doc.documentElement)
+  parse: (body, callback) ->
+    domjs = new DomJS
+    domjs.parse body, (err, dom)=>
+      callback? err, @convertNodeToObject dom
 
 exports.XmlParser = XmlParser

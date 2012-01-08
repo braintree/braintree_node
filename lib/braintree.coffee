@@ -1,4 +1,3 @@
-sys = require "sys"
 {Config} = require("./braintree/config")
 {Environment} = require("./braintree/environment")
 {BraintreeGateway} = require("./braintree/braintree_gateway")

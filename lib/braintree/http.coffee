@@ -1,4 +1,3 @@
-sys = require('sys')
 http = require('http')
 https = require('https')
 {Buffer} = require('buffer')
@@ -64,7 +63,7 @@ class Http
         error = @checkHttpStatus(response.statusCode)
         return callback(error, null) if error
         if body isnt ' '
-          callback(null, XmlParser.parse(body))
+          XmlParser.parse body, callback
         else
           callback(null, null)
       )
