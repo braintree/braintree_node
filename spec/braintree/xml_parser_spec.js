@@ -36,7 +36,7 @@ var CUSTOMER_XML = [
 '    </credit-card>',
 '  </credit-cards>',
 '  <addresses type="array"/>',
-'</customer>',
+'</customer>'
 ].join("\n");
 
 var VALIDATION_ERRORS_XML = [
@@ -71,33 +71,35 @@ var VALIDATION_ERRORS_XML = [
 '    </subscription>',
 '    <errors type="array"/>',
 '  </errors>',
-'</api-error-response>',
+'</api-error-response>'
 ].join("\n");
 
 vows.describe('XmlParser').addBatch({
   'parse': {
     'parsing customer xml': {
-      topic: XmlParser.parse(CUSTOMER_XML),
-      'parses customer attributes': function (result) {
+      topic: function(){
+        XmlParser.parse(CUSTOMER_XML, this.callback);
+      },
+      'parses customer attributes': function (err, result) {
         assert.equal(result.customer.id, '403123');
         assert.equal(result.customer.merchantId, 'integration_merchant_id');
         assert.equal(result.customer.firstName, 'Dan');
       },
-      'parses nil values': function (result) {
+      'parses nil values': function (err, result) {
         assert.equal(result.customer.lastName, null);
       },
-      'parses empty values': function (result) {
+      'parses empty values': function (err, result) {
         assert.equal(result.customer.company, '');
       },
-      'parses boolean values': function (result) {
+      'parses boolean values': function (err, result) {
         assert.equal(result.customer.creditCards[0].default, true);
         assert.equal(result.customer.creditCards[0].expired, false);
       },
-      'parses empty arrays': function (result) {
+      'parses empty arrays': function (err, result) {
         assert.equal(result.customer.addresses.length, 0);
         assert.isEmptyArray(result.customer.addresses);
       },
-      'parses an array of credit cards': function (result) {
+      'parses an array of credit cards': function (err, result) {
         assert.equal(result.customer.creditCards.length, 1);
         var creditCard = result.customer.creditCards[0];
         assert.equal(creditCard.bin, '510510');
@@ -110,14 +112,16 @@ vows.describe('XmlParser').addBatch({
     },
 
     'parsing validation errors on subscriptions': {
-      topic: XmlParser.parse(VALIDATION_ERRORS_XML),
-      'parses the message': function (result) {
+      topic: function(){
+        XmlParser.parse(VALIDATION_ERRORS_XML, this.callback);
+      },
+      'parses the message': function (err, result) {
         assert.equal(result.apiErrorResponse.message, "Payment method token is invalid.\nPlan ID is invalid.");
       },
-      'parses top level errors': function (result) {
+      'parses top level errors': function (err, result) {
         assert.isEmptyArray(result.apiErrorResponse.errors.errors);
       },
-      'parses subscription errors': function (result) {
+      'parses subscription errors': function (err, result) {
         var subscriptionErrors = result.apiErrorResponse.errors.subscription.errors;
         assert.isArray(subscriptionErrors);
         assert.equal(subscriptionErrors.length, 2);

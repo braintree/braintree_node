@@ -8,11 +8,11 @@
   "main"                : "./lib/braintree.js",
   "repository"          : { "type": "git", "url" : "https://github.com/braintree/braintree_node.git" },
   "dependencies"        : {},
-  "engines"             : { "node": "~0.4.7" },
+  "engines"             : { "node": "~0.6.6" },
   "bundledDependencies" : [ "dateformat" ],
   "dependencies" : {
-    "coffee-script" : "~1.1",
-    "o3-xml"        : "~0.1.0"
+    "coffee-script" : "~1.1"
+    "dom-js"        : "~0.0.6"
   },
   "devDependencies" : {
     "underscore" : "=1.1.6",
