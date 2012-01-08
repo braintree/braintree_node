@@ -1,4 +1,3 @@
-sys = require('sys')
 http = require('http')
 https = require('https')
 {Buffer} = require('buffer')

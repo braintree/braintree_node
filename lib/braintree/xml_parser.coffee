@@ -1,4 +1,3 @@
-sys = require('sys')
 xml = require('o3-xml')
 {Util} = require('./util')
 
