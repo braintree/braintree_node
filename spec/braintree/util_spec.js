@@ -44,6 +44,95 @@ vows.describe('Util').addBatch({
     }
   },
 
+  'convertNodeToObject': {
+    'single value': {
+      topic: Util.convertNodeToObject('foobar'),
+      'is converted to an object': function (result) {
+        assert.equal(result, 'foobar');
+      }
+    },
+
+    'hash of values': {
+      topic: Util.convertNodeToObject({'foo-bar': 'baz', 'ping': 'pong'}),
+      'is converted to an object': function (result) {
+        assert.deepEqual(result, {'fooBar': 'baz', 'ping': 'pong'});
+      }
+    },
+
+    'hash of hash of values': {
+      topic: Util.convertNodeToObject({'foo-bar': 'baz', 'hash': {'ping-pong': 'paddle'}}),
+      'is converted to an object': function (result) {
+        assert.deepEqual(result, {'fooBar': 'baz', 'hash': {'pingPong': 'paddle'}});
+      }
+    },
+
+    'array as object with no items': {
+      topic: Util.convertNodeToObject({'@':{'type': 'array'}}),
+      'is converted to an object': function (result) {
+        assert.deepEqual(result, []);
+      }
+    },
+
+    'array as object with one item': {
+      topic: Util.convertNodeToObject({'@':{'type': 'array'}, 'item': {'foo': 'bar'}}),
+      'is converted to an object': function (result) {
+        assert.deepEqual(result, [{'foo': 'bar'}]);
+      }
+    },
+
+    'array as object with multiple items': {
+      topic: Util.convertNodeToObject({'@':{'type': 'array'}, 'item':[{'prop': 'value'}, {'prop': 'value'}]}),
+      'is converted to an object': function (result) {
+        assert.deepEqual(result, [{'prop': 'value'}, {'prop': 'value'}]);
+      }
+    },
+
+    'array as object with root element': {
+      topic: Util.convertNodeToObject({'items':{'@':{'type': 'array'}, 'item':[{'prop': 'value'}, {'prop': 'value'}]}}),
+      'is converted to an object': function (result) {
+        assert.deepEqual(result, {'items':[{'prop': 'value'}, {'prop': 'value'}]});
+      }
+    },
+
+    'nil object': {
+      topic: Util.convertNodeToObject({'@': {nil: 'true'}}),
+      'is converted to null': function (result) {
+        assert.isNull(result);
+      }
+    },
+
+    'symbol': {
+      topic: Util.convertNodeToObject({attribute: { '#': 'country_name', '@': { type: 'symbol' } } }),
+      'is converted to string': function (result) {
+        assert.deepEqual(result, {'attribute': 'country_name'})
+      }
+    },
+
+    'integer': {
+      topic: Util.convertNodeToObject({attribute: { '#': '1234', '@': { type: 'integer' } } }),
+      'is converted to integer': function (result) {
+        assert.deepEqual(result, {'attribute': 1234})
+      }
+    },
+
+    'boolean': {
+      topic: Util.convertNodeToObject({'a1': { '#': 'true', '@': { type: 'boolean' } }, 'a2': { '#': 'false', '@': { type: 'boolean' } } }),
+      'is converted to boolean': function (result) {
+        assert.isTrue(result.a1)
+        assert.isFalse(result.a2)
+      }
+    },
+
+    'empty object': {
+      topic: Util.convertNodeToObject({attribute: {}}),
+      'is converted to empty string': function (result) {
+        assert.deepEqual(result, {'attribute': ''})
+      }
+    }
+
+
+  },
+
   'toCamelCase': {
     'string with underscores': {
       topic: Util.toCamelCase('one_two_three'),
