@@ -36,14 +36,6 @@ class CustomerGateway extends Gateway
     @createResponseHandler("customer", Customer, callback)
 
   searchResponseHandler: (callback) ->
-    (err, response) ->
-      return callback(err, response) if err
-
-      if (response.searchResults.ids)
-        sys.log sys.inspect(response)
-        response.success = true
-        callback(null, response)
-      else if (response.apiErrorResponse)
-        callback(null, new ErrorResponse(response.apiErrorResponse))
+    @createResponseHandler("searchResults", null, callback)
 
 exports.CustomerGateway = CustomerGateway

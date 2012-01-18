@@ -635,18 +635,40 @@ vows.describe('CustomerGateway').addBatch({
   },
 
   "search": {
-    topic: function() {
-      specHelper.defaultGateway.customer.search(function(search) {
-        search.email().is("email@example.com");
-      }, this.callback);
+    "when no results are found": {
+      topic: function() {
+        specHelper.defaultGateway.customer.search(function(search) {
+          search.email().is("email@example.com");
+        }, this.callback);
+      },
+
+      'does not have error': function(err, response) {
+        assert.isNull(err);
+      },
+
+      'returns no results': function(err, response) {
+        assert.isEmpty(response.searchResults.ids);
+      }
     },
 
-    'does not have error': function(err, response) {
-      assert.isNull(err);
-    },
+    "when the search yields a single result": {
+      topic: function() {
+        var callback = this.callback;
+        var random = specHelper.randomNumberAsString();
+        specHelper.defaultGateway.customer.create({
+          firstName: 'Bob',
+          lastName: "Smith",
+          email: random + '@smith.org',
+        }, function(err, response) {
+          specHelper.defaultGateway.customer.search(function(search) {
+            search.email().is(random + "@smith.org");
+          }, callback);
+        });
+      },
 
-    'returns no results': function(err, response) {
-      assert.isEmpty(response.searchResults.ids);
+      'returns results': function(err, response) {
+        assert.equal(response.searchResults.ids.length, 1);
+      }
     }
   }
 }).export(module);

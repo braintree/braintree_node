@@ -90,6 +90,10 @@ nowInEastern = ->
   eastern = now.getTime() - (5*60*60*1000)
   return new Date(eastern)
 
+randomNumberAsString = (max) ->
+  max ?= 99999
+  Math.floor(Math.random() * (max + 1)).toString()
+
 GLOBAL.specHelper = {
   addOns: addOns
   braintree: braintree
@@ -99,6 +103,7 @@ GLOBAL.specHelper = {
   makePastDue: makePastDue
   multiplyString: multiplyString
   nowInEastern: nowInEastern
+  randomNumberAsString: randomNumberAsString
   plans: plans
   settleTransaction: settleTransaction
   simulateTrFormPost: simulateTrFormPost

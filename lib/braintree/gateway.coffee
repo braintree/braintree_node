@@ -7,9 +7,12 @@ class Gateway
 
       if (response[attributeName])
         response.success = true
-        response[attributeName] = new klass(response[attributeName])
+        response[attributeName] = new klass(response[attributeName]) if klass?
         callback(null, response)
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
+
+  searchResponseHandler: (callback) ->
+    @createResponseHandler("searchResults", null, callback)
 
 exports.Gateway = Gateway
