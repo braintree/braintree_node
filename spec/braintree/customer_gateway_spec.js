@@ -13,7 +13,7 @@ vows.describe('CustomerGateway').addBatch({
         }, this.callback);
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'has customer attributes': function (err, response) {
         assert.equal(response.customer.firstName, 'John');
         assert.equal(response.customer.lastName, 'Smith');
@@ -28,7 +28,7 @@ vows.describe('CustomerGateway').addBatch({
         }, this.callback);
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'has customer attributes': function (err, response) {
         assert.equal(response.customer.firstName, 'Jöhn');
         assert.equal(response.customer.lastName, 'Smith');
@@ -39,7 +39,7 @@ vows.describe('CustomerGateway').addBatch({
       topic: function () {
         specHelper.defaultGateway.customer.create({}, this.callback);
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -54,7 +54,7 @@ vows.describe('CustomerGateway').addBatch({
         }, this.callback);
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'has custom fields in response': function (err, response) {
         assert.equal(response.customer.customFields.storeMe, 'custom value');
       }
@@ -72,7 +72,7 @@ vows.describe('CustomerGateway').addBatch({
         }, this.callback);
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'has customer attributes': function (err, response) {
         assert.equal(response.customer.firstName, 'John');
         assert.equal(response.customer.lastName, 'Smith');
@@ -97,7 +97,7 @@ vows.describe('CustomerGateway').addBatch({
           }
         }, this.callback);
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -115,7 +115,7 @@ vows.describe('CustomerGateway').addBatch({
           }
         }, this.callback);
       },
-      'is not succesful': function (err, response) {
+      'is not successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, false);
       },
@@ -172,7 +172,7 @@ vows.describe('CustomerGateway').addBatch({
         }, this.callback);
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'has customer attributes': function (err, response) {
         assert.equal(response.customer.firstName, 'John');
         assert.equal(response.customer.lastName, 'Smith');
@@ -388,7 +388,7 @@ vows.describe('CustomerGateway').addBatch({
         );
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'has updated customer attributes': function (err, response) {
         assert.equal(response.customer.firstName, 'New First Name');
         assert.equal(response.customer.lastName, 'New Last Name');
@@ -419,7 +419,7 @@ vows.describe('CustomerGateway').addBatch({
           }
         );
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -462,7 +462,7 @@ vows.describe('CustomerGateway').addBatch({
           }
         );
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -514,7 +514,7 @@ vows.describe('CustomerGateway').addBatch({
           }
         );
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -569,7 +569,7 @@ vows.describe('CustomerGateway').addBatch({
           }
         );
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -633,4 +633,20 @@ vows.describe('CustomerGateway').addBatch({
       }
     }
   },
+
+  "search": {
+    topic: function() {
+      specHelper.defaultGateway.customer.search(function(search) {
+        search.email().is("email@example.com");
+      }, this.callback);
+    },
+
+    'does not have error': function(err, response) {
+      assert.isNull(err);
+    },
+
+    'returns no results': function(err, response) {
+      assert.isEmpty(response.searchResults.ids);
+    }
+  }
 }).export(module);

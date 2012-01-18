@@ -1,5 +1,8 @@
 {Gateway} = require('./gateway')
 {Customer} = require('./customer')
+{CustomerSearch} = require('./customer_search')
+sys = require('sys')
+
 exceptions = require('./exceptions')
 
 class CustomerGateway extends Gateway
@@ -24,7 +27,23 @@ class CustomerGateway extends Gateway
   update: (customerId, attributes, callback) ->
     @gateway.http.put("/customers/#{customerId}", {customer: attributes}, @responseHandler(callback))
 
+  search: (fn, callback) ->
+    search = new CustomerSearch
+    fn(search)
+    @gateway.http.post("/customers/advanced_search_ids", {search: search.toHash()}, @searchResponseHandler(callback))
+
   responseHandler: (callback) ->
     @createResponseHandler("customer", Customer, callback)
+
+  searchResponseHandler: (callback) ->
+    (err, response) ->
+      return callback(err, response) if err
+
+      if (response.searchResults.ids)
+        sys.log sys.inspect(response)
+        response.success = true
+        callback(null, response)
+      else if (response.apiErrorResponse)
+        callback(null, new ErrorResponse(response.apiErrorResponse))
 
 exports.CustomerGateway = CustomerGateway
