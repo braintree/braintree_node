@@ -30,7 +30,7 @@ vows.describe('SubscriptionGateway').addBatch({
         );
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'cancels the subscription': function (err, result) {
         assert.equal(result.subscription.status, 'Canceled');
       }
@@ -103,7 +103,7 @@ vows.describe('SubscriptionGateway').addBatch({
           }, callback);
         },
         'does not have an error': function (err, response) { assert.isNull(err); },
-        'is succesful': function (err, response) { assert.equal(response.success, true); },
+        'is successful': function (err, response) { assert.equal(response.success, true); },
         'has the expected plan id and amount': function (err, response) {
           assert.equal(response.subscription.planId, specHelper.plans.trialless.id);
           assert.equal(response.subscription.price, specHelper.plans.trialless.price);
@@ -126,7 +126,7 @@ vows.describe('SubscriptionGateway').addBatch({
             firstBillingDate: firstBillingDate
           }, callback);
         },
-        'is succesful': function (err, response) {
+        'is successful': function (err, response) {
           assert.isNull(err);
           assert.equal(response.success, true);
         },
@@ -149,7 +149,7 @@ vows.describe('SubscriptionGateway').addBatch({
             price: '2000.00'
           }, callback);
         },
-        'is not succesful': function (err, result) {
+        'is not successful': function (err, result) {
           assert.isNull(err);
           assert.equal(result.success, false);
         },
@@ -404,7 +404,7 @@ vows.describe('SubscriptionGateway').addBatch({
           }
         );
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -441,7 +441,7 @@ vows.describe('SubscriptionGateway').addBatch({
           }
         );
       },
-      'is not succesful': function (err, response) {
+      'is not successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, false);
       },
