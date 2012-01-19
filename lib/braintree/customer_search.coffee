@@ -1,22 +1,6 @@
-class CustomerSearch
-  constructor: -> @criteria = {}
-  addCriteria: (key, value) -> @criteria[key] = value
-  toHash: -> @criteria
+{AdvancedSearch} = require('./advanced_search')
 
-  field: (nodeName)
-    new EqualityNode(nodeName, CustomerSearch)
-
-class SearchNode
-  constructor: (nodeName, parentName) ->
-    @nodeName = nodeName
-    @parentName = parentName
-
-  operators: (operatorNames...) ->
-    for operator in operatorNames
-      @[operator] = (value) =>
-        @parentName.addCriteria(@nodeName, { operator : value.toString() }
-
-class EqualityNode extends SearchNode
-  operators("is", "isNot")
+class CustomerSearch extends AdvancedSearch
+  @equalityFields "email"
 
 exports.CustomerSearch = CustomerSearch
