@@ -647,7 +647,7 @@ vows.describe('CustomerGateway').addBatch({
       },
 
       'returns no results': function(err, response) {
-        assert.isEmpty(response.searchResults.ids);
+        assert.equal(response.length(), 0);
       }
     },
 
@@ -666,8 +666,11 @@ vows.describe('CustomerGateway').addBatch({
         });
       },
 
-      'returns results': function(err, response) {
-        assert.equal(response.searchResults.ids.length, 1);
+      'returns the first customer': function(err, response) {
+        response.first( function(err, customer) {
+          assert.equal(customer.firstName, 'Bob');
+          assert.equal(customer.lastName, 'Smith');
+        });
       }
     }
   }

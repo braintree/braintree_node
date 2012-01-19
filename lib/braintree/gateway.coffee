@@ -1,4 +1,5 @@
 {ErrorResponse} = require('./error_response')
+{SearchResponse} = require ('./search_response')
 
 class Gateway
   createResponseHandler: (attributeName, klass, callback) ->
@@ -12,7 +13,13 @@ class Gateway
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
 
-  searchResponseHandler: (callback) ->
-    @createResponseHandler("searchResults", null, callback)
+  searchResponseHandler: (gateway, klass, callback) ->
+    (err, response) ->
+      return callback(err, response) if err
+      if (response["searchResults"])
+        container = new SearchResponse(gateway, klass, response)
+        callback(null, container)
+      else if (response.apiErrorResponse)
+        callback(null, new ErrorResponse(response.apiErrorResponse))
 
 exports.Gateway = Gateway
