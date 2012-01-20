@@ -9,6 +9,7 @@ class TestSearch extends AdvancedSearch
   @multipleValueField "multiple"
   @multipleValueField "multipleWithAllows", { "allows" : ["Hello", "World"] }
   @multipleValueOrTextField "multipleValueOrText"
+  @rangeFields "range"
 
 newSearch = -> new TestSearch()
 value = "mail@example.com"
@@ -74,7 +75,7 @@ vows
         search.multiple().is(value)
         assert.deepEqual(search.toHash(), { multiple: [value] })
 
-    'multiple value of text field':
+    'multiple value or text field':
       'inherited operators': ->
         search = newSearch()
         assert.isFunction(search.multipleValueOrText().is)
@@ -83,6 +84,28 @@ vows
         assert.isFunction(search.multipleValueOrText().startsWith)
         assert.isFunction(search.multipleValueOrText().contains)
         assert.isFunction(search.multipleValueOrText().in)
+      'is delegates to TextNode': ->
+        search = newSearch()
+        search.multipleValueOrText().is(value)
+        assert.deepEqual(search.toHash(), { multipleValueOrText: { is : value }})
+
+    'range field':
+      'is': ->
+        search = newSearch()
+        search.range().is(value)
+        assert.deepEqual(search.toHash(), { range : { is : value }})
+      'min': ->
+        search = newSearch()
+        search.range().min(50)
+        assert.deepEqual(search.toHash(), { range : { min : 50 }})
+      'max': ->
+        search = newSearch()
+        search.range().max(100)
+        assert.deepEqual(search.toHash(), { range : { max : 100 }})
+      'between': ->
+        search = newSearch()
+        search.range().between(50, 100)
+        assert.deepEqual(search.toHash(), { range : { min : 50, max : 100 }})
 
   .export(module)
 

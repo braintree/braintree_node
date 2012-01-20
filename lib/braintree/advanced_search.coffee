@@ -1,12 +1,6 @@
 _ = require('underscore')._
 
 class AdvancedSearch
-  constructor: -> @criteria = {}
-
-  addCriteria: (key, value) -> @criteria[key] = value
-
-  toHash: -> @criteria
-
   @equalityFields: (fields...) ->
     @_createFieldAccessors(fields, EqualityNode)
 
@@ -25,17 +19,26 @@ class AdvancedSearch
   @multipleValueOrTextField: (field, options = {}) ->
     @::[field] = @_fieldTemplate(field, MultipleValueOrTextNode, options)
 
-  @_fieldTemplate: (field, nodeClass, options) ->
-    -> new nodeClass(field, @, options)
+  @rangeFields: (fields...) ->
+    @_createFieldAccessors(fields, RangeNode)
 
   @_createFieldAccessors: (fields, nodeClass) ->
     @::[field] = @_fieldTemplate(field, nodeClass) for field in fields
 
-class SearchNode
-  constructor: (nodeName, parent) ->
-    @nodeName = nodeName
-    @parent = parent
+  @_fieldTemplate: (field, nodeClass, options) ->
+    -> new nodeClass(field, @, options)
 
+  constructor: -> @criteria = {}
+
+  addCriteria: (key, value) ->
+    if @criteria[key] is Object(@criteria[key])
+      _.extend(@criteria[key], value)
+    else
+      @criteria[key] = value
+
+  toHash: -> @criteria
+
+class SearchNode
   @operators: (operators...) ->
     operatorTemplate = (operator) =>
       (value) ->
@@ -44,6 +47,10 @@ class SearchNode
         @parent.addCriteria(@nodeName, criterion)
 
     @::[operator] = operatorTemplate(operator) for operator in operators
+
+  constructor: (nodeName, parent) ->
+    @nodeName = nodeName
+    @parent = parent
 
 class EqualityNode extends SearchNode
   @operators("is", "isNot")
@@ -78,14 +85,29 @@ class MultipleValueNode extends SearchNode
     @in(value)
 
 class MultipleValueOrTextNode extends MultipleValueNode
+  @delegators: (delegatedMethods...) ->
+    delegatorTemplate = (methodName) =>
+      (value) -> @textNode[methodName](value)
+
+    @::[methodName] = delegatorTemplate(methodName) for methodName in delegatedMethods
+
+  @delegators("contains", "endsWith", "is", "isNot", "startsWith")
+
   constructor: (nodeName, parent, options) ->
     super
     @textNode = new TextNode(nodeName, parent)
 
-  _.each(["is", "isNot", "endsWith", "startsWith", "contains"], (methodName) ->
-    delegatorTemplate = (methodName) =>
-      (value) -> @textNode[methodName](value)
+class RangeNode extends SearchNode
+  @operators("is")
 
-    MultipleValueOrTextNode::[methodName] = delegatorTemplate(methodName))
+  between: (min, max) ->
+    @min(min)
+    @max(max)
+
+  max: (value) ->
+    @parent.addCriteria(@nodeName, { max : value})
+
+  min: (value) ->
+    @parent.addCriteria(@nodeName, { min : value})
 
 exports.AdvancedSearch = AdvancedSearch
