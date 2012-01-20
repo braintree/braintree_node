@@ -8,6 +8,7 @@ class TestSearch extends AdvancedSearch
   @keyValueFields "key"
   @multipleValueField "multiple"
   @multipleValueField "multipleWithAllows", { "allows" : ["Hello", "World"] }
+  @multipleValueOrTextField "multipleValueOrText"
 
 newSearch = -> new TestSearch()
 value = "mail@example.com"
@@ -42,10 +43,10 @@ vows
     'text field':
       'inherited operators': ->
         search = newSearch()
-        assert.isFunction(search.equality().is)
-        assert.isFunction(search.equality().isNot)
-        assert.isFunction(search.partialMatch().endsWith)
-        assert.isFunction(search.partialMatch().startsWith)
+        assert.isFunction(search.text().is)
+        assert.isFunction(search.text().isNot)
+        assert.isFunction(search.text().endsWith)
+        assert.isFunction(search.text().startsWith)
       'contains': ->
         search = newSearch()
         search.text().contains("ample")
@@ -72,6 +73,16 @@ vows
         search = newSearch()
         search.multiple().is(value)
         assert.deepEqual(search.toHash(), { multiple: [value] })
+
+    'multiple value of text field':
+      'inherited operators': ->
+        search = newSearch()
+        assert.isFunction(search.multipleValueOrText().is)
+        assert.isFunction(search.multipleValueOrText().isNot)
+        assert.isFunction(search.multipleValueOrText().endsWith)
+        assert.isFunction(search.multipleValueOrText().startsWith)
+        assert.isFunction(search.multipleValueOrText().contains)
+        assert.isFunction(search.multipleValueOrText().in)
 
   .export(module)
 

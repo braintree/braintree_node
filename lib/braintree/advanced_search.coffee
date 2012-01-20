@@ -22,11 +22,11 @@ class AdvancedSearch
   @multipleValueField: (field, options = {}) ->
     @::[field] = @_fieldTemplate(field, MultipleValueNode, options)
 
+  @multipleValueOrTextField: (field, options = {}) ->
+    @::[field] = @_fieldTemplate(field, MultipleValueOrTextNode, options)
+
   @_fieldTemplate: (field, nodeClass, options) ->
-    if options
-      -> new nodeClass(field, @, options)
-    else
-      -> new nodeClass(field, @)
+    -> new nodeClass(field, @, options)
 
   @_createFieldAccessors: (fields, nodeClass) ->
     @::[field] = @_fieldTemplate(field, nodeClass) for field in fields
@@ -43,7 +43,7 @@ class SearchNode
         criterion[operator] = "#{value}"
         @parent.addCriteria(@nodeName, criterion)
 
-    SearchNode::[operator] = operatorTemplate(operator) for operator in operators
+    @::[operator] = operatorTemplate(operator) for operator in operators
 
 class EqualityNode extends SearchNode
   @operators("is", "isNot")
@@ -76,5 +76,16 @@ class MultipleValueNode extends SearchNode
 
   is: (value) ->
     @in(value)
+
+class MultipleValueOrTextNode extends MultipleValueNode
+  constructor: (nodeName, parent, options) ->
+    super
+    @textNode = new TextNode(nodeName, parent)
+
+  _.each(["is", "isNot", "endsWith", "startsWith", "contains"], (methodName) ->
+    delegatorTemplate = (methodName) =>
+      (value) -> @textNode[methodName](value)
+
+    MultipleValueOrTextNode::[methodName] = delegatorTemplate(methodName))
 
 exports.AdvancedSearch = AdvancedSearch
