@@ -672,6 +672,38 @@ vows.describe('CustomerGateway').addBatch({
           assert.equal(customer.lastName, 'Smith');
         });
       }
+    },
+
+    "when the search returns multiple values": {
+      topic: function() {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create({
+          firstName: 'Bob',
+          lastName: "Smote",
+        }, function(err, response) {
+          specHelper.defaultGateway.customer.create({
+            firstName: 'Ryan',
+            lastName: "Smote",
+          }, function(err, response) {
+            specHelper.defaultGateway.customer.search(function(search) {
+              search.lastName().is("Smote");
+            }, function(err, response) {
+              var count = 0;
+              response.each( function(err, customer) {
+                assert.equal(customer.lastName, "Smote")
+                count += 1;
+                if(count > 1){
+                  callback(null, count);
+                }
+              })
+            });
+          })
+        });
+      },
+      "iterates through the customer results": function(err, count){
+        assert.equal(count > 1, true);
+      }
+
     }
   }
 }).export(module);

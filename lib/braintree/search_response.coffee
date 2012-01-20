@@ -13,6 +13,10 @@ class SearchResponse
   first: (callback)->
     @gateway.find(@ids[0], callback)
 
+  each: (callback)->
+    for id in @ids
+      @gateway.find(id, callback)
+
   length: ->
     @ids.length
 

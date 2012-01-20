@@ -1,6 +1,6 @@
 {AdvancedSearch} = require('./advanced_search')
 
 class CustomerSearch extends AdvancedSearch
-  @equalityFields "email"
+  @textFields "email", "lastName", "firstName"
 
 exports.CustomerSearch = CustomerSearch
