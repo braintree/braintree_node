@@ -667,7 +667,7 @@ vows.describe('CustomerGateway').addBatch({
       },
 
       'returns the first customer': function(err, response) {
-        response.first( function(err, customer) {
+        response.first(function(err, customer) {
           assert.equal(customer.firstName, 'Bob');
           assert.equal(customer.lastName, 'Smith');
         });
@@ -703,7 +703,6 @@ vows.describe('CustomerGateway').addBatch({
       "iterates through the customer results": function(err, count){
         assert.equal(count > 1, true);
       }
-
     }
   }
 }).export(module);

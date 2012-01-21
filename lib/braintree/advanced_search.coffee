@@ -81,8 +81,7 @@ class MultipleValueNode extends SearchNode
 
     @parent.addCriteria(@nodeName, values)
 
-  is: (value) ->
-    @in(value)
+  is: (value) -> @in(value)
 
 class MultipleValueOrTextNode extends MultipleValueNode
   @delegators: (delegatedMethods...) ->

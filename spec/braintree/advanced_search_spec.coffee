@@ -1,5 +1,5 @@
-require("../spec_helper.coffee")
-{AdvancedSearch} = require('../../lib/braintree/advanced_search.coffee')
+require("../spec_helper")
+{AdvancedSearch} = require('../../lib/braintree/advanced_search')
 
 class TestSearch extends AdvancedSearch
   @equalityFields "equality"

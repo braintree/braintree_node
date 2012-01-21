@@ -1,6 +1,3 @@
-{Transaction} = require('./transaction')
-{Customer} = require('./customer')
-
 class SearchResponse
   constructor: (gateway, klass, results) ->
     @klass = klass
