@@ -1,5 +1,6 @@
 {Gateway} = require('./gateway')
 {Transaction} = require('./transaction')
+{TransactionSearch} = require('./transaction_search')
 {ErrorResponse} = require('./error_response')
 exceptions = require('./exceptions')
 
@@ -35,6 +36,12 @@ class TransactionGateway extends Gateway
   sale: (attributes, callback) ->
     attributes.type = 'sale'
     @create(attributes, callback)
+
+  search: (fn, callback) ->
+    search = new TransactionSearch()
+    fn(search)
+    @gateway.http.post("/transactions/advanced_search_ids",
+      { search : search.toHash() }, @searchResponseHandler(@, Transaction, callback))
 
   submitForSettlement: (transactionId, amount..., callback) ->
     @gateway.http.put("/transactions/#{transactionId}/submit_for_settlement",
