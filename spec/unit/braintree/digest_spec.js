@@ -1,5 +1,5 @@
-require('../spec_helper');
-var Digest = require('../../lib/braintree/digest').Digest;
+require('../../spec_helper');
+var Digest = require('../../../lib/braintree/digest').Digest;
 
 vows.describe('Util').addBatch({
   'hexdigest': {

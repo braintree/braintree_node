@@ -1,5 +1,5 @@
-require("../spec_helper.coffee")
-{SubscriptionSearch} = require('../../lib/braintree/subscription_search')
+require("../../spec_helper.coffee")
+{SubscriptionSearch} = require('../../../lib/braintree/subscription_search')
 
 vows
   .describe("SubscriptionSearch")

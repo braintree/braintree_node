@@ -1,4 +1,4 @@
-require('../spec_helper');
+require('../../spec_helper');
 
 var _ = require('underscore')._,
    braintree = specHelper.braintree;

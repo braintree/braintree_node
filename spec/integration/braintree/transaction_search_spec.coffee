@@ -1,5 +1,5 @@
-require("../spec_helper")
-{TransactionSearch} = require('../../lib/braintree/transaction_search')
+require("../../spec_helper")
+{TransactionSearch} = require('../../../lib/braintree/transaction_search')
 
 vows
   .describe("TransactionSearch")

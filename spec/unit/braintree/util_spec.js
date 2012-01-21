@@ -1,5 +1,5 @@
-require('../spec_helper');
-var Util = require('../../lib/braintree/util').Util;
+require('../../spec_helper');
+var Util = require('../../../lib/braintree/util').Util;
 
 vows.describe('Util').addBatch({
   'convertObjectKeysToUnderscores': {

@@ -1,5 +1,5 @@
-require('../spec_helper');
-var ValidationErrorsCollection = require('../../lib/braintree/validation_errors_collection').ValidationErrorsCollection;
+require('../../spec_helper');
+var ValidationErrorsCollection = require('../../../lib/braintree/validation_errors_collection').ValidationErrorsCollection;
 
 vows.describe('ValidationErrorsCollection').addBatch({
   'on': {

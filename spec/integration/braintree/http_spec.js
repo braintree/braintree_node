@@ -1,8 +1,8 @@
-require('../spec_helper');
+require('../../spec_helper');
 
 var braintree = specHelper.braintree,
-    Config = require('../../lib/braintree/config').Config,
-    Http = require('../../lib/braintree/http').Http;
+    Config = require('../../../lib/braintree/config').Config,
+    Http = require('../../../lib/braintree/http').Http;
 
 vows.describe('Http').addBatch({
   'request': {

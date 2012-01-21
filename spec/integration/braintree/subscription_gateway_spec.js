@@ -1,4 +1,4 @@
-require('../spec_helper');
+require('../../spec_helper');
 dateFormat = require('dateformat')
 
 var _ = require('underscore')._,
