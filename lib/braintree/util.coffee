@@ -69,6 +69,12 @@ class Util
         first.concat rest
     array
 
+  @merge: (obj1, obj2) ->
+    util = require('util')
+    for key, value of obj2
+      obj1[key] = value
+    obj1
+
   @_containsArray: (array) ->
     for element in array
       return true if Array.isArray(element)

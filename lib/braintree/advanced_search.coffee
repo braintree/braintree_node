@@ -33,7 +33,7 @@ class AdvancedSearch
 
   addCriteria: (key, value) ->
     if @criteria[key] is Object(@criteria[key])
-      _.extend(@criteria[key], value)
+      Util.merge(@criteria[key], value)
     else
       @criteria[key] = value
 

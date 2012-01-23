@@ -170,23 +170,6 @@ vows.describe('Util').addBatch({
     }
   },
 
-  'flatten': {
-    topic: Util.flatten([[1], [2, [3, [4, [5, [6, [7, [8, [9]]]]]]]]]),
-    'returns flattened array': function(result) {
-      assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    },
-
-    topic: Util.flatten([[1, 2], [3, 4], [5], [6, [7, [8, [9]]]]]),
-    'returns flattened array': function(result) {
-      assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    },
-
-    topic: Util.flatten([[[[[[[[[[[[[[[[[[[[1]]]]]]]]]]]]]]]]]]]]),
-    'returns flattened array': function(result) {
-      assert.deepEqual(result, [1]);
-    },
-  },
-
   'toCamelCase': {
     'string with underscores': {
       topic: Util.toCamelCase('one_two_three'),
@@ -216,6 +199,45 @@ vows.describe('Util').addBatch({
         assert.equal(result, 'one_two_three');
       }
     },
+  },
+
+  'flatten': {
+    'deeply nested array': {
+      topic: Util.flatten([[1], [2, [3, [4, [5, [6, [7, [8, [9]]]]]]]]]),
+      'returns flattened array': function(result) {
+        assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      }
+    },
+
+    'varying nest level array': {
+      topic: Util.flatten([[1, 2], [3, 4], [5], [6, [7, [8, [9]]]]]),
+      'returns flattened array': function(result) {
+        assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      }
+    },
+
+    'deeply nested single element array': {
+      topic: Util.flatten([[[[[[[[[[[[[[[[[[[[1]]]]]]]]]]]]]]]]]]]]),
+      'returns flattened array': function(result) {
+        assert.deepEqual(result, [1]);
+      }
+    }
+  },
+
+  'merge': {
+    'concatenation': {
+      topic: Util.merge({ key : 'value' }, { key2 : 'value2' }),
+      'returns merged object': function(result) {
+        assert.deepEqual(result, { key : 'value', key2 : 'value2' });
+      }
+    },
+
+    'overriding existing value': {
+      topic: Util.merge({ key : 'value' }, { key : 'value2' }),
+      'returns merged object': function(result) {
+        assert.deepEqual(result, { key : 'value2' });
+      }
+    }
   }
 }).export(module);
 
