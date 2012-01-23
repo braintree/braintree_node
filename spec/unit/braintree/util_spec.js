@@ -126,11 +126,41 @@ vows.describe('Util').addBatch({
     'empty object': {
       topic: Util.convertNodeToObject({attribute: {}}),
       'is converted to empty string': function (result) {
-        assert.deepEqual(result, {'attribute': ''})
+        assert.deepEqual(result, {'attribute': ''});
       }
     }
+  },
 
+  'objectIsEmpty': {
+    'empty object': {
+      topic: Util.objectIsEmpty({}),
+      'returns true': function(result) {
+        assert.equal(result, true);
+      }
+    },
 
+    'non-empty object': {
+      topic: Util.objectIsEmpty({ key : 'value' }),
+      'returns false': function(result) {
+        assert.equal(result, false);
+      }
+    }
+  },
+
+  'arrayIsEmpty': {
+    'empty array': {
+      topic: Util.arrayIsEmpty([]),
+      'returns true': function(result) {
+        assert.equal(result, true);
+      }
+    },
+
+    'non-empty array': {
+      topic: Util.arrayIsEmpty([1, 2, 3]),
+      'returns false': function(result) {
+        assert.equal(result, false);
+      }
+    }
   },
 
   'toCamelCase': {

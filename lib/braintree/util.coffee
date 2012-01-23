@@ -49,6 +49,11 @@ class Util
     return false for key, value of obj
     return true
 
+  @arrayIsEmpty: (array) ->
+    return false unless Array.isArray(array)
+    return false if array.length > 0
+    return true
+
   @toCamelCase: (string) ->
 
     string.replace(/([\-\_][a-z0-9])/g, (match) -> match.toUpperCase().replace('-','').replace('_',''))
