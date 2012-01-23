@@ -238,6 +238,22 @@ vows.describe('Util').addBatch({
         assert.deepEqual(result, { key : 'value2' });
       }
     }
+  },
+
+  'without': {
+    'returns the difference between two arrays': {
+      topic: Util.without([1,2,3,4,5], [1,4]),
+      'returns new array': function(result) {
+        assert.deepEqual(result, [2,3,5]);
+      }
+    },
+
+    'returns the same array': {
+      topic: Util.without([1,2,3], [4,5]),
+      'returns array': function(result) {
+        assert.deepEqual(result, [1,2,3]);
+      }
+    }
   }
 }).export(module);
 

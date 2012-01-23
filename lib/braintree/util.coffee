@@ -50,7 +50,7 @@ class Util
     return true
 
   @arrayIsEmpty: (array) ->
-    return false unless Array.isArray(array)
+    return false unless array instanceof Array
     return false if array.length > 0
     return true
 
@@ -64,19 +64,27 @@ class Util
   @flatten: (array) ->
     while @_containsArray(array)
       array = array.reduce (first, rest) =>
-        first = if Array.isArray(first) then first else [first]
-        rest  = if Array.isArray(rest) then @flatten(rest) else rest
+        first = if first instanceof Array then first else [first]
+        rest  = if rest instanceof Array then @flatten(rest) else rest
         first.concat rest
     array
 
   @merge: (obj1, obj2) ->
-    util = require('util')
     for key, value of obj2
       obj1[key] = value
     obj1
 
+  @without: (array1, array2) ->
+    newArray = []
+    for value in array1
+      newArray.push(value) unless @_containsValue(array2, value)
+    newArray
+
+  @_containsValue: (array, element) ->
+    array.indexOf(element) isnt -1
+
   @_containsArray: (array) ->
     for element in array
-      return true if Array.isArray(element)
+      return true if element instanceof Array
 
 exports.Util = Util

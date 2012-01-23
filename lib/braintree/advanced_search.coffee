@@ -1,4 +1,3 @@
-_ = require('underscore')._
 {Util} = require('./util')
 
 class AdvancedSearch
@@ -77,7 +76,7 @@ class MultipleValueNode extends SearchNode
 
     if @allowedValues?()
       allowedValues = @allowedValues()
-      badValues = _.without(values, allowedValues...)
+      badValues = Util.without(values, allowedValues)
       throw new Error("Invalid argument(s) for #{@nodeName}") unless Util.arrayIsEmpty(badValues)
 
     @parent.addCriteria(@nodeName, values)
