@@ -61,4 +61,16 @@ class Util
   @toUnderscore: (string) ->
     string.replace(/([A-Z])/g, (match) -> "_" + match.toLowerCase())
 
+  @flatten: (array) ->
+    while @_containsArray(array)
+      array = array.reduce (first, rest) =>
+        first = if Array.isArray(first) then first else [first]
+        rest  = if Array.isArray(rest) then @flatten(rest) else rest
+        first.concat rest
+    array
+
+  @_containsArray: (array) ->
+    for element in array
+      return true if Array.isArray(element)
+
 exports.Util = Util

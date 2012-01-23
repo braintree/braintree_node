@@ -160,7 +160,31 @@ vows.describe('Util').addBatch({
       'returns false': function(result) {
         assert.equal(result, false);
       }
+    },
+
+    'not an array': {
+      topic: Util.arrayIsEmpty({}),
+      'return false': function(result) {
+        assert.equal(result, false);
+      }
     }
+  },
+
+  'flatten': {
+    topic: Util.flatten([[1], [2, [3, [4, [5, [6, [7, [8, [9]]]]]]]]]),
+    'returns flattened array': function(result) {
+      assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    },
+
+    topic: Util.flatten([[1, 2], [3, 4], [5], [6, [7, [8, [9]]]]]),
+    'returns flattened array': function(result) {
+      assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    },
+
+    topic: Util.flatten([[[[[[[[[[[[[[[[[[[[1]]]]]]]]]]]]]]]]]]]]),
+    'returns flattened array': function(result) {
+      assert.deepEqual(result, [1]);
+    },
   },
 
   'toCamelCase': {

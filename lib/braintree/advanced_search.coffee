@@ -73,7 +73,7 @@ class MultipleValueNode extends SearchNode
   allowedValues: -> @options['allows']
 
   in: (values...) ->
-    values = _.flatten(values)
+    values = Util.flatten(values)
 
     if @allowedValues?()
       allowedValues = @allowedValues()
