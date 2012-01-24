@@ -654,7 +654,7 @@ vows.describe('CustomerGateway').addBatch({
     "when the search yields a single result": {
       topic: function() {
         var callback = this.callback;
-        var random = specHelper.randomNumberAsString();
+        var random = specHelper.randomId();
         specHelper.defaultGateway.customer.create({
           firstName: 'Bob',
           lastName: "Smith",
