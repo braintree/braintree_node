@@ -93,17 +93,21 @@ nowInEastern = ->
 randomId = ->
   Math.floor(Math.random() * Math.pow(36,8)).toString(36)
 
+doesNotInclude = (array, value) ->
+  assert.isTrue(array.indexOf(value) is -1)
+
 GLOBAL.specHelper = {
   addOns: addOns
   braintree: braintree
   dateToMdy: dateToMdy
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
+  doesNotInclude: doesNotInclude
   makePastDue: makePastDue
   multiplyString: multiplyString
   nowInEastern: nowInEastern
-  randomId: randomId
   plans: plans
+  randomId: randomId
   settleTransaction: settleTransaction
   simulateTrFormPost: simulateTrFormPost
 }

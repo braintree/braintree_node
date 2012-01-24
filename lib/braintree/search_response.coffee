@@ -3,8 +3,6 @@ class SearchResponse
     @klass = klass
     @ids = results.searchResults.ids
     @gateway = gateway
-    for key, value of results
-      @[key] = value
     @success = true
 
   first: (callback)->
