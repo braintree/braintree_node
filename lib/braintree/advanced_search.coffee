@@ -14,16 +14,16 @@ class AdvancedSearch
     @_createFieldAccessors(fields, KeyValueNode)
 
   @multipleValueField: (field, options = {}) ->
-    @::[field] = @_fieldTemplate(field, MultipleValueNode, options)
+    @_createFieldAccessors([field], MultipleValueNode, options)
 
   @multipleValueOrTextField: (field, options = {}) ->
-    @::[field] = @_fieldTemplate(field, MultipleValueOrTextNode, options)
+    @_createFieldAccessors([field], MultipleValueOrTextNode, options)
 
   @rangeFields: (fields...) ->
     @_createFieldAccessors(fields, RangeNode)
 
-  @_createFieldAccessors: (fields, nodeClass) ->
-    @::[field] = @_fieldTemplate(field, nodeClass) for field in fields
+  @_createFieldAccessors: (fields, nodeClass, options) ->
+    @::[field] = @_fieldTemplate(field, nodeClass, options) for field in fields
 
   @_fieldTemplate: (field, nodeClass, options) ->
     -> new nodeClass(field, @, options)
