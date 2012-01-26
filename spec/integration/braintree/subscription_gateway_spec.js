@@ -111,6 +111,7 @@ vows.describe('SubscriptionGateway').addBatch({
         'returns transactions': function (err, response) {
           assert.match(response.subscription.transactions[0].id, /^\w{6,7}$/);
           assert.equal(response.subscription.transactions[0].creditCard.maskedNumber, '510510******5100');
+          assert.equal(response.subscription.transactions[0].planId, specHelper.plans.trialless.id);
         }
       },
 
