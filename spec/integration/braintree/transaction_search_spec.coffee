@@ -6,7 +6,7 @@ require("../../spec_helper")
 vows
   .describe("TransactionSearch")
   .addBatch
-    "text fields":
+    "transaction search":
       topic: ->
         firstName = "Tom_#{specHelper.randomId()}"
         cardToken = "card_#{specHelper.randomId()}"
@@ -56,7 +56,7 @@ vows
         specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) ->
           specHelper.settleTransaction(response.transaction.id, (err, settleResult) ->
             specHelper.defaultGateway.transaction.find(response.transaction.id, (err, transaction) ->
-              searchCriteria =
+              textCriteria =
                 billingCompany: "Braintree"
                 billingCountryName: "United States of America"
                 billingExtendedAddress: "Apt B"
@@ -91,7 +91,6 @@ vows
                 shippingRegion: "IL"
                 shippingStreetAddress: "123 Fake St"
                 creditCardExpirationDate: "05/2012"
-                refund: false
 
               partialCriteria =
                 creditCardNumber:
@@ -106,6 +105,9 @@ vows
                 status: Transaction.Status.Settled
                 source: Transaction.Source.Api
                 type: Transaction.Type.Sale
+
+              keyValueCriteria =
+                refund: false
 
               today = new Date()
               yesterday = new Date(); yesterday.setDate(today.getDate() - 1)
@@ -129,20 +131,26 @@ vows
                   max: tomorrow
 
               specHelper.defaultGateway.transaction.search((search) ->
-                for criteria, value of searchCriteria
+                for criteria, value of textCriteria
                   search[criteria]().is(value)
+
                 for criteria, partial of partialCriteria
                   for operator, value of partial
                     search[criteria]()[operator](value)
+
                 for criteria, value of multipleValueCriteria
                   search[criteria]().in(value)
+
+                for criteria, value of keyValueCriteria
+                  search[criteria]().is(value)
+
                 for criteria, range of rangeCriteria
                   for operator, value of range
                     search[criteria]()[operator](value)
 
               , (err, response) ->
                 callback(err,
-                  transactionId: searchCriteria.id
+                  transactionId: textCriteria.id
                   result: response
                 )
               )
