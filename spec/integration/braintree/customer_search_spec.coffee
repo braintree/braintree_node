@@ -56,8 +56,10 @@ vows
                   customers = []
                   response.each( (err, customer) ->
                     customers.push(customer)
-                    if(customers.length >= 2)
+                    if(customers.length == 2)
                       callback(null, {customers: customers, lastName: random})
+                    else if customers.length > 2
+                      callback("TOO Many Results", null)
                   )
                 )
               )
