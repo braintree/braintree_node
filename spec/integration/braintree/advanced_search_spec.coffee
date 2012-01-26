@@ -358,10 +358,29 @@ vows
               response
             "is successful": (response) ->
               assert.isTrue(response.result.success)
-            "includes both subscriptions": (response) ->
-              assert.equal(response.result.ids.length, 2)
-              assert.includes(response.result.ids, response.subscription1.id)
-              assert.includes(response.result.ids, response.subscription2.id)
+          "get each in collection":
+            topic: (response) ->
+              callback = @callback
+              subscriptionIds = []
+              response.result.each((err, subscription) ->
+                subscriptionIds.push(subscription.id)
+                if (subscriptionIds.length == 2)
+                  callback(null,
+                    subscriptionIds : subscriptionIds
+                    subscription1 : response.subscription1
+                    subscription2 : response.subscription2
+                  )
+                else if subscriptionIds.length > 2
+                  callback("TOO Many Results", null)
+              )
+              undefined
+            "gets subscription domain objects": (err, response) ->
+              assert.equal(response.subscriptionIds.length, 2)
+              assert.includes(response.subscriptionIds, response.subscription1.id)
+              assert.includes(response.subscriptionIds, response.subscription2.id)
+            "does not error": (err, response) ->
+              assert.isNull(err)
+
       "is":
         topic: (response) ->
           creditCard = response.customer.creditCards[0]
