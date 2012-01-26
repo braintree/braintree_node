@@ -629,6 +629,134 @@ vows
           undefined
         "on search":
           "result":
+            topic: (response) -> response
+            "is successful": (response) ->
+              assert.isTrue(response.result.success)
+            "includes subscription1": (response) ->
+              assert.includes(response.result.ids, response.subscription1.id)
+            "does not include subscription2": (response) ->
+              specHelper.doesNotInclude(response.result.ids, response.subscription2.id)
+
+    "rangeFields":
+      topic: ->
+        specHelper.defaultGateway.customer.create(
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/12'
+        , @callback)
+        undefined
+
+      "min":
+        topic: (response) ->
+          creditCard = response.customer.creditCards[0]
+          callback = @callback
+          specHelper.defaultGateway.subscription.create(
+            paymentMethodToken: creditCard.token
+            planId: specHelper.plans.trialless.id
+            id: specHelper.randomId()
+          , (err, response) ->
+            subscription1 = response.subscription
+            specHelper.defaultGateway.subscription.create(
+              paymentMethodToken: creditCard.token
+              planId: specHelper.plans.addonDiscountPlan.id
+              id: specHelper.randomId()
+            , (err, response) ->
+              subscription2 = response.subscription
+              subscription1Price = Number(subscription1.price)
+              specHelper.defaultGateway.subscription.search((search) ->
+                search.price().min(subscription1Price)
+              , (err, response) ->
+                callback(err,
+                  subscription1: subscription1
+                  subscription2: subscription2
+                  result: response
+                )
+              )
+            )
+          )
+          undefined
+        "on search":
+          "result":
+            topic: (response) ->
+              response
+            "is successful": (response) ->
+              assert.isTrue(response.result.success)
+            "includes subscription1": (response) ->
+              assert.includes(response.result.ids, response.subscription1.id)
+            "does not include subscription2": (response) ->
+              specHelper.doesNotInclude(response.result.ids, response.subscription2.id)
+
+      "max":
+        topic: (response) ->
+          creditCard = response.customer.creditCards[0]
+          callback = @callback
+          specHelper.defaultGateway.subscription.create(
+            paymentMethodToken: creditCard.token
+            planId: specHelper.plans.trialless.id
+            id: specHelper.randomId()
+          , (err, response) ->
+            subscription1 = response.subscription
+            specHelper.defaultGateway.subscription.create(
+              paymentMethodToken: creditCard.token
+              planId: specHelper.plans.addonDiscountPlan.id
+              id: specHelper.randomId()
+            , (err, response) ->
+              subscription2 = response.subscription
+              subscription2Price = Number(subscription2.price)
+              specHelper.defaultGateway.subscription.search((search) ->
+                search.price().max(subscription2Price)
+              , (err, response) ->
+                callback(err,
+                  subscription1: subscription1
+                  subscription2: subscription2
+                  result: response
+                )
+              )
+            )
+          )
+          undefined
+        "on search":
+          "result":
+            topic: (response) ->
+              response
+            "is successful": (response) ->
+              assert.isTrue(response.result.success)
+            "includes subscription2": (response) ->
+              assert.includes(response.result.ids, response.subscription2.id)
+            "does not include subscription1": (response) ->
+              specHelper.doesNotInclude(response.result.ids, response.subscription1.id)
+
+      "between":
+        topic: (response) ->
+          creditCard = response.customer.creditCards[0]
+          callback = @callback
+          specHelper.defaultGateway.subscription.create(
+            paymentMethodToken: creditCard.token
+            planId: specHelper.plans.trialless.id
+            id: specHelper.randomId()
+          , (err, response) ->
+            subscription1 = response.subscription
+            specHelper.defaultGateway.subscription.create(
+              paymentMethodToken: creditCard.token
+              planId: specHelper.plans.addonDiscountPlan.id
+              id: specHelper.randomId()
+            , (err, response) ->
+              subscription2 = response.subscription
+              subscriptionPrice = Number(subscription1.price)
+              specHelper.defaultGateway.subscription.search((search) ->
+                search.price().between(subscriptionPrice - 0.01, subscriptionPrice + 0.01)
+              , (err, response) ->
+                callback(err,
+                  subscription1: subscription1
+                  subscription2: subscription2
+                  result: response
+                )
+              )
+            )
+          )
+          undefined
+        "on search":
+          "result":
             topic: (response) ->
               response
             "is successful": (response) ->
