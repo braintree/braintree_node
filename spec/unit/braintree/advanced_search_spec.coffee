@@ -66,10 +66,10 @@ vows
         assert.deepEqual(search.toHash(), { multiple: [1, 2, 3] })
       'in with an allowed value': ->
         search = newSearch()
-        assert.doesNotThrow((=> search.multipleWithAllows().in(["Hello"])), Error)
+        assert.doesNotThrow((-> search.multipleWithAllows().in(["Hello"])), Error)
       'in with an unallowed value': ->
         search = newSearch()
-        assert.throws((=> search.multipleWithAllows().in(["Hello", "Bah"])), Error)
+        assert.throws((-> search.multipleWithAllows().in(["Hello", "Bah"])), Error)
       'is': ->
         search = newSearch()
         search.multiple().is(value)
