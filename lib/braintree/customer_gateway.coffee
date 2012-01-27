@@ -30,7 +30,7 @@ class CustomerGateway extends Gateway
   search: (fn, callback) ->
     search = new CustomerSearch()
     fn(search)
-    @gateway.http.post("/customers/advanced_search_ids", {search: search.toHash()}, @searchResponseHandler(@, Customer, callback))
+    @gateway.http.post("/customers/advanced_search_ids", {search: search.toHash()}, @searchResponseHandler(@, callback))
 
   responseHandler: (callback) ->
     @createResponseHandler("customer", Customer, callback)

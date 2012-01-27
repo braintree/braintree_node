@@ -1,12 +1,14 @@
 class SearchResponse
-  constructor: (gateway, klass, results) ->
-    @klass = klass
+  constructor: (gateway, results) ->
     @ids = results.searchResults.ids
     @gateway = gateway
     @success = true
 
   first: (callback)->
-    @gateway.find(@ids[0], callback)
+    if @ids.length == 0
+      callback(null, null)
+    else
+      @gateway.find(@ids[0], callback)
 
   # TODO: Should we provide this massively paralell version of each??
   # each: (callback)->

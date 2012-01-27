@@ -41,7 +41,7 @@ class TransactionGateway extends Gateway
     search = new TransactionSearch()
     fn(search)
     @gateway.http.post("/transactions/advanced_search_ids",
-      { search : search.toHash() }, @searchResponseHandler(@, Transaction, callback))
+      { search : search.toHash() }, @searchResponseHandler(@, callback))
 
   submitForSettlement: (transactionId, amount..., callback) ->
     @gateway.http.put("/transactions/#{transactionId}/submit_for_settlement",

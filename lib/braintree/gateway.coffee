@@ -13,11 +13,11 @@ class Gateway
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
 
-  searchResponseHandler: (gateway, klass, callback) ->
+  searchResponseHandler: (gateway, callback) ->
     (err, response) ->
       return callback(err, response) if err
       if (response["searchResults"])
-        container = new SearchResponse(gateway, klass, response)
+        container = new SearchResponse(gateway, response)
         callback(null, container)
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))

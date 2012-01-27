@@ -36,7 +36,7 @@ class SubscriptionGateway extends Gateway
     search = new SubscriptionSearch()
     fn(search)
     @gateway.http.post("/subscriptions/advanced_search_ids",
-      { search : search.toHash() }, @searchResponseHandler(@, Subscription, callback))
+      { search : search.toHash() }, @searchResponseHandler(@, callback))
 
   update: (subscriptionId, attributes, callback) ->
     @gateway.http.put("/subscriptions/#{subscriptionId}", {subscription: attributes}, @responseHandler(callback))
