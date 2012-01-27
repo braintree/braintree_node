@@ -8,6 +8,7 @@ vows
   .addBatch
     "transaction search":
       topic: ->
+        callback = @callback
         firstName = "Tom_#{specHelper.randomId()}"
         cardToken = "card_#{specHelper.randomId()}"
         customerId = "customer_#{specHelper.randomId()}"
@@ -25,7 +26,7 @@ vows
             streetAddress: "123 Fake St"
           shipping:
             company: "Braintree"
-            countryName: "US"
+            countryName: "United States of America"
             extendedAddress: "Apt B"
             firstName: firstName
             lastName: "Guy"
@@ -47,12 +48,11 @@ vows
             firstName: firstName
             lastName: "Guy"
             phone: "(456)123-7890"
-            website: "http://www.example.com"
+            website: "http://www.example.com/"
           orderId: "123"
           options:
             storeInVault: true
             submitForSettlement: true
-        callback = @callback
         specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) ->
           specHelper.settleTransaction(response.transaction.id, (err, settleResult) ->
             specHelper.defaultGateway.transaction.find(response.transaction.id, (err, transaction) ->
@@ -75,7 +75,7 @@ vows
                 customerId: customerId
                 customerLastName: "Guy"
                 customerPhone: "(456)123-7890"
-                customerWebsite: "http://www.example.com"
+                customerWebsite: "http://www.example.com/"
                 id: transaction.id
                 orderId: "123"
                 paymentMethodToken: cardToken
@@ -164,7 +164,7 @@ vows
             response
           "is successful": (response) ->
             assert.isTrue(response.result.success)
-          "returns one result": (err, response) ->
+          "returns one result": (response) ->
             assert.equal(response.result.length(), 1)
         "get first of collection":
           topic: (response) ->
