@@ -1,4 +1,5 @@
 require('../../spec_helper');
+util = require("util")
 
 var _ = require('underscore')._,
     braintree = specHelper.braintree;
@@ -166,6 +167,31 @@ vows.describe('CreditCardGateway').addBatch({
         assert.equal(err.type, braintree.errorTypes.notFoundError);
       }
     },
+  },
+
+  'expired': {
+    'when a card is expired': {
+      topic: function() {
+        var callback = this.callback;
+        specHelper.defaultGateway.customer.create(
+          {
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '01/2010'
+          }
+        },
+        function (err, customer) {
+          specHelper.defaultGateway.creditCard.expired( function(err, credit_cards) {
+            credit_cards.each(function(err, creditCard){
+              callback(null, creditCard);
+            })
+          })
+        });
+      },
+      'is expired' : function(err, creditCard) {
+        assert.equal(creditCard.expirationDate, "01/2010")
+      }
+    }
   },
 
   'find': {

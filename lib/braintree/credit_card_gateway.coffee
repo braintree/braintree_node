@@ -27,4 +27,7 @@ class CreditCardGateway extends Gateway
   responseHandler: (callback) ->
     @createResponseHandler("creditCard", CreditCard, callback)
 
+  expired: (callback) ->
+    @gateway.http.post("/payment_methods/all/expired_ids", {}, @searchResponseHandler(@, callback))
+
 exports.CreditCardGateway = CreditCardGateway
