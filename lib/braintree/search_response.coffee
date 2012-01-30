@@ -10,11 +10,6 @@ class SearchResponse
     else
       @gateway.find(@ids[0], callback)
 
-  # TODO: Should we provide this massively paralell version of each??
-  # each: (callback)->
-  #   for id in @ids
-  #     @gateway.find(id, callback)
-
   next: (resultsLeft, callback) ->
     if resultsLeft.length > 0
       @gateway.find(resultsLeft[0], (err, result) =>
