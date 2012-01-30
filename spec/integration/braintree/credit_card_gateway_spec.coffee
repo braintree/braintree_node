@@ -130,17 +130,22 @@ vows
       'when a card is expired':
         topic: ->
           callback = @callback
+          creditCard = null
+
           specHelper.defaultGateway.customer.create(
             creditCard:
               number: '5105105105105100',
               expirationDate: '01/2010'
-          , (err, customer) ->
-            specHelper.defaultGateway.creditCard.expired( (err, creditCards) ->
-              creditCards.each (err, creditCard) ->
-                callback(null, creditCard)))
+
+          , (err, customerResult) ->
+            testCard = customerResult.customer.creditCards[0]
+
+            specHelper.defaultGateway.creditCard.expired((err, searchResult) ->
+              callback(null, {testCard: testCard, search: searchResult})))
+
           undefined
-        'is expired' : (err, creditCard) ->
-          assert.equal(creditCard.expirationDate, "01/2010")
+        'is expired' : (err, result) ->
+          assert.includes(result.search.ids, result.testCard.token)
 
     'find':
       'when found':
