@@ -17,7 +17,7 @@ vows
         'does not have an error': (err, response) ->
           assert.isNull(err)
         'is successful': (err, response) ->
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'has customer attributes': (err, response) ->
           assert.equal(response.customer.firstName, 'John')
           assert.equal(response.customer.lastName, 'Smith')
@@ -32,7 +32,7 @@ vows
         'does not have an error': (err, response) ->
           assert.isNull(err)
         'is successful': (err, response) ->
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'has customer attributes': (err, response) ->
           assert.equal(response.customer.firstName, 'Jöhn')
           assert.equal(response.customer.lastName, 'Smith')
@@ -43,7 +43,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
 
       'with a custom field':
         topic: ->
@@ -55,7 +55,7 @@ vows
         'does not have an error': (err, response) ->
           assert.isNull(err)
         'is successful': (err, response) ->
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'has custom fields in response': (err, response) ->
           assert.equal(response.customer.customFields.storeMe, 'custom value')
 
@@ -72,7 +72,7 @@ vows
         'does not have an error': (err, response) ->
           assert.isNull(err)
         'is successful': (err, response) ->
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'has customer attributes': (err, response) ->
           assert.equal(response.customer.firstName, 'John')
           assert.equal(response.customer.lastName, 'Smith')
@@ -96,7 +96,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
 
       'with an unsuccessful verification':
         topic: ->
@@ -162,7 +162,7 @@ vows
         'does not have an error': (err, response) ->
           assert.isNull(err)
         'is successful': (err, response) ->
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'has customer attributes': (err, response) ->
           assert.equal(response.customer.firstName, 'John')
           assert.equal(response.customer.lastName, 'Smith')
@@ -335,7 +335,7 @@ vows
         'does not have an error': (err, response) ->
           assert.isNull(err)
         'is successful': (err, response) ->
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'has updated customer attributes': (err, response) ->
           assert.equal(response.customer.firstName, 'New First Name')
           assert.equal(response.customer.lastName, 'New Last Name')
@@ -359,7 +359,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'updates the customer': (err, response) ->
           assert.equal(response.customer.firstName, 'New First Name')
           assert.equal(response.customer.lastName, 'New Last Name')
@@ -390,7 +390,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'updates the customer': (err, response) ->
           assert.equal(response.customer.firstName, 'New First Name')
           assert.equal(response.customer.lastName, 'New Last Name')
@@ -433,7 +433,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'updates the customer': (err, response) ->
           assert.equal(response.customer.firstName, 'New First Name')
           assert.equal(response.customer.lastName, 'New Last Name')
@@ -476,7 +476,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'updates the customer': (err, response) ->
           assert.equal(response.customer.firstName, 'New First Name')
           assert.equal(response.customer.lastName, 'New Last Name')

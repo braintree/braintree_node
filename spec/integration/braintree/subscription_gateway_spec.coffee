@@ -23,7 +23,7 @@ vows
                   specHelper.defaultGateway.subscription.cancel(result.subscription.id, callback)))
           undefined
         'does not have an error': (err, response) -> assert.isNull(err) ,
-        'is successful': (err, response) -> assert.equal(response.success, true) ,
+        'is successful': (err, response) -> assert.isTrue(response.success) ,
         'cancels the subscription': (err, result) ->
           assert.equal(result.subscription.status, 'Canceled')
       'when the subscription cannot be canceled':
@@ -72,7 +72,7 @@ vows
             , callback)
             undefined
           'does not have an error':  (err, response) ->   assert.isNull(err)
-          'is successful':  (err, response) ->   assert.equal(response.success, true)
+          'is successful':  (err, response) ->   assert.isTrue(response.success)
           'has the expected plan id and amount':  (err, response) ->
             assert.equal(response.subscription.planId, specHelper.plans.trialless.id)
             assert.equal(response.subscription.price, specHelper.plans.trialless.price)
@@ -94,7 +94,7 @@ vows
             undefined
           'is successful':  (err, response) ->
             assert.isNull(err)
-            assert.equal(response.success, true)
+            assert.isTrue(response.success)
           'has the expected first billing date':  (err, response) ->
             expectedDate = new Date()
             expectedDate.setFullYear(expectedDate.getFullYear() + 1)
@@ -128,7 +128,7 @@ vows
             undefined
           'is successful':  (err, result) ->
             assert.isNull(err)
-            assert.equal(result.success, true)
+            assert.isTrue(result.success)
           'inherits add ons':  (err, result) ->
             addons = _.sortBy(result.subscription.addOns, (a) ->  return a.id )
             assert.equal(addons.length, 2)
@@ -137,13 +137,13 @@ vows
             assert.equal(addons[0].amount, '10.00')
             assert.equal(addons[0].quantity, 1)
             assert.equal(addons[0].numberOfBillingCycles, null)
-            assert.equal(addons[0].neverExpires, true)
+            assert.isTrue(addons[0].neverExpires)
 
             assert.equal(addons[1].id, 'increase_20')
             assert.equal(addons[1].amount, '20.00')
             assert.equal(addons[1].quantity, 1)
             assert.equal(addons[1].numberOfBillingCycles, null)
-            assert.equal(addons[1].neverExpires, true)
+            assert.isTrue(addons[1].neverExpires)
           ,
           'inherits discounts':  (err, result) ->
             discounts = _.sortBy(result.subscription.discounts, (d) ->  return d.id )
@@ -153,13 +153,13 @@ vows
             assert.equal(discounts[0].amount, '11.00')
             assert.equal(discounts[0].quantity, 1)
             assert.equal(discounts[0].numberOfBillingCycles, null)
-            assert.equal(discounts[0].neverExpires, true)
+            assert.isTrue(discounts[0].neverExpires)
 
             assert.equal(discounts[1].id, 'discount_7')
             assert.equal(discounts[1].amount, '7.00')
             assert.equal(discounts[1].quantity, 1)
             assert.equal(discounts[1].numberOfBillingCycles, null)
-            assert.equal(discounts[1].neverExpires, true)
+            assert.isTrue(discounts[1].neverExpires)
 
         'with validation errors on updates':
           topic: (result) ->
@@ -256,7 +256,7 @@ vows
             undefined
           'it successful':  (err, result) ->
             assert.isNull(err)
-            assert.equal(result.success, true)
+            assert.isTrue(result.success)
           'returns the transaction':  (err, result) ->
             assert.equal(result.transaction.amount, specHelper.plans.trialless.price)
             assert.equal(result.transaction.type, 'sale')
@@ -274,7 +274,7 @@ vows
             undefined
           'it successful':  (err, result) ->
             assert.isNull(err)
-            assert.equal(result.success, true)
+            assert.isTrue(result.success)
           'returns the transaction':  (err, result) ->
             assert.equal(result.transaction.amount, '6.00')
             assert.equal(result.transaction.type, 'sale')
@@ -300,7 +300,7 @@ vows
           undefined
         'is successful':  (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'updates the subscription':  (err, result) ->
           assert.equal(result.subscription.price, '8.00')
 

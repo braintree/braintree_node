@@ -24,7 +24,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'returns the address': (err, response) ->
           assert.equal(response.address.streetAddress, '123 Fake St')
           assert.equal(response.address.extendedAddress, 'Suite 403')
@@ -167,7 +167,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'returns the updated address': (err, response) ->
           assert.equal(response.address.streetAddress, '1 New Street')
           assert.equal(response.address.extendedAddress, 'New Extended')

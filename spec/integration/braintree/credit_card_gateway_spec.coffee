@@ -23,7 +23,7 @@ vows
         'does not have an error': (err, response) ->
           assert.isNull(err)
         'is successful': (err, response) ->
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'has credit card attributes': (err, response) ->
           assert.equal(response.creditCard.maskedNumber, '510510******5100')
           assert.equal(response.creditCard.expirationDate, '05/2012')
@@ -48,7 +48,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'has credit card attributes': (err, response) ->
           assert.equal(response.creditCard.maskedNumber, '510510******5100')
           assert.equal(response.creditCard.expirationDate, '05/2012')
@@ -222,7 +222,7 @@ vows
           undefined
 
         'does not have an error': (err, response) -> assert.isNull(err)
-        'is successful': (err, response) -> assert.equal(response.success, true)
+        'is successful': (err, response) -> assert.isTrue(response.success)
         'has updated credit card attributes': (err, response) ->
           assert.equal(response.creditCard.cardholderName, 'New Cardholder Name')
           assert.equal(response.creditCard.maskedNumber, '411111******1111')
@@ -256,7 +256,7 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, true)
+          assert.isTrue(response.success)
         'has updated credit card attributes': (err, response) ->
           assert.equal(response.creditCard.cardholderName, 'New Cardholder Name')
           assert.equal(response.creditCard.maskedNumber, '411111******1111')
