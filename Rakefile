@@ -3,12 +3,12 @@ task :default => %w[spec:unit spec:integration]
 namespace :spec do
   desc "Run units"
   task :unit => :install_vows do
-    sh "#{local_vows} " + Dir.glob("spec/unit/**/*_spec.{coffee,js}").join(" ")
+    sh "#{local_vows} " + Dir.glob("spec/unit/**/*_spec.coffee").join(" ")
   end
 
   desc "Run integration"
   task :integration => :install_vows do
-    sh "#{local_vows} " + Dir.glob("spec/integration/**/*_spec.{coffee,js}").join(" ")
+    sh "#{local_vows} " + Dir.glob("spec/integration/**/*_spec.coffee").join(" ")
   end
 end
 
