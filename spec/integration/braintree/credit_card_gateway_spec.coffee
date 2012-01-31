@@ -1,6 +1,7 @@
 require('../../spec_helper')
 _ = require('underscore')._
 braintree = specHelper.braintree
+sys = require('sys')
 
 vows
   .describe('CreditCardGateway')
@@ -137,15 +138,39 @@ vows
               number: '5105105105105100',
               expirationDate: '01/2010'
 
-          , (err, customerResult) ->
-            testCard = customerResult.customer.creditCards[0]
+          , (err, response) ->
+            testCard = response.customer.creditCards[0]
 
             specHelper.defaultGateway.creditCard.expired((err, searchResult) ->
               callback(null, {testCard: testCard, search: searchResult})))
 
           undefined
-        'is expired' : (err, result) ->
+        'includes a card' : (err, result) ->
           assert.includes(result.search.ids, result.testCard.token)
+
+    'expiringBetween':
+      'when there are results':
+        topic: ->
+          callback = @callback
+          specHelper.defaultGateway.customer.create(
+            creditCard:
+              number: '5105105105105100',
+              expirationDate: '05/2016'
+          , (err, response) ->
+            testCard = response.customer.creditCards[0]
+
+            today = new Date
+            before = new Date("2016-04-31")
+            after = new Date("2016-10-01")
+
+            specHelper.defaultGateway.creditCard.expiringBetween(before, after, (err, searchResult) ->
+              callback(null, {testCard: testCard, searchResult: searchResult})))
+
+          undefined
+        'has no errors': (err, result) ->
+          assert.isNull(err)
+        'includes the card': (err, result) ->
+          assert.includes(result.searchResult.ids, result.testCard.token)
 
     'find':
       'when found':
@@ -187,7 +212,7 @@ vows
               cardholderName: 'Old Cardholder Name',
               number: '5105105105105100',
               expirationDate: '05/2014'
-            , (err, response) -> 
+            , (err, response) ->
               specHelper.defaultGateway.creditCard.update(
                 response.customer.creditCards[0].token,
                   cardholderName: 'New Cardholder Name',
