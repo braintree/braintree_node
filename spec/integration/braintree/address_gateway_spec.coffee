@@ -131,6 +131,13 @@ vows
         'returns a not found error': (err, address) ->
           assert.equal(err.type, braintree.errorTypes.notFoundError)
 
+      'when the address id is whitespace':
+        topic: ->
+          specHelper.defaultGateway.address.find('blah', "\t ", @callback)
+          undefined
+        'returns a not found error': (err, address) ->
+          assert.equal(err.type, braintree.errorTypes.notFoundError)
+
     'update':
       'update an existing address':
         topic: ->

@@ -128,6 +128,8 @@ vows
           undefined
         'is unsuccessful': (err, response) ->
           assert.equal(response.success, false)
+        'has a unified message': (err, response) ->
+          assert.equal(response.message, 'Credit card number is invalid.')
         'has a nested error on creditCard.number': (err, response) ->
           assert.equal(
             response.errors.for('customer').for('creditCard').on('number')[0].code,
@@ -222,6 +224,8 @@ vows
           undefined
         'is unsuccessful': (err, response) ->
           assert.equal(response.success, false)
+        'has a unified message': (err, response) ->
+          assert.equal(response.message, 'Email is an invalid format.')
         'has an error on email': (err, response) ->
           assert.equal(
             response.errors.for('customer').on('email')[0].code
