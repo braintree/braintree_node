@@ -112,7 +112,7 @@ vows
           undefined
         'is not successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, false)
+          assert.isFalse(response.success)
         'returns the verification': (err, response) ->
           assert.equal(response.verification.status, 'processor_declined')
           assert.equal(response.verification.processorResponseCode, '2000')
@@ -127,7 +127,7 @@ vows
           , @callback)
           undefined
         'is unsuccessful': (err, response) ->
-          assert.equal(response.success, false)
+          assert.isFalse(response.success)
         'has a unified message': (err, response) ->
           assert.equal(response.message, 'Credit card number is invalid.')
         'has a nested error on creditCard.number': (err, response) ->
@@ -192,7 +192,7 @@ vows
           , @callback)
           undefined
         'is unsuccessful': (err, response) ->
-          assert.equal(response.success, false)
+          assert.isFalse(response.success)
         'has a unified message': (err, response) ->
           assert.equal(response.message, 'Credit card number is invalid.\nCountry name is not an accepted country.')
         'has a nested error on creditCard.number': (err, response) ->
@@ -223,7 +223,7 @@ vows
           , @callback)
           undefined
         'is unsuccessful': (err, response) ->
-          assert.equal(response.success, false)
+          assert.isFalse(response.success)
         'has a unified message': (err, response) ->
           assert.equal(response.message, 'Email is an invalid format.')
         'has an error on email': (err, response) ->
@@ -508,7 +508,7 @@ vows
           )
           undefined
         'is unsuccessful': (err, response) ->
-          assert.equal(response.success, false)
+          assert.isFalse(response.success)
         'has a unified message': (err, response) ->
           assert.equal(response.message, 'Email is an invalid format.')
         'has an error on email': (err, response) ->

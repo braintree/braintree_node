@@ -41,7 +41,7 @@ vows
                   specHelper.defaultGateway.subscription.cancel(result.subscription.id,  (err, result) ->
                     specHelper.defaultGateway.subscription.cancel(result.subscription.id, callback))))
           undefined
-        'is unsuccessful':  (err, response) ->   assert.equal(response.success, false)
+        'is unsuccessful':  (err, response) ->   assert.isFalse(response.success)
         'has a unified message':  (err, response) ->
           assert.equal(response.message, 'Subscription has already been canceled.')
         'has an error on base':  (err, response) ->
@@ -112,7 +112,7 @@ vows
             undefined
           'is not successful':  (err, result) ->
             assert.isNull(err)
-            assert.equal(result.success, false)
+            assert.isFalse(result.success)
           'returns the transaction on the result':  (err, result) ->
             assert.match(result.transaction.id, /^\w{6,7}$/)
             assert.equal(result.transaction.status, 'processor_declined')
@@ -175,7 +175,7 @@ vows
             undefined
           'is not successful':  (err, result) ->
             assert.isNull(err)
-            assert.equal(result.success, false)
+            assert.isFalse(result.success)
           'has errors accessible by array index':  (err, result) ->
             assert.equal(result.errors.for('subscription').for('addOns').for('update').forIndex(0).on('amount')[0].code, '92002')
             assert.equal(result.errors.for('subscription').for('addOns').for('update').forIndex(1).on('quantity')[0].code, '92001')
@@ -187,7 +187,7 @@ vows
             planId: 'invalid_plan_id'
             , callback)
           undefined
-        'is unsuccessful':  (err, response) ->   assert.equal(response.success, false)
+        'is unsuccessful':  (err, response) ->   assert.isFalse(response.success)
         'has a unified message':  (err, response) ->
           messages = response.message.split("\n")
           assert.equal(messages.length, 2)
@@ -324,7 +324,7 @@ vows
           undefined
         'is not successful':  (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, false)
+          assert.isFalse(response.success)
         'returns validation errors':  (err, result) ->
           assert.equal(result.errors.for('subscription').on('price')[0].message, 'Price is an invalid format.')
           assert.equal(result.errors.for('subscription').on('price')[0].code, '81904')

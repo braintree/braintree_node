@@ -45,7 +45,7 @@ vows
           undefined
         'is not successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, false)
+          assert.isFalse(response.success)
         'returns an error message': (err, response) ->
           assert.equal(response.message, 'Country name is not an accepted country.')
         'has an error on countryName': (err, response) ->
@@ -199,7 +199,7 @@ vows
           undefined
         'is not successful': (err, response) ->
           assert.isNull(err)
-          assert.equal(response.success, false)
+          assert.isFalse(response.success)
         'returns an error message': (err, response) ->
           assert.equal(response.message, 'Country name is not an accepted country.')
         'has an error on countryName': (err, response) ->

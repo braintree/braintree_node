@@ -72,7 +72,7 @@ vows
               , callback
           undefined
         'is unsuccessful': (err, response) ->
-          assert.equal(response.success, false)
+          assert.isFalse(response.success)
         'has a unified message': (err, response) ->
           assert.equal(response.message, 'Credit card number must be 12-19 digits.')
         'has an error on number': (err, response) ->
@@ -280,7 +280,7 @@ vows
                   number: 'invalid'
                 callback))
           undefined
-        'is unsuccessful': (err, response) -> assert.equal(response.success, false)
+        'is unsuccessful': (err, response) -> assert.isFalse(response.success)
         'has a unified message': (err, response) ->
           assert.equal(response.message, 'Credit card number must be 12-19 digits.')
         'has an error on number': (err, response) ->
