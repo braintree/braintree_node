@@ -23,7 +23,7 @@ vows.describe('CreditCardGateway').addBatch({
         );
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'has credit card attributes': function (err, response) {
         assert.equal(response.creditCard.maskedNumber, '510510******5100');
         assert.equal(response.creditCard.expirationDate, '05/2012');
@@ -53,7 +53,7 @@ vows.describe('CreditCardGateway').addBatch({
           }
         );
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -239,7 +239,7 @@ vows.describe('CreditCardGateway').addBatch({
         );
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'has updated credit card attributes': function (err, response) {
         assert.equal(response.creditCard.cardholderName, 'New Cardholder Name');
         assert.equal(response.creditCard.maskedNumber, '411111******1111');
@@ -282,7 +282,7 @@ vows.describe('CreditCardGateway').addBatch({
           }
         );
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },

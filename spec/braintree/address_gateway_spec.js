@@ -23,7 +23,7 @@ vows.describe('AddressGateway').addBatch({
           }
         );
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -193,7 +193,7 @@ vows.describe('AddressGateway').addBatch({
           }
         );
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },

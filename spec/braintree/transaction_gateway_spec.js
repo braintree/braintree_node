@@ -37,7 +37,7 @@ vows.describe('TransactionGateway').addBatch({
         }, this.callback);
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'is a credit': function (err, response) { assert.equal(response.transaction.type, 'credit'); },
       'is for 5.00': function (err, response) { assert.equal(response.transaction.amount, '5.00'); },
       'has a masked number of 510510******5100': function (err, response) {
@@ -96,7 +96,7 @@ vows.describe('TransactionGateway').addBatch({
         }, this.callback);
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'is a sale': function (err, response) { assert.equal(response.transaction.type, 'sale'); },
       'is for 5.00': function (err, response) { assert.equal(response.transaction.amount, '5.00'); },
       'has a masked number of 510510******5100': function (err, response) {
@@ -126,7 +126,7 @@ vows.describe('TransactionGateway').addBatch({
         );
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'is a sale': function (err, response) { assert.equal(response.transaction.type, 'sale'); },
       'snapshots customer details': function (err, response) {
         assert.equal(response.transaction.customer.firstName, 'Adam');
@@ -161,7 +161,7 @@ vows.describe('TransactionGateway').addBatch({
         );
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'is a sale': function (err, response) { assert.equal(response.transaction.type, 'sale'); },
       'snapshots customer details': function (err, response) {
         assert.equal(response.transaction.customer.firstName, 'Adam');
@@ -187,7 +187,7 @@ vows.describe('TransactionGateway').addBatch({
           }
         }, this.callback);
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -209,7 +209,7 @@ vows.describe('TransactionGateway').addBatch({
           }
         }, this.callback);
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -233,7 +233,7 @@ vows.describe('TransactionGateway').addBatch({
         }, this.callback);
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'has custom fields in response': function (err, response) {
         assert.equal(response.transaction.customFields.storeMe, 'custom value');
       }
@@ -346,7 +346,7 @@ vows.describe('TransactionGateway').addBatch({
           specHelper.defaultGateway.transaction.refund(transaction.id, callback);
         });
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -363,7 +363,7 @@ vows.describe('TransactionGateway').addBatch({
           specHelper.defaultGateway.transaction.refund(transaction.id, '1.00', callback);
         });
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -394,7 +394,7 @@ vows.describe('TransactionGateway').addBatch({
         )
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is not succesful': function (err, response) { assert.equal(response.success, false); },
+      'is not successful': function (err, response) { assert.equal(response.success, false); },
       'has error 91507 on base': function (err, response) {
         assert.equal(response.errors.for('transaction').on('base')[0].code, '91506');
       }
@@ -418,7 +418,7 @@ vows.describe('TransactionGateway').addBatch({
           }
         )
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -446,7 +446,7 @@ vows.describe('TransactionGateway').addBatch({
           }
         )
       },
-      'is succesful': function (err, response) {
+      'is successful': function (err, response) {
         assert.isNull(err);
         assert.equal(response.success, true);
       },
@@ -478,7 +478,7 @@ vows.describe('TransactionGateway').addBatch({
         )
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is not succesful': function (err, response) { assert.equal(response.success, false); },
+      'is not successful': function (err, response) { assert.equal(response.success, false); },
       'has error 91507 on base': function (err, response) {
         assert.equal(response.errors.for('transaction').on('base')[0].code, '91507');
       }
@@ -503,7 +503,7 @@ vows.describe('TransactionGateway').addBatch({
         )
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is succesful': function (err, response) { assert.equal(response.success, true); },
+      'is successful': function (err, response) { assert.equal(response.success, true); },
       'sets the status to voided': function (err, response) { assert.equal(response.transaction.status, 'voided'); },
     },
 
@@ -526,7 +526,7 @@ vows.describe('TransactionGateway').addBatch({
         )
       },
       'does not have an error': function (err, response) { assert.isNull(err); },
-      'is not succesful': function (err, response) { assert.equal(response.success, false); },
+      'is not successful': function (err, response) { assert.equal(response.success, false); },
       'has error 91504 on base': function (err, response) {
         assert.equal(response.errors.for('transaction').on('base')[0].code, '91504');
       }
