@@ -1,3 +1,7 @@
+## 1.0.0
+
+* Add search functionality
+
 ## 0.5.1
 
 * Exposes plan_id on transactions
