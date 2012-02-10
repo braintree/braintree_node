@@ -27,4 +27,16 @@ class CreditCardGateway extends Gateway
   responseHandler: (callback) ->
     @createResponseHandler("creditCard", CreditCard, callback)
 
+  expired: (callback) ->
+    @gateway.http.post("/payment_methods/all/expired_ids", {}, @searchResponseHandler(@, callback))
+
+  expiringBetween: (after, before, callback) ->
+    url = "/payment_methods/all/expiring_ids?start=#{@dateFormat(after)}&end=#{@dateFormat(before)}"
+    @gateway.http.post(url, {}, @searchResponseHandler(@, callback))
+
+  dateFormat: (date) ->
+    month = date.getMonth() + 1
+    month = "0#{month}" if month < 10
+    return month + date.getFullYear()
+
 exports.CreditCardGateway = CreditCardGateway

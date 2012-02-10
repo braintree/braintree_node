@@ -90,16 +90,24 @@ nowInEastern = ->
   eastern = now.getTime() - (5*60*60*1000)
   return new Date(eastern)
 
+randomId = ->
+  Math.floor(Math.random() * Math.pow(36,8)).toString(36)
+
+doesNotInclude = (array, value) ->
+  assert.isTrue(array.indexOf(value) is -1)
+
 GLOBAL.specHelper = {
   addOns: addOns
   braintree: braintree
   dateToMdy: dateToMdy
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
+  doesNotInclude: doesNotInclude
   makePastDue: makePastDue
   multiplyString: multiplyString
   nowInEastern: nowInEastern
   plans: plans
+  randomId: randomId
   settleTransaction: settleTransaction
   simulateTrFormPost: simulateTrFormPost
 }

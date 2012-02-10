@@ -1,5 +1,6 @@
 {Gateway} = require('./gateway')
 {Subscription} = require('./subscription')
+{SubscriptionSearch} = require('./subscription_search')
 {TransactionGateway} = require('./transaction_gateway')
 exceptions = require('./exceptions')
 
@@ -30,6 +31,12 @@ class SubscriptionGateway extends Gateway
       amount: amount[0],
       subscriptionId: subscriptionId
     , callback
+
+  search: (fn, callback) ->
+    search = new SubscriptionSearch()
+    fn(search)
+    @gateway.http.post("/subscriptions/advanced_search_ids",
+      { search : search.toHash() }, @searchResponseHandler(@, callback))
 
   update: (subscriptionId, attributes, callback) ->
     @gateway.http.put("/subscriptions/#{subscriptionId}", {subscription: attributes}, @responseHandler(callback))
