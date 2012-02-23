@@ -14,27 +14,27 @@ and __querystring-stringify__ sub-modules, repsectively.
 
 ### parse example
 
-    var sys = require("sys");
+    var util = require("util");
     var qs = require("./querystring");
 
     var str = qs.parse("foo=bar&baz=qux");
-    sys.puts(JSON.stringify(str)); // => {"foo":"bar","baz":"qux"}
+    util.log(JSON.stringify(str)); // => {"foo":"bar","baz":"qux"}
 
     str = qs.parse("foo[bar][][bla]=baz");
-    sys.puts(JSON.stringify(str)); // => {"foo":{"bar":[{"bla":"baz"}]}}
+    util.log(JSON.stringify(str)); // => {"foo":{"bar":[{"bla":"baz"}]}}
 
 
 
 ### stringify example
 
-    var sys = require("sys");
+    var util = require("util");
     var qs = require("./querystring");
 
     var obj = {"foo":"bar","baz":"qux"};
-    sys.puts(qs.stringify(obj)); // => foo=bar&baz=qux
+    util.log(qs.stringify(obj)); // => foo=bar&baz=qux
 
     obj = {"foo":{"bar":[{"bla":"baz"}]}};
-    sys.puts(qs.stringify(obj)); // => foo%5Bbar%5D%5B%5D%5Bbla%5D=baz
+    util.log(qs.stringify(obj)); // => foo%5Bbar%5D%5B%5D%5Bbla%5D=baz
 
 
 ## querystring-parse.js

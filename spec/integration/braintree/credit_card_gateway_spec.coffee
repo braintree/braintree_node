@@ -1,7 +1,7 @@
 require('../../spec_helper')
 _ = require('underscore')._
 braintree = specHelper.braintree
-sys = require('sys')
+util = require('util')
 
 vows
   .describe('CreditCardGateway')

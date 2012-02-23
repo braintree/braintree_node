@@ -123,4 +123,4 @@ var f = qs.stringify({
 }, ";", ":");
 assert.equal(f, "a:b;q:x%3Ay%3By%3Az");
 
-require("sys").puts("ok");
+require("util").log("ok");

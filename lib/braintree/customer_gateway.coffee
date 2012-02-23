@@ -1,7 +1,7 @@
 {Gateway} = require('./gateway')
 {Customer} = require('./customer')
 {CustomerSearch} = require('./customer_search')
-sys = require('sys')
+util = require('util')
 
 exceptions = require('./exceptions')
 
