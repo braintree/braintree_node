@@ -4,7 +4,7 @@ require('../../spec_helper')
 vows
   .describe('ValidationErrorsCollection')
   .addBatch
-    'on':
+    'retreiving errors on attribute':
       'with mutliple errors on a single attribute':
         topic: new ValidationErrorsCollection(
           errors: [

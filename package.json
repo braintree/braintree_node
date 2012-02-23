@@ -16,6 +16,6 @@
   },
   "devDependencies" : {
     "underscore" : "=1.1.6",
-    "vows"       : "=0.5.11"
+    "vows"       : "=0.6.1"
   }
 }
