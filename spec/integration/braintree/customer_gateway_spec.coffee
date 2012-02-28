@@ -82,6 +82,36 @@ vows
           assert.equal(response.customer.creditCards[0].expirationYear, '2012')
           assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
 
+      'with failOnDuplicatePaymentMethod option':
+        topic: ->
+          callback = @callback
+          specHelper.defaultGateway.customer.create(
+              firstName: 'John',
+              lastName: 'Smith'
+              creditCard:
+                number: '5555555555554444'
+                expirationDate: '05/2012'
+                options:
+                  failOnDuplicatePaymentMethod: true
+            , (err, response) ->
+              specHelper.defaultGateway.customer.create
+                firstName: 'John',
+                lastName: 'Smith'
+                creditCard:
+                  number: '5555555555554444'
+                  expirationDate: '05/2012'
+                  options:
+                    failOnDuplicatePaymentMethod: true
+              , callback)
+          undefined
+        'is not successful': (err, response) ->
+          assert.isFalse(response.success)
+        'has a card duplicated error on creditCard.number': (err, response) ->
+          assert.equal(
+            response.errors.for('customer').for('creditCard').on('number')[0].code,
+            '81724'
+          )
+
       'with a successful verification':
         topic: ->
           specHelper.defaultGateway.customer.create(
