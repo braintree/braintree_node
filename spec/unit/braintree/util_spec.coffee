@@ -67,6 +67,52 @@ vows
               'pingPong': 'paddle'
           )
 
+      'a collection with one item':
+        topic: Util.convertNodeToObject(
+          'credit-card-transactions':
+             '@': { type: 'collection' },
+             'current-page-number': { '#': '1', '@': { type: 'integer' } },
+             'page-size': { '#': '50', '@': { type: 'integer' } },
+             'total-items': { '#': '1', '@': { type: 'integer' } },
+             'transaction':
+               id: '22vwrm',
+               status: 'settled'
+        )
+        'is converted to an object': (result) ->
+          assert.deepEqual(result,
+            'creditCardTransactions':
+               'currentPageNumber': 1,
+               'pageSize': 50,
+               'totalItems': 1,
+               'transaction':
+                 id: '22vwrm',
+                 status: 'settled'
+          )
+
+      'a collection with multiple item':
+        topic: Util.convertNodeToObject(
+          'credit-card-transactions':
+             '@': { type: 'collection' },
+             'current-page-number': { '#': '1', '@': { type: 'integer' } },
+             'page-size': { '#': '50', '@': { type: 'integer' } },
+             'total-items': { '#': '1', '@': { type: 'integer' } },
+             'transaction': [
+               { id: '22yyyy' },
+               { id: '22xxxx' },
+             ]
+        )
+        'is converted to an object': (result) ->
+          assert.deepEqual(result,
+            'creditCardTransactions':
+               'currentPageNumber': 1,
+               'pageSize': 50,
+               'totalItems': 1,
+               'transaction': [
+                 { id: '22yyyy' },
+                 { id: '22xxxx' },
+               ]
+          )
+
       'array as object with no items':
         topic: Util.convertNodeToObject(
           '@':

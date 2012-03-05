@@ -38,14 +38,13 @@ vows
     "each":
       "zero results":
         topic: ->
-          fakeGateway =
-            find: (id, callback) ->
+          fakePagingFunction = (ids, callback) ->
               throw new Error("This exception should NOT be thrown")
           fakeResults =
             searchResults:
               ids: []
-          new SearchResponse(fakeGateway, fakeResults)
-        "does not call gateway#find": (searchResponse) ->
+          new SearchResponse(fakePagingFunction, fakeResults)
+        "does not call pagingFunction": (searchResponse) ->
           assert.doesNotThrow(->
             searchResponse.each()
           , Error)
