@@ -3,7 +3,7 @@ _ = require('underscore')
 class SearchResponse
   constructor: (pagingFunction, results) ->
     @ids = results.searchResults.ids
-    @pageSize = results.searchResults.pageSize
+    @pageSize = parseInt(results.searchResults.pageSize)
     @pagingFunction = pagingFunction
     @success = true
 

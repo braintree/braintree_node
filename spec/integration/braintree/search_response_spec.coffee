@@ -21,8 +21,9 @@ vows
         )
         undefined
       "should return results from all pages": (err, results) ->
+        assert.isNull(err)
         assert.equal(results.customers.length, results.expectedLength)
-        assert.equal(_.uniq(_.map(results.customers, (id) -> id)).length, results.expectedLength)
+        assert.equal(_.uniq(_.map(results.customers, (customer) -> customer.id)).length, results.expectedLength)
         assert(results.customers.length > 50)
 
 .export(module)

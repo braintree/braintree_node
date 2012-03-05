@@ -38,8 +38,10 @@ class CustomerGateway extends Gateway
 
   pagingFunctionGenerator: (search) ->
     (ids, callback) =>
+      searchCriteria = search.toHash()
+      searchCriteria["ids"] = ids
       @gateway.http.post("/customers/advanced_search",
-        { search : search.toHash() },
+        { search : searchCriteria },
         (err, response) ->
           if err
             callback(err, null)
