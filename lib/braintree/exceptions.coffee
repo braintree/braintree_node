@@ -18,6 +18,12 @@ DownForMaintenanceError = ->
     type: errorTypes.downForMaintenanceError
   }
 
+InvalidSignatureError = ->
+  {
+    message: 'Invalid Signature',
+    type: errorTypes.invalidSignatureError
+  }
+
 InvalidTransparentRedirectHashError = ->
   {
     message: 'The transparent redirect hash is invalid.',
@@ -52,6 +58,7 @@ exports.AuthenticationError = AuthenticationError
 exports.AuthorizationError = AuthorizationError
 exports.DownForMaintenanceError = DownForMaintenanceError
 exports.InvalidTransparentRedirectHashError = InvalidTransparentRedirectHashError
+exports.InvalidSignatureError = InvalidSignatureError
 exports.NotFoundError = NotFoundError
 exports.ServerError = ServerError
 exports.UnexpectedError = UnexpectedError

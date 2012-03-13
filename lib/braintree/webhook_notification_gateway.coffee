@@ -1,8 +1,10 @@
 xml2js = require('xml2js')
 {Digest} = require('./digest')
 {Gateway} = require('./gateway')
-{WebhookNotification} = require('./webhook_notification')
+{InvalidSignatureError} = require('./exceptions')
 {Util} = require('./util')
+{WebhookNotification} = require('./webhook_notification')
+_ = require('underscore')
 
 class WebhookNotificationGateway extends Gateway
   constructor: (@gateway) ->
@@ -10,6 +12,10 @@ class WebhookNotificationGateway extends Gateway
       explicitRoot: true
 
   parse: (signature, payload, callback) ->
+    unless @validateSignature(signature, payload)
+      callback(InvalidSignatureError(), null)
+      return
+
     xmlPayload = new Buffer(payload, "base64").toString("utf8")
     @parser.parseString xmlPayload, (err, result) =>
       attributes = Util.convertNodeToObject(result)
@@ -17,8 +23,18 @@ class WebhookNotificationGateway extends Gateway
         callback(null, result.notification)
       handler(null, attributes)
 
+  validateSignature: (signature, payload) ->
+    signaturePairs = (pair.split("|") for pair in signature.split("&") when pair.indexOf("|") isnt -1)
+    @matchingSignature(signaturePairs) == Digest.hexdigest(@gateway.config.privateKey, payload)
+
   verify: (challenge) ->
     digest = Digest.hexdigest(@gateway.config.privateKey, challenge)
     "#{@gateway.config.publicKey}|#{digest}"
+
+  matchingSignature: (signaturePairs) ->
+    for [publicKey, signature] in signaturePairs
+      if @gateway.config.publicKey == publicKey
+        return signature
+    return null
 
 exports.WebhookNotificationGateway = WebhookNotificationGateway

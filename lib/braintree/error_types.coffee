@@ -1,6 +1,7 @@
 exports.authenticationError = 'authenticationError'
 exports.authorizationError = 'authorizationError'
 exports.downForMaintenanceError = 'downForMaintenanceError'
+exports.invalidSignatureError = 'invalidSignatureError'
 exports.invalidTransparentRedirectHashError = 'invalidTransparentRedirectHashError'
 exports.notFoundError = 'notFoundError'
 exports.serverError = 'serverError'

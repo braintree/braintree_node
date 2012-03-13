@@ -1,4 +1,5 @@
 {Buffer} = require('buffer')
+{Digest} = require('./digest')
 {Gateway} = require('./gateway')
 dateFormat = require('dateformat')
 
@@ -6,10 +7,11 @@ class WebhookTestingGateway extends Gateway
   constructor: (@gateway) ->
 
   sampleNotification: (kind, id) ->
-    sampleXml = @sampleXml(kind, id)
+    payload = new Buffer(@sampleXml(kind, id)).toString("base64")
+    signature = "#{@gateway.config.publicKey}|#{Digest.hexdigest(@gateway.config.privateKey, payload)}"
     {
-      signature: "sig",
-      payload: new Buffer(sampleXml).toString("base64")
+      signature: signature,
+      payload: payload
     }
 
   sampleXml: (kind, id) ->

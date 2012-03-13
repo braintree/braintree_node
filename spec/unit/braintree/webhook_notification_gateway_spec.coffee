@@ -1,5 +1,6 @@
 require('../../spec_helper')
 {WebhookNotification} = require('../../../lib/braintree/webhook_notification')
+errorTypes = require('../../../lib/braintree/error_types')
 
 vows
   .describe('WebhookNotificationGateway')
@@ -23,5 +24,41 @@ vows
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionPastDue)
         assert.equal(webhookNotification.subscription.id, "my_id")
         assert.ok(webhookNotification.timestamp?)
+
+    'invalidSignature':
+      topic: ->
+        {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+          WebhookNotification.Kind.SubscriptionPastDue,
+          "my_id"
+        )
+        specHelper.defaultGateway.webhookNotification.parse("bad_signature", payload, @callback)
+        undefined
+
+      'gets an errback with InvalidSignatureError when signature is totally invalid': (err, webhookNotification) ->
+        assert.equal(err.type, errorTypes.invalidSignatureError)
+
+    'modifiedPublicKey':
+      topic: ->
+        {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+          WebhookNotification.Kind.SubscriptionPastDue,
+          "my_id"
+        )
+        specHelper.defaultGateway.webhookNotification.parse("bad#{signature}", payload, @callback)
+        undefined
+
+      'gets an errback with InvalidSignatureError when signature is totally invalid': (err, webhookNotification) ->
+        assert.equal(err.type, errorTypes.invalidSignatureError)
+
+    'modifiedSignature':
+      topic: ->
+        {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+          WebhookNotification.Kind.SubscriptionPastDue,
+          "my_id"
+        )
+        specHelper.defaultGateway.webhookNotification.parse("#{signature}bad", payload, @callback)
+        undefined
+
+      'gets an errback with InvalidSignatureError when signature is totally invalid': (err, webhookNotification) ->
+        assert.equal(err.type, errorTypes.invalidSignatureError)
 
   .export(module)
