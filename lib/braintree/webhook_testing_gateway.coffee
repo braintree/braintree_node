@@ -1,5 +1,6 @@
 {Buffer} = require('buffer')
 {Gateway} = require('./gateway')
+dateFormat = require('dateformat')
 
 class WebhookTestingGateway extends Gateway
   constructor: (@gateway) ->
@@ -14,7 +15,7 @@ class WebhookTestingGateway extends Gateway
   sampleXml: (kind, id) ->
     """
     <notification>
-        <timestamp type="datetime"></timestamp>
+        <timestamp type="datetime">#{dateFormat(new Date(), dateFormat.masks.isoUtcDateTime, true)}</timestamp>
         <kind>#{kind}</kind>
         <subject>#{@subscriptionSampleXml(id)}</subject>
     </notification>

@@ -22,5 +22,6 @@ vows
       'returns a parsable signature and payload': (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionPastDue)
         assert.equal(webhookNotification.subscription.id, "my_id")
+        assert.ok(webhookNotification.timestamp?)
 
   .export(module)
