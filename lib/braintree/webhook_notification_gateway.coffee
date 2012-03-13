@@ -4,7 +4,6 @@ xml2js = require('xml2js')
 {InvalidSignatureError} = require('./exceptions')
 {Util} = require('./util')
 {WebhookNotification} = require('./webhook_notification')
-_ = require('underscore')
 
 class WebhookNotificationGateway extends Gateway
   constructor: (@gateway) ->
