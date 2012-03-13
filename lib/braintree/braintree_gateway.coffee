@@ -6,6 +6,8 @@
 {SubscriptionGateway} = require("./subscription_gateway")
 {TransactionGateway} = require("./transaction_gateway")
 {TransparentRedirectGateway} = require("./transparent_redirect_gateway")
+{WebhookNotificationGateway} = require("./webhook_notification_gateway")
+{WebhookTestingGateway} = require("./webhook_testing_gateway")
 
 class BraintreeGateway
   constructor: (@config) ->
@@ -17,5 +19,7 @@ class BraintreeGateway
     @subscription = new SubscriptionGateway(this)
     @transaction = new TransactionGateway(this)
     @transparentRedirect = new TransparentRedirectGateway(this)
+    @webhookNotification = new WebhookNotificationGateway(this)
+    @webhookTesting = new WebhookTestingGateway(this)
 
 exports.BraintreeGateway = BraintreeGateway
