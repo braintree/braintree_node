@@ -24,7 +24,7 @@ class WebhookNotificationGateway extends Gateway
 
   validateSignature: (signature, payload) ->
     signaturePairs = (pair.split("|") for pair in signature.split("&") when pair.indexOf("|") isnt -1)
-    @matchingSignature(signaturePairs) == Digest.hexdigest(@gateway.config.privateKey, payload)
+    Digest.secureCompare(@matchingSignature(signaturePairs), Digest.hexdigest(@gateway.config.privateKey, payload))
 
   verify: (challenge) ->
     digest = Digest.hexdigest(@gateway.config.privateKey, challenge)
