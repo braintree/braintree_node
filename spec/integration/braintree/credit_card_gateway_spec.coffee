@@ -27,6 +27,7 @@ vows
         'has credit card attributes': (err, response) ->
           assert.equal(response.creditCard.maskedNumber, '510510******5100')
           assert.equal(response.creditCard.expirationDate, '05/2012')
+          assert.isTrue(/^\w{32}$/.test(response.creditCard.numberUniqueIdentifier))
 
       'with billing address':
         topic: ->
