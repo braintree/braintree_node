@@ -81,7 +81,7 @@ vows
           assert.equal(response.customer.creditCards[0].expirationMonth, '05')
           assert.equal(response.customer.creditCards[0].expirationYear, '2012')
           assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
-          assert.isTrue(/^\w{32}$/.test(response.customer.creditCards[0].numberUniqueIdentifier))
+          assert.isTrue(/^\w{32}$/.test(response.customer.creditCards[0].uniqueNumberIdentifier))
 
       'with failOnDuplicatePaymentMethod option':
         topic: ->
