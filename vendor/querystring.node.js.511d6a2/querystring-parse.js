@@ -12,8 +12,8 @@
  */
 
 
-var sys = require("sys"),
-  util = require("./util");
+var util = require("util"),
+  braintree_util = require("./util");
 
 exports.parse = querystring_parse;
 
@@ -73,7 +73,7 @@ function pieceParser (eq, unesc) {
       );
     }
     key = key.replace(/^\s+|\s+$/g, '');
-    if (util.isString(val)) {
+    if (braintree_util.isString(val)) {
       val = val.replace(/^\s+|\s+$/g, '');
       // convert numerals to numbers
       if (!isNaN(val)) {
@@ -108,10 +108,10 @@ function mergeParams (params, addition) {
 	if (!params){
 		// if it's uncontested, then just return the addition.
 		ret = addition;
-	} else if (util.isArray(params)) {
+	} else if (braintree_util.isArray(params)) {
 		// if the existing value is an array, then concat it.
 		ret = params.concat(addition);
-	} else if (!util.isObject(params) || !util.isObject(addition)) {
+	} else if (!braintree_util.isObject(params) || !braintree_util.isObject(addition)) {
 		// if the existing value is not an array, and either are not objects, arrayify it.		
 		ret = [params].concat(addition);
 	} else {

@@ -1,24 +1,21 @@
+_ = require('underscore')
+
 class SearchResponse
-  constructor: (gateway, results) ->
+  constructor: (pagingFunction, results) ->
     @ids = results.searchResults.ids
-    @gateway = gateway
+    @pageSize = parseInt(results.searchResults.pageSize)
+    @pagingFunction = pagingFunction
     @success = true
 
   first: (callback)->
     if @ids.length == 0
       callback(null, null)
     else
-      @gateway.find(@ids[0], callback)
+      @pagingFunction([@ids[0]], callback)
 
-  next: (resultsLeft, callback) ->
-    if resultsLeft.length > 0
-      @gateway.find(resultsLeft[0], (err, result) =>
-        callback(err, result)
-        @next(resultsLeft.slice(1), callback)
-      )
-
-  each: (callback)->
-    @next(@ids, callback)
+  each: (callback) ->
+    _.each(_.range(0, @ids.length, @pageSize), (offset) =>
+      @pagingFunction(@ids.slice(offset, offset + @pageSize), callback))
 
   length: ->
     @ids.length

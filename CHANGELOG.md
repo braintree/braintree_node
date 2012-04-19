@@ -1,3 +1,10 @@
+## 1.1.0
+
+* Add webhook gateways for parsing, verifying, and testing incoming notifications
+* Use util.log instead of sys.puts for logging
+* Add underscore as a dependency
+* Allow failing on credit card creation if a duplicate card already exists
+
 ## 1.0.0
 
 * Add search functionality

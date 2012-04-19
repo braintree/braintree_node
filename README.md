@@ -27,7 +27,7 @@ This is a Node.js library for integrating with the [Braintree](http://www.braint
 
 ## Quick Start
 ```javascript
-var sys = require('sys'),
+var util = require('util'),
     braintree = require('braintree');
 
 var gateway = braintree.connect({
@@ -47,9 +47,9 @@ gateway.transaction.sale({
   if (err) throw err;
 
   if (result.success) {
-    sys.puts('Transaction ID: ' + result.transaction.id);
+    util.log('Transaction ID: ' + result.transaction.id);
   } else {
-    sys.puts(result.message);
+    util.log(result.message);
   }
 });
 ```

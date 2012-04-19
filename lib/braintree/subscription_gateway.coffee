@@ -3,6 +3,7 @@
 {SubscriptionSearch} = require('./subscription_search')
 {TransactionGateway} = require('./transaction_gateway')
 exceptions = require('./exceptions')
+_ = require('underscore')
 
 class SubscriptionGateway extends Gateway
   constructor: (@gateway) ->
@@ -36,9 +37,23 @@ class SubscriptionGateway extends Gateway
     search = new SubscriptionSearch()
     fn(search)
     @gateway.http.post("/subscriptions/advanced_search_ids",
-      { search : search.toHash() }, @searchResponseHandler(@, callback))
+      { search : search.toHash() }, @searchResponseHandler(@pagingFunctionGenerator(search), callback))
 
   update: (subscriptionId, attributes, callback) ->
     @gateway.http.put("/subscriptions/#{subscriptionId}", {subscription: attributes}, @responseHandler(callback))
+
+  pagingFunctionGenerator: (search) ->
+    (ids, callback) =>
+      @gateway.http.post("/subscriptions/advanced_search",
+        { search : search.toHash() },
+        (err, response) ->
+          if err
+            callback(err, null)
+          else
+            if _.isArray(response.subscriptions.subscription)
+              for subscription in response.subscriptions.subscription
+                callback(null, new Subscription(subscription))
+            else
+              callback(null, new Subscription(response.subscriptions.subscription)))
 
 exports.SubscriptionGateway = SubscriptionGateway

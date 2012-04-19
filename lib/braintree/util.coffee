@@ -27,8 +27,15 @@ class Util
           else
             newArray.push(@convertNodeToObject(value))
         newArray
+      else if obj['@'].type is 'collection'
+        newObj = {}
+        for key, value of obj when key isnt '@'
+          newObj[@toCamelCase(key)] = @convertNodeToObject(value)
+        newObj
       else if obj['@'].nil is 'true'
         null
+      else if obj['@'].type is 'integer'
+        parseInt(obj['#'])
       else if obj['@'].type is 'boolean'
         obj['#'] is 'true'
       else
