@@ -165,7 +165,7 @@ vows
             after = new Date("2016-10-01")
 
             specHelper.defaultGateway.creditCard.expiringBetween(before, after, (err, searchResult) ->
-              callback(null, {testCard: testCard, searchResult: searchResult})))
+              callback(err, {testCard: testCard, searchResult: searchResult})))
 
           undefined
         'has no errors': (err, result) ->
