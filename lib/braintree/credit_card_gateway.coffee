@@ -36,7 +36,10 @@ class CreditCardGateway extends Gateway
 
   dateFormat: (date) ->
     month = date.getMonth() + 1
-    month = "0#{month}" if month < 10
+    if month < 10
+      month = "0#{month}" 
+    else
+      month = "#{month}"
     return month + date.getFullYear()
 
 exports.CreditCardGateway = CreditCardGateway
