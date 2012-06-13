@@ -32,5 +32,5 @@ vows
           }
           new TransparentRedirectGateway(braintree.connect(sandboxConfig))
         'gives full dev url': (result) ->
-          assert.equal(result.url, 'http://localhost:3000/merchants/integration_merchant_id/transparent_redirect_requests')
+          assert.equal(result.url, "http://localhost:#{result.gateway.config.environment.port}/merchants/integration_merchant_id/transparent_redirect_requests")
   .export(module)
