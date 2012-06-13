@@ -16,7 +16,12 @@ class TransparentRedirectGateway
     CREATE_TRANSACTION: 'create_transaction'
 
   constructor: (@gateway) ->
-    @url = "#{@gateway.config.baseMerchantPath}/transparent_redirect_requests"
+    uriScheme = if @gateway.config.environment.ssl then 'https://' else 'http://'
+    fullHost  = if @gateway.config.environment is braintree.Environment.Development
+      "#{@gateway.config.environment.server}:#{@gateway.config.environment.port}"
+    else
+      @gateway.config.environment.server
+    @url = "#{uriScheme}#{fullHost}#{@gateway.config.baseMerchantPath}/transparent_redirect_requests"
 
   generateTrData: (inputData) ->
     data = Util.convertObjectKeysToUnderscores(inputData)
