@@ -1,3 +1,7 @@
+## 1.1.1
+* Fix dateFormat bug with months after October in CreditCardGateway
+* Fix TransparentRedirecteGateway url method to return full url (thanks to [sberryman](https://github.com/sberryman))
+
 ## 1.1.0
 
 * Add webhook gateways for parsing, verifying, and testing incoming notifications
