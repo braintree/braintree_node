@@ -54,11 +54,6 @@ settleTransaction = (transactionId, callback) ->
   )
 
 simulateTrFormPost = (url, trData, inputFormData, callback) ->
-  client = http.createClient(
-    specHelper.defaultGateway.config.environment.port,
-    specHelper.defaultGateway.config.environment.server,
-    specHelper.defaultGateway.config.environment.ssl
-  )
   headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
     'Host': 'localhost'
@@ -67,12 +62,26 @@ simulateTrFormPost = (url, trData, inputFormData, callback) ->
   formData.tr_data = trData
   requestBody = querystring.stringify(formData)
   headers['Content-Length'] = requestBody.length.toString()
-  request = client.request('POST', url, headers)
-  request.write(requestBody)
-  request.end()
+
+  options = {
+    port: specHelper.defaultGateway.config.environment.port
+    host: specHelper.defaultGateway.config.environment.server
+    method: 'POST'
+    headers: headers
+    path: url
+  }
+
+  if specHelper.defaultGateway.config.environment.ssl
+    request = https.request(options, ->)
+  else
+    request = http.request(options, ->)
+
   request.on('response', (response) ->
     callback(null, response.headers.location.split('?', 2)[1])
   )
+
+  request.write(requestBody)
+  request.end()
 
 dateToMdy = (date) ->
   year = date.getFullYear().toString()
