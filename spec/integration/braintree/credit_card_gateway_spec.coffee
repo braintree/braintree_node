@@ -2,6 +2,7 @@ require('../../spec_helper')
 _ = require('underscore')._
 braintree = specHelper.braintree
 util = require('util')
+{CreditCard} = require('../../../lib/braintree/credit_card')
 
 vows
   .describe('CreditCardGateway')
@@ -203,6 +204,64 @@ vows
           undefined
         'returns a not found error': (err, address) ->
           assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+    'prepaid':
+      'with a prepaid card':
+        topic: () ->
+          callback = @callback
+          specHelper.defaultGateway.customer.create(
+            firstName: 'John',
+            lastName: 'Smith'
+          , (err, response) ->
+            specHelper.defaultGateway.creditCard.create(
+              customerId: response.customer.id,
+              number: '4500600000000061',
+              expirationDate: '05/2012',
+              options: {
+                verifyCard: true
+              }
+            , callback))
+          undefined
+        'sets the prepaid field to Yes': (err, response) ->
+          assert.equal(response.creditCard.prepaid, CreditCard.Prepaid.Yes)
+
+      'with a non-prepaid card':
+        topic: () ->
+          callback = @callback
+          specHelper.defaultGateway.customer.create(
+            firstName: 'John',
+            lastName: 'Smith'
+          , (err, response) ->
+            specHelper.defaultGateway.creditCard.create(
+              customerId: response.customer.id,
+              number: '4111111111111111',
+              expirationDate: '05/2012',
+              options: {
+                verifyCard: true
+              }
+            , callback))
+          undefined
+        'sets the prepaid field to No': (err, response) ->
+          assert.equal(response.creditCard.prepaid, CreditCard.Prepaid.No)
+
+      'with an un-identified card':
+        topic: () ->
+          callback = @callback
+          specHelper.defaultGateway.customer.create(
+            firstName: 'John',
+            lastName: 'Smith'
+          , (err, response) ->
+            specHelper.defaultGateway.creditCard.create(
+              customerId: response.customer.id,
+              number: '5555555555554444',
+              expirationDate: '05/2012',
+              options: {
+                verifyCard: true
+              }
+            , callback))
+          undefined
+        'sets the prepaid field to Unknown': (err, response) ->
+          assert.equal(response.creditCard.prepaid, CreditCard.Prepaid.Unknown)
 
     'update':
       'for a minimal case':
