@@ -213,6 +213,23 @@ vows
         'has custom fields in response': (err, response) ->
           assert.equal(response.transaction.customFields.storeMe, 'custom value')
 
+      'when setting recurring':
+        topic: ->
+          specHelper.defaultGateway.transaction.sale(
+            amount: '5.00'
+            creditCard:
+              number: '5105105105105100'
+              expirationDate: '05/12'
+            recurring: true
+          , @callback)
+          undefined
+        'does not have an error': (err, response) ->
+          assert.isNull(err)
+        'is successful': (err, response) ->
+          assert.isTrue(response.success)
+        'sets recurring to true': (err, response) ->
+          assert.equal(response.transaction.recurring, true)
+
       'when processor declined':
         topic: ->
           specHelper.defaultGateway.transaction.sale(
