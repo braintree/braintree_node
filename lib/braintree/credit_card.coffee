@@ -24,6 +24,11 @@ class CreditCard extends AttributeSetter
     International : 'international'
     US : 'us'
 
+  @Prepaid =
+    Yes : "Yes"
+    No : "No"
+    Unknown : "Unknown"
+
   constructor: (attributes) ->
     super attributes
     @maskedNumber = "#{@bin}******#{@last4}"
