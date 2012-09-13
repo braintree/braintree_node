@@ -1,3 +1,7 @@
+## 1.2.0
+
+* Add prepaid field to credit card (possible values include Yes, No, Unknown)
+
 ## 1.1.2
 * Compatibility with Node 0.8.x
 
