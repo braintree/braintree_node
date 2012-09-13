@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/braintree/braintree_node.png)](http://travis-ci.org/braintree/braintree_node)
 ## Overview
 
 This is a Node.js library for integrating with the [Braintree](http://www.braintreepayments.com) gateway.
