@@ -29,6 +29,31 @@ class CreditCard extends AttributeSetter
     No : "No"
     Unknown : "Unknown"
 
+  @Commercial =
+    Yes : "Yes"
+    No : "No"
+    Unknown : "Unknown"
+
+  @Payroll =
+    Yes : "Yes"
+    No : "No"
+    Unknown : "Unknown"
+
+  @Healthcare =
+    Yes : "Yes"
+    No : "No"
+    Unknown : "Unknown"
+
+  @DurbinRegulated =
+    Yes : "Yes"
+    No : "No"
+    Unknown : "Unknown"
+
+  @Debit =
+    Yes : "Yes"
+    No : "No"
+    Unknown : "Unknown"
+
   constructor: (attributes) ->
     super attributes
     @maskedNumber = "#{@bin}******#{@last4}"
