@@ -1,60 +1,51 @@
 require("../../spec_helper")
 {SearchResponse} = require('../../../lib/braintree/search_response')
 
-vows
-  .describe("SearchResponse")
-  .addBatch
-    "first":
-      "with results":
-        topic: ->
-          fakeGateway =
-            find: (id, callback) ->
-              throw new Error("This exception SHOULD be thrown")
-          fakeResults =
-            searchResults:
-              ids: [ specHelper.randomId() ]
-          new SearchResponse(fakeGateway, fakeResults)
-        "calls gateway#find": (searchResponse) ->
-          assert.throws(->
-            searchResponse.first()
-          , Error)
-      "zero results":
-        topic: ->
-          fakeGateway =
-            find: (id, callback) ->
-              throw new Error("This exception should NOT be thrown")
-          fakeResults =
-            searchResults:
-              ids: []
-          new SearchResponse(fakeGateway, fakeResults)
-        "does not call gateway#find": (searchResponse) ->
-          response = undefined
-          callback = ->
-            response = true
-          assert.doesNotThrow(->
-            searchResponse.first(callback)
-          , Error)
-          assert.isTrue(response)
-    "each":
-      "zero results":
-        topic: ->
-          fakePagingFunction = (ids, callback) ->
-              throw new Error("This exception should NOT be thrown")
-          fakeResults =
-            searchResults:
-              ids: []
-          new SearchResponse(fakePagingFunction, fakeResults)
-        "does not call pagingFunction": (searchResponse) ->
-          assert.doesNotThrow(->
-            searchResponse.each()
-          , Error)
-    "length":
-      topic: ->
-        fakeResults =
-          searchResults:
-            ids: [ 1, 2 ]
-        new SearchResponse(null, fakeResults)
-      "returns 2": (searchResponse) ->
-        assert.equal(searchResponse.length(), 2)
+describe "SearchResponse", ->
+  describe "first", ->
+    it "calls gateway#find with results", ->
+      fakeGateway =
+        find: (id, callback) ->
+          throw new Error("This exception SHOULD be thrown")
+      fakeResults =
+        searchResults:
+          ids: [ specHelper.randomId() ]
 
-  .export(module)
+      searchResponse = new SearchResponse(fakeGateway, fakeResults)
+
+      assert.throws((=> @searchResponse.first()), Error)
+
+    it "does not call gateway#find with zero results", (done) ->
+      fakeGateway =
+        find: (id, callback) ->
+          throw new Error("This exception should NOT be thrown")
+      fakeResults =
+        searchResults:
+          ids: []
+      searchResponse = new SearchResponse(fakeGateway, fakeResults)
+
+      searchResponse.first ->
+        assert.isTrue true
+        done()
+
+  describe "each", ->
+    it "does not call pagingFunding with zero results", ->
+      fakePagingFunction = (ids, callback) ->
+          throw new Error("This exception should NOT be thrown")
+      fakeResults =
+        searchResults:
+          ids: []
+
+      searchResponse = new SearchResponse(fakePagingFunction, fakeResults)
+
+      assert.doesNotThrow((-> searchResponse.each()), Error)
+
+  describe "length", ->
+    it "returns the correct length", ->
+      fakeResults =
+        searchResults:
+          ids: [ 1, 2 ]
+
+      searchResponse = new SearchResponse(null, fakeResults)
+
+      assert.equal(searchResponse.length(), 2)

@@ -3,4 +3,5 @@
 /node_modules/xml2js
 /node_modules/underscore
 /node_modules/vows
+/node_modules/mocha
 /tags
