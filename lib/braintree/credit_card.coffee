@@ -24,35 +24,13 @@ class CreditCard extends AttributeSetter
     International : 'international'
     US : 'us'
 
-  @Prepaid =
+  @CardTypeIndicator =
     Yes : "Yes"
     No : "No"
     Unknown : "Unknown"
 
-  @Commercial =
-    Yes : "Yes"
-    No : "No"
-    Unknown : "Unknown"
-
-  @Payroll =
-    Yes : "Yes"
-    No : "No"
-    Unknown : "Unknown"
-
-  @Healthcare =
-    Yes : "Yes"
-    No : "No"
-    Unknown : "Unknown"
-
-  @DurbinRegulated =
-    Yes : "Yes"
-    No : "No"
-    Unknown : "Unknown"
-
-  @Debit =
-    Yes : "Yes"
-    No : "No"
-    Unknown : "Unknown"
+  @Prepaid = @Commercial = @Payroll = @Healthcare = @DurbinRegulated =
+    @Debit = @CountryOfIssuance = @IssuingBank = @CardTypeIndicator
 
   constructor: (attributes) ->
     super attributes
