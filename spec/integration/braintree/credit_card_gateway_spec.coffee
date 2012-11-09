@@ -4,6 +4,7 @@ braintree = specHelper.braintree
 util = require('util')
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
+{CreditCardDefaults} = require('../../../lib/braintree/test/credit_card_defaults')
 
 vows
   .describe('CreditCardGateway')
@@ -316,6 +317,44 @@ vows
         'sets the debit field to Yes': (err, response) ->
           assert.equal(response.creditCard.debit, CreditCard.Debit.Yes)
 
+      'it sets the country of issuance':
+        topic: () ->
+          callback = @callback
+          specHelper.defaultGateway.customer.create(
+            firstName: 'John',
+            lastName: 'Smith'
+          , (err, response) ->
+            specHelper.defaultGateway.creditCard.create(
+              customerId: response.customer.id,
+              number: CreditCardNumbers.CardTypeIndicators.CountryOfIssuance,
+              expirationDate: '05/2012',
+              options: {
+                verifyCard: true
+              }
+            , callback))
+          undefined
+        'sets the country of issuance field to the default': (err, response) ->
+          assert.equal(response.creditCard.countryOfIssuance, CreditCardDefaults.CountryOfIssuance)
+
+      'it sets the issuing bank':
+        topic: () ->
+          callback = @callback
+          specHelper.defaultGateway.customer.create(
+            firstName: 'John',
+            lastName: 'Smith'
+          , (err, response) ->
+            specHelper.defaultGateway.creditCard.create(
+              customerId: response.customer.id,
+              number: CreditCardNumbers.CardTypeIndicators.IssuingBank,
+              expirationDate: '05/2012',
+              options: {
+                verifyCard: true
+              }
+            , callback))
+          undefined
+        'sets the issuing bank field to the default': (err, response) ->
+          assert.equal(response.creditCard.issuingBank, CreditCardDefaults.IssuingBank)
+
     'negative card type indicators':
       'with a negative card type indicator card':
         topic: () ->
@@ -365,6 +404,21 @@ vows
           undefined
         'sets the prepaid field to Unknown': (err, response) ->
           assert.equal(response.creditCard.prepaid, CreditCard.Prepaid.Unknown)
+        'sets the payroll field to Unknown': (err, response) ->
+          assert.equal(response.creditCard.payroll, CreditCard.Payroll.Unknown)
+        'sets the debit field to Unknown': (err, response) ->
+          assert.equal(response.creditCard.debit, CreditCard.Debit.Unknown)
+        'sets the commercial field to Unknown': (err, response) ->
+          assert.equal(response.creditCard.commercial, CreditCard.Commercial.Unknown)
+        'sets the durbin regulated field to Unknown': (err, response) ->
+          assert.equal(response.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown)
+        'sets the heathcare field to Unknown': (err, response) ->
+          assert.equal(response.creditCard.healthcare, CreditCard.Healthcare.Unknown)
+        'sets the country of issuance field to Unknown': (err, response) ->
+          assert.equal(response.creditCard.countryOfIssuance, CreditCard.CountryOfIssuance.Unknown)
+        'sets the issuing bank field to Unknown': (err, response) ->
+          assert.equal(response.creditCard.issuingBank, CreditCard.IssuingBank.Unknown)
+
 
     'update':
       'for a minimal case':
