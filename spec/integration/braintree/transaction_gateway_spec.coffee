@@ -2,6 +2,8 @@ require('../../spec_helper')
 
 {_} = require('underscore')
 braintree = specHelper.braintree
+{CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
+{CreditCard} = require('../../../lib/braintree/credit_card')
 
 createTransactionToRefund = (callback) ->
   specHelper.defaultGateway.transaction.sale(
@@ -229,6 +231,24 @@ vows
           assert.isTrue(response.success)
         'sets recurring to true': (err, response) ->
           assert.equal(response.transaction.recurring, true)
+
+      'when using a card with card type indicators':
+        topic: ->
+          specHelper.defaultGateway.transaction.sale(
+            amount: '5.00'
+            creditCard:
+              number: CreditCardNumbers.CardTypeIndicators.Unknown
+              expirationDate: '05/12'
+          , @callback)
+          undefined
+        'has cardtype indicator fields in result': (err, response) ->
+          assert.equal(response.transaction.creditCard.prepaid, CreditCard.Prepaid.Unknown)
+          assert.equal(response.transaction.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown)
+          assert.equal(response.transaction.creditCard.commercial, CreditCard.Commercial.Unknown)
+          assert.equal(response.transaction.creditCard.healthcare, CreditCard.Healthcare.Unknown)
+          assert.equal(response.transaction.creditCard.debit, CreditCard.Debit.Unknown)
+          assert.equal(response.transaction.creditCard.payroll, CreditCard.Payroll.Unknown)
+
 
       'when processor declined':
         topic: ->

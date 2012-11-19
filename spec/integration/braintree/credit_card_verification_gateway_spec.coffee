@@ -1,4 +1,6 @@
 require('../../spec_helper')
+{CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
+{CreditCard} = require('../../../lib/braintree/credit_card')
 
 braintree = specHelper.braintree
 
@@ -37,5 +39,39 @@ vows
           undefined
         'returns a not found error': (err, response) ->
           assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+      'when using a card with card type indicators':
+        topic: ->
+          callback = @callback
+          name = specHelper.randomId() + ' Smith'
+          specHelper.defaultGateway.customer.create({
+            creditCard:
+              cardholderName: name,
+              number: CreditCardNumbers.CardTypeIndicators.Unknown,
+              expirationDate: '05/12',
+              options:
+                verifyCard: true
+            }, (err, response) ->
+              specHelper.defaultGateway.creditCardVerification.search((search) ->
+                search.creditCardCardholderName().is(name)
+              , (err, response) ->
+                response.first((err, result) ->
+                  callback(err,
+                    verification: result
+                    name: name
+                  )
+                )
+              )
+            )
+          undefined
+        'card details card type indicator should be prepaid': (err, result) ->
+          assert.isNull(err)
+          assert.equal(result.verification.creditCard.cardholderName, result.name)
+          assert.equal(result.verification.creditCard.prepaid, CreditCard.Prepaid.Unknown)
+          assert.equal(result.verification.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown)
+          assert.equal(result.verification.creditCard.commercial, CreditCard.Commercial.Unknown)
+          assert.equal(result.verification.creditCard.healthcare, CreditCard.Healthcare.Unknown)
+          assert.equal(result.verification.creditCard.debit, CreditCard.Debit.Unknown)
+          assert.equal(result.verification.creditCard.payroll, CreditCard.Payroll.Unknown)
 
   .export(module)
