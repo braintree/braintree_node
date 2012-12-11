@@ -496,6 +496,7 @@ vows
           , (err, result) ->
             specHelper.defaultGateway.transaction.cloneTransaction(result.transaction.id,
               amount: '123.45'
+              channel: 'MyShoppingCartProvider'
               options:
                 submitForSettlement: 'false'
               , callback)
@@ -503,9 +504,10 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isTrue(response.success)
-        'it copies fields': (err, response) ->
+        'it copies and updates fields': (err, response) ->
           transaction = response.transaction
           assert.equal(transaction.amount, '123.45')
+          assert.equal(transaction.channel, 'MyShoppingCartProvider')
           assert.equal(transaction.creditCard.maskedNumber, '510510******5100')
           assert.equal(transaction.creditCard.expirationDate, '05/2012')
 
