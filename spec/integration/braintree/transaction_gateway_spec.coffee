@@ -2,6 +2,8 @@ require('../../spec_helper')
 
 {_} = require('underscore')
 braintree = specHelper.braintree
+{CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
+{CreditCard} = require('../../../lib/braintree/credit_card')
 
 createTransactionToRefund = (callback) ->
   specHelper.defaultGateway.transaction.sale(
@@ -229,6 +231,24 @@ vows
           assert.isTrue(response.success)
         'sets recurring to true': (err, response) ->
           assert.equal(response.transaction.recurring, true)
+
+      'when using a card with card type indicators':
+        topic: ->
+          specHelper.defaultGateway.transaction.sale(
+            amount: '5.00'
+            creditCard:
+              number: CreditCardNumbers.CardTypeIndicators.Unknown
+              expirationDate: '05/12'
+          , @callback)
+          undefined
+        'has cardtype indicator fields in result': (err, response) ->
+          assert.equal(response.transaction.creditCard.prepaid, CreditCard.Prepaid.Unknown)
+          assert.equal(response.transaction.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown)
+          assert.equal(response.transaction.creditCard.commercial, CreditCard.Commercial.Unknown)
+          assert.equal(response.transaction.creditCard.healthcare, CreditCard.Healthcare.Unknown)
+          assert.equal(response.transaction.creditCard.debit, CreditCard.Debit.Unknown)
+          assert.equal(response.transaction.creditCard.payroll, CreditCard.Payroll.Unknown)
+
 
       'when processor declined':
         topic: ->
@@ -476,6 +496,7 @@ vows
           , (err, result) ->
             specHelper.defaultGateway.transaction.cloneTransaction(result.transaction.id,
               amount: '123.45'
+              channel: 'MyShoppingCartProvider'
               options:
                 submitForSettlement: 'false'
               , callback)
@@ -483,9 +504,10 @@ vows
           undefined
         'is successful': (err, response) ->
           assert.isTrue(response.success)
-        'it copies fields': (err, response) ->
+        'it copies and updates fields': (err, response) ->
           transaction = response.transaction
           assert.equal(transaction.amount, '123.45')
+          assert.equal(transaction.channel, 'MyShoppingCartProvider')
           assert.equal(transaction.creditCard.maskedNumber, '510510******5100')
           assert.equal(transaction.creditCard.expirationDate, '05/2012')
 
