@@ -4,7 +4,7 @@ nvm_location="/var/lib/jenkins/.nvm/v$nvm_version/bin"
 
 source ~/.nvm/nvm.sh
 
-if [ -d nvm_location ]
+if [ -d nvm_location ]; then
   nvm use $nvm_version
   rake --trace
 else
