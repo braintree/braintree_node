@@ -17,8 +17,6 @@ This is a Node.js library for integrating with the [Braintree](http://www.braint
 ### Dependencies
 
 * node ~0.6.6
-* coffee-script ~1.1
-* xml2js >= 0.1.13
 
 ## Links
 

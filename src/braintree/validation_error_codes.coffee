@@ -77,7 +77,7 @@ class ValidationErrorCodes
     TokenIsRequired : "91722"
     TokenIsTooLong : "91720"
     VenmoSDKPaymentMethodCodeCardTypeIsNotAccepted : "91726"
-    Options =
+    Options:
       UpdateExistingTokenIsInvalid : "91723"
 
    @Descriptor =
@@ -126,7 +126,7 @@ class ValidationErrorCodes
     TrialDurationFormatIsInvalid : "81907"
     TrialDurationIsRequired : "81908"
     TrialDurationUnitIsInvalid : "81909"
-    Modification =
+    Modification:
       AmountCannotBeBlank : "92003"
       AmountIsInvalid : "92002"
       AmountIsTooLarge : "92023"
@@ -176,8 +176,9 @@ class ValidationErrorCodes
     CannotSubmitForSettlement : "91507"
     PaymentMethodDoesNotBelongToSubscription : "91527"
     SubscriptionStatusMustBePastDue : "91531"
-    Options.VaultIsDisabled : "91525"
-    Options.SubmitForSettlementIsRequiredForCloning : "91544"
+    Options:
+      VaultIsDisabled : "91525"
+      SubmitForSettlementIsRequiredForCloning : "91544"
     CannotCloneVoiceAuthorizations : "91541"
     OrderIdIsTooLong : "91501"
     PaymentMethodTokenCardTypeIsNotAccepted : "91517"

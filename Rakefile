@@ -2,12 +2,12 @@ task :default => %w[spec:unit spec:integration]
 
 namespace :spec do
   desc "Run units"
-  task :unit => :install_vows do
+  task :unit => [:install_vows, :compile_coffee] do
     sh "#{local_mocha} spec --recursive --compilers 'coffee:coffee-script'"
   end
 
   desc "Run integration"
-  task :integration => :install_vows do
+  task :integration => [:install_vows, :compile_coffee] do
     sh "#{local_vows} " + Dir.glob("spec/integration/**/*_spec.coffee").join(" ")
   end
 end
@@ -20,6 +20,11 @@ task :install_vows do
   unless File.exist?(local_mocha) && File.exist?(local_vows)
     sh "npm install"
   end
+end
+
+task :compile_coffee do
+  sh "find ./lib -name '*.js' -exec rm -f {} \\;"
+  sh "./node_modules/.bin/coffee -cbo ./lib ./src"
 end
 
 def local_vows
