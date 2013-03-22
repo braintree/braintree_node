@@ -1,4 +1,5 @@
 require('../../spec_helper')
+braintree = require '../../../lib/braintree'
 
 {TransparentRedirectGateway} = require('../../../lib/braintree/transparent_redirect_gateway')
 

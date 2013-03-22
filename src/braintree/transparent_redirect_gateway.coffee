@@ -1,3 +1,4 @@
+{Environment} = require './environment'
 {Digest} = require('./digest')
 {Util} = require('./util')
 querystring = require('../../vendor/querystring.node.js.511d6a2/querystring')
@@ -17,7 +18,7 @@ class TransparentRedirectGateway
 
   constructor: (@gateway) ->
     uriScheme = if @gateway.config.environment.ssl then 'https://' else 'http://'
-    fullHost  = if @gateway.config.environment is braintree.Environment.Development
+    fullHost  = if @gateway.config.environment is Environment.Development
       "#{@gateway.config.environment.server}:#{@gateway.config.environment.port}"
     else
       @gateway.config.environment.server
