@@ -71,6 +71,9 @@ class Http
           callback(null, null)
       )
     )
+    theRequest.on('error', (err) =>
+        callback(err)
+        )
     theRequest.write(requestBody) if body
     theRequest.end()
 
