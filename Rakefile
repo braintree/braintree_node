@@ -20,6 +20,7 @@ namespace :spec do
       "customer_gateway_spec",
       "customer_search_spec",
       "http_spec",
+      "settlement_batch_summary_gateway_spec",
     ]
 
     vows_specs = Dir.glob("spec/integration/**/*_spec.coffee").reject do |file|

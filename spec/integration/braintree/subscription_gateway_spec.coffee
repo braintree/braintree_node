@@ -1,6 +1,5 @@
 require('../../spec_helper')
 dateFormat = require('dateformat')
-
 _ = require('underscore')._
 braintree = specHelper.braintree
 
