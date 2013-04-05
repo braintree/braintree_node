@@ -18,6 +18,7 @@ namespace :spec do
       "credit_card_verification_gateway_spec",
       "credit_card_verification_search_spec",
       "customer_gateway_spec",
+      "customer_search_spec",
     ]
 
     vows_specs = Dir.glob("spec/integration/**/*_spec.coffee").reject do |file|
