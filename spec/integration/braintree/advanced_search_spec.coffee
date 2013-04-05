@@ -91,6 +91,8 @@ describe "AdvancedSearch", ->
 
   describe "keyValueFields", ->
     it "accepts the 'is' operator", (done) ->
+      @timeout 5000
+
       transactionParams =
         amount: "5.00"
         creditCard:
