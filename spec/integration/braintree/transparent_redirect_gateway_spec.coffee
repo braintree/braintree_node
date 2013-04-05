@@ -3,242 +3,201 @@ require('../../spec_helper')
 {_} = require('underscore')
 braintree = specHelper.braintree
 
-vows
-  .describe('TransparentRedirectGateway')
-  .addBatch
-    'createCustomerData':
-      'generating data to create a customer':
-        topic: ->
-          callback = @callback
-          specHelper.simulateTrFormPost(
-            specHelper.defaultGateway.transparentRedirect.url,
-            specHelper.defaultGateway.transparentRedirect.createCustomerData(
-              redirectUrl: 'http://www.example.com/'
-              customer:
-                firstName: 'Dan'
-            ),
-            customer:
-              last_name: 'Smith'
-            , (err, result) ->
-              specHelper.defaultGateway.transparentRedirect.confirm(result, callback)
-          )
-          undefined
-        'is successful': (err, result) ->
+describe "TransparentRedirectGateway", ->
+  url = specHelper.defaultGateway.transparentRedirect.url
+
+  describe "createCustomerData", ->
+    it "generates tr data for the customer", (done) ->
+      trData = specHelper.defaultGateway.transparentRedirect.createCustomerData(
+        redirectUrl: 'http://www.example.com/'
+        customer:
+          firstName: 'Dan'
+      )
+
+      customerParams =
+        customer:
+          last_name: 'Smith'
+
+      specHelper.simulateTrFormPost url, trData, customerParams, (err, response) ->
+        specHelper.defaultGateway.transparentRedirect.confirm response, (err, response) ->
           assert.isNull(err)
-          assert.isTrue(result.success)
-        'uses data submitted in tr_data': (err, result) ->
-          assert.equal(result.customer.firstName, 'Dan')
-        'uses data submitted in form params': (err, result) ->
-          assert.equal(result.customer.lastName, 'Smith')
+          assert.isTrue(response.success)
+          assert.equal(response.customer.firstName, 'Dan')
+          assert.equal(response.customer.lastName, 'Smith')
 
-      'creating a customer with credit card and billing address':
-        topic: ->
-          callback = @callback
-          specHelper.simulateTrFormPost(
-            specHelper.defaultGateway.transparentRedirect.url,
-            specHelper.defaultGateway.transparentRedirect.createCustomerData(
-              redirectUrl: 'http://www.example.com/'
-              customer:
-                firstName: 'Dan'
-                creditCard:
-                  cardholderName: 'Cardholder'
-                  billingAddress:
-                    streetAddress: '123 E Fake St'
-            ),
-            customer:
-              last_name: 'Smith'
-              creditCard:
-                number: '5105105105105100'
-                expirationMonth: '05'
-                expirationYear: '2017'
-                billingAddress:
-                  extendedAddress: '5th Floor'
-            , (err, result) ->
-              specHelper.defaultGateway.transparentRedirect.confirm(result, callback)
-          )
-          undefined
-        'is successful': (err, result) ->
+          done()
+
+    it "can include the credit card and billing address", (done) ->
+      trData = specHelper.defaultGateway.transparentRedirect.createCustomerData(
+        redirectUrl: 'http://www.example.com/'
+        customer:
+          firstName: 'Dan'
+          creditCard:
+            cardholderName: 'Cardholder'
+            billingAddress:
+              streetAddress: '123 E Fake St'
+      )
+
+      customerParams =
+        customer:
+          last_name: 'Smith'
+          creditCard:
+            number: '5105105105105100'
+            expirationMonth: '05'
+            expirationYear: '2017'
+            billingAddress:
+              extendedAddress: '5th Floor'
+
+      specHelper.simulateTrFormPost url, trData, customerParams, (err, response) ->
+        specHelper.defaultGateway.transparentRedirect.confirm response, (err, response) ->
           assert.isNull(err)
-          assert.isTrue(result.success)
-        'uses data submitted in tr_data': (err, result) ->
-          assert.equal(result.customer.firstName, 'Dan')
-          assert.equal(result.customer.creditCards[0].cardholderName, 'Cardholder')
-          assert.equal(result.customer.creditCards[0].billingAddress.streetAddress, '123 E Fake St')
-        'uses data submitted in form params': (err, result) ->
-          assert.equal(result.customer.lastName, 'Smith')
-          assert.equal(result.customer.creditCards[0].maskedNumber, '510510******5100')
-          assert.equal(result.customer.creditCards[0].expirationMonth, '05')
-          assert.equal(result.customer.creditCards[0].expirationYear, '2017')
-          assert.equal(result.customer.creditCards[0].billingAddress.extendedAddress, '5th Floor')
+          assert.isTrue(response.success)
+          assert.equal(response.customer.firstName, 'Dan')
+          assert.equal(response.customer.creditCards[0].cardholderName, 'Cardholder')
+          assert.equal(response.customer.creditCards[0].billingAddress.streetAddress, '123 E Fake St')
+          assert.equal(response.customer.lastName, 'Smith')
+          assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
+          assert.equal(response.customer.creditCards[0].expirationMonth, '05')
+          assert.equal(response.customer.creditCards[0].expirationYear, '2017')
+          assert.equal(response.customer.creditCards[0].billingAddress.extendedAddress, '5th Floor')
 
-    'updateCustomerData':
-      'updating a customer':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'Old First Name'
-            lastName: 'Old Last Name'
-          , (err, result) ->
-            specHelper.simulateTrFormPost(
-              specHelper.defaultGateway.transparentRedirect.url,
-              specHelper.defaultGateway.transparentRedirect.updateCustomerData(
-                redirectUrl: 'http://www.example.com/'
-                customerId: result.customer.id
-                customer:
-                  firstName: 'New First Name'
-              ),
-              customer:
-                lastName: 'New Last Name'
-              , (err, result) ->
-                specHelper.defaultGateway.transparentRedirect.confirm(result, callback)
-            )
-          )
-          undefined
-        'is successful': (err, result) ->
+          done()
+
+  describe "updateCustomerData", ->
+    it "updates a customer", (done) ->
+      customerParams =
+        firstName: 'Old First Name'
+        lastName: 'Old Last Name'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        trData = specHelper.defaultGateway.transparentRedirect.updateCustomerData(
+          redirectUrl: 'http://www.example.com/'
+          customerId: response.customer.id
+          customer:
+            firstName: 'New First Name'
+        )
+
+        updateParams =
+          customer:
+            lastName: 'New Last Name'
+
+        specHelper.simulateTrFormPost url, trData, updateParams, (err, response) ->
+          specHelper.defaultGateway.transparentRedirect.confirm response, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.customer.firstName, 'New First Name')
+            assert.equal(response.customer.lastName, 'New Last Name')
+
+            done()
+
+  describe "transactionData", ->
+    it "creates a transaction", (done) ->
+      trData = specHelper.defaultGateway.transparentRedirect.transactionData(
+        redirectUrl: 'http://www.example.com/'
+        transaction:
+          amount: 50.00
+          type: 'sale'
+      )
+
+      transactionParams =
+        transaction:
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2012'
+
+      specHelper.simulateTrFormPost url, trData, transactionParams, (err, response) ->
+        specHelper.defaultGateway.transparentRedirect.confirm response, (err, response) ->
           assert.isNull(err)
-          assert.isTrue(result.success)
-        'uses data submitted in tr_data': (err, result) ->
-          assert.equal(result.customer.firstName, 'New First Name')
-        'uses data submitted in form params': (err, result) ->
-          assert.equal(result.customer.lastName, 'New Last Name')
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'authorized')
+          assert.equal(response.transaction.amount, '50.00')
+          assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100')
 
-    'transactionData':
-      'generating data to create a transaction':
-        topic: ->
-          callback = @callback
-          specHelper.simulateTrFormPost(
-            specHelper.defaultGateway.transparentRedirect.url,
-            specHelper.defaultGateway.transparentRedirect.transactionData(
-              redirectUrl: 'http://www.example.com/'
-              transaction:
-                amount: 50.00
-                type: 'sale'
-            ),
-            transaction:
-              creditCard:
-                number: '5105105105105100'
-                expirationDate: '05/2012'
-            , (err, result) ->
-              specHelper.defaultGateway.transparentRedirect.confirm(result, callback)
-          )
-          undefined
-        'is successful': (err, result) ->
-          assert.isNull(err)
-          assert.isTrue(result.success)
-        'creates a transaction': (err, result) ->
-          assert.equal(result.transaction.status, 'authorized')
-        'uses data submitted in tr_data': (err, result) ->
-          assert.equal(result.transaction.amount, '50.00')
-        'uses data submitted in form params': (err, result) ->
-          assert.equal(result.transaction.creditCard.maskedNumber, '510510******5100')
+          done()
 
-    'createCreditCard':
-      'generating data to create a credit card':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'Customer First Name'
-            , (err, result) ->
-              specHelper.simulateTrFormPost(
-                specHelper.defaultGateway.transparentRedirect.url,
-                specHelper.defaultGateway.transparentRedirect.createCreditCardData(
-                  redirectUrl: 'http://www.example.com/'
-                  creditCard:
-                    customerId: result.customer.id
-                    cardholderName: 'Dan'
-                ),
-                creditCard:
-                  number: '5105105105105100'
-                  expirationDate: '05/2017'
-                , (err, result) ->
-                  specHelper.defaultGateway.transparentRedirect.confirm(result, callback)
-              )
-          )
-          undefined
-        'is successful': (err, result) ->
-          assert.isNull(err)
-          assert.isTrue(result.success)
-        'uses data submitted in tr_data': (err, result) ->
-          assert.equal(result.creditCard.cardholderName, 'Dan')
-        'uses data submitted in form params': (err, result) ->
-          assert.equal(result.creditCard.maskedNumber, '510510******5100')
+  describe "createCreditCard", ->
+    it.skip "creates a credit card", (done) ->
+      specHelper.defaultGateway.customer.create firstName: 'Customer First Name', (err, response) ->
+        trData = specHelper.defaultGateway.transparentRedirect.createCreditCardData(
+          redirectUrl: 'http://www.example.com/'
+          creditCard:
+            customerId: response.customer.id
+            cardholderName: 'Dan'
+        )
 
-    'updateCreditCard':
-      'generating data to update a credit card':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'Customer First Name'
-            creditCard:
-              cardholderName: 'Old Cardholder Name'
-              number: '5105105105105100'
-              expirationDate: '05/2017'
-          , (err, result) ->
-            specHelper.simulateTrFormPost(
-              specHelper.defaultGateway.transparentRedirect.url,
-              specHelper.defaultGateway.transparentRedirect.updateCreditCardData(
-                redirectUrl: 'http://www.example.com/'
-                paymentMethodToken: result.customer.creditCards[0].token
-                creditCard:
-                  cardholderName: 'New Cardholder Name'
-              ),
-              creditCard:
-                number: '4111111111111111'
-              , (err, result) ->
-                specHelper.defaultGateway.transparentRedirect.confirm(result, callback)
-            )
-          )
-          undefined
-        'is successful': (err, result) ->
-          assert.isNull(err)
-          assert.isTrue(result.success)
-        'uses data submitted in tr_data': (err, result) ->
-          assert.equal(result.creditCard.cardholderName, 'New Cardholder Name')
-        'uses data submitted in form params': (err, result) ->
-          assert.equal(result.creditCard.maskedNumber, '411111******1111')
+        creditCardParams =
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2017'
 
-    'confirm':
-      'when the hash is not the expected value':
-        topic: ->
-          specHelper.defaultGateway.transparentRedirect.confirm('a=b&hash=invalid', @callback)
-          undefined
-        'calls the callback with an error': (err, result) ->
-          assert.equal(err.type, braintree.errorTypes.invalidTransparentRedirectHashError)
+        specHelper.simulateTrFormPost url, trData, creditCardParams, (err, response) ->
+          specHelper.defaultGateway.transparentRedirect.confirm response, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.creditCard.cardholderName, 'Dan')
+            assert.equal(response.creditCard.maskedNumber, '510510******5100')
 
-      'on http status 401':
-        topic: ->
-          specHelper.defaultGateway.transparentRedirect.confirm('http_status=401&hash=none', @callback)
-          undefined
-        'returns an authentication error': (err, result) ->
-          assert.equal(err.type, braintree.errorTypes.authenticationError)
+            done()
 
-      'on http status 403':
-        topic: ->
-          specHelper.defaultGateway.transparentRedirect.confirm('http_status=403&hash=irrelevant', @callback)
-          undefined
-        'returns an authorization error': (err, result) ->
-          assert.equal(err.type, braintree.errorTypes.authorizationError)
+  describe "updateCreditCard", ->
+    it.skip "updates a credit card", (done) ->
+      customerParams =
+        firstName: 'Customer First Name'
+        creditCard:
+          cardholderName: 'Old Cardholder Name'
+          number: '5105105105105100'
+          expirationDate: '05/2017'
 
-      'on http status 426':
-        topic: ->
-          specHelper.defaultGateway.transparentRedirect.confirm('http_status=426&hash=irrelevant', @callback)
-          undefined
-        'returns an upgrade required error': (err, result) ->
-          assert.equal(err.type, braintree.errorTypes.upgradeRequired)
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        trData = specHelper.defaultGateway.transparentRedirect.updateCreditCardData(
+          redirectUrl: 'http://www.example.com/'
+          paymentMethodToken: response.customer.creditCards[0].token
+          creditCard:
+            cardholderName: 'New Cardholder Name'
+        )
 
-      'on http status 500':
-        topic: ->
-          specHelper.defaultGateway.transparentRedirect.confirm('http_status=500&hash=irrelevant', @callback)
-          undefined
-        'returns a server error': (err, result) ->
-          assert.equal(err.type, braintree.errorTypes.serverError)
+        creditCardParams =
+          creditCard:
+            number: '4111111111111111'
 
-      'on http status 503':
-        topic: ->
-          specHelper.defaultGateway.transparentRedirect.confirm('http_status=503&hash=irrelevant', @callback)
-          undefined
-        'returns a down for maintenance error': (err, result) ->
-          assert.equal(err.type, braintree.errorTypes.downForMaintenanceError)
+        specHelper.simulateTrFormPost url, trData, creditCardParams, (err, response) ->
+          specHelper.defaultGateway.transparentRedirect.confirm response, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.creditCard.cardholderName, 'New Cardholder Name')
+            assert.equal(response.creditCard.maskedNumber, '411111******1111')
+
+            done()
+
+  describe "confirm", ->
+    it "handles invalid hashes", (done) ->
+      specHelper.defaultGateway.transparentRedirect.confirm 'a=b&hash=invalid', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.invalidTransparentRedirectHashError)
+        done()
+
+    it "handles status 401", (done) ->
+      specHelper.defaultGateway.transparentRedirect.confirm 'http_status=401&hash=none', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.authenticationError)
+        done()
 
 
-  .export(module)
+    it "handles status 403", (done) ->
+      specHelper.defaultGateway.transparentRedirect.confirm 'http_status=403&hash=irrelevant', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.authorizationError)
+        done()
+
+    it "handles status 426", (done) ->
+      specHelper.defaultGateway.transparentRedirect.confirm 'http_status=426&hash=irrelevant', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.upgradeRequired)
+        done()
+
+    it "handles status 500", (done) ->
+      specHelper.defaultGateway.transparentRedirect.confirm 'http_status=500&hash=irrelevant', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.serverError)
+        done()
+
+    it "handles status 503", (done) ->
+      specHelper.defaultGateway.transparentRedirect.confirm 'http_status=503&hash=irrelevant', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError)
+        done()
+
