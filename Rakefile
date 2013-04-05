@@ -15,6 +15,8 @@ namespace :spec do
       "advanced_search_spec.coffee",
       "braintree_spec",
       "credit_card_gateway_spec",
+      "credit_card_verification_gateway_spec",
+      "credit_card_verification_search_spec",
     ]
 
     vows_specs = Dir.glob("spec/integration/**/*_spec.coffee").reject do |file|
