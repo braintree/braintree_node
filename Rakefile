@@ -22,6 +22,7 @@ namespace :spec do
       "http_spec",
       "settlement_batch_summary_gateway_spec",
       "subscription_gateway_spec",
+      "subscription_search_spec",
     ]
 
     vows_specs = Dir.glob("spec/integration/**/*_spec.coffee").reject do |file|
