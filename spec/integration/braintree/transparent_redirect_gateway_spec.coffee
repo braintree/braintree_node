@@ -116,7 +116,7 @@ describe "TransparentRedirectGateway", ->
           done()
 
   describe "createCreditCard", ->
-    it.skip "creates a credit card", (done) ->
+    it "creates a credit card", (done) ->
       specHelper.defaultGateway.customer.create firstName: 'Customer First Name', (err, response) ->
         trData = specHelper.defaultGateway.transparentRedirect.createCreditCardData(
           redirectUrl: 'http://www.example.com/'
@@ -140,7 +140,7 @@ describe "TransparentRedirectGateway", ->
             done()
 
   describe "updateCreditCard", ->
-    it.skip "updates a credit card", (done) ->
+    it "updates a credit card", (done) ->
       customerParams =
         firstName: 'Customer First Name'
         creditCard:
