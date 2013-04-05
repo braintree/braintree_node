@@ -3,6 +3,9 @@ require("../../spec_helper.coffee")
 {TransactionSearch} = require('../../../lib/braintree/transaction_search')
 
 describe "AdvancedSearch", ->
+  beforeEach ->
+    @timeout 5000
+
   describe "textFields", ->
     subscription1 = null
     subscription2 = null

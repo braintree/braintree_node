@@ -4,50 +4,48 @@ braintree = specHelper.braintree
 {Config} = require('../../../lib/braintree/config')
 {Http} = require('../../../lib/braintree/http')
 
-vows
-  .describe('Http')
-  .addBatch
-    'request':
-      'when the http response status is 500':
-        topic: ->
-          http = new Http(new Config(specHelper.defaultConfig))
-          http.post('/test/error', '', @callback)
-          undefined
-        'returns a ServerError': (err, response) ->
-          assert.equal(err.type, braintree.errorTypes.serverError)
+describe "Http", ->
+  describe "request", ->
+    it "returns a ServerError for 500s", (done) ->
+      http = new Http(new Config(specHelper.defaultConfig))
+      http.post '/test/error', '', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.serverError)
 
-      'when the http response is 503':
-        topic: ->
-          http = new Http(new Config(specHelper.defaultConfig))
-          http.post('/test/maintenance', '', @callback)
-          undefined
-        'returns a down for maintenance error': (err, response) ->
-          assert.equal(err.type, braintree.errorTypes.downForMaintenanceError)
+        done()
 
-      'can hit the sandbox':
-        topic: ->
-          http = new Http(new Config(
-            environment: braintree.Environment.Sandbox
-            merchantId: 'node'
-            publicKey: 'node'
-            privateKey: 'node'
-          ))
-          http.get('/not_found', @callback)
-          undefined
-        'gets a not found error': (err, response) ->
-          assert.equal(err.type, braintree.errorTypes.notFoundError)
+    it "returns a down for maintenance error for 503s", (done) ->
+      http = new Http(new Config(specHelper.defaultConfig))
+      http.post '/test/maintenance', '', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError)
 
-      'can hit production':
-        topic: ->
-          http = new Http(new Config(
-            environment: braintree.Environment.Production
-            merchantId: 'node'
-            publicKey: 'node'
-            privateKey: 'node'
-          ))
-          http.get('/not_found', @callback)
-          undefined
-        'gets a not found error': (err, response) ->
-          assert.equal(err.type, braintree.errorTypes.notFoundError)
+        done()
 
-  .export(module)
+    it "can hit the sandbox", (done) ->
+      @timeout 10000
+
+      http = new Http(new Config(
+        environment: braintree.Environment.Sandbox
+        merchantId: 'node'
+        publicKey: 'node'
+        privateKey: 'node'
+      ))
+
+      http.get '/not_found', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
+
+    it "can hit production", (done) ->
+      @timeout 10000
+
+      http = new Http(new Config(
+        environment: braintree.Environment.Production
+        merchantId: 'node'
+        publicKey: 'node'
+        privateKey: 'node'
+      ))
+
+      http.get '/not_found', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
