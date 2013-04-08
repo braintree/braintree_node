@@ -119,4 +119,6 @@ GLOBAL.specHelper = {
   randomId: randomId
   settleTransaction: settleTransaction
   simulateTrFormPost: simulateTrFormPost
+  defaultMerchantAccountId: "sandbox_credit_card"
+  nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
 }

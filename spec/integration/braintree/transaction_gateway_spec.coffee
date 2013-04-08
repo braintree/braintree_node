@@ -4,6 +4,7 @@ require('../../spec_helper')
 braintree = specHelper.braintree
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
 {CreditCard} = require('../../../lib/braintree/credit_card')
+{ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 
 createTransactionToRefund = (callback) ->
   transactionParams =
@@ -254,6 +255,48 @@ describe "TransactionGateway", ->
         assert.include(errorCodes, '81709')
 
         done()
+
+    context "with a service fee", ->
+      it "persists the service fee", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.nonDefaultMerchantAccountId
+          amount: '5.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/12'
+          serviceFee:
+            amount: '1.00'
+            merchantAccountId: specHelper.defaultMerchantAccountId
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.serviceFee.amount, '1.00')
+          assert.equal(response.transaction.serviceFee.merchantAccountId, specHelper.defaultMerchantAccountId)
+
+          done()
+
+      it "handles validation errors on service fees", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.nonDefaultMerchantAccountId
+          amount: '1.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/12'
+          serviceFee:
+            amount: '5.00'
+            merchantAccountId: specHelper.defaultMerchantAccountId
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').for('serviceFee').on('amount')[0].code,
+            ValidationErrorCodes.ServiceFee.AmountIsTooLarge
+          )
+
+          done()
+
 
   describe "find", ->
     it "finds a transaction", (done) ->

@@ -10,10 +10,11 @@ namespace :spec do
   task :integration => [:npm_install, :compile_coffee] do
     sh "#{local_mocha} spec/integration --recursive --compilers 'coffee:coffee-script'"
   end
-end
 
-task :mocha do
-  sh "#{local_mocha} spec --recursive --compilers 'coffee:coffee-script'"
+  desc "Run tests in a specific file"
+  task :focused, :filename, :needs => [:compile_coffee] do |t, args|
+    sh "#{local_mocha} #{args[:filename]} --recursive --compilers 'coffee:coffee-script'"
+  end
 end
 
 task :npm_install do
