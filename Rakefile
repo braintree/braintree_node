@@ -12,7 +12,7 @@ namespace :spec do
   end
 
   desc "Run tests in a specific file"
-  task :focused, :filename, :needs => [:compile_coffee] do |t, args|
+  task :focused, [:filename] => [:compile_coffee] do |t, args|
     sh "#{local_mocha} #{args[:filename]} --recursive --compilers 'coffee:coffee-script'"
   end
 end

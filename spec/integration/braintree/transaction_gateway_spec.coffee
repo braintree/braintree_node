@@ -3,6 +3,7 @@ require('../../spec_helper')
 {_} = require('underscore')
 braintree = specHelper.braintree
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
+{VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 
@@ -296,6 +297,18 @@ describe "TransactionGateway", ->
           )
 
           done()
+
+    it "can use venmo sdk payment method codes", (done) ->
+      transactionParams =
+        amount: '1.00'
+        venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.creditCard.bin, "411111")
+
+        done()
 
 
   describe "find", ->

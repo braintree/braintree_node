@@ -1,6 +1,7 @@
 require('../../spec_helper')
 
 {_} = require('underscore')
+{VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
 braintree = specHelper.braintree
 
 describe "CustomerGateway", ->
@@ -199,6 +200,19 @@ describe "CustomerGateway", ->
         assert.equal(response.params.customer.creditCard.billingAddress.countryName, 'invalid country')
 
         done()
+
+    it "creates a customer with venmo sdk payment method code", (done) ->
+      customerParams = 
+        creditCard:
+          venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.customer.creditCards[0].bin, "411111")
+
+        done()
+
 
   describe "delete", ->
     it "deletes a customer", (done) ->

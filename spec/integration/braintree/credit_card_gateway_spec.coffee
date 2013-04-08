@@ -5,6 +5,7 @@ util = require('util')
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
 {CreditCardDefaults} = require('../../../lib/braintree/test/credit_card_defaults')
+{VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
 
 describe "CreditCardGateway", ->
   describe "create", ->
@@ -73,6 +74,18 @@ describe "CreditCardGateway", ->
         errorCodes = (error.code for error in response.errors.deepErrors())
         assert.equal(1, errorCodes.length)
         assert.include(errorCodes, '81716')
+
+        done()
+
+    it "accepts a venmo sdk payment method code", (done) ->
+      creditCardParams =
+        customerId: customerId
+        venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.maskedNumber, '411111******1111')
 
         done()
 
