@@ -15,6 +15,15 @@ describe "CustomerGateway", ->
 
         done()
 
+    it "creates a customer", (done) ->
+      specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.customer.firstName, 'John')
+        assert.equal(response.customer.lastName, 'Smith')
+
+        done()
+
     it "handles uft8 characters", (done) ->
       specHelper.defaultGateway.customer.create {firstName: 'Jöhn', lastName: 'Smith'}, (err, response) ->
         assert.isNull(err)
