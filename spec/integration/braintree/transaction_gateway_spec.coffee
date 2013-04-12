@@ -325,6 +325,20 @@ describe "TransactionGateway", ->
 
           done()
 
+    it "exposes depositDetails", (done) ->
+      transactionId = "deposit_transaction"
+
+      specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
+        depositDetails = transaction.depositDetails
+        assert.equal(depositDetails.settlementAmount, '100.00')
+        assert.equal(depositDetails.settlementCurrencyIsoCode, 'USD')
+        assert.equal(depositDetails.settlementCurrencyExchangeRate, '1')
+        assert.equal(depositDetails.disbursedAt, '2013-04-09T00:00:00Z')
+        assert.equal(depositDetails.depositDate, '2013-04-10')
+        assert.equal(depositDetails.fundsHeld, false)
+
+        done()
+
     it "returns a not found error if given a bad id", (done) ->
       specHelper.defaultGateway.transaction.find 'nonexistent_transaction', (err, response) ->
         assert.equal(err.type, braintree.errorTypes.notFoundError)

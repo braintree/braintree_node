@@ -1,6 +1,7 @@
 {AttributeSetter} = require('./attribute_setter')
 {CreditCard} = require('./credit_card')
 {ServiceFee} = require('./service_fee')
+{DepositDetails} = require('./deposit_details')
 
 class Transaction extends AttributeSetter
   @CreatedUsing =
@@ -39,5 +40,6 @@ class Transaction extends AttributeSetter
     super attributes
     @creditCard = new CreditCard(attributes.creditCard)
     @serviceFee = new ServiceFee(attributes.serviceFee)
+    @depositDetails = new DepositDetails(attributes.depositDetails)
 
 exports.Transaction = Transaction
