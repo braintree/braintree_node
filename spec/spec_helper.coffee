@@ -1,4 +1,6 @@
-require('source-map-support').install()
+try
+  require('source-map-support').install()
+catch err
 
 http = require('http')
 {Util} = require('../lib/braintree/util')

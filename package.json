@@ -9,6 +9,7 @@
   "directories"         : {"lib"  : "./lib"},
   "repository"          : { "type": "git", "url" : "https://github.com/braintree/braintree_node.git" },
   "engines"             : { "node": ">=0.6.6" },
+  "config"              : { "optional": false },
   "bundledDependencies" : [ "dateformat" ],
   "dependencies" : {
     "xml2js"        : "=0.1.13",
@@ -16,8 +17,10 @@
   },
   "devDependencies" : {
     "chai"              : "=1.5.0",
-    "coffee-script"     : "=1.6.2",
-    "mocha"             : "=1.6.0",
+    "coffee-script"     : "=1.6.1",
+    "mocha"             : "=1.6.0"
+  },
+  "optionalDependencies" : {
     "source-map-support": "=0.1.2"
   },
   "scripts" : {
