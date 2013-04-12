@@ -326,7 +326,7 @@ describe "TransactionGateway", ->
           done()
 
     it "exposes depositDetails", (done) ->
-      transactionId = "deposit_transaction"
+      transactionId = "deposittransaction"
 
       specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
         depositDetails = transaction.depositDetails

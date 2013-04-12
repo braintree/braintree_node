@@ -186,7 +186,7 @@ describe "TransactionSearch", ->
       tomorrow =  new Date("April 11, 2013")
 
       search = (s) ->
-        s.id().is("deposit_transaction")
+        s.id().is("deposittransaction")
         s.depositDate().min(yesterday)
         s.depositDate().max(tomorrow)
 
