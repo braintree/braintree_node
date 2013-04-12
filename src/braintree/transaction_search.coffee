@@ -62,9 +62,10 @@ class TransactionSearch extends AdvancedSearch
     @keyValueFields "refund"
     @rangeFields(
       "amount"
-      "createdAt"
       "authorizationExpiredAt"
       "authorizedAt"
+      "createdAt"
+      "depositDate"
       "failedAt"
       "gatewayRejectedAt"
       "processorDeclinedAt"

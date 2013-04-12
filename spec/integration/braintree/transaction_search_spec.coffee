@@ -179,3 +179,25 @@ describe "TransactionSearch", ->
                 assert.equal(transactions[1].orderId, random)
 
                 done()
+
+
+    it "can find transactions by deposit date", (done) ->
+      yesterday = new Date("April 9, 2013")
+      tomorrow =  new Date("April 11, 2013")
+
+      search = (s) ->
+        s.id().is("deposit_transaction")
+        s.depositDate().min(yesterday)
+        s.depositDate().max(tomorrow)
+
+      specHelper.defaultGateway.transaction.search search, (err, response) ->
+        transactions = []
+
+        response.each (err, transaction) ->
+          transactions.push(transaction)
+
+          if transactions.length == 1
+            assert.equal(transactions.length, 1)
+            assert.equal(transactions[0].depositDetails.depositDate, "2013-04-10")
+
+            done()
