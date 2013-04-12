@@ -4,11 +4,10 @@ require("../../spec_helper")
 {CreditCard} = require('../../../lib/braintree/credit_card')
 
 describe "TransactionSearch", ->
-  beforeEach ->
-    @timeout 5000
-
   describe "search", ->
     it "finds transactions", (done) ->
+      @timeout 10000
+
       firstName = "Tom_#{specHelper.randomId()}"
       cardToken = "card_#{specHelper.randomId()}"
       customerId = "customer_#{specHelper.randomId()}"
