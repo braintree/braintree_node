@@ -25,10 +25,13 @@ task :npm_install do
   end
 end
 
-task :compile_coffee do
-  sh "find ./lib -name '*.js' -exec rm -f {} \\;"
-  sh "rm -rf spec_compiled"
+task :clean do
+  %w[lib spec_compiled].each do |dir|
+    sh "rm -rf #{dir}/*"
+  end
+end
 
+task :compile_coffee => [:clean] do
   sh "./node_modules/.bin/coffee --map -cbo ./lib ./src"
   sh "./node_modules/.bin/coffee --map -cbo ./spec_compiled ./spec"
 end

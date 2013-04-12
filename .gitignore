@@ -1,3 +1,4 @@
+/lib
 /node_modules/.bin
 /node_modules/chai
 /node_modules/coffee-script
