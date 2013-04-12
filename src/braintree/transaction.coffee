@@ -42,4 +42,7 @@ class Transaction extends AttributeSetter
     @serviceFee = new ServiceFee(attributes.serviceFee)
     @depositDetails = new DepositDetails(attributes.depositDetails)
 
+  isDeposited: ->
+    @depositDetails.isValid()
+
 exports.Transaction = Transaction

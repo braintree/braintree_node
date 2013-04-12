@@ -329,6 +329,8 @@ describe "TransactionGateway", ->
       transactionId = "deposittransaction"
 
       specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
+        assert.equal(transaction.isDeposited(), true)
+
         depositDetails = transaction.depositDetails
         assert.equal(depositDetails.settlementAmount, '100.00')
         assert.equal(depositDetails.settlementCurrencyIsoCode, 'USD')
