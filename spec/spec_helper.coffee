@@ -1,9 +1,11 @@
+require('source-map-support').install()
+
 http = require('http')
 {Util} = require('../lib/braintree/util')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
+chai = require("chai")
 
-GLOBAL.vows = require('vows')
-GLOBAL.assert = require('assert')
+GLOBAL.assert = chai.assert
 
 GLOBAL.assert.isEmptyArray = (array) ->
   assert.isArray(array)

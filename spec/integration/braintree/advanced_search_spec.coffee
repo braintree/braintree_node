@@ -1,4 +1,4 @@
-require("../../spec_helper.coffee")
+require("../../spec_helper")
 {SubscriptionSearch} = require('../../../lib/braintree/subscription_search')
 {TransactionSearch} = require('../../../lib/braintree/transaction_search')
 
@@ -166,8 +166,8 @@ describe "AdvancedSearch", ->
         response.each (err, subscription) ->
           subscriptionIds.push(subscription.id)
           if subscriptionIds.length == 2
-            assert.includes(subscriptionIds, subscription1.id)
-            assert.includes(subscriptionIds, subscription2.id)
+            assert.include(subscriptionIds, subscription1.id)
+            assert.include(subscriptionIds, subscription2.id)
             assert.isNull(err)
 
             done()
@@ -176,7 +176,7 @@ describe "AdvancedSearch", ->
       specHelper.defaultGateway.subscription.search ((search) -> search.ids().is(subscription1.id)), (err, response) ->
         assert.isTrue(response.success)
         assert.equal(response.ids.length, 1)
-        assert.includes(response.ids, subscription1.id)
+        assert.include(response.ids, subscription1.id)
         specHelper.doesNotInclude(response.ids, subscription2.id)
         
         done()
@@ -211,15 +211,15 @@ describe "AdvancedSearch", ->
     it "accepts the 'in' operator", (done) ->
       specHelper.defaultGateway.subscription.search ((search) -> search.planId().in(subscription1.planId, subscription2.planId)), (err, response) ->
         assert.isTrue(response.success)
-        assert.includes(response.ids, subscription1.id)
-        assert.includes(response.ids, subscription2.id)
+        assert.include(response.ids, subscription1.id)
+        assert.include(response.ids, subscription2.id)
 
         done()
 
     it "accepts the 'is' operator", (done) ->
       specHelper.defaultGateway.subscription.search ((search) -> search.planId().is(subscription1.planId)), (err, response) ->
         assert.isTrue(response.success)
-        assert.includes(response.ids, subscription1.id)
+        assert.include(response.ids, subscription1.id)
         specHelper.doesNotInclude(response.ids, subscription2.id)
 
         done()
@@ -235,7 +235,7 @@ describe "AdvancedSearch", ->
     it "accepts the 'startsWith' operator", (done) ->
       specHelper.defaultGateway.subscription.search ((search) -> search.planId().startsWith(subscription1.planId.slice(0, subscription1.planId.length - 1))), (err, response) ->
         assert.isTrue(response.success)
-        assert.includes(response.ids, subscription1.id)
+        assert.include(response.ids, subscription1.id)
         specHelper.doesNotInclude(response.ids, subscription2.id)
 
         done()
@@ -243,7 +243,7 @@ describe "AdvancedSearch", ->
     it "accepts the 'endsWith' operator", (done) ->
       specHelper.defaultGateway.subscription.search ((search) -> search.planId().endsWith(subscription1.planId.slice(1))), (err, response) ->
         assert.isTrue(response.success)
-        assert.includes(response.ids, subscription1.id)
+        assert.include(response.ids, subscription1.id)
         specHelper.doesNotInclude(response.ids, subscription2.id)
 
         done()
@@ -251,7 +251,7 @@ describe "AdvancedSearch", ->
     it "accepts the 'contains' operator", (done) ->
       specHelper.defaultGateway.subscription.search ((search) -> search.planId().contains(subscription1.planId.slice(1, subscription1.planId.length - 1))), (err, response) ->
         assert.isTrue(response.success)
-        assert.includes(response.ids, subscription1.id)
+        assert.include(response.ids, subscription1.id)
         specHelper.doesNotInclude(response.ids, subscription2.id)
 
         done()
@@ -286,7 +286,7 @@ describe "AdvancedSearch", ->
     it "accepts the 'min' operator", (done) ->
       specHelper.defaultGateway.subscription.search ((search) -> search.price().min(Number(subscription1.price))), (err, response) ->
         assert.isTrue(response.success)
-        assert.includes(response.ids, subscription1.id)
+        assert.include(response.ids, subscription1.id)
         specHelper.doesNotInclude(response.ids, subscription2.id)
 
         done()
@@ -294,7 +294,7 @@ describe "AdvancedSearch", ->
     it "accepts the 'max' operator", (done) ->
       specHelper.defaultGateway.subscription.search ((search) -> search.price().max(Number(subscription2.price))), (err, response) ->
         assert.isTrue(response.success)
-        assert.includes(response.ids, subscription2.id)
+        assert.include(response.ids, subscription2.id)
         specHelper.doesNotInclude(response.ids, subscription1.id)
 
         done()
@@ -303,7 +303,7 @@ describe "AdvancedSearch", ->
       subscriptionPrice = Number(subscription1.price)
       specHelper.defaultGateway.subscription.search ((search) -> search.price().between(subscriptionPrice - 0.01, subscriptionPrice + 0.01)) , (err, response) ->
         assert.isTrue(response.success)
-        assert.includes(response.ids, subscription1.id)
+        assert.include(response.ids, subscription1.id)
         specHelper.doesNotInclude(response.ids, subscription2.id)
 
         done()

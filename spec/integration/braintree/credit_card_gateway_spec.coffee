@@ -305,7 +305,7 @@ describe "CreditCardGateway", ->
         testCard = response.customer.creditCards[0]
 
         specHelper.defaultGateway.creditCard.expired (err, result) ->
-          assert.includes(result.ids, testCard.token)
+          assert.include(result.ids, testCard.token)
 
           done()
 
@@ -325,7 +325,7 @@ describe "CreditCardGateway", ->
 
         specHelper.defaultGateway.creditCard.expiringBetween before, after, (err, result) ->
           assert.isNull(err)
-          assert.includes(result.ids, testCard.token)
+          assert.include(result.ids, testCard.token)
 
           done()
 
