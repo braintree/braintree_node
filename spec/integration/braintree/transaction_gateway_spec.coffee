@@ -325,19 +325,18 @@ describe "TransactionGateway", ->
 
           done()
 
-    it "exposes depositDetails", (done) ->
+    it "exposes disbursementDetails", (done) ->
       transactionId = "deposittransaction"
 
       specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
-        assert.equal(transaction.isDeposited(), true)
+        assert.equal(transaction.isDisbursed(), true)
 
-        depositDetails = transaction.depositDetails
-        assert.equal(depositDetails.settlementAmount, '100.00')
-        assert.equal(depositDetails.settlementCurrencyIsoCode, 'USD')
-        assert.equal(depositDetails.settlementCurrencyExchangeRate, '1')
-        assert.equal(depositDetails.disbursedAt, '2013-04-09T00:00:00Z')
-        assert.equal(depositDetails.depositDate, '2013-04-10')
-        assert.equal(depositDetails.fundsHeld, false)
+        disbursementDetails = transaction.disbursementDetails
+        assert.equal(disbursementDetails.settlementAmount, '100.00')
+        assert.equal(disbursementDetails.settlementCurrencyIsoCode, 'USD')
+        assert.equal(disbursementDetails.settlementCurrencyExchangeRate, '1')
+        assert.equal(disbursementDetails.disbursementDate, '2013-04-10')
+        assert.equal(disbursementDetails.fundsHeld, false)
 
         done()
 

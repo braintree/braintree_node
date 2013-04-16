@@ -183,14 +183,14 @@ describe "TransactionSearch", ->
                 done()
 
 
-    it "can find transactions by deposit date", (done) ->
+    it "can find transactions by disbursement date", (done) ->
       yesterday = new Date("April 9, 2013")
       tomorrow =  new Date("April 11, 2013")
 
       search = (s) ->
         s.id().is("deposittransaction")
-        s.depositDate().min(yesterday)
-        s.depositDate().max(tomorrow)
+        s.disbursementDate().min(yesterday)
+        s.disbursementDate().max(tomorrow)
 
       specHelper.defaultGateway.transaction.search search, (err, response) ->
         transactions = []
@@ -200,6 +200,6 @@ describe "TransactionSearch", ->
 
           if transactions.length == 1
             assert.equal(transactions.length, 1)
-            assert.equal(transactions[0].depositDetails.depositDate, "2013-04-10")
+            assert.equal(transactions[0].disbursementDetails.disbursementDate, "2013-04-10")
 
             done()
