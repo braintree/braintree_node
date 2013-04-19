@@ -79,6 +79,7 @@ class ValidationErrorCodes
     VenmoSDKPaymentMethodCodeCardTypeIsNotAccepted : "91726"
     Options:
       UpdateExistingTokenIsInvalid : "91723"
+      VerificationMerchantAccountIdIsInvalid : "91728"
 
    @Descriptor =
      InternationalNameFormatIsInvalid : "92204"
