@@ -203,3 +203,61 @@ describe "TransactionSearch", ->
             assert.equal(transactions[0].disbursementDetails.disbursementDate, "2013-04-10")
 
             done()
+
+    it "filters on valid merchant account ids", (done) ->
+      random = specHelper.randomId()
+      transactionParams =
+        amount: '10.00'
+        orderId: random
+        creditCard:
+          number: '4111111111111111'
+          expirationDate: '01/2015'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.search (
+          (search) -> 
+            search.merchantAccountId().is(response.transaction.merchantAccountId)
+            search.id().is(response.transaction.id)
+        ), (err, response) ->
+
+          assert.equal(1, response.length())
+          done()
+
+    it "filters on valid and invalid merchant account ids", (done) ->
+      random = specHelper.randomId()
+      transactionParams =
+        amount: '10.00'
+        orderId: random
+        creditCard:
+          number: '4111111111111111'
+          expirationDate: '01/2015'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.search (
+          (search) -> 
+            search.merchantAccountId().in(response.transaction.merchantAccountId, "invalid_merchant_acct_id")
+            search.id().is(response.transaction.id)
+        ), (err, response) ->
+
+          assert.equal(1, response.length())
+          done()
+
+    it "filters out invalid merchant account ids", (done) ->
+      random = specHelper.randomId()
+      transactionParams =
+        amount: '10.00'
+        orderId: random
+        creditCard:
+          number: '4111111111111111'
+          expirationDate: '01/2015'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.search (
+          (search) -> 
+            search.merchantAccountId().is("invalid_merchant_acct_id")
+            search.id().is(response.transaction.id)
+        ), (err, response) ->
+
+          assert.equal(0, response.length())
+          done()
+

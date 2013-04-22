@@ -69,3 +69,87 @@ describe "SubscriptionSearch", ->
               assert.isNull(err)
 
               done()
+
+    it "filters on valid merchant account ids", (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        subscriptionParams =
+          paymentMethodToken: response.customer.creditCards[0].token
+          planId: specHelper.plans.trialless.id
+          id: specHelper.randomId()
+
+        specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+          subscriptionId = response.subscription.id 
+
+          multipleValueCriteria =
+            merchantAccountId: 'sandbox_credit_card'
+            ids: subscriptionParams.id
+
+          search = (search) ->
+            for criteria, value of multipleValueCriteria
+              search[criteria]().in(value)
+
+          specHelper.defaultGateway.subscription.search search, (err, response) ->
+            assert.isTrue(response.success)
+            assert.equal(1, response.length())
+            done()
+
+    it "filters on mixed valid and invalid merchant account ids", (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        subscriptionParams =
+          paymentMethodToken: response.customer.creditCards[0].token
+          planId: specHelper.plans.trialless.id
+          id: specHelper.randomId()
+
+        specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+          subscriptionId = response.subscription.id 
+
+          multipleValueCriteria =
+            merchantAccountId: ['sandbox_credit_card', 'invalid_merchant_id']
+            ids: subscriptionParams.id
+
+          search = (search) ->
+            for criteria, value of multipleValueCriteria
+              search[criteria]().in(value)
+
+          specHelper.defaultGateway.subscription.search search, (err, response) ->
+            assert.isTrue(response.success)
+            assert.equal(1, response.length())
+            done()
+
+    it "filters on invalid merchant account ids", (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        subscriptionParams =
+          paymentMethodToken: response.customer.creditCards[0].token
+          planId: specHelper.plans.trialless.id
+          id: specHelper.randomId()
+
+        specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+          subscriptionId = response.subscription.id 
+
+          multipleValueCriteria =
+            merchantAccountId: 'invalid_merchant_id'
+            ids: subscriptionParams.id
+
+          search = (search) ->
+            for criteria, value of multipleValueCriteria
+              search[criteria]().in(value)
+
+          specHelper.defaultGateway.subscription.search search, (err, response) ->
+            assert.isTrue(response.success)
+            assert.equal(0, response.length())
+            done()
