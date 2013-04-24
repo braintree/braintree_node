@@ -28,6 +28,7 @@ describe "CreditCardGateway", ->
         assert.equal(response.creditCard.maskedNumber, '510510******5100')
         assert.equal(response.creditCard.expirationDate, '05/2012')
         assert.isTrue(response.creditCard.uniqueNumberIdentifier.length == 32)
+        assert.match(response.creditCard.imageUrl, /png/)
 
         done()
 
