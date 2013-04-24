@@ -87,6 +87,55 @@ describe "CreditCardGateway", ->
         assert.isNull(err)
         assert.isTrue(response.success)
         assert.equal(response.creditCard.maskedNumber, '411111******1111')
+        assert.isTrue(response.creditCard.venmoSdk)
+
+        done()
+
+    it "rejects a bad venmo sdk payment method code", (done) ->
+      creditCardParams =
+        customerId: customerId
+        venmoSdkPaymentMethodCode: VenmoSdk.InvalidPaymentMethodCode
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isFalse(response.success)
+        errorCodes = (error.code for error in response.errors.deepErrors())
+        assert.equal(1, errorCodes.length)
+        assert.include(errorCodes, '91727')
+
+        done()
+
+    it "venmo sdk is true for card created with a venmo sdk session", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '5105105105105100'
+        expirationDate: '05/2012'
+        options:
+          venmoSdkSession: VenmoSdk.Session
+
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.maskedNumber, '510510******5100')
+        assert.isTrue(response.creditCard.venmoSdk)
+
+        done()
+
+    it "venmo sdk is false for card created with an invalid venmo sdk session", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '5105105105105100'
+        expirationDate: '05/2012'
+        options:
+          venmoSdkSession: VenmoSdk.InvalidSession
+
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.maskedNumber, '510510******5100')
+        assert.isFalse(response.creditCard.venmoSdk)
 
         done()
 
