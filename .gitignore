@@ -1,10 +1,4 @@
-/lib
-/node_modules/.bin
-/node_modules/chai
-/node_modules/coffee-script
-/node_modules/mocha
-/node_modules/source-map-support
-/node_modules/underscore
-/node_modules/xml2js
-/spec_compiled
-/tags
+lib
+node_modules
+spec_compiled
+tags
