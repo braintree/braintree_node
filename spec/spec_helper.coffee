@@ -125,4 +125,5 @@ GLOBAL.specHelper = {
   simulateTrFormPost: simulateTrFormPost
   defaultMerchantAccountId: "sandbox_credit_card"
   nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
+  nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
 }

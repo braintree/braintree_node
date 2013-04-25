@@ -260,7 +260,7 @@ describe "TransactionGateway", ->
     context "with a service fee", ->
       it "persists the service fee", (done) ->
         transactionParams =
-          merchantAccountId: specHelper.nonDefaultMerchantAccountId
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
           amount: '5.00'
           creditCard:
             number: '5105105105105100'
