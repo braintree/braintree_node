@@ -102,6 +102,7 @@ describe "CreditCardGateway", ->
         errorCodes = (error.code for error in response.errors.deepErrors())
         assert.equal(1, errorCodes.length)
         assert.include(errorCodes, '91727')
+        assert.equal(response.message, "Invalid VenmoSDK payment method code")
 
         done()
 
