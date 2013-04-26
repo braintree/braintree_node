@@ -2,27 +2,31 @@ task :default => %w[spec:unit spec:integration]
 
 namespace :spec do
   desc "Run units"
-  task :unit => [:npm_install, :compile_coffee] do
+  task :unit => [:npm_install] do
     sh "#{local_mocha} spec_compiled/unit --recursive"
   end
 
   desc "Run integration"
-  task :integration => [:npm_install, :compile_coffee] do
+  task :integration => [:npm_install] do
     sh "#{local_mocha} spec_compiled/integration --recursive"
   end
 
   desc "Run tests in a specific file"
-  task :focused, [:filename] => [:compile_coffee] do |t, args|
+  task :focused, [:filename] => [:npm_install] do |t, args|
     compiled_filename = args[:filename].sub(/\Aspec/, "spec_compiled").sub(/\.coffee\z/, ".js")
 
     sh "#{local_mocha} #{compiled_filename}"
   end
 end
 
-task :npm_install do
-  unless File.exist?(local_mocha)
-    sh "npm install"
+task :install_coffee do
+  unless File.exist?(local_coffee)
+    sh "npm install coffee-script"
   end
+end
+
+task :npm_install do
+  sh "npm install"
 end
 
 task :clean do
@@ -31,9 +35,13 @@ task :clean do
   end
 end
 
-task :compile_coffee => [:clean] do
-  sh "./node_modules/.bin/coffee --map -cbo ./lib ./src"
-  sh "./node_modules/.bin/coffee --map -cbo ./spec_compiled ./spec"
+task :compile_coffee => [:clean, :install_coffee] do
+  sh "#{local_coffee} --map -cbo ./lib ./src"
+  sh "#{local_coffee} --map -cbo ./spec_compiled ./spec"
+end
+
+def local_coffee
+  "./node_modules/.bin/coffee"
 end
 
 def local_mocha
