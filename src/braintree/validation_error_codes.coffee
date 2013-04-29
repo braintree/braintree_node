@@ -207,6 +207,7 @@ class ValidationErrorCodes
     SubscriptionDoesNotBelongToCustomer : "91529"
     SubscriptionIdIsInvalid : "91528"
     SubscriptionStatusMustBePastDue : "91531"
+    SubMerchantAccountRequiresServiceFee : "91553"
     TaxAmountCannotBeNegative : "81534"
     TaxAmountFormatIsInvalid : "81535"
     TaxAmountIsTooLarge : "81536"
