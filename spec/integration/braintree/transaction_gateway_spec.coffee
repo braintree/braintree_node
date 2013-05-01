@@ -257,87 +257,6 @@ describe "TransactionGateway", ->
 
         done()
 
-    context "with a service fee", ->
-      it "persists the service fee", (done) ->
-        transactionParams =
-          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
-          amount: '5.00'
-          creditCard:
-            number: '5105105105105100'
-            expirationDate: '05/12'
-          serviceFee:
-            amount: '1.00'
-            merchantAccountId: specHelper.defaultMerchantAccountId
-
-        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-          assert.equal(response.transaction.serviceFee.amount, '1.00')
-          assert.equal(response.transaction.serviceFee.merchantAccountId, specHelper.defaultMerchantAccountId)
-
-          done()
-
-      it "handles validation errors on service fees", (done) ->
-        transactionParams =
-          merchantAccountId: specHelper.nonDefaultMerchantAccountId
-          amount: '1.00'
-          creditCard:
-            number: '5105105105105100'
-            expirationDate: '05/12'
-          serviceFee:
-            amount: '5.00'
-            merchantAccountId: specHelper.defaultMerchantAccountId
-
-        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          assert.isNull(err)
-          assert.isFalse(response.success)
-          assert.equal(
-            response.errors.for('transaction').for('serviceFee').on('amount')[0].code,
-            ValidationErrorCodes.ServiceFee.AmountIsTooLarge
-          )
-
-          done()
-
-      it "sub merchant accounts must provide a service fee", (done) ->
-        transactionParams =
-          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
-          amount: '1.00'
-          creditCard:
-            number: '5105105105105100'
-            expirationDate: '05/12'
-
-        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          assert.isNull(err)
-          assert.isFalse(response.success)
-          assert.equal(
-            response.errors.for('transaction').on('merchantAccountId')[0].code,
-            ValidationErrorCodes.Transaction.SubMerchantAccountRequiresServiceFee
-          )
-
-          done()
-
-      it "master merchant accounts must not provide a service fee", (done) ->
-        transactionParams =
-          merchantAccountId: specHelper.defaultMerchantAccountId
-          amount: '1.00'
-          creditCard:
-            number: '5105105105105100'
-            expirationDate: '05/12'
-          serviceFee:
-            amount: '5.00'
-            merchantAccountId: specHelper.nonDefaultMerchantAccountId
-
-        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          assert.isNull(err)
-          assert.isFalse(response.success)
-          assert.equal(
-            response.errors.for('transaction').for('serviceFee').on('base')[0].code,
-            ValidationErrorCodes.ServiceFee.MerchantAccountNotSupported
-          )
-
-          done()
-
-
     it "can use venmo sdk payment method codes", (done) ->
       transactionParams =
         amount: '1.00'
@@ -349,7 +268,6 @@ describe "TransactionGateway", ->
         assert.equal(response.transaction.creditCard.bin, "411111")
 
         done()
-
 
   describe "find", ->
     it "finds a transaction", (done) ->
