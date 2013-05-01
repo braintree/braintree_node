@@ -2,23 +2,14 @@
 
 This is a Node.js library for integrating with the [Braintree](http://www.braintreepayments.com) gateway.
 
-## Installing
-
-### From NPM
+## Installation
 
 * `npm install braintree`
 * `var braintree = require('braintree')`
 
-### From Source
-
-* clone the latest tag somewhere in your require.paths
-* `var braintree = require('braintree-node/lib/braintree')`
-
 ### Dependencies
 
 * node ~0.6.6
-* coffee-script ~1.1
-* xml2js >= 0.1.13
 
 ## Links
 

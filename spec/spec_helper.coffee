@@ -1,9 +1,13 @@
+try
+  require('source-map-support').install()
+catch err
+
 http = require('http')
 {Util} = require('../lib/braintree/util')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
+chai = require("chai")
 
-GLOBAL.vows = require('vows')
-GLOBAL.assert = require('assert')
+GLOBAL.assert = chai.assert
 
 GLOBAL.assert.isEmptyArray = (array) ->
   assert.isArray(array)
@@ -119,4 +123,7 @@ GLOBAL.specHelper = {
   randomId: randomId
   settleTransaction: settleTransaction
   simulateTrFormPost: simulateTrFormPost
+  defaultMerchantAccountId: "sandbox_credit_card"
+  nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
+  nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
 }

@@ -1,3 +1,8 @@
+## 1.7.0
+
+* Adds disbursement details to transactions.
+* Adds image url to transactions.
+
 ## 1.6.0
 
 * Adds channel field to transactions.

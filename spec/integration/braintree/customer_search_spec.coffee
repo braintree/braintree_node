@@ -1,196 +1,144 @@
 require("../../spec_helper")
 {CustomerSearch} = require('../../../lib/braintree/customer_search')
 
-vows
-  .describe("CustomerSearch")
-  .addBatch
-    "customer search":
-      "when no results are found":
-        topic: ->
-          specHelper.defaultGateway.customer.search((search) ->
-            search.email().is(specHelper.randomId() + "@example.com")
-          , @callback)
-          undefined
+describe "CustomerSearch", ->
+  describe "search", ->
+    lastName = null
 
-        'does not have error': (err, response) ->
-          assert.isNull(err)
+    before (done) ->
+      lastName = specHelper.randomId()
+      specHelper.defaultGateway.customer.create {firstName: 'Bob', lastName: lastName}, (err, response) ->
+        specHelper.defaultGateway.customer.create {firstName: 'Ryan', lastName: lastName}, (err, response) ->
+          done()
 
-        'returns no results': (err, response) ->
-          assert.equal(response.length(), 0)
-      "when the search yields a single result":
-        topic: ->
-          callback = @callback
-          random = specHelper.randomId()
-          specHelper.defaultGateway.customer.create(
-            firstName: 'Bob',
-            lastName: "Smith",
-            email: random + '@smith.org'
-            , (err, response) ->
-              specHelper.defaultGateway.customer.search((search) ->
-                search.email().is(random + "@smith.org")
-              , (err, response) ->
-                response.first(callback)
-              )
-          )
-          undefined
+    it "can return no results", (done) ->
+      specHelper.defaultGateway.customer.search ((search) -> search.email().is(specHelper.randomId() + "@example.com")), (err, response) ->
+        assert.isNull(err)
+        assert.equal(response.length(), 0)
 
-        'returns the first customer': (err, customer) ->
+        done()
+
+    it "can return a single result", (done) ->
+      search = (search) ->
+        search.firstName().is("Bob")
+        search.lastName().is(lastName)
+
+      specHelper.defaultGateway.customer.search search, (err, response) ->
+        response.first (err, customer) ->
           assert.equal(customer.firstName, 'Bob')
-          assert.equal(customer.lastName, 'Smith')
+          assert.equal(customer.lastName, lastName)
 
-      "when the seach returns multiple values":
-        topic: ->
-          callback = @callback
-          random = specHelper.randomId()
-          specHelper.defaultGateway.customer.create({
-            firstName: 'Bob',
-            lastName: random,
-            }, (err, response) ->
-            specHelper.defaultGateway.customer.create({
-              firstName: 'Ryan',
-              lastName: random,
-              }, (err, response) ->
-                specHelper.defaultGateway.customer.search((search) ->
-                  search.lastName().is(random)
-                , (err, response) ->
-                  customers = []
-                  response.each( (err, customer) ->
-                    customers.push(customer)
-                    if(customers.length == 2)
-                      callback(null, {customers: customers, lastName: random})
-                    else if customers.length > 2
-                      callback("TOO Many Results", null)
-                  )
-                )
-              )
-            )
-          undefined
-        "2 results should be returned": (err, results) ->
-          assert.equal(results.customers.length, 2)
-          assert.equal(results.customers[0].lastName, results.lastName)
-          assert.equal(results.customers[1].lastName, results.lastName)
+          done()
 
-        "complex search":
-          topic: ->
-            callback = @callback
-            id = specHelper.randomId()
-            email = "#{specHelper.randomId()}@example.com"
-            firstName = "John_#{specHelper.randomId()}"
-            lastName = "Smith_#{specHelper.randomId()}"
-            cardToken = "card_#{specHelper.randomId()}"
+    it "can return multiple results", (done) ->
+      specHelper.defaultGateway.customer.search ((search) -> search.lastName().is(lastName)), (err, response) ->
+        customers = []
+        response.each (err, customer) ->
+          customers.push customer
 
-            customerParams =
-              company: "Braintree"
-              email: email
-              fax: "(123)456-7890"
-              firstName: firstName
-              id: id
-              lastName: lastName
-              phone: "(456)123-7890"
-              website: "http://www.example.com/"
-              creditCard:
-                number: "5105105105105100"
-                expirationDate: "05/2012"
-                cardholderName: "#{firstName} #{lastName}"
-                token: cardToken
-                billingAddress:
-                  firstName: firstName
-                  lastName: lastName
-                  streetAddress: "123 Fake St"
-                  extendedAddress: "Suite 403"
-                  locality: "Chicago"
-                  region: "IL"
-                  postalCode: "60607"
-                  countryName: "United States of America"
+          if customers.length == 2
+            assert.equal(customers.length, 2)
+            assert.equal(customers[0].lastName, lastName)
+            assert.equal(customers[1].lastName, lastName)
 
-            specHelper.defaultGateway.customer.create(customerParams, (err, response) ->
-              textCriteria =
-                addressCountryName: "United States of America"
-                addressExtendedAddress: "Suite 403"
-                addressFirstName: firstName
-                addressLastName: lastName
-                addressLocality: "Chicago"
-                addressPostalCode: "60607"
-                addressStreetAddress: "123 Fake St"
-                cardholderName: "#{firstName} #{lastName}"
-                company: "Braintree"
-                email: email
-                fax: "(123)456-7890"
-                firstName: firstName
-                id: id
-                lastName: lastName
-                paymentMethodToken: cardToken
-                phone: "(456)123-7890"
-                website: "http://www.example.com/"
+            done()
 
-              equalityCriteria =
-                creditCardExpirationDate: "05/2012"
+    it "handles complex searches", (done) ->
+      id = specHelper.randomId()
+      email = "#{specHelper.randomId()}@example.com"
+      firstName = "John_#{specHelper.randomId()}"
+      lastName = "Smith_#{specHelper.randomId()}"
+      cardToken = "card_#{specHelper.randomId()}"
 
-              partialCriteria =
-                creditCardNumber:
-                  startsWith: "5105"
-                  endsWith: "100"
+      customerParams =
+        company: "Braintree"
+        email: email
+        fax: "(123)456-7890"
+        firstName: firstName
+        id: id
+        lastName: lastName
+        phone: "(456)123-7890"
+        website: "http://www.example.com/"
+        creditCard:
+          number: "5105105105105100"
+          expirationDate: "05/2012"
+          cardholderName: "#{firstName} #{lastName}"
+          token: cardToken
+          billingAddress:
+            firstName: firstName
+            lastName: lastName
+            streetAddress: "123 Fake St"
+            extendedAddress: "Suite 403"
+            locality: "Chicago"
+            region: "IL"
+            postalCode: "60607"
+            countryName: "United States of America"
 
-              multipleValueCriteria =
-                ids: customerParams.id
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        textCriteria =
+          addressCountryName: "United States of America"
+          addressExtendedAddress: "Suite 403"
+          addressFirstName: firstName
+          addressLastName: lastName
+          addressLocality: "Chicago"
+          addressPostalCode: "60607"
+          addressStreetAddress: "123 Fake St"
+          cardholderName: "#{firstName} #{lastName}"
+          company: "Braintree"
+          email: email
+          fax: "(123)456-7890"
+          firstName: firstName
+          id: id
+          lastName: lastName
+          paymentMethodToken: cardToken
+          phone: "(456)123-7890"
+          website: "http://www.example.com/"
 
-              today = new Date()
-              yesterday = new Date(); yesterday.setDate(today.getDate() - 1)
-              tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1)
+        equalityCriteria =
+          creditCardExpirationDate: "05/2012"
 
-              rangeCriteria =
-                createdAt:
-                  min: yesterday
-                  max: tomorrow
+        partialCriteria =
+          creditCardNumber:
+            startsWith: "5105"
+            endsWith: "100"
 
-              specHelper.defaultGateway.customer.search((search) ->
-                for criteria, value of textCriteria
-                  search[criteria]().is(value)
+        multipleValueCriteria =
+          ids: customerParams.id
 
-                for criteria, value of equalityCriteria
-                  search[criteria]().is(value)
+        today = new Date()
+        yesterday = new Date(); yesterday.setDate(today.getDate() - 1)
+        tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1)
 
-                for criteria, partial of partialCriteria
-                  for operator, value of partial
-                    search[criteria]()[operator](value)
+        rangeCriteria =
+          createdAt:
+            min: yesterday
+            max: tomorrow
 
-                for criteria, value of multipleValueCriteria
-                  search[criteria]().is(value)
+        search = (search) ->
+          for criteria, value of textCriteria
+            search[criteria]().is(value)
 
-                for criteria, range of rangeCriteria
-                  for operator, value of range
-                    search[criteria]()[operator](value)
-              , (err, response) ->
-                callback(err,
-                  customerId: customerParams.id
-                  result: response
-                )
-              )
-            )
-            undefined
-          "on search":
-            "result":
-              topic: (response) ->
-                response
-              "is successful": (response) ->
-                assert.isTrue(response.result.success)
-              "returns one result": (response) ->
-                assert.equal(response.result.length(), 1)
-            "get first of collection":
-              topic: (response) ->
-                callback = @callback
-                response.result.first((err, result) ->
-                  callback(err,
-                    customerId: response.customerId
-                    result: result
-                  )
-                )
-                undefined
-              "gets customer domain object": (err, response) ->
-                assert.isObject(response.result)
-                assert.equal(response.result.id, response.customerId)
-              "does not error": (err, response) ->
-                assert.isNull(err)
+          for criteria, value of equalityCriteria
+            search[criteria]().is(value)
 
-  .export(module)
+          for criteria, partial of partialCriteria
+            for operator, value of partial
+              search[criteria]()[operator](value)
 
+          for criteria, value of multipleValueCriteria
+            search[criteria]().is(value)
+
+          for criteria, range of rangeCriteria
+            for operator, value of range
+              search[criteria]()[operator](value)
+
+        specHelper.defaultGateway.customer.search search, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.length(), 1)
+
+          response.first (err, customer) ->
+            assert.isObject(customer)
+            assert.equal(customer.id, customerParams.id)
+            assert.isNull(err)
+
+            done()

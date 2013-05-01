@@ -5,514 +5,488 @@ util = require('util')
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
 {CreditCardDefaults} = require('../../../lib/braintree/test/credit_card_defaults')
+{VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
 
-vows
-  .describe('CreditCardGateway')
-  .addBatch
-    'create':
-      'for a minimal case':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: '5105105105105100',
-              expirationDate: '05/2012'
-            , callback))
-          undefined
-        'does not have an error': (err, response) ->
-          assert.isNull(err)
-        'is successful': (err, response) ->
-          assert.isTrue(response.success)
-        'has credit card attributes': (err, response) ->
-          assert.equal(response.creditCard.maskedNumber, '510510******5100')
-          assert.equal(response.creditCard.expirationDate, '05/2012')
-          assert.isTrue(response.creditCard.uniqueNumberIdentifier.length == 32)
+describe "CreditCardGateway", ->
+  describe "create", ->
+    customerId = null
 
-      'with billing address':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-              firstName: 'John',
-              lastName: 'Smith'
-            , (err, response) ->
-              specHelper.defaultGateway.creditCard.create
-                customerId: response.customer.id,
-                number: '5105105105105100',
-                expirationDate: '05/2012',
-                billingAddress:
-                  streetAddress: '123 Fake St',
-                  locality: 'Chicago',
-                  region: 'IL',
-                  postalCode: '60607'
-              , callback)
-          undefined
-        'is successful': (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-        'has credit card attributes': (err, response) ->
-          assert.equal(response.creditCard.maskedNumber, '510510******5100')
-          assert.equal(response.creditCard.expirationDate, '05/2012')
-        'creates a billing address': (err, response) ->
-          assert.equal(response.creditCard.billingAddress.streetAddress, '123 Fake St')
-          assert.equal(response.creditCard.billingAddress.locality, 'Chicago')
-          assert.equal(response.creditCard.billingAddress.region, 'IL')
-          assert.equal(response.creditCard.billingAddress.postalCode, '60607')
+    before (done) ->
+      specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
+        customerId = response.customer.id
+        done()
 
-      'with errors':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create
-              firstName: 'John',
-              lastName: 'Smith'
-            , (err, response) ->
-              specHelper.defaultGateway.creditCard.create
-                customerId: response.customer.id,
-                number: 'invalid',
-                expirationDate: '05/2012'
-              , callback
-          undefined
-        'is unsuccessful': (err, response) ->
-          assert.isFalse(response.success)
-        'has a unified message': (err, response) ->
-          assert.equal(response.message, 'Credit card number must be 12-19 digits.')
-        'has an error on number': (err, response) ->
-          assert.equal(
-            response.errors.for('creditCard').on('number')[0].code,
-            '81716')
-        'has an attribute on ValidationError objects': (err, response) ->
-          assert.equal(
-            response.errors.for('creditCard').on('number')[0].attribute,
-            'number')
-        'returns deepErrors': (err, response) ->
-          errorCodes = _.map(response.errors.deepErrors(), (error) ->
-            return error.code )
-          assert.equal(1, errorCodes.length)
-          assert.include(errorCodes, '81716')
+    it "works for a simple create", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '5105105105105100'
+        expirationDate: '05/2012'
 
-    'delete':
-      'the delete response':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-              creditCard:
-                number: '5105105105105100',
-                expirationDate: '05/2014'
-            , (err, response) ->
-              specHelper.defaultGateway.creditCard.delete(
-                response.customer.creditCards[0].token, callback))
-          undefined
-        'does not have an error': (err) ->
-          assert.isNull(err)
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.maskedNumber, '510510******5100')
+        assert.equal(response.creditCard.expirationDate, '05/2012')
+        assert.isTrue(response.creditCard.uniqueNumberIdentifier.length == 32)
+        assert.match(response.creditCard.imageUrl, /png/)
 
-      'the creditCard':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-              creditCard:
-                number: '5105105105105100',
-                expirationDate: '05/2014'
-            , (err, response) ->
-              specHelper.defaultGateway.creditCard.delete(
-                response.customer.creditCards[0].token,
-                (err) ->
-                  specHelper.defaultGateway.creditCard.find(
-                    response.customer.creditCards[0].token, callback)))
-          undefined
-        'returning a not found error': (err, response) ->
-          assert.equal(err.type, braintree.errorTypes.notFoundError)
-      'when the credit card cannot be found':
-        topic: ->
-          specHelper.defaultGateway.creditCard.delete('nonexistent_token', @callback)
-          undefined
-        'returns a not found error': (err, response) ->
-          assert.equal(err.type, braintree.errorTypes.notFoundError)
+        done()
 
-    'expired':
-      'when a card is expired':
-        topic: ->
-          callback = @callback
-          creditCard = null
+    it "accepts a billing address", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '5105105105105100'
+        expirationDate: '05/2012'
+        billingAddress:
+          streetAddress: '123 Fake St'
+          locality: 'Chicago'
+          region: 'IL'
+          postalCode: '60607'
 
-          specHelper.defaultGateway.customer.create(
-            creditCard:
-              number: '5105105105105100',
-              expirationDate: '01/2010'
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.maskedNumber, '510510******5100')
+        assert.equal(response.creditCard.expirationDate, '05/2012')
+        assert.equal(response.creditCard.billingAddress.streetAddress, '123 Fake St')
+        assert.equal(response.creditCard.billingAddress.locality, 'Chicago')
+        assert.equal(response.creditCard.billingAddress.region, 'IL')
+        assert.equal(response.creditCard.billingAddress.postalCode, '60607')
 
-          , (err, response) ->
-            testCard = response.customer.creditCards[0]
+        done()
 
-            specHelper.defaultGateway.creditCard.expired((err, searchResult) ->
-              callback(null, {testCard: testCard, search: searchResult})))
+    it "handles errors", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: 'invalid'
+        expirationDate: '05/2012'
 
-          undefined
-        'includes a card' : (err, result) ->
-          assert.includes(result.search.ids, result.testCard.token)
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isFalse(response.success)
+        assert.equal(response.message, 'Credit card number must be 12-19 digits.')
+        assert.equal(
+          response.errors.for('creditCard').on('number')[0].code,
+          '81716'
+        )
+        assert.equal(
+          response.errors.for('creditCard').on('number')[0].attribute,
+          'number'
+        )
+        errorCodes = (error.code for error in response.errors.deepErrors())
+        assert.equal(1, errorCodes.length)
+        assert.include(errorCodes, '81716')
 
-    'expiringBetween':
-      'when there are results':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            creditCard:
-              number: '5105105105105100',
-              expirationDate: '05/2016'
-          , (err, response) ->
-            testCard = response.customer.creditCards[0]
+        done()
 
-            today = new Date
-            before = new Date("2016-04-31")
-            after = new Date("2016-10-01")
+    it "accepts a venmo sdk payment method code", (done) ->
+      creditCardParams =
+        customerId: customerId
+        venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode
 
-            specHelper.defaultGateway.creditCard.expiringBetween(before, after, (err, searchResult) ->
-              callback(err, {testCard: testCard, searchResult: searchResult})))
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.maskedNumber, '411111******1111')
+        assert.isTrue(response.creditCard.venmoSdk)
 
-          undefined
-        'has no errors': (err, result) ->
-          assert.isNull(err)
-        'includes the card': (err, result) ->
-          assert.includes(result.searchResult.ids, result.testCard.token)
+        done()
 
-    'find':
-      'when found':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-              creditCard:
-                number: '5105105105105100',
-                expirationDate: '05/2014'
-            , (err, response) ->
-              specHelper.defaultGateway.creditCard.find(
-                response.customer.creditCards[0].token,
-                callback))
-          undefined
-        'does not have an error': (err, response) ->
-          assert.isNull(err)
-        'returns credit card details': (err, creditCard) ->
-          assert.equal(creditCard.maskedNumber, '510510******5100')
-          assert.equal(creditCard.expirationDate, '05/2014')
-      'when not found':
-        topic: () ->
-          specHelper.defaultGateway.creditCard.find('nonexistent_token', @callback)
-          undefined
-        'returns a not found error': (err, response) ->
-          assert.equal(err.type, braintree.errorTypes.notFoundError)
-      'when the id is whitespace':
-        topic: () ->
-          specHelper.defaultGateway.creditCard.find(" ", @callback)
-          undefined
-        'returns a not found error': (err, address) ->
-          assert.equal(err.type, braintree.errorTypes.notFoundError)
+    it "rejects a bad venmo sdk payment method code", (done) ->
+      creditCardParams =
+        customerId: customerId
+        venmoSdkPaymentMethodCode: VenmoSdk.InvalidPaymentMethodCode
 
-    'card type indicator are set':
-      'with a prepaid card':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.Prepaid,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the prepaid field to Yes': (err, response) ->
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isFalse(response.success)
+        errorCodes = (error.code for error in response.errors.deepErrors())
+        assert.equal(1, errorCodes.length)
+        assert.include(errorCodes, '91727')
+        assert.equal(response.message, "Invalid VenmoSDK payment method code")
+
+        done()
+
+    it "venmo sdk is true for card created with a venmo sdk session", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '5105105105105100'
+        expirationDate: '05/2012'
+        options:
+          venmoSdkSession: VenmoSdk.Session
+
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.maskedNumber, '510510******5100')
+        assert.isTrue(response.creditCard.venmoSdk)
+
+        done()
+
+    it "venmo sdk is false for card created with an invalid venmo sdk session", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '5105105105105100'
+        expirationDate: '05/2012'
+        options:
+          venmoSdkSession: VenmoSdk.InvalidSession
+
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.maskedNumber, '510510******5100')
+        assert.isFalse(response.creditCard.venmoSdk)
+
+        done()
+
+    context "card type indicators", ->
+      it "handles prepaid cards", (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.Prepaid
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.prepaid, CreditCard.Prepaid.Yes)
-      'with a commercial card':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.Commercial,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the commercial field to Yes': (err, response) ->
+
+          done()
+
+      it "handles commercial cards", (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.Commercial
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.commercial, CreditCard.Commercial.Yes)
-      'with a payroll card':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.Payroll,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the payroll field to Yes': (err, response) ->
+
+          done()
+
+      it "handles payroll cards", (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.Payroll
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.payroll, CreditCard.Payroll.Yes)
-      'with a heathcare card':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.Healthcare,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the healthcare field to Yes': (err, response) ->
+
+          done()
+
+      it "handles healthcare cards", (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.Healthcare
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.healthcare, CreditCard.Healthcare.Yes)
-      'with a durbin regulated card':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.DurbinRegulated,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the durbin regulated field to Yes': (err, response) ->
+
+          done()
+
+      it "handles durbin regulated cards", (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.DurbinRegulated
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Yes)
-      'with a debit card':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.Debit,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the debit field to Yes': (err, response) ->
+
+          done()
+
+      it "handles debit cards", (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.Debit
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.debit, CreditCard.Debit.Yes)
 
-      'it sets the country of issuance':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.CountryOfIssuance,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the country of issuance field to the default': (err, response) ->
+          done()
+
+      it "sets the country of issuance", (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.CountryOfIssuance
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.countryOfIssuance, CreditCardDefaults.CountryOfIssuance)
 
-      'it sets the issuing bank':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.IssuingBank,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the issuing bank field to the default': (err, response) ->
+          done()
+
+      it "sets the issuing bank", (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.IssuingBank
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.issuingBank, CreditCardDefaults.IssuingBank)
 
-    'negative card type indicators':
-      'with a negative card type indicator card':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.No,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the prepaid field to No': (err, response) ->
-          assert.equal(response.creditCard.prepaid, CreditCard.Prepaid.No)
-        'sets the payroll field to No': (err, response) ->
-          assert.equal(response.creditCard.payroll, CreditCard.Payroll.No)
-        'sets the debit field to No': (err, response) ->
-          assert.equal(response.creditCard.debit, CreditCard.Debit.No)
-        'sets the commercial field to No': (err, response) ->
-          assert.equal(response.creditCard.commercial, CreditCard.Commercial.No)
-        'sets the durbin regulated field to No': (err, response) ->
-          assert.equal(response.creditCard.durbinRegulated, CreditCard.DurbinRegulated.No)
-        'sets the heathcare field to No': (err, response) ->
-          assert.equal(response.creditCard.healthcare, CreditCard.Healthcare.No)
+          done()
 
-    'unknown card type indicators':
-      'with an un-identified card':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            firstName: 'John',
-            lastName: 'Smith'
-          , (err, response) ->
-            specHelper.defaultGateway.creditCard.create(
-              customerId: response.customer.id,
-              number: CreditCardNumbers.CardTypeIndicators.Unknown,
-              expirationDate: '05/2012',
-              options: {
-                verifyCard: true
-              }
-            , callback))
-          undefined
-        'sets the prepaid field to Unknown': (err, response) ->
-          assert.equal(response.creditCard.prepaid, CreditCard.Prepaid.Unknown)
-        'sets the payroll field to Unknown': (err, response) ->
-          assert.equal(response.creditCard.payroll, CreditCard.Payroll.Unknown)
-        'sets the debit field to Unknown': (err, response) ->
-          assert.equal(response.creditCard.debit, CreditCard.Debit.Unknown)
-        'sets the commercial field to Unknown': (err, response) ->
-          assert.equal(response.creditCard.commercial, CreditCard.Commercial.Unknown)
-        'sets the durbin regulated field to Unknown': (err, response) ->
-          assert.equal(response.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown)
-        'sets the heathcare field to Unknown': (err, response) ->
-          assert.equal(response.creditCard.healthcare, CreditCard.Healthcare.Unknown)
-        'sets the country of issuance field to Unknown': (err, response) ->
-          assert.equal(response.creditCard.countryOfIssuance, CreditCard.CountryOfIssuance.Unknown)
-        'sets the issuing bank field to Unknown': (err, response) ->
-          assert.equal(response.creditCard.issuingBank, CreditCard.IssuingBank.Unknown)
+    context "negative card type indicators", ->
+      createResponse = null
 
+      before (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.No
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
 
-    'update':
-      'for a minimal case':
-        topic: () ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            creditCard:
-              cardholderName: 'Old Cardholder Name',
-              number: '5105105105105100',
-              expirationDate: '05/2014'
-            , (err, response) ->
-              specHelper.defaultGateway.creditCard.update(
-                response.customer.creditCards[0].token,
-                  cardholderName: 'New Cardholder Name',
-                  number: '4111111111111111',
-                  expirationDate: '12/2015'
-                , callback))
-          undefined
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+          createResponse = response
+          done()
 
-        'does not have an error': (err, response) -> assert.isNull(err)
-        'is successful': (err, response) -> assert.isTrue(response.success)
-        'has updated credit card attributes': (err, response) ->
-          assert.equal(response.creditCard.cardholderName, 'New Cardholder Name')
-          assert.equal(response.creditCard.maskedNumber, '411111******1111')
-          assert.equal(response.creditCard.expirationDate, '12/2015')
+      it 'sets the prepaid field to No', ->
+        assert.equal(createResponse.creditCard.prepaid, CreditCard.Prepaid.No)
 
+      it 'sets the payroll field to No', ->
+        assert.equal(createResponse.creditCard.prepaid, CreditCard.Prepaid.No)
+        assert.equal(createResponse.creditCard.payroll, CreditCard.Payroll.No)
 
-      'with updating the billing address':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            creditCard:
-              cardholderName: 'Old Cardholder Name',
-              number: '5105105105105100',
-              expirationDate: '05/2014',
-              billingAddress:
-                streetAddress: '123 Old St',
-                locality: 'Old City',
-                region: 'Old Region'
-            , (err, response) ->
-              specHelper.defaultGateway.creditCard.update(
-                response.customer.creditCards[0].token,
-                  cardholderName: 'New Cardholder Name',
-                  number: '4111111111111111',
-                  expirationDate: '12/2015',
-                  billingAddress:
-                    streetAddress: '123 New St',
-                    locality: 'New City',
-                    region: 'New Region',
-                    options: { updateExisting: true }
-              , callback))
-          undefined
-        'is successful': (err, response) ->
+      it 'sets the debit field to No', ->
+        assert.equal(createResponse.creditCard.debit, CreditCard.Debit.No)
+
+      it 'sets the commercial field to No', ->
+        assert.equal(createResponse.creditCard.commercial, CreditCard.Commercial.No)
+
+      it 'sets the durbin regulated field to No', ->
+        assert.equal(createResponse.creditCard.durbinRegulated, CreditCard.DurbinRegulated.No)
+
+      it 'sets the heathcare field to No', ->
+        assert.equal(createResponse.creditCard.healthcare, CreditCard.Healthcare.No)
+
+    context "unknown card type indicators", ->
+      createResponse = null
+
+      before (done) ->
+        creditCardParams =
+          customerId: customerId
+          number: CreditCardNumbers.CardTypeIndicators.Unknown
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+          createResponse = response
+          done()
+
+      it 'sets the prepaid field to Unknown', ->
+        assert.equal(createResponse.creditCard.prepaid, CreditCard.Prepaid.Unknown)
+
+      it 'sets the payroll field to Unknown', ->
+        assert.equal(createResponse.creditCard.payroll, CreditCard.Payroll.Unknown)
+
+      it 'sets the debit field to Unknown', ->
+        assert.equal(createResponse.creditCard.debit, CreditCard.Debit.Unknown)
+
+      it 'sets the commercial field to Unknown', ->
+        assert.equal(createResponse.creditCard.commercial, CreditCard.Commercial.Unknown)
+
+      it 'sets the durbin regulated field to Unknown', ->
+        assert.equal(createResponse.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown)
+
+      it 'sets the heathcare field to Unknown', ->
+        assert.equal(createResponse.creditCard.healthcare, CreditCard.Healthcare.Unknown)
+
+      it 'sets the country of issuance field to Unknown', ->
+        assert.equal(createResponse.creditCard.countryOfIssuance, CreditCard.CountryOfIssuance.Unknown)
+
+      it 'sets the issuing bank field to Unknown', ->
+        assert.equal(createResponse.creditCard.issuingBank, CreditCard.IssuingBank.Unknown)
+
+  describe "delete", (done) ->
+    customerToken = null
+
+    before (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100',
+          expirationDate: '05/2014'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        customerToken = response.customer.creditCards[0].token
+        done()
+
+    it "deletes the credit card", (done) ->
+      specHelper.defaultGateway.creditCard.delete customerToken, (err) ->
+        assert.isNull(err)
+
+        specHelper.defaultGateway.creditCard.find customerToken, (err, response) ->
+          assert.equal(err.type, braintree.errorTypes.notFoundError)
+          done()
+
+    it "handles invalid tokens", (done) ->
+      specHelper.defaultGateway.creditCard.delete 'nonexistent_token', (err) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
+
+  describe "expired", ->
+    it "returns expired cards", (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100',
+          expirationDate: '01/2010'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        testCard = response.customer.creditCards[0]
+
+        specHelper.defaultGateway.creditCard.expired (err, result) ->
+          assert.include(result.ids, testCard.token)
+
+          done()
+
+  describe "expiringBetween", ->
+    it "returns card expiring between the given dates", (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/2016'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        testCard = response.customer.creditCards[0]
+
+        today = new Date
+        before = new Date("2016-04-31")
+        after = new Date("2016-10-01")
+
+        specHelper.defaultGateway.creditCard.expiringBetween before, after, (err, result) ->
           assert.isNull(err)
-          assert.isTrue(response.success)
-        'has updated credit card attributes': (err, response) ->
-          assert.equal(response.creditCard.cardholderName, 'New Cardholder Name')
-          assert.equal(response.creditCard.maskedNumber, '411111******1111')
-          assert.equal(response.creditCard.expirationDate, '12/2015')
-        'updates the billing address': (err, response) ->
-          billingAddress = response.creditCard.billingAddress
-          assert.equal(billingAddress.streetAddress, '123 New St')
-          assert.equal(billingAddress.locality, 'New City')
-          assert.equal(billingAddress.region, 'New Region')
+          assert.include(result.ids, testCard.token)
 
-      'with errors':
-        topic: ->
-          callback = @callback
-          specHelper.defaultGateway.customer.create(
-            creditCard:
-              number: '5105105105105100',
-              expirationDate: '05/2014'
-            , (err, response) ->
-              specHelper.defaultGateway.creditCard.update(
-                response.customer.creditCards[0].token,
-                  number: 'invalid'
-                callback))
-          undefined
-        'is unsuccessful': (err, response) -> assert.isFalse(response.success)
-        'has a unified message': (err, response) ->
-          assert.equal(response.message, 'Credit card number must be 12-19 digits.')
-        'has an error on number': (err, response) ->
-          assert.equal(
-            response.errors.for('creditCard').on('number')[0].code,
-            '81716'
-          )
-        'has an attribute on ValidationError objects': (err, response) ->
-          assert.equal(
-            response.errors.for('creditCard').on('number')[0].attribute,
-            'number'
-          )
-        'returns deepErrors': (err, response) ->
-          errorCodes = _.map(response.errors.deepErrors(), (error) -> error.code )
-          assert.equal(1, errorCodes.length)
-          assert.include(errorCodes, '81716')
+          done()
 
-  .export(module)
+  describe "find", ->
+    customerToken = null
+
+    before (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100',
+          expirationDate: '05/2014'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        customerToken = response.customer.creditCards[0].token
+        done()
+
+    it "finds the card", (done) ->
+      specHelper.defaultGateway.creditCard.find customerToken, (err, creditCard) ->
+        assert.isNull(err)
+        assert.equal(creditCard.maskedNumber, '510510******5100')
+        assert.equal(creditCard.expirationDate, '05/2014')
+
+        done()
+
+    it "handles not finding the card", (done) ->
+      specHelper.defaultGateway.creditCard.find 'nonexistent_token', (err, creditCard) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
+
+    it "handles whitespace", (done) ->
+      specHelper.defaultGateway.creditCard.find ' ', (err, creditCard) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
+
+  describe "update", ->
+    creditCardToken = null
+    before (done) ->
+      customerParams =
+        creditCard:
+          cardholderName: 'Old Cardholder Name',
+          number: '5105105105105100',
+          expirationDate: '05/2014'
+          billingAddress:
+            streetAddress: '123 Old St',
+            locality: 'Old City',
+            region: 'Old Region'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        creditCardToken = response.customer.creditCards[0].token
+        done()
+
+    it "updates the card", (done) ->
+      updateParams =
+        cardholderName: 'New Cardholder Name',
+        number: '4111111111111111',
+        expirationDate: '12/2015'
+
+      specHelper.defaultGateway.creditCard.update creditCardToken, updateParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.cardholderName, 'New Cardholder Name')
+        assert.equal(response.creditCard.maskedNumber, '411111******1111')
+        assert.equal(response.creditCard.expirationDate, '12/2015')
+
+        done()
+
+    it "updates the billing address", (done) ->
+      updateParams =
+        cardholderName: 'New Cardholder Name'
+        number: '4111111111111111'
+        expirationDate: '12/2015'
+        billingAddress:
+          streetAddress: '123 New St'
+          locality: 'New City'
+          region: 'New Region'
+          options: 
+            updateExisting: true
+
+      specHelper.defaultGateway.creditCard.update creditCardToken, updateParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.creditCard.cardholderName, 'New Cardholder Name')
+        assert.equal(response.creditCard.maskedNumber, '411111******1111')
+        assert.equal(response.creditCard.expirationDate, '12/2015')
+        billingAddress = response.creditCard.billingAddress
+        assert.equal(billingAddress.streetAddress, '123 New St')
+        assert.equal(billingAddress.locality, 'New City')
+        assert.equal(billingAddress.region, 'New Region')
+
+        done()
+
+    it "handles errors", (done) ->
+      updateParams =
+        number: 'invalid'
+
+      specHelper.defaultGateway.creditCard.update creditCardToken, updateParams, (err, response) ->
+        assert.isFalse(response.success)
+        assert.equal(response.message, 'Credit card number must be 12-19 digits.')
+        assert.equal(
+          response.errors.for('creditCard').on('number')[0].code,
+          '81716'
+        )
+        assert.equal(
+          response.errors.for('creditCard').on('number')[0].attribute,
+          'number'
+        )
+        errorCodes = (error.code for error in response.errors.deepErrors())
+        assert.equal(1, errorCodes.length)
+        assert.include(errorCodes, '81716')
+
+        done()
