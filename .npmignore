@@ -1,0 +1,7 @@
+/ci.sh
+/.git
+/.gitignore
+/node_modules
+/spec_compiled
+/spec
+/src
