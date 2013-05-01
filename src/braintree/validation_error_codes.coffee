@@ -88,6 +88,16 @@ class ValidationErrorCodes
      NameFormatIsInvalid : "92201"
      InternationalPhoneFormatIsInvalid : "92205"
 
+  @ServiceFee =
+    AmountCannotBeNegative : "92501"
+    AmountFormatIsInvalid : "92503"
+    AmountIsRequired : "92502"
+    AmountIsTooLarge : "92504"
+    MerchantAccountCannotMatchTransactionMerchantAccount : "92507"
+    MerchantAccountCurrenciesMustMatch : "92508"
+    MerchantAccountIdIsInvalid : "92506"
+    MerchantAccountNotSupported : "92505"
+
   @SettlementBatchSummary =
     SettlementDateIsInvalid : "82302"
     SettlementDateIsRequired : "82301"
@@ -197,9 +207,12 @@ class ValidationErrorCodes
     SubscriptionDoesNotBelongToCustomer : "91529"
     SubscriptionIdIsInvalid : "91528"
     SubscriptionStatusMustBePastDue : "91531"
+    SubMerchantAccountRequiresServiceFee : "91553"
     TaxAmountCannotBeNegative : "81534"
     TaxAmountFormatIsInvalid : "81535"
     TaxAmountIsTooLarge : "81536"
+    TransactionServiceFeeIsNotAllowedOnCredits : "91552"
+    TransactionSettlementAmountIsLessThanServiceFeeAmount : "91551"
     TypeIsInvalid : "91523"
     TypeIsRequired : "91524"
     UnsupportedVoiceAuthorization : "91539"
