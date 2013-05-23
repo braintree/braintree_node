@@ -80,6 +80,7 @@ class ValidationErrorCodes
     Options:
       UpdateExistingTokenIsInvalid : "91723"
       VerificationMerchantAccountIdIsInvalid : "91728"
+      UpdateExistingTokenNotAllowed : "91729"
 
    @Descriptor =
      InternationalNameFormatIsInvalid : "92204"
