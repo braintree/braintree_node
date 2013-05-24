@@ -89,6 +89,15 @@ class ValidationErrorCodes
      NameFormatIsInvalid : "92201"
      InternationalPhoneFormatIsInvalid : "92205"
 
+   @MerchantAccount =
+     IdIsTooLong : "82602"
+     IdFormatIsInvalid : "82603"
+     IdIsInUse : "82604"
+     IdIsNotAllowed : "82605"
+     MasterMerchantAccountIdIsRequired : "82606"
+     MasterMerchantAccountIdIsInvalid : "82607"
+     MasterMerchantAccountMustBeActive : "82608"
+
   @SettlementBatchSummary =
     SettlementDateIsInvalid : "82302"
     SettlementDateIsRequired : "82301"
