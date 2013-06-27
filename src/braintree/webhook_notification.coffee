@@ -1,4 +1,5 @@
 {AttributeSetter} = require('./attribute_setter')
+{MerchantAccount} = require('./merchant_account')
 {Subscription} = require('./subscription')
 
 class WebhookNotification extends AttributeSetter
@@ -10,9 +11,16 @@ class WebhookNotification extends AttributeSetter
     SubscriptionTrialEnded: "subscription_trial_ended"
     SubscriptionWentActive: "subscription_went_active"
     SubscriptionWentPastDue: "subscription_went_past_due"
+    MerchantAccountApproved: "merchant_account_approved"
+    MerchantAccountDeclined: "merchant_account_declined"
 
   constructor: (attributes) ->
     super attributes
-    @subscription = new Subscription(attributes.subject.subscription)
+
+    if attributes.subject.subscription?
+      @subscription = new Subscription(attributes.subject.subscription)
+
+    if attributes.subject.merchantAccount?
+      @merchantAccount = new MerchantAccount(attributes.subject.merchantAccount)
 
 exports.WebhookNotification = WebhookNotification

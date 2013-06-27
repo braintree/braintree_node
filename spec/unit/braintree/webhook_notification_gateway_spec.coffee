@@ -51,3 +51,27 @@ describe "WebhookNotificationGateway", ->
       specHelper.defaultGateway.webhookNotification.parse "#{signature}bad", payload, (err, webhookNotification) ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
         done()
+
+    it "returns a parsable signature and payload for merchant account approvals", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.MerchantAccountApproved,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.MerchantAccountApproved)
+        assert.equal(webhookNotification.merchantAccount.id, "my_id")
+        assert.ok(webhookNotification.timestamp?)
+        done()
+
+    it "returns a parsable signature and payload for merchant account declines", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.MerchantAccountDeclined,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.MerchantAccountDeclined)
+        assert.equal(webhookNotification.merchantAccount.id, "my_id")
+        assert.ok(webhookNotification.timestamp?)
+        done()

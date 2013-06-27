@@ -1,6 +1,7 @@
 {Buffer} = require('buffer')
 {Digest} = require('./digest')
 {Gateway} = require('./gateway')
+{WebhookNotification} = require('./webhook_notification')
 dateFormat = require('dateformat')
 
 class WebhookTestingGateway extends Gateway
@@ -19,11 +20,31 @@ class WebhookTestingGateway extends Gateway
     <notification>
         <timestamp type="datetime">#{dateFormat(new Date(), dateFormat.masks.isoUtcDateTime, true)}</timestamp>
         <kind>#{kind}</kind>
-        <subject>#{@subscriptionSampleXml(id)}</subject>
+        <subject>#{@subjectXmlFor(kind, id)}</subject>
     </notification>
     """
 
-  subscriptionSampleXml: (id) ->
+  subjectXmlFor: (kind, id) ->
+    switch kind
+      when WebhookNotification.Kind.MerchantAccountApproved then @subjectXmlForMerchantAccountApproved(id)
+      when WebhookNotification.Kind.MerchantAccountDeclined then @subjectXmlForMerchantAccountDeclined(id)
+      else @subjectXmlForSubscription(id)
+
+  subjectXmlForMerchantAccountApproved: (id) ->
+    """
+    <merchant_account>
+      <id>#{id}</id>
+    </merchant_account>
+    """
+
+  subjectXmlForMerchantAccountDeclined: (id) ->
+    """
+    <merchant_account>
+      <id>#{id}</id>
+    </merchant_account>
+    """
+
+  subjectXmlForSubscription: (id) ->
     """
     <subscription>
         <id>#{id}</id>
