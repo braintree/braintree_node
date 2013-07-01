@@ -306,7 +306,7 @@ describe "TransactionGateway", ->
           assert.isFalse(response.success)
           assert.equal(
             response.errors.for('transaction').on('merchantAccountId')[0].code,
-            ValidationErrorCodes.Transaction.SubMerchantAccountRequiresServiceFee
+            ValidationErrorCodes.Transaction.SubMerchantAccountRequiresServiceFeeAmount
           )
 
           done()
