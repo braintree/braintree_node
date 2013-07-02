@@ -1,6 +1,7 @@
 {AttributeSetter} = require('./attribute_setter')
 {MerchantAccount} = require('./merchant_account')
 {Subscription} = require('./subscription')
+{ValidationErrorsCollection} = require('./validation_errors_collection')
 
 class WebhookNotification extends AttributeSetter
   @Kind =
@@ -17,10 +18,19 @@ class WebhookNotification extends AttributeSetter
   constructor: (attributes) ->
     super attributes
 
-    if attributes.subject.subscription?
-      @subscription = new Subscription(attributes.subject.subscription)
+    if attributes.subject.apiErrorResponse?
+      wrapper_node = attributes.subject.apiErrorResponse
+    else
+      wrapper_node = attributes.subject
 
-    if attributes.subject.merchantAccount?
-      @merchantAccount = new MerchantAccount(attributes.subject.merchantAccount)
+    if wrapper_node.subscription?
+      @subscription = new Subscription(wrapper_node.subscription)
+
+    if wrapper_node.merchantAccount?
+      @merchantAccount = new MerchantAccount(wrapper_node.merchantAccount)
+
+    if wrapper_node.errors?
+      @errors = new ValidationErrorsCollection(wrapper_node.errors)
+      @message = wrapper_node.message
 
 exports.WebhookNotification = WebhookNotification

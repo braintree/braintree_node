@@ -37,10 +37,39 @@ class WebhookTestingGateway extends Gateway
     </merchant_account>
     """
 
+  errorSampleXml: (error) ->
+    """
+    <error>
+      <code>82609</code>
+      <message>Credit score is too low</message>
+      <attribute type=\"symbol\">base</attribute>
+    </error>
+    """
+
   subjectXmlForMerchantAccountDeclined: (id) ->
+    """
+    <api-error-response>
+      <message>Credit score is too low</message>
+      <errors>
+        <merchant-account>
+          <errors type="array">
+            #{@errorSampleXml()}
+          </errors>
+        </merchant-account>
+      </errors>
+      #{@merchantAccountSampleXml(id)}
+    </api-error-response>
+    """
+
+  merchantAccountSampleXml: (id) ->
     """
     <merchant_account>
       <id>#{id}</id>
+      <master_merchant_account>
+        <id>master_ma_for_#{id}</id>
+        <status>suspended</status>
+      </master_merchant_account>
+      <status>suspended</status>
     </merchant_account>
     """
 

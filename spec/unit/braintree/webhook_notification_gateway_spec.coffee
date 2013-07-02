@@ -73,5 +73,7 @@ describe "WebhookNotificationGateway", ->
       specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.MerchantAccountDeclined)
         assert.equal(webhookNotification.merchantAccount.id, "my_id")
+        assert.equal(webhookNotification.errors.for("merchantAccount").on("base")[0].code, "82609")
+        assert.equal(webhookNotification.message, "Credit score is too low")
         assert.ok(webhookNotification.timestamp?)
         done()
