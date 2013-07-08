@@ -40,7 +40,7 @@ class WebhookTestingGateway extends Gateway
   errorSampleXml: (error) ->
     """
     <error>
-      <code>82609</code>
+      <code>82621</code>
       <message>Credit score is too low</message>
       <attribute type=\"symbol\">base</attribute>
     </error>
