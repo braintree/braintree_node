@@ -79,3 +79,16 @@ describe "WebhookNotificationGateway", ->
         assert.equal(webhookNotification.message, "Credit score is too low")
         assert.ok(webhookNotification.timestamp?)
         done()
+
+    it "returns a parsable signature and payload for disbursed transaction", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.TransactionDisbursed,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionDisbursed)
+        assert.equal(webhookNotification.transaction.id, "my_id")
+        assert.equal(webhookNotification.transaction.amount, '100')
+        assert.ok(webhookNotification.transaction.disbursementDetails.disbursementDate?)
+        done()

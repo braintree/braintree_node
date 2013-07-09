@@ -26,9 +26,21 @@ class WebhookTestingGateway extends Gateway
 
   subjectXmlFor: (kind, id) ->
     switch kind
+      when WebhookNotification.Kind.TransactionDisbursed then @subjectXmlForTransactionDisbursed(id)
       when WebhookNotification.Kind.MerchantAccountApproved then @subjectXmlForMerchantAccountApproved(id)
       when WebhookNotification.Kind.MerchantAccountDeclined then @subjectXmlForMerchantAccountDeclined(id)
       else @subjectXmlForSubscription(id)
+
+  subjectXmlForTransactionDisbursed: (id) ->
+    """
+    <transaction>
+      <id>#{id}</id>
+      <amount>100</amount>
+      <disbursement-details>
+        <disbursement-date type="datetime">2013-07-09T18:23:29Z</disbursement-date>
+      </disbursement-details>
+    </transaction>
+    """
 
   subjectXmlForMerchantAccountApproved: (id) ->
     """
