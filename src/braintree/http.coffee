@@ -70,6 +70,20 @@ class Http
         else
           callback(null, null)
       )
+
+      response.on('error', (err) ->
+        error = exceptions.UnexpectedError('Unexpected response error: ' + err)
+        return callback(error, null)
+      )
+    )
+
+    theRequest.setTimeout(60000, ->
+      error = exceptions.ServerError()
+      return callback(error, null)
+    )
+    theRequest.on('error', (err) ->
+      error = exceptions.UnexpectedError('Unexpected request error: ' + err)
+      return callback(error, null)
     )
     theRequest.write(requestBody) if body
     theRequest.end()
