@@ -27,8 +27,8 @@ class WebhookTestingGateway extends Gateway
   subjectXmlFor: (kind, id) ->
     switch kind
       when WebhookNotification.Kind.TransactionDisbursed then @subjectXmlForTransactionDisbursed(id)
-      when WebhookNotification.Kind.MerchantAccountApproved then @subjectXmlForMerchantAccountApproved(id)
-      when WebhookNotification.Kind.MerchantAccountDeclined then @subjectXmlForMerchantAccountDeclined(id)
+      when WebhookNotification.Kind.SubMerchantAccountApproved then @subjectXmlForSubMerchantAccountApproved(id)
+      when WebhookNotification.Kind.SubMerchantAccountDeclined then @subjectXmlForSubMerchantAccountDeclined(id)
       else @subjectXmlForSubscription(id)
 
   subjectXmlForTransactionDisbursed: (id) ->
@@ -42,7 +42,7 @@ class WebhookTestingGateway extends Gateway
     </transaction>
     """
 
-  subjectXmlForMerchantAccountApproved: (id) ->
+  subjectXmlForSubMerchantAccountApproved: (id) ->
     """
     <merchant_account>
       <id>#{id}</id>
@@ -58,7 +58,7 @@ class WebhookTestingGateway extends Gateway
     </error>
     """
 
-  subjectXmlForMerchantAccountDeclined: (id) ->
+  subjectXmlForSubMerchantAccountDeclined: (id) ->
     """
     <api-error-response>
       <message>Credit score is too low</message>

@@ -56,24 +56,24 @@ describe "WebhookNotificationGateway", ->
 
     it "returns a parsable signature and payload for merchant account approvals", (done) ->
       {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
-        WebhookNotification.Kind.MerchantAccountApproved,
+        WebhookNotification.Kind.SubMerchantAccountApproved,
         "my_id"
       )
 
       specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
-        assert.equal(webhookNotification.kind, WebhookNotification.Kind.MerchantAccountApproved)
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubMerchantAccountApproved)
         assert.equal(webhookNotification.merchantAccount.id, "my_id")
         assert.ok(webhookNotification.timestamp?)
         done()
 
     it "returns a parsable signature and payload for merchant account declines", (done) ->
       {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
-        WebhookNotification.Kind.MerchantAccountDeclined,
+        WebhookNotification.Kind.SubMerchantAccountDeclined,
         "my_id"
       )
 
       specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
-        assert.equal(webhookNotification.kind, WebhookNotification.Kind.MerchantAccountDeclined)
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubMerchantAccountDeclined)
         assert.equal(webhookNotification.merchantAccount.id, "my_id")
         assert.equal(webhookNotification.errors.for("merchantAccount").on("base")[0].code, ValidationErrorCodes.MerchantAccount.ApplicantDetails.DeclinedOFAC)
         assert.equal(webhookNotification.message, "Credit score is too low")

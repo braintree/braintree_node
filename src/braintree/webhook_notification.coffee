@@ -13,8 +13,8 @@ class WebhookNotification extends AttributeSetter
     SubscriptionTrialEnded: "subscription_trial_ended"
     SubscriptionWentActive: "subscription_went_active"
     SubscriptionWentPastDue: "subscription_went_past_due"
-    MerchantAccountApproved: "merchant_account_approved"
-    MerchantAccountDeclined: "merchant_account_declined"
+    SubMerchantAccountApproved: "sub_merchant_account_approved"
+    SubMerchantAccountDeclined: "sub_merchant_account_declined"
     TransactionDisbursed: "transaction_disbursed"
 
   constructor: (attributes) ->
