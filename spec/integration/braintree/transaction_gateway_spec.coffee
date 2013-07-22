@@ -421,7 +421,7 @@ describe "TransactionGateway", ->
             done()
 
     context "holdForEscrow", ->
-      it.only "can hold authorized or submitted for settlement transactions for escrow", (done) ->
+      it "can hold authorized or submitted for settlement transactions for escrow", (done) ->
         transactionParams =
           merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
           amount: '10.00'
@@ -439,7 +439,7 @@ describe "TransactionGateway", ->
             )
             done()
 
-      it.only "cannot hold settled transactions for escrow", (done) ->
+      it "cannot hold settled transactions for escrow", (done) ->
         transactionParams =
           merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
           amount: '10.00'
