@@ -43,6 +43,13 @@ addOns = {
   increase20: 'increase_20'
 }
 
+escrowTransaction = (transactionId, callback) ->
+  defaultGateway.http.put(
+    "/transactions/#{transactionId}/escrow",
+    null,
+    callback
+  )
+
 makePastDue = (subscription, callback) ->
   defaultGateway.http.put(
     "/subscriptions/#{subscription.id}/make_past_due?days_past_due=1",
@@ -116,6 +123,7 @@ GLOBAL.specHelper = {
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
   doesNotInclude: doesNotInclude
+  escrowTransaction: escrowTransaction
   makePastDue: makePastDue
   multiplyString: multiplyString
   nowInEastern: nowInEastern
