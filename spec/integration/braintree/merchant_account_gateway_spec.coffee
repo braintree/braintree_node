@@ -6,6 +6,7 @@ braintree = specHelper.braintree
 
 merchantAccountParams =
   applicant_details:
+    company_name: "Waterfalls, inc"
     first_name: "Joe"
     last_name: "Bloggs"
     email: "joe@bloggs.com"
@@ -16,7 +17,8 @@ merchantAccountParams =
       region: "IL"
     date_of_birth: "10/9/1980"
     ssn: "123-000-1234"
-    routing_number: "1234567890"
+    tax_id: "123456789"
+    routing_number: "122100024"
     account_number: "43759348798"
   tos_accepted: true
   master_merchant_account_id: "sandbox_master_merchant_account"
