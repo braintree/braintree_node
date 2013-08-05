@@ -77,6 +77,7 @@ class ValidationErrorCodes
     TokenIsRequired : "91722"
     TokenIsTooLong : "91720"
     VenmoSDKPaymentMethodCodeCardTypeIsNotAccepted : "91726"
+    VerificationNotSupportedOnThisMerchantAccount : "91730"
     Options:
       UpdateExistingTokenIsInvalid : "91723"
       VerificationMerchantAccountIdIsInvalid : "91728"
