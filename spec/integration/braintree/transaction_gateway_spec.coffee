@@ -363,14 +363,14 @@ describe "TransactionGateway", ->
           assert.isFalse(response.success)
           assert.equal(
             response.errors.for('transaction').on('base')[0].code,
-            ValidationErrorCodes.Transaction.CannotHoldForEscrow
+            ValidationErrorCodes.Transaction.CannotHoldInEscrow
           )
           done()
 
-    context "submitForRelease", ->
+    context "releaseFromEscrow", ->
       it "can release an escrowed transaction", (done) ->
         createEscrowedTransaction (transaction) ->
-          specHelper.defaultGateway.transaction.submitForRelease transaction.id, (err, response) ->
+          specHelper.defaultGateway.transaction.releaseFromEscrow transaction.id, (err, response) ->
             assert.isNull(err)
             assert.isTrue(response.success)
             assert.equal(response.transaction.escrowStatus, Transaction.EscrowStatus.ReleasePending)
@@ -387,19 +387,19 @@ describe "TransactionGateway", ->
           options:
             holdInEscrow: true
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          specHelper.defaultGateway.transaction.submitForRelease response.transaction.id, (err, response) ->
+          specHelper.defaultGateway.transaction.releaseFromEscrow response.transaction.id, (err, response) ->
             assert.isNull(err)
             assert.isFalse(response.success)
             assert.equal(
               response.errors.for('transaction').on('base')[0].code,
-              ValidationErrorCodes.Transaction.CannotSubmitForRelease
+              ValidationErrorCodes.Transaction.CannotReleaseFromEscrow
             )
             done()
 
     context "cancelRelease", ->
       it "can cancel release for a transaction that has been submitted for release", (done) ->
         createEscrowedTransaction (transaction) ->
-          specHelper.defaultGateway.transaction.submitForRelease transaction.id, (err, response) ->
+          specHelper.defaultGateway.transaction.releaseFromEscrow transaction.id, (err, response) ->
             specHelper.defaultGateway.transaction.cancelRelease transaction.id, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
@@ -455,7 +455,7 @@ describe "TransactionGateway", ->
               assert.isFalse(response.success)
               assert.equal(
                 response.errors.for('transaction').on('base')[0].code,
-                ValidationErrorCodes.Transaction.CannotHoldForEscrow
+                ValidationErrorCodes.Transaction.CannotHoldInEscrow
               )
               done()
 
