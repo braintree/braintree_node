@@ -34,8 +34,8 @@ class TransactionGateway extends Gateway
         else
           callback(null, new Transaction(response.transaction))
 
-  holdForEscrow: (transactionId, callback) ->
-    @gateway.http.put("/transactions/#{transactionId}/hold_for_escrow",
+  holdInEscrow: (transactionId, callback) ->
+    @gateway.http.put("/transactions/#{transactionId}/hold_in_escrow",
       {},
       @responseHandler(callback)
     )

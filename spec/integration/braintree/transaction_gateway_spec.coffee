@@ -31,7 +31,7 @@ createEscrowedTransaction = (callback) ->
       number: '5105105105105100'
       expirationDate: '05/2012'
     options:
-      holdForEscrow: true
+      holdInEscrow: true
 
   specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
     specHelper.escrowTransaction result.transaction.id, (err, settleResult) ->
@@ -338,13 +338,13 @@ describe "TransactionGateway", ->
             number: "4111111111111111"
             expirationDate: '05/12'
           options:
-            holdForEscrow: true
+            holdInEscrow: true
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.equal(
             response.transaction.escrowStatus,
-            Transaction.EscrowStatus.SubmittedForEscrow
+            Transaction.EscrowStatus.HoldPending
           )
           done()
 
@@ -357,7 +357,7 @@ describe "TransactionGateway", ->
             number: "4111111111111111"
             expirationDate: '05/12'
           options:
-            holdForEscrow: true
+            holdInEscrow: true
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
           assert.isNull(err)
           assert.isFalse(response.success)
@@ -373,7 +373,7 @@ describe "TransactionGateway", ->
           specHelper.defaultGateway.transaction.submitForRelease transaction.id, (err, response) ->
             assert.isNull(err)
             assert.isTrue(response.success)
-            assert.equal(response.transaction.escrowStatus, Transaction.EscrowStatus.SubmittedForRelease)
+            assert.equal(response.transaction.escrowStatus, Transaction.EscrowStatus.ReleasePending)
             done()
 
       it "cannot submit a non-escrowed transaction for release", (done) ->
@@ -385,7 +385,7 @@ describe "TransactionGateway", ->
             number: "4111111111111111"
             expirationDate: '05/12'
           options:
-            holdForEscrow: true
+            holdInEscrow: true
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
           specHelper.defaultGateway.transaction.submitForRelease response.transaction.id, (err, response) ->
             assert.isNull(err)
@@ -405,7 +405,7 @@ describe "TransactionGateway", ->
               assert.isTrue(response.success)
               assert.equal(
                 response.transaction.escrowStatus,
-                Transaction.EscrowStatus.HeldInEscrow
+                Transaction.EscrowStatus.Held
               )
               done()
 
@@ -420,7 +420,7 @@ describe "TransactionGateway", ->
             )
             done()
 
-    context "holdForEscrow", ->
+    context "holdInEscrow", ->
       it "can hold authorized or submitted for settlement transactions for escrow", (done) ->
         transactionParams =
           merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
@@ -430,12 +430,12 @@ describe "TransactionGateway", ->
             number: "4111111111111111"
             expirationDate: '05/12'
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          specHelper.defaultGateway.transaction.holdForEscrow response.transaction.id, (err, response) ->
+          specHelper.defaultGateway.transaction.holdInEscrow response.transaction.id, (err, response) ->
             assert.isNull(err)
             assert.isTrue(response.success)
             assert.equal(
               response.transaction.escrowStatus,
-              Transaction.EscrowStatus.SubmittedForEscrow
+              Transaction.EscrowStatus.HoldPending
             )
             done()
 
@@ -451,7 +451,7 @@ describe "TransactionGateway", ->
             submitForSettlement: true
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
           specHelper.settleTransaction response.transaction.id, (err, response) ->
-            specHelper.defaultGateway.transaction.holdForEscrow response.transaction.id, (err, response) ->
+            specHelper.defaultGateway.transaction.holdInEscrow response.transaction.id, (err, response) ->
               assert.isFalse(response.success)
               assert.equal(
                 response.errors.for('transaction').on('base')[0].code,
