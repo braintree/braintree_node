@@ -10,6 +10,7 @@ merchantAccountParams =
     first_name: "Joe"
     last_name: "Bloggs"
     email: "joe@bloggs.com"
+    phone: "555-555-5555"
     address:
       street_address: "123 Credibility St."
       postal_code: "60606"
