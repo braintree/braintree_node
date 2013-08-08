@@ -106,7 +106,7 @@ class ValidationErrorCodes
       Declined : "82626"
       DeclinedMasterCardMatch : "82622"
       DeclinedOFAC : "82621"
-      DeclinedPreciseId : "82623"
+      DeclinedFailedKYC : "82623"
       DeclinedSsnInvalid : "82624"
       DeclinedSsnMatchesDeceased : "82625"
       EmailAddressIsInvalid : "82616"
