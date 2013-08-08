@@ -114,6 +114,7 @@ class ValidationErrorCodes
       FirstNameIsRequired : "82609"
       LastNameIsInvalid : "82628"
       LastNameIsRequired : "82611"
+      PhoneIsInvalid : "82636"
       RoutingNumberIsInvalid : "82635"
       RoutingNumberIsRequired : "82613"
       SsnIsInvalid : "82615"
