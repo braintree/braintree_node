@@ -471,6 +471,22 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "can use venmo sdk session", (done) ->
+      transactionParams =
+        amount: '1.00'
+        creditCard:
+          number: "4111111111111111"
+          expirationDate: '05/12'
+        options:
+          venmoSdkSession: VenmoSdk.Session
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.isTrue(response.transaction.creditCard.venmoSdk)
+
+        done()
+
   describe "find", ->
     it "finds a transaction", (done) ->
       transactionParams =

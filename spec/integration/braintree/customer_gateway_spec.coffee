@@ -213,6 +213,21 @@ describe "CustomerGateway", ->
 
         done()
 
+    it "creates a customer with venmo sdk session", (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/2012'
+          options:
+            venmoSdkSession: VenmoSdk.Session
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.isTrue(response.customer.creditCards[0].venmoSdk)
+
+        done()
+
 
   describe "delete", ->
     it "deletes a customer", (done) ->
