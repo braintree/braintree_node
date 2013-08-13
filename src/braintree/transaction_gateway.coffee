@@ -8,6 +8,12 @@ _ = require('underscore')
 class TransactionGateway extends Gateway
   constructor: (@gateway) ->
 
+  cancelRelease: (transactionId, callback) ->
+    @gateway.http.put("/transactions/#{transactionId}/cancel_release",
+      {},
+      @responseHandler(callback)
+    )
+
   cloneTransaction: (transactionId, attributes, callback) ->
     @gateway.http.post("/transactions/#{transactionId}/clone", {transactionClone: attributes}, @responseHandler(callback))
 
@@ -28,6 +34,12 @@ class TransactionGateway extends Gateway
         else
           callback(null, new Transaction(response.transaction))
 
+  holdInEscrow: (transactionId, callback) ->
+    @gateway.http.put("/transactions/#{transactionId}/hold_in_escrow",
+      {},
+      @responseHandler(callback)
+    )
+
   refund: (transactionId, amount..., callback) ->
     @gateway.http.post("/transactions/#{transactionId}/refund", {transaction: {amount: amount[0]}}, @responseHandler(callback))
 
@@ -43,6 +55,12 @@ class TransactionGateway extends Gateway
     fn(search)
     @gateway.http.post("/transactions/advanced_search_ids",
       { search : search.toHash() }, @searchResponseHandler(@pagingFunctionGenerator(search), callback))
+
+  releaseFromEscrow: (transactionId, callback) ->
+    @gateway.http.put("/transactions/#{transactionId}/release_from_escrow",
+      {},
+      @responseHandler(callback)
+    )
 
   submitForSettlement: (transactionId, amount..., callback) ->
     @gateway.http.put("/transactions/#{transactionId}/submit_for_settlement",

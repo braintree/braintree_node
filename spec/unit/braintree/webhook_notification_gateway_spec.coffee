@@ -1,4 +1,6 @@
 require('../../spec_helper')
+
+{ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 {WebhookNotification} = require('../../../lib/braintree/webhook_notification')
 errorTypes = require('../../../lib/braintree/error_types')
 
@@ -50,4 +52,43 @@ describe "WebhookNotificationGateway", ->
 
       specHelper.defaultGateway.webhookNotification.parse "#{signature}bad", payload, (err, webhookNotification) ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
+        done()
+
+    it "returns a parsable signature and payload for merchant account approvals", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubMerchantAccountApproved,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubMerchantAccountApproved)
+        assert.equal(webhookNotification.merchantAccount.id, "my_id")
+        assert.ok(webhookNotification.timestamp?)
+        done()
+
+    it "returns a parsable signature and payload for merchant account declines", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubMerchantAccountDeclined,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubMerchantAccountDeclined)
+        assert.equal(webhookNotification.merchantAccount.id, "my_id")
+        assert.equal(webhookNotification.errors.for("merchantAccount").on("base")[0].code, ValidationErrorCodes.MerchantAccount.ApplicantDetails.DeclinedOFAC)
+        assert.equal(webhookNotification.message, "Credit score is too low")
+        assert.ok(webhookNotification.timestamp?)
+        done()
+
+    it "returns a parsable signature and payload for disbursed transaction", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.TransactionDisbursed,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionDisbursed)
+        assert.equal(webhookNotification.transaction.id, "my_id")
+        assert.equal(webhookNotification.transaction.amount, '100')
+        assert.ok(webhookNotification.transaction.disbursementDetails.disbursementDate?)
         done()

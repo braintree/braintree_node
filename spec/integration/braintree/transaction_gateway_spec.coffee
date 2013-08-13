@@ -6,6 +6,7 @@ braintree = specHelper.braintree
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
+{Transaction} = require('../../../lib/braintree/transaction')
 
 createTransactionToRefund = (callback) ->
   transactionParams =
@@ -18,6 +19,22 @@ createTransactionToRefund = (callback) ->
 
   specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
     specHelper.settleTransaction result.transaction.id, (err, settleResult) ->
+      specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
+        callback(transaction)
+
+createEscrowedTransaction = (callback) ->
+  transactionParams =
+    merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
+    amount: '5.00'
+    serviceFeeAmount: '1.00'
+    creditCard:
+      number: '5105105105105100'
+      expirationDate: '05/2012'
+    options:
+      holdInEscrow: true
+
+  specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
+    specHelper.escrowTransaction result.transaction.id, (err, settleResult) ->
       specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
         callback(transaction)
 
@@ -257,6 +274,191 @@ describe "TransactionGateway", ->
 
         done()
 
+    context "with a service fee", ->
+      it "persists the service fee", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
+          amount: '5.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/12'
+          serviceFeeAmount: '1.00'
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.serviceFeeAmount, '1.00')
+
+          done()
+
+      it "handles validation errors on service fees", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
+          amount: '1.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/12'
+          serviceFeeAmount: '5.00'
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').on('serviceFeeAmount')[0].code,
+            ValidationErrorCodes.Transaction.ServiceFeeAmountIsTooLarge
+          )
+
+          done()
+
+      it "sub merchant accounts must provide a service fee", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
+          amount: '1.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/12'
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').on('merchantAccountId')[0].code,
+            ValidationErrorCodes.Transaction.SubMerchantAccountRequiresServiceFeeAmount
+          )
+
+          done()
+
+    context "with escrow status", ->
+      it "can specify transactions to be held for escrow", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '10.00'
+          serviceFeeAmount: '1.00'
+          creditCard:
+            number: "4111111111111111"
+            expirationDate: '05/12'
+          options:
+            holdInEscrow: true
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(
+            response.transaction.escrowStatus,
+            Transaction.EscrowStatus.HoldPending
+          )
+          done()
+
+      it "can not be held for escrow if not a submerchant", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.defaultMerchantAccountId,
+          amount: '10.00'
+          serviceFeeAmount: '1.00'
+          creditCard:
+            number: "4111111111111111"
+            expirationDate: '05/12'
+          options:
+            holdInEscrow: true
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').on('base')[0].code,
+            ValidationErrorCodes.Transaction.CannotHoldInEscrow
+          )
+          done()
+
+    context "releaseFromEscrow", ->
+      it "can release an escrowed transaction", (done) ->
+        createEscrowedTransaction (transaction) ->
+          specHelper.defaultGateway.transaction.releaseFromEscrow transaction.id, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.escrowStatus, Transaction.EscrowStatus.ReleasePending)
+            done()
+
+      it "cannot submit a non-escrowed transaction for release", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '10.00'
+          serviceFeeAmount: '1.00'
+          creditCard:
+            number: "4111111111111111"
+            expirationDate: '05/12'
+          options:
+            holdInEscrow: true
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          specHelper.defaultGateway.transaction.releaseFromEscrow response.transaction.id, (err, response) ->
+            assert.isNull(err)
+            assert.isFalse(response.success)
+            assert.equal(
+              response.errors.for('transaction').on('base')[0].code,
+              ValidationErrorCodes.Transaction.CannotReleaseFromEscrow
+            )
+            done()
+
+    context "cancelRelease", ->
+      it "can cancel release for a transaction that has been submitted for release", (done) ->
+        createEscrowedTransaction (transaction) ->
+          specHelper.defaultGateway.transaction.releaseFromEscrow transaction.id, (err, response) ->
+            specHelper.defaultGateway.transaction.cancelRelease transaction.id, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(
+                response.transaction.escrowStatus,
+                Transaction.EscrowStatus.Held
+              )
+              done()
+
+      it "cannot cancel release a transaction that has not been submitted for release", (done) ->
+        createEscrowedTransaction (transaction) ->
+          specHelper.defaultGateway.transaction.cancelRelease transaction.id, (err, response) ->
+            assert.isNull(err)
+            assert.isFalse(response.success)
+            assert.equal(
+              response.errors.for('transaction').on('base')[0].code,
+              ValidationErrorCodes.Transaction.CannotCancelRelease
+            )
+            done()
+
+    context "holdInEscrow", ->
+      it "can hold authorized or submitted for settlement transactions for escrow", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '10.00'
+          serviceFeeAmount: '1.00'
+          creditCard:
+            number: "4111111111111111"
+            expirationDate: '05/12'
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          specHelper.defaultGateway.transaction.holdInEscrow response.transaction.id, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(
+              response.transaction.escrowStatus,
+              Transaction.EscrowStatus.HoldPending
+            )
+            done()
+
+      it "cannot hold settled transactions for escrow", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '10.00'
+          serviceFeeAmount: '1.00'
+          creditCard:
+            number: "4111111111111111"
+            expirationDate: '05/12'
+          options:
+            submitForSettlement: true
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          specHelper.settleTransaction response.transaction.id, (err, response) ->
+            specHelper.defaultGateway.transaction.holdInEscrow response.transaction.id, (err, response) ->
+              assert.isFalse(response.success)
+              assert.equal(
+                response.errors.for('transaction').on('base')[0].code,
+                ValidationErrorCodes.Transaction.CannotHoldInEscrow
+              )
+              done()
+
     it "can use venmo sdk payment method codes", (done) ->
       transactionParams =
         amount: '1.00'
@@ -266,6 +468,22 @@ describe "TransactionGateway", ->
         assert.isNull(err)
         assert.isTrue(response.success)
         assert.equal(response.transaction.creditCard.bin, "411111")
+
+        done()
+
+    it "can use venmo sdk session", (done) ->
+      transactionParams =
+        amount: '1.00'
+        creditCard:
+          number: "4111111111111111"
+          expirationDate: '05/12'
+        options:
+          venmoSdkSession: VenmoSdk.Session
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.isTrue(response.transaction.creditCard.venmoSdk)
 
         done()
 
@@ -490,5 +708,4 @@ describe "TransactionGateway", ->
         specHelper.defaultGateway.transaction.cloneTransaction response.transaction.id, cloneParams, (err, response) ->
           assert.isTrue(response.success)
           assert.equal(response.transaction.status, 'submitted_for_settlement')
-
           done()

@@ -6,6 +6,12 @@ class Transaction extends AttributeSetter
   @CreatedUsing =
     FullInformation : 'full_information'
     Token : 'token'
+  @EscrowStatus =
+    HoldPending : 'hold_pending'
+    Held : 'held'
+    ReleasePending : 'release_pending'
+    Released : 'released'
+    Refunded : 'refunded'
   @Source =
     Api : 'api'
     ControlPanel : 'control_panel'
