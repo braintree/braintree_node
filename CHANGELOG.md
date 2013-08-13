@@ -1,3 +1,12 @@
+## 1.8.0
+
+* Adds holdInEscrow method
+* Add error codes for verification not supported error
+* Supports company_name and tax_id on merchant account create
+* Adds cancel_release method
+* Adds release_from_escrow functionality
+* Adds merchant account phone error code.
+
 ## 1.7.0
 
 * Adds disbursement details to transactions.
