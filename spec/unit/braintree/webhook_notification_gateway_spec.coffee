@@ -92,3 +92,31 @@ describe "WebhookNotificationGateway", ->
         assert.equal(webhookNotification.transaction.amount, '100')
         assert.ok(webhookNotification.transaction.disbursementDetails.disbursementDate?)
         done()
+
+
+    it "builds a sample notification for a partner user created webhook", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.PartnerUserCreated,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerUserCreated)
+        assert.equal(webhookNotification.partnerUser.publicKey, 'public_key')
+        assert.equal(webhookNotification.partnerUser.privateKey, 'private_key')
+        assert.equal(webhookNotification.partnerUser.merchantPublicId, 'public_id')
+        assert.equal(webhookNotification.partnerUser.partnerUserId, 'abc123')
+        assert.ok(webhookNotification.timestamp?)
+        done()
+
+    it "builds a sample notification for a partner user deleted webhook", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.PartnerUserDeleted,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerUserDeleted)
+        assert.equal(webhookNotification.partnerUser.partnerUserId, 'abc123')
+        assert.ok(webhookNotification.timestamp?)
+        done()
