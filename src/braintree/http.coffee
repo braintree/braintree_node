@@ -8,6 +8,8 @@ exceptions = require('./exceptions')
 {Util} = require('./util')
 
 class Http
+  timeout: 60000
+
   constructor: (@config) ->
     @parser = new xml2js.Parser
       explicitRoot: true
@@ -77,8 +79,8 @@ class Http
       )
     )
 
-    theRequest.setTimeout(60000, ->
-      error = exceptions.ServerError()
+    theRequest.setTimeout(@timeout, ->
+      error = exceptions.UnexpectedError()
       return callback(error, null)
     )
 
