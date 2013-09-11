@@ -120,3 +120,15 @@ describe "WebhookNotificationGateway", ->
         assert.equal(webhookNotification.partnerUser.partnerUserId, 'abc123')
         assert.ok(webhookNotification.timestamp?)
         done()
+
+    it "builds a sample notification for a partner merchant declined webhook", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.PartnerMerchantDeclined,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDeclined)
+        assert.equal(webhookNotification.partnerUser.partnerUserId, 'abc123')
+        assert.ok(webhookNotification.timestamp?)
+        done()

@@ -31,6 +31,7 @@ class WebhookTestingGateway extends Gateway
       when WebhookNotification.Kind.SubMerchantAccountDeclined then @subjectXmlForSubMerchantAccountDeclined(id)
       when WebhookNotification.Kind.PartnerUserCreated then @subjectXmlForPartnerUserCreated()
       when WebhookNotification.Kind.PartnerUserDeleted then @subjectXmlForPartnerUserDeleted()
+      when WebhookNotification.Kind.PartnerMerchantDeclined then @subjectXmlForPartnerMerchantDeclined()
       else @subjectXmlForSubscription(id)
 
   subjectXmlForTransactionDisbursed: (id) ->
@@ -108,6 +109,13 @@ class WebhookTestingGateway extends Gateway
     """
 
   subjectXmlForPartnerUserDeleted: () ->
+    """
+        <partner_user>
+          <partner_user_id>abc123</partner_user_id>
+        </partner_user>
+    """
+
+  subjectXmlForPartnerMerchantDeclined: () ->
     """
         <partner_user>
           <partner_user_id>abc123</partner_user_id>
