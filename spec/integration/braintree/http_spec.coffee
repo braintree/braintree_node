@@ -51,18 +51,16 @@ describe "Http", ->
 
         done()
 
-    # Pending Test (This is how you do it in mocha......)
-    # This test only fails due to the 'done' callback being called twice.
-    # Invalid test, which randomly fails.
+    xit "returns errors to the callback", (done) ->
+      # This test only fails due to the 'done' callback being called twice.
+      # Invalid test, which randomly fails.
+      http = new Http(new Config(
+        environment: new Environment('not_a_subdomain.braintreegateway.com', '12345', false)
+        merchantId: 'node'
+        publicKey: 'node'
+        privateKey: 'node'
+      ))
 
-    # it "returns errors to the callback", (done) ->
-    #   http = new Http(new Config(
-    #     environment: new Environment('not_a_subdomain.braintreegateway.com', '12345', false)
-    #     merchantId: 'node'
-    #     publicKey: 'node'
-    #     privateKey: 'node'
-    #   ))
-
-    #   http.timeout = 1
-    #   http.get '/not_a_real_url', (err, response) ->
-    #     assert.equal(err.type, braintree.errorTypes.unexpectedError)
+      http.timeout = 1
+      http.get '/not_a_real_url', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.unexpectedError)
