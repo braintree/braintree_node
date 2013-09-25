@@ -247,6 +247,19 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "handles fraud rejection", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: CreditCardNumbers.CardTypeIndicators.Fraud
+          expirationDate: '05/16'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isFalse(response.success)
+        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected)
+        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud)
+        done()
+
     it "handles validation errors", (done) ->
       transactionParams =
         creditCard:
@@ -674,7 +687,7 @@ describe "TransactionGateway", ->
 
           done()
 
-    it "handles validation erros", (done) ->
+    it "handles validation errors", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:
