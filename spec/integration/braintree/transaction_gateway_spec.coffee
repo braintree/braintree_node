@@ -97,6 +97,7 @@ describe "TransactionGateway", ->
         assert.equal(response.transaction.type, 'sale')
         assert.equal(response.transaction.amount, '5.00')
         assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100')
+        assert.isNull(response.transaction.voiceReferralNumber)
 
         done()
 
