@@ -29,8 +29,8 @@ class WebhookTestingGateway extends Gateway
       when WebhookNotification.Kind.TransactionDisbursed then @subjectXmlForTransactionDisbursed(id)
       when WebhookNotification.Kind.SubMerchantAccountApproved then @subjectXmlForSubMerchantAccountApproved(id)
       when WebhookNotification.Kind.SubMerchantAccountDeclined then @subjectXmlForSubMerchantAccountDeclined(id)
-      when WebhookNotification.Kind.PartnerUserCreated then @subjectXmlForPartnerUserCreated()
-      when WebhookNotification.Kind.PartnerUserDeleted then @subjectXmlForPartnerUserDeleted()
+      when WebhookNotification.Kind.PartnerMerchantConnected then @subjectXmlForPartnerMerchantConnected()
+      when WebhookNotification.Kind.PartnerMerchantDisconnected then @subjectXmlForPartnerMerchantDisconnected()
       when WebhookNotification.Kind.PartnerMerchantDeclined then @subjectXmlForPartnerMerchantDeclined()
       else @subjectXmlForSubscription(id)
 
@@ -98,28 +98,29 @@ class WebhookTestingGateway extends Gateway
     </subscription>
     """
 
-  subjectXmlForPartnerUserCreated: () ->
+  subjectXmlForPartnerMerchantConnected: () ->
     """
-        <partner_user>
+        <partner_merchant>
           <merchant_public_id>public_id</merchant_public_id>
           <public_key>public_key</public_key>
           <private_key>private_key</private_key>
-          <partner_user_id>abc123</partner_user_id>
-        </partner_user>
+          <partner_merchant_id>abc123</partner_merchant_id>
+          <client_side_encryption_key>cse_key</partner_merchant_id>
+        </partner_merchant>
     """
 
-  subjectXmlForPartnerUserDeleted: () ->
+  subjectXmlForPartnerMerchantDisconnected: () ->
     """
-        <partner_user>
-          <partner_user_id>abc123</partner_user_id>
-        </partner_user>
+        <partner_merchant>
+          <partner_merchant_id>abc123</partner_merchant_id>
+        </partner_merchant>
     """
 
   subjectXmlForPartnerMerchantDeclined: () ->
     """
-        <partner_user>
-          <partner_user_id>abc123</partner_user_id>
-        </partner_user>
+        <partner_merchant>
+          <partner_merchant_id>abc123</partner_merchant_id>
+        </partner_merchant>
     """
 
 exports.WebhookTestingGateway = WebhookTestingGateway

@@ -1,14 +1,14 @@
 {AttributeSetter} = require('./attribute_setter')
 {MerchantAccount} = require('./merchant_account')
 {Transaction} = require('./transaction')
-{PartnerUser} = require('./partner_user')
+{PartnerMerchant} = require('./partner_merchant')
 {Subscription} = require('./subscription')
 {ValidationErrorsCollection} = require('./validation_errors_collection')
 
 class WebhookNotification extends AttributeSetter
   @Kind =
-    PartnerUserCreated: "partner_user_created"
-    PartnerUserDeleted: "partner_user_deleted"
+    PartnerMerchantConnected: "partner_merchant_connected"
+    PartnerMerchantDisconnected: "partner_merchant_disconnected"
     PartnerMerchantDeclined: "partner_merchant_declined"
     SubscriptionCanceled: "subscription_canceled"
     SubscriptionChargedSuccessfully: "subscription_charged_successfully"
@@ -38,8 +38,8 @@ class WebhookNotification extends AttributeSetter
     if wrapper_node.transaction?
       @transaction = new Transaction(wrapper_node.transaction)
 
-    if wrapper_node.partnerUser?
-      @partnerUser = new PartnerUser(wrapper_node.partnerUser)
+    if wrapper_node.partnerMerchant?
+      @partnerMerchant = new PartnerMerchant(wrapper_node.partnerMerchant)
 
     if wrapper_node.errors?
       @errors = new ValidationErrorsCollection(wrapper_node.errors)
