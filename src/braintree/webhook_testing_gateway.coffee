@@ -105,7 +105,7 @@ class WebhookTestingGateway extends Gateway
           <public_key>public_key</public_key>
           <private_key>private_key</private_key>
           <partner_merchant_id>abc123</partner_merchant_id>
-          <client_side_encryption_key>cse_key</partner_merchant_id>
+          <client_side_encryption_key>cse_key</client_side_encryption_key>
         </partner_merchant>
     """
 
