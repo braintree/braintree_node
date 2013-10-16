@@ -17,7 +17,7 @@ merchantAccountParams =
       locality: "Chicago"
       region: "IL"
     dateOfBirth: "10/9/1980"
-    ssn: "123-000-1234"
+    ssn: "123-00-1234"
     taxId: "123456789"
     routingNumber: "122100024"
     accountNumber: "43759348798"
