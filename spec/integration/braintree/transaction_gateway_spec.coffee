@@ -261,6 +261,20 @@ describe "TransactionGateway", ->
         assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud)
         done()
 
+    it "allows fraud params", (done) ->
+      transactionParams =
+        amount: '10.0'
+        deviceSessionId: "123456789"
+        fraudMerchantId: "0000000031"
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        done()
+
     it "handles validation errors", (done) ->
       transactionParams =
         creditCard:
