@@ -2,6 +2,7 @@ require("../../spec_helper")
 {TransactionSearch} = require('../../../lib/braintree/transaction_search')
 {Transaction} = require('../../../lib/braintree/transaction')
 {CreditCard} = require('../../../lib/braintree/credit_card')
+braintree = specHelper.braintree 
 
 describe "TransactionSearch", ->
   describe "search", ->
@@ -182,7 +183,6 @@ describe "TransactionSearch", ->
 
                 done()
 
-
     it "can find transactions by disbursement date", (done) ->
       yesterday = new Date("April 9, 2013")
       tomorrow =  new Date("April 11, 2013")
@@ -260,4 +260,11 @@ describe "TransactionSearch", ->
 
           assert.equal(0, response.length())
           done()
+
+    it "raises Down For Maintenance Error for search timeouts", (done) ->
+      specHelper.defaultGateway.transaction.search ((search) -> search.amount().is(-10)), (err, response) ->
+        transactions = []
+        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError)
+
+        done()
 
