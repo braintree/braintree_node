@@ -1,5 +1,6 @@
 {ErrorResponse} = require('./error_response')
 {SearchResponse} = require ('./search_response')
+exceptions = require('./exceptions')
 
 class Gateway
   createResponseHandler: (attributeName, klass, callback) ->
@@ -21,5 +22,7 @@ class Gateway
         callback(null, container)
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
+      else
+        callback(exceptions.DownForMaintenanceError(), null)
 
 exports.Gateway = Gateway
