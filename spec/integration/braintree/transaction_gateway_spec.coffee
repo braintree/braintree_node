@@ -97,6 +97,7 @@ describe "TransactionGateway", ->
         assert.equal(response.transaction.type, 'sale')
         assert.equal(response.transaction.amount, '5.00')
         assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100')
+        assert.isNull(response.transaction.voiceReferralNumber)
 
         done()
 
@@ -245,6 +246,33 @@ describe "TransactionGateway", ->
         assert.equal(response.transaction.amount, '2000.00')
         assert.equal(response.transaction.status, 'processor_declined')
 
+        done()
+
+    it "handles fraud rejection", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: CreditCardNumbers.CardTypeIndicators.Fraud
+          expirationDate: '05/16'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isFalse(response.success)
+        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected)
+        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud)
+        done()
+
+    it "allows fraud params", (done) ->
+      transactionParams =
+        amount: '10.0'
+        deviceSessionId: "123456789"
+        fraudMerchantId: "0000000031"
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
         done()
 
     it "handles validation errors", (done) ->
@@ -674,7 +702,7 @@ describe "TransactionGateway", ->
 
           done()
 
-    it "handles validation erros", (done) ->
+    it "handles validation errors", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:

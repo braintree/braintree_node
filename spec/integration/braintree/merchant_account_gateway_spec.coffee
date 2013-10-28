@@ -5,24 +5,24 @@ braintree = specHelper.braintree
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 
 merchantAccountParams =
-  applicant_details:
-    company_name: "Waterfalls, inc"
-    first_name: "Joe"
-    last_name: "Bloggs"
+  applicantDetails:
+    companyName: "Waterfalls, inc"
+    firstName: "Joe"
+    lastName: "Bloggs"
     email: "joe@bloggs.com"
     phone: "555-555-5555"
     address:
-      street_address: "123 Credibility St."
-      postal_code: "60606"
+      streetAddress: "123 Credibility St."
+      postalCode: "60606"
       locality: "Chicago"
       region: "IL"
-    date_of_birth: "10/9/1980"
-    ssn: "123-000-1234"
-    tax_id: "123456789"
-    routing_number: "122100024"
-    account_number: "43759348798"
-  tos_accepted: true
-  master_merchant_account_id: "sandbox_master_merchant_account"
+    dateOfBirth: "10/9/1980"
+    ssn: "123-00-1234"
+    taxId: "123456789"
+    routingNumber: "122100024"
+    accountNumber: "43759348798"
+  tosAccepted: true
+  masterMerchantAccountId: "sandbox_master_merchant_account"
 
 describe "MerchantAccountGateway", ->
   describe "create", ->
