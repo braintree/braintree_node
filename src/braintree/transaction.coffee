@@ -24,6 +24,12 @@ class Transaction extends AttributeSetter
       for key, value of @
         all.push value if key isnt 'All'
       all
+  @GatewayRejectionReason =
+    Avs : 'avs'
+    Cvv : 'cvv'
+    AvsAndCvv : 'avs_and_cvv'
+    Duplicate : 'duplicate'
+    Fraud : 'fraud'
   @Status =
     AuthorizationExpired : 'authorization_expired'
     Authorizing : 'authorizing'

@@ -45,5 +45,5 @@ def local_coffee
 end
 
 def local_mocha
-  "./node_modules/mocha/bin/mocha"
+  "./node_modules/mocha/bin/mocha --timeout 5000"
 end

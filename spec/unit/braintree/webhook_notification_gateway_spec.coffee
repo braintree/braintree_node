@@ -92,3 +92,44 @@ describe "WebhookNotificationGateway", ->
         assert.equal(webhookNotification.transaction.amount, '100')
         assert.ok(webhookNotification.transaction.disbursementDetails.disbursementDate?)
         done()
+
+
+    it "builds a sample notification for a partner merchant connected webhook", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.PartnerMerchantConnected,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantConnected)
+        assert.equal(webhookNotification.partnerMerchant.publicKey, 'public_key')
+        assert.equal(webhookNotification.partnerMerchant.privateKey, 'private_key')
+        assert.equal(webhookNotification.partnerMerchant.clientSideEncryptionKey, 'cse_key')
+        assert.equal(webhookNotification.partnerMerchant.merchantPublicId, 'public_id')
+        assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123')
+        assert.ok(webhookNotification.timestamp?)
+        done()
+
+    it "builds a sample notification for a partner merchant disconnected webhook", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.PartnerMerchantDisconnected,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDisconnected)
+        assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123')
+        assert.ok(webhookNotification.timestamp?)
+        done()
+
+    it "builds a sample notification for a partner merchant declined webhook", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.PartnerMerchantDeclined,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDeclined)
+        assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123')
+        assert.ok(webhookNotification.timestamp?)
+        done()

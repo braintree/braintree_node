@@ -10,6 +10,7 @@ CreditCardNumbers =
     No                : "4111111111310101"
     IssuingBank       : "4111111141010101"
     CountryOfIssuance : "4111111111121102"
+    Fraud             : "4000111111111511"
   }
 
 exports.CreditCardNumbers = CreditCardNumbers
