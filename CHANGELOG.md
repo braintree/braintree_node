@@ -1,3 +1,6 @@
+## 1.9.0
+* Adds support for Partnerships
+
 ## 1.8.0
 
 * Adds holdInEscrow method
