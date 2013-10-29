@@ -12,7 +12,7 @@ describe "TransparentRedirectGateway", ->
       }
       gateway = new TransparentRedirectGateway(braintree.connect(config))
 
-      assert.equal(gateway.url, 'https://sandbox.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests')
+      assert.equal(gateway.url, 'https://api.sandbox.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests')
 
     it "gives the correct url for the production environment", ->
       config = {
@@ -21,7 +21,7 @@ describe "TransparentRedirectGateway", ->
       }
       gateway = new TransparentRedirectGateway(braintree.connect(config))
 
-      assert.equal(gateway.url, 'https://www.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests')
+      assert.equal(gateway.url, 'https://api.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests')
 
     it "gives the correct url for the development environment", ->
       config = {
