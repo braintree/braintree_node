@@ -1,3 +1,6 @@
+## 1.9.1
+* Update configuration URLs
+
 ## 1.9.0
 * Adds support for Partnerships
 
