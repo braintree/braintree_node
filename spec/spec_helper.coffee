@@ -128,6 +128,9 @@ class ClientApiHttp
   get: (url, callback) ->
     @request('GET', url, null, callback)
 
+  post: (url, body, callback) ->
+    @request('POST', url, body, callback)
+
   checkHttpStatus: (status) ->
     switch status.toString()
       when '200', '201', '422' then null
@@ -156,29 +159,12 @@ class ClientApiHttp
     theRequest = client.request(options, (response) =>
       body = ''
       response.on('data', (responseBody) -> body += responseBody )
-
-      response.on('end', =>
-        error = @checkHttpStatus(response.statusCode)
-        return callback(error, null) if error
-        if body isnt ' '
-          @parser.parseString body, (err, result) ->
-            callback(null, Util.convertNodeToObject(result))
-        else
-          callback(null, null)
-      )
-
-      response.on('error', (err) ->
-        return callback("Unexpected response error: #{err}", null)
-      )
+      response.on('end', => callback(response.statusCode))
+      response.on('error', (err) -> callback("Unexpected response error: #{err}"))
     )
 
-    theRequest.setTimeout(@timeout, ->
-      return callback("timeout", null)
-    )
-
-    theRequest.on('error', (err) ->
-      return callback("Unexpected request error: #{err}", null)
-    )
+    theRequest.setTimeout(@timeout, -> callback("timeout"))
+    theRequest.on('error', (err) -> callback("Unexpected request error: #{err}"))
 
     theRequest.write(requestBody) if body
     theRequest.end()

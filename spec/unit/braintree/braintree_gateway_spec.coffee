@@ -2,7 +2,7 @@ require('../../spec_helper')
 
 describe "BraintreeGateway", ->
   describe "generateAuthorizationFingerprint", ->
-    it "generates a url encoded fingerprint", ->
+    it "generates a fingerprint", ->
       gateway = specHelper.braintree.connect(specHelper.defaultConfig)
       fingerprint = gateway.generateAuthorizationFingerprint()
       fingerprintParts = fingerprint.split("|")
@@ -11,4 +11,4 @@ describe "BraintreeGateway", ->
       payload = fingerprintParts[1]
 
       assert.isNotNull(signature)
-      assert.include(payload, "merchant_id%3Dintegration_merchant_id")
+      assert.include(payload, "merchant_id=integration_merchant_id")

@@ -28,13 +28,11 @@ class BraintreeGateway
     @webhookTesting = new WebhookTestingGateway(this)
 
   generateAuthorizationFingerprint: (options) ->
-    fingerprint = AuthorizationFingerprint.generate(
+    AuthorizationFingerprint.generate(
       @config.merchantId,
       @config.publicKey,
       @config.privateKey,
       options
     )
-
-    encodeURIComponent(fingerprint)
 
 exports.BraintreeGateway = BraintreeGateway
