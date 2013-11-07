@@ -1,5 +1,6 @@
 {Http} = require('./http')
 {AddressGateway} = require("./address_gateway")
+{AuthorizationFingerprint} = require("./authorization_fingerprint")
 {CreditCardGateway} = require("./credit_card_gateway")
 {CreditCardVerificationGateway} = require("./credit_card_verification_gateway")
 {CustomerGateway} = require("./customer_gateway")
@@ -25,5 +26,15 @@ class BraintreeGateway
     @transparentRedirect = new TransparentRedirectGateway(this)
     @webhookNotification = new WebhookNotificationGateway(this)
     @webhookTesting = new WebhookTestingGateway(this)
+
+  generateAuthorizationFingerprint: (options) ->
+    fingerprint = AuthorizationFingerprint.generate(
+      @config.merchantId,
+      @config.publicKey,
+      @config.privateKey,
+      options
+    )
+
+    encodeURIComponent(fingerprint)
 
 exports.BraintreeGateway = BraintreeGateway

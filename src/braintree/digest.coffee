@@ -2,11 +2,19 @@ crypto = require('crypto')
 _ = require('underscore')
 
 class Digest
-  @hexdigest: (privateKey, string) ->
+  @Sha1hexdigest: (privateKey, string) ->
     new Digest().hmacSha1(privateKey, string)
+
+  @Sha256hexdigest: (privateKey, string) ->
+    new Digest().hmacSha256(privateKey, string)
 
   @secureCompare: (left, right) ->
     new Digest().secureCompare(left, right)
+
+  hmacSha256: (key, data) ->
+    hmac = crypto.createHmac('sha256', @sha256(key))
+    hmac.update(data)
+    hmac.digest('hex')
 
   hmacSha1: (key, data) ->
     hmac = crypto.createHmac('sha1', @sha1(key))
@@ -27,6 +35,11 @@ class Digest
 
   sha1: (data) ->
     hash = crypto.createHash('sha1')
+    hash.update(data)
+    hash.digest()
+
+  sha256: (data) ->
+    hash = crypto.createHash('sha256')
     hash.update(data)
     hash.digest()
 

@@ -30,7 +30,7 @@ class TransparentRedirectGateway
     data.time = dateFormat(new Date(), 'yyyymmddHHMMss', true)
     data.public_key = @gateway.config.publicKey
     dataSegment = querystring.stringify(data)
-    trDataHash = Digest.hexdigest(@gateway.config.privateKey, dataSegment)
+    trDataHash = Digest.Sha1hexdigest(@gateway.config.privateKey, dataSegment)
     trDataHash + "|" + dataSegment
 
   createCreditCardData: (data) ->
@@ -55,7 +55,7 @@ class TransparentRedirectGateway
 
   validateQueryString: (queryString) ->
     matches = queryString.match(/^(.+)&hash=(.+?)$/)
-    (Digest.hexdigest(@gateway.config.privateKey, matches[1]) is matches[2])
+    (Digest.Sha1hexdigest(@gateway.config.privateKey, matches[1]) is matches[2])
 
   confirm: (queryString, callback) ->
     statusMatch = queryString.match(/http_status=(\d+)/)

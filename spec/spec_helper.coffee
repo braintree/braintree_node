@@ -6,6 +6,8 @@ http = require('http')
 {Util} = require('../lib/braintree/util')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
 chai = require("chai")
+{Buffer} = require('buffer')
+xml2js = require('xml2js')
 
 GLOBAL.assert = chai.assert
 
@@ -116,6 +118,71 @@ randomId = ->
 doesNotInclude = (array, value) ->
   assert.isTrue(array.indexOf(value) is -1)
 
+class ClientApiHttp
+  timeout: 60000
+
+  constructor: (@config) ->
+    @parser = new xml2js.Parser
+      explicitRoot: true
+
+  get: (url, callback) ->
+    @request('GET', url, null, callback)
+
+  checkHttpStatus: (status) ->
+    switch status.toString()
+      when '200', '201', '422' then null
+      else status.toString()
+
+  request: (method, url, body, callback) ->
+    client = http
+
+    options = {
+      host: @config.environment.server,
+      port: @config.environment.port,
+      method: method,
+      path: url,
+      headers: {
+        'X-ApiVersion': @config.apiVersion,
+        'Accept': 'application/xml',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Braintree Node ' + braintree.version
+      }
+    }
+
+    if body
+      requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(body))
+      options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString()
+
+    theRequest = client.request(options, (response) =>
+      body = ''
+      response.on('data', (responseBody) -> body += responseBody )
+
+      response.on('end', =>
+        error = @checkHttpStatus(response.statusCode)
+        return callback(error, null) if error
+        if body isnt ' '
+          @parser.parseString body, (err, result) ->
+            callback(null, Util.convertNodeToObject(result))
+        else
+          callback(null, null)
+      )
+
+      response.on('error', (err) ->
+        return callback("Unexpected response error: #{err}", null)
+      )
+    )
+
+    theRequest.setTimeout(@timeout, ->
+      return callback("timeout", null)
+    )
+
+    theRequest.on('error', (err) ->
+      return callback("Unexpected request error: #{err}", null)
+    )
+
+    theRequest.write(requestBody) if body
+    theRequest.end()
+
 GLOBAL.specHelper = {
   addOns: addOns
   braintree: braintree
@@ -134,4 +201,5 @@ GLOBAL.specHelper = {
   defaultMerchantAccountId: "sandbox_credit_card"
   nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
   nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
+  clientApiHttp: ClientApiHttp
 }
