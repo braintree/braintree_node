@@ -6,6 +6,7 @@ dateFormat = require('dateformat')
 {CreditCardGateway} = require('./credit_card_gateway')
 {CustomerGateway} = require('./customer_gateway')
 {TransactionGateway} = require('./transaction_gateway')
+{SignatureService} = require('./signature_service')
 exceptions = require('./exceptions')
 
 class TransparentRedirectGateway
@@ -30,8 +31,7 @@ class TransparentRedirectGateway
     data.time = dateFormat(new Date(), 'yyyymmddHHMMss', true)
     data.public_key = @gateway.config.publicKey
     dataSegment = querystring.stringify(data)
-    trDataHash = Digest.Sha1hexdigest(@gateway.config.privateKey, dataSegment)
-    trDataHash + "|" + dataSegment
+    new SignatureService(@gateway.config.privateKey, Digest.Sha1hexdigest).sign(dataSegment)
 
   createCreditCardData: (data) ->
     data.kind = KIND.CREATE_CREDIT_CARD

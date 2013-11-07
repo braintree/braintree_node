@@ -1,4 +1,5 @@
 {Digest} = require('./digest')
+{SignatureService} = require('./signature_service')
 
 class AuthorizationFingerprint
 
@@ -25,6 +26,6 @@ class AuthorizationFingerprint
       payloadList.push("#{key}=#{value}")
 
     payloadString = payloadList.join("&")
-    "#{Digest.Sha256hexdigest(privateKey, payloadString)}|#{payloadString}"
+    new SignatureService(privateKey, Digest.Sha256hexdigest).sign(payloadString)
 
 exports.AuthorizationFingerprint = AuthorizationFingerprint
