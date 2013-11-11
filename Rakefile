@@ -26,7 +26,7 @@ task :install_coffee do
 end
 
 task :npm_install do
-  sh "npm install"
+  sh "npm install --force"
 end
 
 task :clean do
