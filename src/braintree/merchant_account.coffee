@@ -3,6 +3,13 @@
 class MerchantAccount extends AttributeSetter
   @Status =
     Pending : "pending"
+    Active : "active"
+    Suspended : "suspended"
+
+  @FundingDestination =
+    Bank : "bank"
+    Email : "email"
+    MobilePhone : "mobile_phone"
 
   constructor: (attributes) ->
     super attributes
