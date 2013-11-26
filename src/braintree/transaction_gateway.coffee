@@ -73,6 +73,7 @@ class TransactionGateway extends Gateway
 
   pagingFunctionGenerator: (search) ->
     (ids, callback) =>
+      search.ids().contains(ids)
       @gateway.http.post("/transactions/advanced_search",
         { search : search.toHash() },
         (err, response) ->
