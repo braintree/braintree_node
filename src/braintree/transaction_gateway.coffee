@@ -80,11 +80,15 @@ class TransactionGateway extends Gateway
           if err
             callback(err, null)
           else
+            results = []
             if _.isArray(response.creditCardTransactions.transaction)
               for transaction in response.creditCardTransactions.transaction
-                callback(null, new Transaction(transaction))
+                results.push(new Transaction(transaction))
             else
-              callback(null, new Transaction(response.creditCardTransactions.transaction)))
+              results.push(new Transaction(response.creditCardTransactions.transaction))
+
+            callback(null, results)
+      )
 
 
 exports.TransactionGateway = TransactionGateway
