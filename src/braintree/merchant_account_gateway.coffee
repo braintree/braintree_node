@@ -7,6 +7,9 @@ class MerchantAccountGateway extends Gateway
   create: (attributes, callback) ->
     @gateway.http.post('/merchant_accounts/create_via_api', {merchantAccount: attributes}, @responseHandler(callback))
 
+  update: (id, attributes, callback) ->
+    @gateway.http.put("/merchant_accounts/#{id}/update_via_api", {merchantAccount: attributes}, @responseHandler(callback))
+
   responseHandler: (callback) ->
     @createResponseHandler("merchantAccount", MerchantAccount, callback)
 
