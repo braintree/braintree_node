@@ -18,22 +18,25 @@ describe "AuthorizationFingerprint", ->
     )
 
   it "can pass verifyCard", (done) ->
-    myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-    fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint(verifyCard: true)
-    params = {
-      authorizationFingerprint: fingerprint,
-      sessionIdentifierType: "testing",
-      sessionIdentifier: "testing-identifier",
-      credit_card: {
-        number: "4115111111111115",
-        expiration_month: "11",
-        expiration_year: "2099"
+    specHelper.defaultGateway.customer.create({}, (err, result) ->
+      customerId = result.customer.id
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+      fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint(customerId: customerId, verifyCard: true)
+      params = {
+        authorizationFingerprint: fingerprint,
+        sessionIdentifierType: "testing",
+        sessionIdentifier: "testing-identifier",
+        credit_card: {
+          number: "4115111111111115",
+          expiration_month: "11",
+          expiration_year: "2099"
+        }
       }
-    }
 
-    myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
-      assert.equal(statusCode, 422)
-      done()
+      myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
+        assert.equal(statusCode, 422)
+        done()
+      )
     )
 
   it "can pass makeDefault", (done) ->
@@ -64,7 +67,7 @@ describe "AuthorizationFingerprint", ->
         }
 
         myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
-          assert.equal(statusCode, 200)
+          assert.equal(statusCode, 201)
           specHelper.defaultGateway.customer.find(customerId, (err, customer) ->
             assert.equal(2, customer.creditCards.length)
             for index, credit_card of customer.creditCards
@@ -95,7 +98,7 @@ describe "AuthorizationFingerprint", ->
       }
 
       myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
-        assert.equal(statusCode, 200)
+        assert.equal(statusCode, 201)
         fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint({
           customerId: result.customer.id,
           failOnDuplicatePaymentMethod: true
