@@ -8,7 +8,7 @@ class Util
           (if typeof(item) is 'object' then Util.convertObjectKeysToUnderscores(item) else item) for item in value
         )
       else if typeof(value) is 'object'
-        if value instanceof Date
+        if value instanceof Date || value is null
           newObj[newKey] = value
         else
           newObj[newKey] = Util.convertObjectKeysToUnderscores(value)
