@@ -7,6 +7,7 @@ braintree = specHelper.braintree
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 {Transaction} = require('../../../lib/braintree/transaction')
+{Config} = require('../../../lib/braintree/config')
 
 createTransactionToRefund = (callback) ->
   transactionParams =
@@ -514,6 +515,34 @@ describe "TransactionGateway", ->
         assert.isTrue(response.transaction.creditCard.venmoSdk)
 
         done()
+
+    it "can use payment method nonce", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+      fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint()
+      params = {
+        authorizationFingerprint: fingerprint,
+        sessionIdentifierType: "testing",
+        sessionIdentifier: "testing-identifier",
+        share: true,
+        credit_card: {
+          number: "4111111111111111",
+          expiration_month: "11",
+          expiration_year: "2099"
+        }
+      }
+
+      myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
+        nonce = JSON.parse(body).nonce
+        transactionParams =
+          amount: '1.00'
+          paymentMethodNonce: nonce
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+
+          done()
+      )
 
   describe "find", ->
     it "finds a transaction", (done) ->

@@ -6,6 +6,7 @@ util = require('util')
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
 {CreditCardDefaults} = require('../../../lib/braintree/test/credit_card_defaults')
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
+{Config} = require('../../../lib/braintree/config')
 
 describe "CreditCardGateway", ->
   describe "create", ->
@@ -139,6 +140,35 @@ describe "CreditCardGateway", ->
         assert.isFalse(response.creditCard.venmoSdk)
 
         done()
+
+    it "accepts a payment method nonce", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+      fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint()
+      params = {
+        authorizationFingerprint: fingerprint,
+        sessionIdentifierType: "testing",
+        sessionIdentifier: "testing-identifier",
+        share: true,
+        credit_card: {
+          number: "4111111111111111",
+          expiration_month: "11",
+          expiration_year: "2099"
+        }
+      }
+
+      myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
+        nonce = JSON.parse(body).nonce
+        creditCardParams =
+          customerId: customerId
+          paymentMethodNonce: nonce
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.creditCard.maskedNumber, '411111******1111')
+
+          done()
+      )
 
     context "card type indicators", ->
       it "handles prepaid cards", (done) ->

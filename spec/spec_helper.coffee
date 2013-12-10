@@ -159,7 +159,7 @@ class ClientApiHttp
     theRequest = client.request(options, (response) =>
       body = ''
       response.on('data', (responseBody) -> body += responseBody )
-      response.on('end', => callback(response.statusCode))
+      response.on('end', => callback(response.statusCode, body))
       response.on('error', (err) -> callback("Unexpected response error: #{err}"))
     )
 
