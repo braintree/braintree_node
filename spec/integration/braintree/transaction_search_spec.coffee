@@ -1,4 +1,5 @@
 require("../../spec_helper")
+_ = require("underscore")
 {TransactionSearch} = require('../../../lib/braintree/transaction_search')
 {Transaction} = require('../../../lib/braintree/transaction')
 {CreditCard} = require('../../../lib/braintree/credit_card')
@@ -158,6 +159,35 @@ describe "TransactionSearch", ->
                 assert.isNull(err)
 
                 done()
+
+    xit "pages correctly (slow test)", (done) ->
+      random = specHelper.randomId()
+      transactionParams =
+        amount: '13.19'
+        orderId: random
+        creditCard:
+          number: '4111111111111111'
+          expirationDate: '01/2015'
+      counter = 0
+
+      _.each [1..51], ->
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          counter += 1
+          if counter == 51
+            specHelper.defaultGateway.transaction.search ((search) -> search.orderId().is(random)), (err, response) ->
+              transactions = {}
+
+              responseCounter = 0
+              response.each (err, transaction) ->
+                console.log(transaction.id)
+                if transactions[transaction.id]
+                  assert.equal(transaction.id, 0)
+                transactions[transaction.id] = true
+                responseCounter += 1
+
+                if _.size(transactions) != responseCounter || responseCounter == 51
+                  assert.equal(_.size(transactions), responseCounter)
+                  done()
 
     it "returns multiple results", (done) ->
       random = specHelper.randomId()
