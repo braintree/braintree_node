@@ -1,3 +1,7 @@
+## 1.9.2
+* Merchant account update API
+* Merchant account create API v2
+
 ## 1.9.1
 * Update configuration URLs
 

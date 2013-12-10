@@ -12,13 +12,21 @@ describe "Util", ->
 
       assert.equal(result.top_level.nested_one.nested_two, 'aValue')
 
-    it "does not effect date values", ->
+    it "does not affect date values", ->
       result = Util.convertObjectKeysToUnderscores(
         someDate:
           new Date()
       )
 
       assert.instanceOf(result.some_date, Date)
+
+    it "does not affect null", ->
+      result = Util.convertObjectKeysToUnderscores(
+        somethingNull:
+          null
+      )
+
+      assert.strictEqual(result.something_null, null)
 
     it "works on array values", ->
       result = Util.convertObjectKeysToUnderscores(
