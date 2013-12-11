@@ -2,7 +2,6 @@
 {Customer} = require('./customer')
 {CustomerSearch} = require('./customer_search')
 util = require('util')
-_ = require('underscore')
 
 exceptions = require('./exceptions')
 
@@ -37,20 +36,6 @@ class CustomerGateway extends Gateway
     @createResponseHandler("customer", Customer, callback)
 
   pagingFunctionGenerator: (search) ->
-    (ids, callback) =>
-      searchCriteria = search.toHash()
-      searchCriteria["ids"] = ids
-      @gateway.http.post("/customers/advanced_search",
-        { search : searchCriteria },
-        (err, response) ->
-          if err
-            callback(err, null)
-          else
-            if _.isArray(response.customers.customer)
-              for customer in response.customers.customer
-                callback(null, new Customer(customer))
-            else
-              callback(null, new Customer(response.customers.customer)))
-
+    super search, 'customers', Customer, (response) -> response.customers.customer
 
 exports.CustomerGateway = CustomerGateway

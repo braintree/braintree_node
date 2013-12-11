@@ -179,7 +179,6 @@ describe "TransactionSearch", ->
 
               responseCounter = 0
               response.each (err, transaction) ->
-                console.log(transaction.id)
                 if transactions[transaction.id]
                   assert.equal(transaction.id, 0)
                 transactions[transaction.id] = true
