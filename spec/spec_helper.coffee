@@ -143,7 +143,7 @@ class ClientApiHttp
       host: @config.environment.server,
       port: @config.environment.port,
       method: method,
-      path: url,
+      path: "/merchants/" + @config.merchantId + url,
       headers: {
         'X-ApiVersion': @config.apiVersion,
         'Accept': 'application/xml',
