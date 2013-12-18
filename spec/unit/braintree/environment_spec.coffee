@@ -20,4 +20,5 @@ describe "Environment", ->
       assert.equal("https://test.domain", env.baseUrl())
 
     it "includes the port for the Development environment", ->
-      assert.equal("http://localhost:3000", Environment.Development.baseUrl())
+      baseUrl = "http://localhost:#{process.env['GATEWAY_PORT'] || '3000'}"
+      assert.equal(baseUrl, Environment.Development.baseUrl())
