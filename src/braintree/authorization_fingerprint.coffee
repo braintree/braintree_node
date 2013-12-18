@@ -3,12 +3,13 @@
 
 class AuthorizationFingerprint
 
-  @generate: (merchantId, publicKey, privateKey, options={}) ->
+  @generate: (merchantId, publicKey, privateKey, baseUrl, options={}) ->
     date = new Date()
     payload = {
       merchant_id: merchantId,
       public_key: publicKey,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      base_url: baseUrl
     }
 
     if "customerId" of options

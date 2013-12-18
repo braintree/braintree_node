@@ -9,17 +9,24 @@ describe "AuthorizationFingerprint", ->
       assert.match(signature, /[A-Fa-f0-9]{64}/)
 
     it "includes the required default values", ->
-      fingerprint = AuthorizationFingerprint.generate("integration_merchant_id", "integration_public_key", "private_key")
+      fingerprint = AuthorizationFingerprint.generate(
+        "integration_merchant_id",
+        "integration_public_key",
+        "private_key",
+        "http://localhost:3000/merchants/integration_merchant_id"
+      )
 
       assert.include(fingerprint, "merchant_id=integration_merchant_id")
       assert.include(fingerprint, "public_key=integration_public_key")
       assert.match(fingerprint, /created_at=\d+/)
+      assert.include(fingerprint, "base_url=http://localhost:3000/merchants/integration_merchant_id")
 
     it "can include customer id", ->
       fingerprint = AuthorizationFingerprint.generate(
         "integration_merchant_id",
         "integration_public_key",
         "private_key",
+        "http://localhost:3000/merchants/integration_merchant_id",
         {customerId: "a-customer-id"}
       )
 
@@ -30,6 +37,7 @@ describe "AuthorizationFingerprint", ->
         "integration_merchant_id",
         "integration_public_key",
         "private_key",
+        "http://localhost:3000/merchants/integration_merchant_id",
         {
           makeDefault: true,
           failOnDuplicatePaymentMethod: true,
@@ -46,6 +54,7 @@ describe "AuthorizationFingerprint", ->
         "integration_merchant_id",
         "integration_public_key",
         "private_key",
+        "http://localhost:3000/merchants/integration_merchant_id",
         {
           merchant_id: "bad-merchant-id",
           public_key: "bad-merchant-public-key",

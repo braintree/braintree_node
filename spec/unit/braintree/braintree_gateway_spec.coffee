@@ -12,3 +12,4 @@ describe "BraintreeGateway", ->
 
       assert.isNotNull(signature)
       assert.include(payload, "merchant_id=integration_merchant_id")
+      assert.include(payload, "base_url=http://localhost:3000/merchants/integration_merchant_id")

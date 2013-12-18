@@ -6,4 +6,13 @@ class Environment
 
   constructor: (@server, @port, @ssl) ->
 
+  baseUrl: ->
+    url = @uriScheme() + @server
+    if @ is Environment.Development
+      url += ":" + @port
+
+    url
+
+  uriScheme: -> if @ssl then "https://" else "http://"
+
 exports.Environment = Environment
