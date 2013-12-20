@@ -14,5 +14,7 @@ describe "BraintreeGateway", ->
       assert.isNotNull(signature)
       assert.include(payload, "merchant_id=integration_merchant_id")
 
-      baseUrl = "http://localhost:#{process.env['GATEWAY_PORT'] || '3000'}/merchants/integration_merchant_id"
-      assert.include(payload, "base_url=#{baseUrl}")
+      clientApiUrl = "http://localhost:#{process.env['GATEWAY_PORT'] || '3000'}/merchants/integration_merchant_id/client_api"
+      authUrl = "http://auth.venmo.dev:4567"
+      assert.include(payload, "client_api_url=#{clientApiUrl}")
+      assert.include(payload, "auth_url=#{authUrl}")

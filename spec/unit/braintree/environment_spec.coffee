@@ -7,6 +7,7 @@ describe "Environment", ->
       env = new Environment(
         'test.domain',
         '3001',
+        'http://auth.venmo.dev',
         false
       )
       assert.equal("http://test.domain", env.baseUrl())
@@ -15,6 +16,7 @@ describe "Environment", ->
       env = new Environment(
         'test.domain',
         '3001',
+        'http://auth.venmo.dev',
         true
       )
       assert.equal("https://test.domain", env.baseUrl())

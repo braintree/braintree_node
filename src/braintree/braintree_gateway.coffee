@@ -32,7 +32,8 @@ class BraintreeGateway
       @config.merchantId,
       @config.publicKey,
       @config.privateKey,
-      @config.baseMerchantUrl(),
+      "#{@config.baseMerchantUrl()}/client_api",
+      @config.environment.authUrl,
       options
     )
 

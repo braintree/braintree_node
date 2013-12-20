@@ -13,20 +13,23 @@ describe "AuthorizationFingerprint", ->
         "integration_merchant_id",
         "integration_public_key",
         "private_key",
-        "http://localhost:3000/merchants/integration_merchant_id"
+        "http://localhost:3000/merchants/integration_merchant_id/client_api",
+        "http://auth.venmo.dev"
       )
 
       assert.include(fingerprint, "merchant_id=integration_merchant_id")
       assert.include(fingerprint, "public_key=integration_public_key")
       assert.match(fingerprint, /created_at=\d+/)
-      assert.include(fingerprint, "base_url=http://localhost:3000/merchants/integration_merchant_id")
+      assert.include(fingerprint, "client_api_url=http://localhost:3000/merchants/integration_merchant_id/client_api")
+      assert.include(fingerprint, "auth_url=http://auth.venmo.dev")
 
     it "can include customer id", ->
       fingerprint = AuthorizationFingerprint.generate(
         "integration_merchant_id",
         "integration_public_key",
         "private_key",
-        "http://localhost:3000/merchants/integration_merchant_id",
+        "http://localhost:3000/merchants/integration_merchant_id/client_api",
+        "http://auth.venmo.dev",
         {customerId: "a-customer-id"}
       )
 
@@ -37,7 +40,8 @@ describe "AuthorizationFingerprint", ->
         "integration_merchant_id",
         "integration_public_key",
         "private_key",
-        "http://localhost:3000/merchants/integration_merchant_id",
+        "http://localhost:3000/merchants/integration_merchant_id/client_api",
+        "http://auth.venmo.dev",
         {
           makeDefault: true,
           failOnDuplicatePaymentMethod: true,
@@ -54,7 +58,8 @@ describe "AuthorizationFingerprint", ->
         "integration_merchant_id",
         "integration_public_key",
         "private_key",
-        "http://localhost:3000/merchants/integration_merchant_id",
+        "http://localhost:3000/merchants/integration_merchant_id/client_api",
+        "http://auth.venmo.dev",
         {
           merchant_id: "bad-merchant-id",
           public_key: "bad-merchant-public-key",
