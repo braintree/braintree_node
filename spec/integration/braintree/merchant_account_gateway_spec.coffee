@@ -503,3 +503,22 @@ describe "MerchantAccountGateway", ->
         )
 
         done()
+
+  describe "find", ->
+    it "can find a merchant account by id", (done) ->
+      specHelper.defaultGateway.merchantAccount.create validMerchantAccountParams, (err, response) ->
+        assert.isTrue(response.success)
+        merchantAccountId = response.merchantAccount.id
+
+        specHelper.defaultGateway.merchantAccount.find merchantAccountId, (err, merchantAccount) ->
+          assert.equal(null, err)
+          assert.equal(merchantAccount.id, merchantAccountId)
+
+          done()
+
+    it "returns a not found error if given a bad id", (done) ->
+      specHelper.defaultGateway.merchantAccount.find " ", (err, merchantAccount) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
+
