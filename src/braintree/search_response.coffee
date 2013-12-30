@@ -43,7 +43,10 @@ class SearchResponse extends EventEmitter
       @pagingFunction @ids.slice(offset, offset + @pageSize), (err, item) =>
         itemCount += 1
 
-        @emit('data', item)
+        if err?
+          @emit('error', err)
+        else
+          @emit('data', item)
 
         @emit('end') if itemCount == @ids.length
 

@@ -240,6 +240,15 @@ describe "TransactionSearch", ->
 
           search.execute()
 
+    it "emits error events when appropriate", (done) ->
+      search = specHelper.defaultGateway.transaction.search (search) ->
+        search.amount().is(-10)
+
+      search.on 'error', (err) ->
+        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError)
+
+        done()
+
     it "can find transactions by disbursement date", (done) ->
       yesterday = new Date("April 9, 2013")
       tomorrow =  new Date("April 11, 2013")

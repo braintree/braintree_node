@@ -20,10 +20,19 @@ class Gateway
       @gateway.http.post(url, {search : search.toHash()}, @searchResponseHandler(pagingFunction, callback))
     else
       searchResponse = new SearchResponse
+
       @gateway.http.post url, {search : search.toHash()}, (err, response) ->
-        searchResponse.setResponse(response)
-        searchResponse.setPagingFunction(pagingFunction)
-        searchResponse.ready()
+        if err?
+          searchResponse.emit('error', err)
+        else if (response["searchResults"])
+          searchResponse.setResponse(response)
+          searchResponse.setPagingFunction(pagingFunction)
+          searchResponse.ready()
+        else if (response.apiErrorResponse)
+          searchResponse.emit('error', new ErrorResponse(response.apiErrorResponse))
+        else
+          searchResponse.emit('error', exceptions.DownForMaintenanceError())
+
       searchResponse
 
   searchResponseHandler: (pagingFunction, callback) ->
