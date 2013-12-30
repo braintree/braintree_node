@@ -1,8 +1,10 @@
 _ = require('underscore')
-{EventEmitter} = require('events')
+{Readable} = require('stream')
 
-class SearchResponse extends EventEmitter
+class SearchResponse extends Readable
   constructor: (pagingFunction, results) ->
+    super(objectMode: true)
+
     if pagingFunction?
       @setPagingFunction(pagingFunction)
 
@@ -10,6 +12,9 @@ class SearchResponse extends EventEmitter
       @setResponse(results)
 
     @success = true
+    @currentItem = 0
+    @currentOffset = 0
+    @bufferedResults = []
 
   setResponse: (results) ->
     @ids = results.searchResults.ids
@@ -30,25 +35,36 @@ class SearchResponse extends EventEmitter
 
   ready: ->
     @readyToStart = true
-    @execute() if @executing?
+    @emit('ready')
 
-  execute: ->
-    @executing = true
+  _read: ->
+    if @readyToStart?
+      @nextItem()
+    else
+      @on 'ready', =>
+        @nextItem()
 
-    return unless @readyToStart
+  nextItem: ->
+    if @bufferedResults.length > 0
+      @push(@bufferedResults.shift())
+    else if @currentItem >= @ids.length
+      @push(null)
+    else
+      index = 0
 
-    itemCount = 0
-
-    _.each _.range(0, @ids.length, @pageSize), (offset) =>
-      @pagingFunction @ids.slice(offset, offset + @pageSize), (err, item) =>
-        itemCount += 1
-
+      @pagingFunction @ids.slice(@currentOffset, @currentOffset + @pageSize), (err, item) =>
         if err?
           @emit('error', err)
         else
-          @emit('data', item)
+          @bufferedResults.push(item)
 
-        @emit('end') if itemCount == @ids.length
+        @currentItem += 1
+        index += 1
+
+        if index == @pageSize or @currentItem == @ids.length
+          @push(@bufferedResults.shift())
+
+      @currentOffset += @pageSize
 
   length: ->
     @ids.length

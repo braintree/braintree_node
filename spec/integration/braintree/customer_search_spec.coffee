@@ -30,7 +30,7 @@ describe "CustomerSearch", ->
 
           done()
 
-    it "allows event emitter style interation of results", (done) ->
+    it "allows stream style interation of results", (done) ->
       search = specHelper.defaultGateway.customer.search (search) ->
         search.lastName().is(lastName)
 
@@ -46,7 +46,7 @@ describe "CustomerSearch", ->
 
         done()
 
-      search.execute()
+      search.resume()
 
     it "can return multiple results", (done) ->
       specHelper.defaultGateway.customer.search ((search) -> search.lastName().is(lastName)), (err, response) ->

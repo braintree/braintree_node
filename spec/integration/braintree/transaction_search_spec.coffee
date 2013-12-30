@@ -212,7 +212,7 @@ describe "TransactionSearch", ->
 
                 done()
 
-    it "allows event emitter style interation of results", (done) ->
+    it "allows stream style interation of results", (done) ->
       random = specHelper.randomId()
       transactionParams =
         amount: '10.00'
@@ -238,7 +238,7 @@ describe "TransactionSearch", ->
 
             done()
 
-          search.execute()
+          search.resume()
 
     it "emits error events when appropriate", (done) ->
       search = specHelper.defaultGateway.transaction.search (search) ->

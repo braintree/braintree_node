@@ -70,7 +70,7 @@ describe "SubscriptionSearch", ->
 
               done()
 
-    it "allows event emitter style interation of results", (done) ->
+    it "allows stream style interation of results", (done) ->
       customerParams =
         creditCard:
           number: '5105105105105100'
@@ -99,7 +99,7 @@ describe "SubscriptionSearch", ->
 
             done()
 
-          search.execute()
+          search.resume()
 
     it "filters on valid merchant account ids", (done) ->
       customerParams =
