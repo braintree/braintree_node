@@ -244,8 +244,15 @@ describe "TransactionSearch", ->
       search = specHelper.defaultGateway.transaction.search (search) ->
         search.amount().is(-10)
 
+      error = null
+
       search.on 'error', (err) ->
-        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError)
+        error = err
+
+      search.on 'data', (data) ->
+
+      search.on 'end', ->
+        assert.equal(error.type, braintree.errorTypes.downForMaintenanceError)
 
         done()
 

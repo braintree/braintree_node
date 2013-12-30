@@ -16,6 +16,9 @@ class SearchResponse extends Readable
     @currentOffset = 0
     @bufferedResults = []
 
+  addError: (error) ->
+    @fatalError = error
+
   setResponse: (results) ->
     @ids = results.searchResults.ids
     @pageSize = parseInt(results.searchResults.pageSize)
@@ -45,7 +48,10 @@ class SearchResponse extends Readable
         @nextItem()
 
   nextItem: ->
-    if @bufferedResults.length > 0
+    if @fatalError?
+      @emit('error', @fatalError)
+      @push(null)
+    else if @bufferedResults.length > 0
       @push(@bufferedResults.shift())
     else if @currentItem >= @ids.length
       @push(null)

@@ -23,15 +23,16 @@ class Gateway
 
       @gateway.http.post url, {search : search.toHash()}, (err, response) ->
         if err?
-          searchResponse.emit('error', err)
+          searchResponse.addError(err)
         else if (response["searchResults"])
           searchResponse.setResponse(response)
           searchResponse.setPagingFunction(pagingFunction)
-          searchResponse.ready()
         else if (response.apiErrorResponse)
-          searchResponse.emit('error', new ErrorResponse(response.apiErrorResponse))
+          searchResponse.addError(new ErrorResponse(response.apiErrorResponse))
         else
-          searchResponse.emit('error', exceptions.DownForMaintenanceError())
+          searchResponse.addError(exceptions.DownForMaintenanceError())
+
+        searchResponse.ready()
 
       searchResponse
 
