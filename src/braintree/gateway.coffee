@@ -15,6 +15,17 @@ class Gateway
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
 
+  createSearchResponse: (url, search, pagingFunction, callback) ->
+    if callback?
+      @gateway.http.post(url, {search : search.toHash()}, @searchResponseHandler(pagingFunction, callback))
+    else
+      searchResponse = new SearchResponse
+      @gateway.http.post url, {search : search.toHash()}, (err, response) ->
+        searchResponse.setResponse(response)
+        searchResponse.setPagingFunction(pagingFunction)
+        searchResponse.ready()
+      searchResponse
+
   searchResponseHandler: (pagingFunction, callback) ->
     (err, response) ->
       return callback(err, response) if err

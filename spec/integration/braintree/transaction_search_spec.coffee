@@ -212,6 +212,34 @@ describe "TransactionSearch", ->
 
                 done()
 
+    it "allows event emitter style interation of results", (done) ->
+      random = specHelper.randomId()
+      transactionParams =
+        amount: '10.00'
+        orderId: random
+        creditCard:
+          number: '4111111111111111'
+          expirationDate: '01/2015'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          transactions = []
+
+          search = specHelper.defaultGateway.transaction.search (search) ->
+            search.orderId().is(random)
+
+          search.on 'data', (transaction) ->
+            transactions.push(transaction)
+
+          search.on 'end', ->
+            assert.equal(transactions.length, 2)
+            assert.equal(transactions[0].orderId, random)
+            assert.equal(transactions[1].orderId, random)
+
+            done()
+
+          search.execute()
+
     it "can find transactions by disbursement date", (done) ->
       yesterday = new Date("April 9, 2013")
       tomorrow =  new Date("April 11, 2013")

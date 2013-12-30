@@ -70,6 +70,37 @@ describe "SubscriptionSearch", ->
 
               done()
 
+    it "allows event emitter style interation of results", (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        subscriptionParams =
+          paymentMethodToken: response.customer.creditCards[0].token
+          planId: specHelper.plans.trialless.id
+          id: specHelper.randomId()
+
+        specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+          subscriptionId = response.subscription.id
+
+          subscriptions = []
+
+          search = specHelper.defaultGateway.subscription.search (search) ->
+            search.id().is(subscriptionId)
+
+          search.on 'data', (subscription) ->
+            subscriptions.push(subscription)
+
+          search.on 'end', ->
+            assert.equal(subscriptions.length, 1)
+            assert.equal(subscriptions[0].id, subscriptionId)
+
+            done()
+
+          search.execute()
+
     it "filters on valid merchant account ids", (done) ->
       customerParams =
         creditCard:

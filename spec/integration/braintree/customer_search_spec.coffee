@@ -30,6 +30,24 @@ describe "CustomerSearch", ->
 
           done()
 
+    it "allows event emitter style interation of results", (done) ->
+      search = specHelper.defaultGateway.customer.search (search) ->
+        search.lastName().is(lastName)
+
+      customers = []
+
+      search.on 'data', (customer) ->
+        customers.push customer
+
+      search.on 'end', ->
+        assert.equal(customers.length, 2)
+        assert.equal(customers[0].lastName, lastName)
+        assert.equal(customers[1].lastName, lastName)
+
+        done()
+
+      search.execute()
+
     it "can return multiple results", (done) ->
       specHelper.defaultGateway.customer.search ((search) -> search.lastName().is(lastName)), (err, response) ->
         customers = []
