@@ -1,6 +1,7 @@
 {ErrorResponse} = require('./error_response')
 {SearchResponse} = require ('./search_response')
 exceptions = require('./exceptions')
+_ = require('underscore')
 
 class Gateway
   createResponseHandler: (attributeName, klass, callback) ->
@@ -24,5 +25,20 @@ class Gateway
         callback(null, new ErrorResponse(response.apiErrorResponse))
       else
         callback(exceptions.DownForMaintenanceError(), null)
+
+  pagingFunctionGenerator: (search, url, subjectType, getSubject) ->
+    (ids, callback) =>
+      search.ids().in(ids)
+      @gateway.http.post("/" + url + "/advanced_search",
+        { search : search.toHash() },
+        (err, response) ->
+          if err
+            callback(err, null)
+          else
+            if _.isArray(getSubject(response))
+              for subject in getSubject(response)
+                callback(null, new subjectType(subject))
+            else
+              callback(null, new subjectType(getSubject(response))))
 
 exports.Gateway = Gateway

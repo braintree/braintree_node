@@ -451,3 +451,19 @@ describe "CustomerGateway", ->
 
           done()
 
+      it "doesn't serialize nulls as empty objects", (done) ->
+        customerParams =
+          creditCard:
+            number: '4111111111111111'
+            expirationDate: '05/2014'
+            billingAddress:
+              streetAddress: null
+              extendedAddress: "asd"
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          billingAddress = response.customer.creditCards[0].billingAddress
+          assert.equal(billingAddress.streetAddress, null)
+
+          done()
