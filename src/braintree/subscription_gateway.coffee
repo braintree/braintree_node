@@ -35,8 +35,7 @@ class SubscriptionGateway extends Gateway
   search: (fn, callback) ->
     search = new SubscriptionSearch()
     fn(search)
-    @gateway.http.post("/subscriptions/advanced_search_ids",
-      { search : search.toHash() }, @searchResponseHandler(@pagingFunctionGenerator(search), callback))
+    @createSearchResponse("/subscriptions/advanced_search_ids", search, @pagingFunctionGenerator(search), callback)
 
   update: (subscriptionId, attributes, callback) ->
     @gateway.http.put("/subscriptions/#{subscriptionId}", {subscription: attributes}, @responseHandler(callback))

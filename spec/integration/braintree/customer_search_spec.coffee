@@ -1,5 +1,6 @@
 require("../../spec_helper")
 {CustomerSearch} = require('../../../lib/braintree/customer_search')
+{Util} = require('../../../lib/braintree/util')
 
 describe "CustomerSearch", ->
   describe "search", ->
@@ -29,6 +30,28 @@ describe "CustomerSearch", ->
           assert.equal(customer.lastName, lastName)
 
           done()
+
+    it "allows stream style interation of results", (done) ->
+      unless Util.supportsStreams()
+        done()
+        return
+
+      search = specHelper.defaultGateway.customer.search (search) ->
+        search.lastName().is(lastName)
+
+      customers = []
+
+      search.on 'data', (customer) ->
+        customers.push customer
+
+      search.on 'end', ->
+        assert.equal(customers.length, 2)
+        assert.equal(customers[0].lastName, lastName)
+        assert.equal(customers[1].lastName, lastName)
+
+        done()
+
+      search.resume()
 
     it "can return multiple results", (done) ->
       specHelper.defaultGateway.customer.search ((search) -> search.lastName().is(lastName)), (err, response) ->
