@@ -1,22 +1,37 @@
 _ = require('underscore')
-{Readable} = require('stream')
+{Util} = require('./util')
 
-class SearchResponse extends Readable
+class SearchResponse
   constructor: (pagingFunction, results) ->
-    super(objectMode: true)
-
     if pagingFunction?
       @setPagingFunction(pagingFunction)
 
     if results?
       @setResponse(results)
 
-    @success = true
-    @currentItem = 0
-    @currentOffset = 0
-    @bufferedResults = []
+    if Util.supportsStreams()
+      {SearchResponseStream} = require('./search_response_stream')
+      @stream = new SearchResponseStream(this)
 
-  addError: (error) ->
+    @success = true
+
+  each: (callback) ->
+    _.each(_.range(0, @ids.length, @pageSize), (offset) =>
+      @pagingFunction(@ids.slice(offset, offset + @pageSize), callback))
+
+  first: (callback)->
+    if @ids.length == 0
+      callback(null, null)
+    else
+      @pagingFunction([@ids[0]], callback)
+
+  length: ->
+    @ids.length
+
+  ready: ->
+    @stream.ready() if @stream?
+
+  setFatalError: (error) ->
     @fatalError = error
 
   setResponse: (results) ->
@@ -25,54 +40,5 @@ class SearchResponse extends Readable
 
   setPagingFunction: (pagingFunction) ->
     @pagingFunction = pagingFunction
-
-  first: (callback)->
-    if @ids.length == 0
-      callback(null, null)
-    else
-      @pagingFunction([@ids[0]], callback)
-
-  each: (callback) ->
-    _.each(_.range(0, @ids.length, @pageSize), (offset) =>
-      @pagingFunction(@ids.slice(offset, offset + @pageSize), callback))
-
-  ready: ->
-    @readyToStart = true
-    @emit('ready')
-
-  _read: ->
-    if @readyToStart?
-      @nextItem()
-    else
-      @on 'ready', =>
-        @nextItem()
-
-  nextItem: ->
-    if @fatalError?
-      @emit('error', @fatalError)
-      @push(null)
-    else if @bufferedResults.length > 0
-      @push(@bufferedResults.shift())
-    else if @currentItem >= @ids.length
-      @push(null)
-    else
-      index = 0
-
-      @pagingFunction @ids.slice(@currentOffset, @currentOffset + @pageSize), (err, item) =>
-        if err?
-          @emit('error', err)
-        else
-          @bufferedResults.push(item)
-
-        @currentItem += 1
-        index += 1
-
-        if index == @pageSize or @currentItem == @ids.length
-          @push(@bufferedResults.shift())
-
-      @currentOffset += @pageSize
-
-  length: ->
-    @ids.length
 
 exports.SearchResponse = SearchResponse

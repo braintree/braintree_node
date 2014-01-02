@@ -1,3 +1,5 @@
+semver = require('semver')
+
 class Util
   @convertObjectKeysToUnderscores: (obj) ->
     newObj = {}
@@ -86,6 +88,9 @@ class Util
     for value in array1
       newArray.push(value) unless @_containsValue(array2, value)
     newArray
+
+  @supportsStreams: ->
+    semver.satisfies(process.version, '>=0.10')
 
   @_containsValue: (array, element) ->
     array.indexOf(element) isnt -1

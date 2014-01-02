@@ -3,6 +3,8 @@ _ = require("underscore")
 {TransactionSearch} = require('../../../lib/braintree/transaction_search')
 {Transaction} = require('../../../lib/braintree/transaction')
 {CreditCard} = require('../../../lib/braintree/credit_card')
+{Util} = require('../../../lib/braintree/util')
+{Writable} = require('stream')
 braintree = specHelper.braintree 
 
 describe "TransactionSearch", ->
@@ -213,6 +215,10 @@ describe "TransactionSearch", ->
                 done()
 
     it "allows stream style interation of results", (done) ->
+      unless Util.supportsStreams()
+        done()
+        return
+
       random = specHelper.randomId()
       transactionParams =
         amount: '10.00'
@@ -240,7 +246,44 @@ describe "TransactionSearch", ->
 
           search.resume()
 
+    it "allows piping results to a writable stream", (done) ->
+      unless Util.supportsStreams()
+        done()
+        return
+
+      random = specHelper.randomId()
+      transactionParams =
+        amount: '10.00'
+        orderId: random
+        creditCard:
+          number: '4111111111111111'
+          expirationDate: '01/2015'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          transactions = []
+
+          ws = Writable({objectMode: true})
+          ws._write = (chunk, enc, next) ->
+            transactions.push(chunk)
+            next()
+
+          search = specHelper.defaultGateway.transaction.search (search) ->
+            search.orderId().is(random)
+
+          ws.on 'finish', ->
+            assert.equal(transactions.length, 2)
+            assert.equal(transactions[0].orderId, random)
+            assert.equal(transactions[1].orderId, random)
+            done()
+
+          search.pipe(ws)
+
     it "emits error events when appropriate", (done) ->
+      unless Util.supportsStreams()
+        done()
+        return
+
       search = specHelper.defaultGateway.transaction.search (search) ->
         search.amount().is(-10)
 
