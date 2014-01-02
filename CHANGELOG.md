@@ -1,3 +1,7 @@
+## 1.11.0
+
+* Adds ability to consume search results as a readable stream
+
 ## 1.10.0
 
 * Merchant account find API
