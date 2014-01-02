@@ -52,8 +52,7 @@ class TransactionGateway extends Gateway
   search: (fn, callback) ->
     search = new TransactionSearch()
     fn(search)
-    @gateway.http.post("/transactions/advanced_search_ids",
-      { search : search.toHash() }, @searchResponseHandler(@pagingFunctionGenerator(search), callback))
+    @createSearchResponse("/transactions/advanced_search_ids", search, @pagingFunctionGenerator(search), callback)
 
   releaseFromEscrow: (transactionId, callback) ->
     @gateway.http.put("/transactions/#{transactionId}/release_from_escrow",
