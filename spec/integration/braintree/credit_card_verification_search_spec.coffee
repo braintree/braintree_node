@@ -2,6 +2,7 @@ require("../../spec_helper")
 {CreditCardVerificationSearch} = require('../../../lib/braintree/credit_card_verification_search')
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
 {CreditCard} = require('../../../lib/braintree/credit_card')
+{Util} = require('../../../lib/braintree/util')
 
 describe "CreditCardVerification", ->
   describe "search", ->
@@ -33,6 +34,37 @@ describe "CreditCardVerification", ->
             assert.equal(verification.creditCard.cardholderName, name)
 
             done()
+
+    it "allows stream style interation of results", (done) ->
+      unless Util.supportsStreams()
+        done()
+        return
+
+      name = specHelper.randomId() + ' Smith'
+      customerParams =
+        creditCard:
+          cardholderName: name,
+          number: '4000111111111115',
+          expirationDate: '12/2016',
+          options:
+            verifyCard: true
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        search = specHelper.defaultGateway.creditCardVerification.search (search) ->
+          search.creditCardCardholderName().is(name)
+
+        verifications = []
+
+        search.on 'data', (verification) ->
+          verifications.push verification
+
+        search.on 'end', ->
+          assert.equal(verifications[0].creditCard.bin, '400011')
+          assert.equal(verifications[0].creditCard.cardholderName, name)
+
+          done()
+
+        search.resume()
 
     it "can return multiple results", (done) ->
       name = specHelper.randomId() + ' Smith'
