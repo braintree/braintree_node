@@ -1,16 +1,13 @@
 {Digest} = require('./digest')
 {SignatureService} = require('./signature_service')
 
-class AuthorizationFingerprint
+class AuthorizationInfo
 
   @generate: (merchantId, publicKey, privateKey, clientApiUrl, authUrl, options={}) ->
     date = new Date()
     payload = {
-      merchant_id: merchantId,
       public_key: publicKey,
       created_at: new Date().toISOString(),
-      client_api_url: clientApiUrl,
-      auth_url: authUrl
     }
 
     if "customerId" of options
@@ -28,6 +25,11 @@ class AuthorizationFingerprint
       payloadList.push("#{key}=#{value}")
 
     payloadString = payloadList.join("&")
-    new SignatureService(privateKey, Digest.Sha256hexdigest).sign(payloadString)
+    fingerprint = new SignatureService(privateKey, Digest.Sha256hexdigest).sign(payloadString)
+    JSON.stringify({
+      fingerprint: fingerprint,
+      client_api_url: clientApiUrl,
+      auth_url: authUrl
+    })
 
-exports.AuthorizationFingerprint = AuthorizationFingerprint
+exports.AuthorizationInfo = AuthorizationInfo

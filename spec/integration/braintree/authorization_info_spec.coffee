@@ -2,10 +2,10 @@ require('../../spec_helper')
 braintree = specHelper.braintree
 {Config} = require('../../../lib/braintree/config')
 
-describe "AuthorizationFingerprint", ->
+describe "AuthorizationInfo", ->
   it "is verified by the gateway", (done) ->
     myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-    fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint()
+    fingerprint = JSON.parse(specHelper.defaultGateway.generateAuthorizationInfo()).fingerprint
     encodedFingerprint = encodeURIComponent(fingerprint)
     url = "/client_api/credit_cards.json?"
     url += "authorizationFingerprint=#{encodedFingerprint}"
@@ -21,7 +21,8 @@ describe "AuthorizationFingerprint", ->
     specHelper.defaultGateway.customer.create({}, (err, result) ->
       customerId = result.customer.id
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint(customerId: customerId, verifyCard: true)
+      authInfo = specHelper.defaultGateway.generateAuthorizationInfo(customerId: customerId, verifyCard: true)
+      fingerprint = JSON.parse(authInfo).fingerprint
       params = {
         authorizationFingerprint: fingerprint,
         sessionIdentifierType: "testing",
@@ -50,10 +51,11 @@ describe "AuthorizationFingerprint", ->
         assert.isTrue(result.success)
         myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
 
-        fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint({
+        authInfo = specHelper.defaultGateway.generateAuthorizationInfo({
           makeDefault: true,
           customerId: customerId
         })
+        fingerprint = JSON.parse(authInfo).fingerprint
 
         params = {
           authorizationFingerprint: fingerprint,
@@ -82,9 +84,10 @@ describe "AuthorizationFingerprint", ->
   it "can pass failOnDuplicatePaymentMethod", (done) ->
     specHelper.defaultGateway.customer.create({}, (err, result) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint({
+      authInfo = specHelper.defaultGateway.generateAuthorizationInfo({
         customerId: result.customer.id
       })
+      fingerprint = JSON.parse(authInfo).fingerprint
 
       params = {
         authorizationFingerprint: fingerprint,
@@ -99,10 +102,11 @@ describe "AuthorizationFingerprint", ->
 
       myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
         assert.equal(statusCode, 201)
-        fingerprint = specHelper.defaultGateway.generateAuthorizationFingerprint({
+        authInfo = specHelper.defaultGateway.generateAuthorizationInfo({
           customerId: result.customer.id,
           failOnDuplicatePaymentMethod: true
         })
+        fingerprint = JSON.parse(authInfo).fingerprint
         params.authorizationFingerprint = fingerprint
         myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
           assert.equal(statusCode, 422)

@@ -1,6 +1,6 @@
 {Http} = require('./http')
 {AddressGateway} = require("./address_gateway")
-{AuthorizationFingerprint} = require("./authorization_fingerprint")
+{AuthorizationInfo} = require("./authorization_info")
 {CreditCardGateway} = require("./credit_card_gateway")
 {CreditCardVerificationGateway} = require("./credit_card_verification_gateway")
 {CustomerGateway} = require("./customer_gateway")
@@ -27,8 +27,8 @@ class BraintreeGateway
     @webhookNotification = new WebhookNotificationGateway(this)
     @webhookTesting = new WebhookTestingGateway(this)
 
-  generateAuthorizationFingerprint: (options) ->
-    AuthorizationFingerprint.generate(
+  generateAuthorizationInfo: (options) ->
+    AuthorizationInfo.generate(
       @config.merchantId,
       @config.publicKey,
       @config.privateKey,
