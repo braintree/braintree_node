@@ -115,3 +115,22 @@ describe "AdvancedSearch", ->
       search = newSearch()
       search.range().between(50, 100)
       assert.deepEqual(search.toHash(), { range : { min : 50, max : 100 }})
+
+  describe "addCriteria", ->
+    it "adds a numeric criteria", ->
+      search = newSearch()
+      search.addCriteria("numero", 2)
+      assert.deepEqual(search.toHash(), { numero: 2 })
+
+    it "merges in an object criteria", ->
+      search = newSearch()
+      search.addCriteria("object", { foo: "bar", key1: 1 })
+      search.addCriteria("object", { foo: "baz", key2: 2 })
+      assert.deepEqual(search.toHash(), { object: { foo: "baz", key1: 1, key2: 2 } })
+
+    it "replaces an array criteria", ->
+      search = newSearch()
+      search.addCriteria("array", [0, 1, 2])
+      search.addCriteria("array", [3, 4])
+      assert.deepEqual(search.toHash(), { array: [3, 4] })
+

@@ -1,3 +1,15 @@
+## 1.11.1
+
+* Adds ability to consume credit card verification search results as a readable stream
+
+## 1.11.0
+
+* Adds ability to consume search results as a readable stream
+
+## 1.10.0
+
+* Merchant account find API
+
 ## 1.9.2
 * Merchant account update API
 * Merchant account create API v2

@@ -1,4 +1,5 @@
 {Util} = require('./util')
+_ = require('underscore')
 
 class AdvancedSearch
   @equalityFields: (fields...) ->
@@ -31,7 +32,7 @@ class AdvancedSearch
   constructor: -> @criteria = {}
 
   addCriteria: (key, value) ->
-    if @criteria[key] is Object(@criteria[key])
+    if @criteria[key] is Object(@criteria[key]) && !_.isArray(@criteria[key])
       Util.merge(@criteria[key], value)
     else
       @criteria[key] = value

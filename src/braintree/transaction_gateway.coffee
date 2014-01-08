@@ -3,7 +3,6 @@
 {TransactionSearch} = require('./transaction_search')
 {ErrorResponse} = require('./error_response')
 exceptions = require('./exceptions')
-_ = require('underscore')
 
 class TransactionGateway extends Gateway
   constructor: (@gateway) ->
@@ -53,8 +52,7 @@ class TransactionGateway extends Gateway
   search: (fn, callback) ->
     search = new TransactionSearch()
     fn(search)
-    @gateway.http.post("/transactions/advanced_search_ids",
-      { search : search.toHash() }, @searchResponseHandler(@pagingFunctionGenerator(search), callback))
+    @createSearchResponse("/transactions/advanced_search_ids", search, @pagingFunctionGenerator(search), callback)
 
   releaseFromEscrow: (transactionId, callback) ->
     @gateway.http.put("/transactions/#{transactionId}/release_from_escrow",
@@ -72,18 +70,6 @@ class TransactionGateway extends Gateway
     @gateway.http.put("/transactions/#{transactionId}/void", null, @responseHandler(callback))
 
   pagingFunctionGenerator: (search) ->
-    (ids, callback) =>
-      @gateway.http.post("/transactions/advanced_search",
-        { search : search.toHash() },
-        (err, response) ->
-          if err
-            callback(err, null)
-          else
-            if _.isArray(response.creditCardTransactions.transaction)
-              for transaction in response.creditCardTransactions.transaction
-                callback(null, new Transaction(transaction))
-            else
-              callback(null, new Transaction(response.creditCardTransactions.transaction)))
-
+    super search, 'transactions', Transaction, (response) -> response.creditCardTransactions.transaction
 
 exports.TransactionGateway = TransactionGateway

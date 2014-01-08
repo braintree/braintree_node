@@ -23,7 +23,7 @@ class CreditCardVerificationGateway extends Gateway
   search: (fn, callback) ->
     search = new CreditCardVerificationSearch()
     fn(search)
-    @gateway.http.post("/verifications/advanced_search_ids", {search: search.toHash()}, @searchResponseHandler(@pagingFunctionGenerator(search), callback))
+    @createSearchResponse("/verifications/advanced_search_ids", search, @pagingFunctionGenerator(search), callback)
 
   responseHandler: (callback) ->
     @createResponseHandler("creditCardVerification", CreditCardVerification, callback)
