@@ -1,6 +1,5 @@
 require("../../spec_helper")
 {CustomerSearch} = require('../../../lib/braintree/customer_search')
-{Util} = require('../../../lib/braintree/util')
 
 describe "CustomerSearch", ->
   describe "search", ->
@@ -32,10 +31,6 @@ describe "CustomerSearch", ->
           done()
 
     it "allows stream style interation of results", (done) ->
-      unless Util.supportsStreams()
-        done()
-        return
-
       search = specHelper.defaultGateway.customer.search (search) ->
         search.lastName().is(lastName)
 

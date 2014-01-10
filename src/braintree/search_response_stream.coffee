@@ -1,5 +1,5 @@
 _ = require('underscore')
-{Readable} = require('stream')
+Readable = require('stream').Readable or require('readable-stream').Readable
 
 class SearchResponseStream extends Readable
   constructor: (searchResponse) ->
