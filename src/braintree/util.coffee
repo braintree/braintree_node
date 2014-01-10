@@ -89,7 +89,7 @@ class Util
       newArray.push(value) unless @_containsValue(array2, value)
     newArray
 
-  @supportsStreams: ->
+  @supportsStreams2: ->
     semver.satisfies(process.version, '>=0.10')
 
   @_containsValue: (array, element) ->

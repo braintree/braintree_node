@@ -215,10 +215,6 @@ describe "TransactionSearch", ->
                 done()
 
     it "allows stream style interation of results", (done) ->
-      unless Util.supportsStreams()
-        done()
-        return
-
       random = specHelper.randomId()
       transactionParams =
         amount: '10.00'
@@ -247,10 +243,6 @@ describe "TransactionSearch", ->
           search.resume()
 
     it "allows checking length on streams on the ready event", (done) ->
-      unless Util.supportsStreams()
-        done()
-        return
-
       random = specHelper.randomId()
       transactionParams =
         amount: '10.00'
@@ -270,7 +262,7 @@ describe "TransactionSearch", ->
             done()
 
     it "allows piping results to a writable stream", (done) ->
-      unless Util.supportsStreams()
+      unless Util.supportsStreams2()
         done()
         return
 
@@ -303,10 +295,6 @@ describe "TransactionSearch", ->
           search.pipe(ws)
 
     it "emits error events when appropriate", (done) ->
-      unless Util.supportsStreams()
-        done()
-        return
-
       search = specHelper.defaultGateway.transaction.search (search) ->
         search.amount().is(-10)
 
