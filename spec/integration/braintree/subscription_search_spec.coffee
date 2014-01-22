@@ -1,6 +1,6 @@
+Braintree = require("../../../lib/braintree")
 require("../../spec_helper")
-{SubscriptionSearch} = require("../../../lib/braintree/subscription_search")
-{Subscription} = require("../../../lib/braintree/subscription")
+Subscription = Braintree.Subscription
 
 describe "SubscriptionSearch", ->
   describe "search", ->

@@ -1,8 +1,8 @@
+Braintree = require("../../../lib/braintree")
 require("../../spec_helper")
 _ = require("underscore")
-{TransactionSearch} = require('../../../lib/braintree/transaction_search')
-{Transaction} = require('../../../lib/braintree/transaction')
-{CreditCard} = require('../../../lib/braintree/credit_card')
+Transaction = Braintree.Transaction
+CreditCard = Braintree.CreditCard
 {Util} = require('../../../lib/braintree/util')
 {Writable} = require('stream')
 braintree = specHelper.braintree
