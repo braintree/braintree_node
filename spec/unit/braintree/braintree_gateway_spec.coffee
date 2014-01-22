@@ -14,6 +14,6 @@ describe "BraintreeGateway", ->
       assert.isNotNull(signature)
 
       clientApiUrl = "http://localhost:#{process.env['GATEWAY_PORT'] || '3000'}/merchants/integration_merchant_id/client_api"
-      authUrl = "http://auth.venmo.dev:4567"
+      authUrl = "http://auth.venmo.dev:9292"
       assert.equal(clientToken.client_api_url, clientApiUrl)
       assert.equal(clientToken.auth_url, authUrl)
