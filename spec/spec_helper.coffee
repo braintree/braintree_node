@@ -4,6 +4,7 @@ catch err
 
 http = require('http')
 {Util} = require('../lib/braintree/util')
+{Config} = require('../lib/braintree/config')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
 chai = require("chai")
 {Buffer} = require('buffer')
@@ -118,6 +119,29 @@ randomId = ->
 doesNotInclude = (array, value) ->
   assert.isTrue(array.indexOf(value) is -1)
 
+generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
+  myHttp = new ClientApiHttp(new Config(specHelper.defaultConfig))
+  clientTokenOptions = {}
+  clientTokenOptions.customerId = customerId if customerId
+  rawAuthorizationFingerprint = specHelper.defaultGateway.generateClientToken(clientTokenOptions)
+  authorizationFingerprint = JSON.parse(rawAuthorizationFingerprint).authorization_fingerprint
+  params = {
+    authorizationFingerprint: authorizationFingerprint,
+    sessionIdentifierType: "testing",
+    sessionIdentifier: "testing-identifier",
+    share: true,
+    credit_card: {
+      number: cardNumber || "4111111111111111",
+      expiration_month: "11",
+      expiration_year: "2099"
+    }
+  }
+
+  myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
+    nonce = JSON.parse(body).nonce
+    callback(nonce)
+  )
+
 class ClientApiHttp
   timeout: 60000
 
@@ -188,4 +212,5 @@ GLOBAL.specHelper = {
   nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
   nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
   clientApiHttp: ClientApiHttp
+  generateNonceForNewCreditCard: generateNonceForNewCreditCard
 }

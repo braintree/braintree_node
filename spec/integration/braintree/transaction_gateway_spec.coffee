@@ -517,22 +517,7 @@ describe "TransactionGateway", ->
         done()
 
     it "can use payment method nonce", (done) ->
-      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      authorizationFingerprint = JSON.parse(specHelper.defaultGateway.generateClientToken()).authorization_fingerprint
-      params = {
-        authorizationFingerprint: authorizationFingerprint,
-        sessionIdentifierType: "testing",
-        sessionIdentifier: "testing-identifier",
-        share: true,
-        credit_card: {
-          number: "4111111111111111",
-          expiration_month: "11",
-          expiration_year: "2099"
-        }
-      }
-
-      myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
-        nonce = JSON.parse(body).nonce
+      specHelper.generateNonceForNewCreditCard(null, null, (nonce) ->
         transactionParams =
           amount: '1.00'
           paymentMethodNonce: nonce
