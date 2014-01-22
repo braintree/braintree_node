@@ -518,9 +518,9 @@ describe "TransactionGateway", ->
 
     it "can use payment method nonce", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      fingerprint = JSON.parse(specHelper.defaultGateway.generateAuthorizationInfo()).fingerprint
+      authorizationFingerprint = JSON.parse(specHelper.defaultGateway.generateClientToken()).authorization_fingerprint
       params = {
-        authorizationFingerprint: fingerprint,
+        authorizationFingerprint: authorizationFingerprint,
         sessionIdentifierType: "testing",
         sessionIdentifier: "testing-identifier",
         share: true,

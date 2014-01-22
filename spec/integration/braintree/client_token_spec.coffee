@@ -2,11 +2,11 @@ require('../../spec_helper')
 braintree = specHelper.braintree
 {Config} = require('../../../lib/braintree/config')
 
-describe "AuthorizationInfo", ->
+describe "ClientToken", ->
   it "is verified by the gateway", (done) ->
     myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-    fingerprint = JSON.parse(specHelper.defaultGateway.generateAuthorizationInfo()).fingerprint
-    encodedFingerprint = encodeURIComponent(fingerprint)
+    authorizationFingerprint = JSON.parse(specHelper.defaultGateway.generateClientToken()).authorization_fingerprint
+    encodedFingerprint = encodeURIComponent(authorizationFingerprint)
     url = "/client_api/credit_cards.json?"
     url += "authorizationFingerprint=#{encodedFingerprint}"
     url += "&sessionIdentifierType=testing"
@@ -21,10 +21,10 @@ describe "AuthorizationInfo", ->
     specHelper.defaultGateway.customer.create({}, (err, result) ->
       customerId = result.customer.id
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      authInfo = specHelper.defaultGateway.generateAuthorizationInfo(customerId: customerId, verifyCard: true)
-      fingerprint = JSON.parse(authInfo).fingerprint
+      clientToken = specHelper.defaultGateway.generateClientToken(customerId: customerId, verifyCard: true)
+      authorizationFingerprint = JSON.parse(clientToken).authorization_fingerprint
       params = {
-        authorizationFingerprint: fingerprint,
+        authorizationFingerprint: authorizationFingerprint,
         sessionIdentifierType: "testing",
         sessionIdentifier: "testing-identifier",
         credit_card: {
@@ -51,14 +51,14 @@ describe "AuthorizationInfo", ->
         assert.isTrue(result.success)
         myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
 
-        authInfo = specHelper.defaultGateway.generateAuthorizationInfo({
+        clientToken = specHelper.defaultGateway.generateClientToken({
           makeDefault: true,
           customerId: customerId
         })
-        fingerprint = JSON.parse(authInfo).fingerprint
+        authorizationFingerprint = JSON.parse(clientToken).authorization_fingerprint
 
         params = {
-          authorizationFingerprint: fingerprint,
+          authorizationFingerprint: authorizationFingerprint,
           sessionIdentifierType: "testing",
           sessionIdentifier: "testing-identifier",
           credit_card: {
@@ -84,13 +84,13 @@ describe "AuthorizationInfo", ->
   it "can pass failOnDuplicatePaymentMethod", (done) ->
     specHelper.defaultGateway.customer.create({}, (err, result) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      authInfo = specHelper.defaultGateway.generateAuthorizationInfo({
+      clientToken = specHelper.defaultGateway.generateClientToken({
         customerId: result.customer.id
       })
-      fingerprint = JSON.parse(authInfo).fingerprint
+      authorizationFingerprint = JSON.parse(clientToken).authorization_fingerprint
 
       params = {
-        authorizationFingerprint: fingerprint,
+        authorizationFingerprint: authorizationFingerprint,
         sessionIdentifierType: "testing",
         sessionIdentifier: "testing-identifier",
         credit_card: {
@@ -102,12 +102,12 @@ describe "AuthorizationInfo", ->
 
       myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
         assert.equal(statusCode, 201)
-        authInfo = specHelper.defaultGateway.generateAuthorizationInfo({
+        clientToken = specHelper.defaultGateway.generateClientToken({
           customerId: result.customer.id,
           failOnDuplicatePaymentMethod: true
         })
-        fingerprint = JSON.parse(authInfo).fingerprint
-        params.authorizationFingerprint = fingerprint
+        authorizationFingerprint = JSON.parse(clientToken).authorization_fingerprint
+        params.authorizationFingerprint = authorizationFingerprint
         myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
           assert.equal(statusCode, 422)
           done()

@@ -1,6 +1,6 @@
 {Http} = require('./http')
 {AddressGateway} = require("./address_gateway")
-{AuthorizationInfo} = require("./authorization_info")
+{ClientToken} = require("./client_token")
 {CreditCardGateway} = require("./credit_card_gateway")
 {CreditCardVerificationGateway} = require("./credit_card_verification_gateway")
 {CustomerGateway} = require("./customer_gateway")
@@ -27,8 +27,8 @@ class BraintreeGateway
     @webhookNotification = new WebhookNotificationGateway(this)
     @webhookTesting = new WebhookTestingGateway(this)
 
-  generateAuthorizationInfo: (options) ->
-    AuthorizationInfo.generate(
+  generateClientToken: (options) ->
+    ClientToken.generate(
       @config.merchantId,
       @config.publicKey,
       @config.privateKey,

@@ -1,7 +1,7 @@
 {Digest} = require('./digest')
 {SignatureService} = require('./signature_service')
 
-class AuthorizationInfo
+class ClientToken
 
   @generate: (merchantId, publicKey, privateKey, clientApiUrl, authUrl, options={}) ->
     date = new Date()
@@ -27,9 +27,9 @@ class AuthorizationInfo
     payloadString = payloadList.join("&")
     fingerprint = new SignatureService(privateKey, Digest.Sha256hexdigest).sign(payloadString)
     JSON.stringify({
-      fingerprint: fingerprint,
+      authorization_fingerprint: fingerprint,
       client_api_url: clientApiUrl,
       auth_url: authUrl
     })
 
-exports.AuthorizationInfo = AuthorizationInfo
+exports.ClientToken = ClientToken
