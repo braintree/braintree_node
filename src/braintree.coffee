@@ -3,6 +3,10 @@
 {BraintreeGateway} = require("./braintree/braintree_gateway")
 errorTypes = require("./braintree/error_types")
 
+{Transaction} = require("./braintree/transaction")
+{CreditCard} = require("./braintree/credit_card")
+{Subscription} = require("./braintree/subscription")
+
 connect = (config) ->
   new BraintreeGateway(new Config(config))
 
@@ -10,3 +14,7 @@ exports.connect = connect
 exports.version = '1.11.2'
 exports.Environment = Environment
 exports.errorTypes = errorTypes
+
+exports.Transaction = Transaction
+exports.CreditCard = CreditCard
+exports.Subscription = Subscription

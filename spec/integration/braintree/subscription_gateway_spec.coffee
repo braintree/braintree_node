@@ -120,12 +120,14 @@ describe "SubscriptionGateway", ->
         assert.equal(addons[0].quantity, 1)
         assert.equal(addons[0].numberOfBillingCycles, null)
         assert.isTrue(addons[0].neverExpires)
+        assert.equal(addons[0].currentBillingCycle, 0)
 
         assert.equal(addons[1].id, 'increase_20')
         assert.equal(addons[1].amount, '20.00')
         assert.equal(addons[1].quantity, 1)
         assert.equal(addons[1].numberOfBillingCycles, null)
         assert.isTrue(addons[1].neverExpires)
+        assert.equal(addons[1].currentBillingCycle, 0)
 
         discounts = _.sortBy(response.subscription.discounts, (d) ->  return d.id )
         assert.equal(discounts.length, 2)
@@ -135,12 +137,14 @@ describe "SubscriptionGateway", ->
         assert.equal(discounts[0].quantity, 1)
         assert.equal(discounts[0].numberOfBillingCycles, null)
         assert.isTrue(discounts[0].neverExpires)
+        assert.equal(discounts[0].currentBillingCycle, 0)
 
         assert.equal(discounts[1].id, 'discount_7')
         assert.equal(discounts[1].amount, '7.00')
         assert.equal(discounts[1].quantity, 1)
         assert.equal(discounts[1].numberOfBillingCycles, null)
         assert.isTrue(discounts[1].neverExpires)
+        assert.equal(discounts[1].currentBillingCycle, 0)
 
         done()
 
