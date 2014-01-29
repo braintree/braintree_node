@@ -9,8 +9,8 @@ describe "ClientToken", ->
     encodedFingerprint = encodeURIComponent(authorizationFingerprint)
     url = "/client_api/credit_cards.json?"
     url += "authorizationFingerprint=#{encodedFingerprint}"
-    url += "&sessionIdentifierType=testing"
-    url += "&sessionIdentifier=test-identifier"
+    url += "&sharedCustomerIdentifierType=testing"
+    url += "&sharedCustomerIdentifier=test-identifier"
 
     myHttp.get(url, (statusCode) ->
       assert.equal(200, statusCode)
@@ -25,8 +25,8 @@ describe "ClientToken", ->
       authorizationFingerprint = JSON.parse(clientToken).authorization_fingerprint
       params = {
         authorizationFingerprint: authorizationFingerprint,
-        sessionIdentifierType: "testing",
-        sessionIdentifier: "testing-identifier",
+        sharedCustomerIdentifierType: "testing",
+        sharedCustomerIdentifier: "testing-identifier",
         credit_card: {
           number: "4115111111111115",
           expiration_month: "11",
@@ -59,8 +59,8 @@ describe "ClientToken", ->
 
         params = {
           authorizationFingerprint: authorizationFingerprint,
-          sessionIdentifierType: "testing",
-          sessionIdentifier: "testing-identifier",
+          sharedCustomerIdentifierType: "testing",
+          sharedCustomerIdentifier: "testing-identifier",
           credit_card: {
             number: "4111111111111111",
             expiration_month: "11",
@@ -91,8 +91,8 @@ describe "ClientToken", ->
 
       params = {
         authorizationFingerprint: authorizationFingerprint,
-        sessionIdentifierType: "testing",
-        sessionIdentifier: "testing-identifier",
+        sharedCustomerIdentifierType: "testing",
+        sharedCustomerIdentifier: "testing-identifier",
         credit_card: {
           number: "4111111111111111",
           expiration_month: "11",

@@ -127,8 +127,8 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
   authorizationFingerprint = JSON.parse(rawAuthorizationFingerprint).authorization_fingerprint
   params = {
     authorizationFingerprint: authorizationFingerprint,
-    sessionIdentifierType: "testing",
-    sessionIdentifier: "testing-identifier",
+    sharedCustomerIdentifierType: "testing",
+    sharedCustomerIdentifier: "testing-identifier",
     share: true,
     credit_card: {
       number: cardNumber || "4111111111111111",
