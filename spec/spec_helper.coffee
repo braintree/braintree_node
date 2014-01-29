@@ -124,7 +124,7 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
   clientTokenOptions = {}
   clientTokenOptions.customerId = customerId if customerId
   rawAuthorizationFingerprint = specHelper.defaultGateway.generateClientToken(clientTokenOptions)
-  authorizationFingerprint = JSON.parse(rawAuthorizationFingerprint).authorization_fingerprint
+  authorizationFingerprint = JSON.parse(rawAuthorizationFingerprint).authorizationFingerprint
   params = {
     authorizationFingerprint: authorizationFingerprint,
     sharedCustomerIdentifierType: "testing",

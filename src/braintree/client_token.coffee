@@ -27,9 +27,9 @@ class ClientToken
     payloadString = payloadList.join("&")
     fingerprint = new SignatureService(privateKey, Digest.Sha256hexdigest).sign(payloadString)
     JSON.stringify({
-      authorization_fingerprint: fingerprint,
-      client_api_url: clientApiUrl,
-      auth_url: authUrl
+      authorizationFingerprint: fingerprint,
+      clientApiUrl: clientApiUrl,
+      authUrl: authUrl
     })
 
 exports.ClientToken = ClientToken

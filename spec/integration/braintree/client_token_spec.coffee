@@ -5,7 +5,7 @@ braintree = specHelper.braintree
 describe "ClientToken", ->
   it "is verified by the gateway", (done) ->
     myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-    authorizationFingerprint = JSON.parse(specHelper.defaultGateway.generateClientToken()).authorization_fingerprint
+    authorizationFingerprint = JSON.parse(specHelper.defaultGateway.generateClientToken()).authorizationFingerprint
     encodedFingerprint = encodeURIComponent(authorizationFingerprint)
     url = "/client_api/credit_cards.json?"
     url += "authorizationFingerprint=#{encodedFingerprint}"
@@ -22,7 +22,7 @@ describe "ClientToken", ->
       customerId = result.customer.id
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
       clientToken = specHelper.defaultGateway.generateClientToken(customerId: customerId, verifyCard: true)
-      authorizationFingerprint = JSON.parse(clientToken).authorization_fingerprint
+      authorizationFingerprint = JSON.parse(clientToken).authorizationFingerprint
       params = {
         authorizationFingerprint: authorizationFingerprint,
         sharedCustomerIdentifierType: "testing",
@@ -55,7 +55,7 @@ describe "ClientToken", ->
           makeDefault: true,
           customerId: customerId
         })
-        authorizationFingerprint = JSON.parse(clientToken).authorization_fingerprint
+        authorizationFingerprint = JSON.parse(clientToken).authorizationFingerprint
 
         params = {
           authorizationFingerprint: authorizationFingerprint,
@@ -87,7 +87,7 @@ describe "ClientToken", ->
       clientToken = specHelper.defaultGateway.generateClientToken({
         customerId: result.customer.id
       })
-      authorizationFingerprint = JSON.parse(clientToken).authorization_fingerprint
+      authorizationFingerprint = JSON.parse(clientToken).authorizationFingerprint
 
       params = {
         authorizationFingerprint: authorizationFingerprint,
@@ -106,7 +106,7 @@ describe "ClientToken", ->
           customerId: result.customer.id,
           failOnDuplicatePaymentMethod: true
         })
-        authorizationFingerprint = JSON.parse(clientToken).authorization_fingerprint
+        authorizationFingerprint = JSON.parse(clientToken).authorizationFingerprint
         params.authorizationFingerprint = authorizationFingerprint
         myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
           assert.equal(statusCode, 422)

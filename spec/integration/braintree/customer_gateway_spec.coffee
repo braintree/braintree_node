@@ -231,7 +231,7 @@ describe "CustomerGateway", ->
 
     it "creates a customer with a payment method nonce", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      authorizationFingerprint = JSON.parse(specHelper.defaultGateway.generateClientToken()).authorization_fingerprint
+      authorizationFingerprint = JSON.parse(specHelper.defaultGateway.generateClientToken()).authorizationFingerprint
       params = {
         authorizationFingerprint: authorizationFingerprint,
         sharedCustomerIdentifierType: "testing",
