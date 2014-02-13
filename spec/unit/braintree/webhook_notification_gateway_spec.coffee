@@ -93,6 +93,22 @@ describe "WebhookNotificationGateway", ->
         assert.ok(webhookNotification.transaction.disbursementDetails.disbursementDate?)
         done()
 
+    it "returns a parsable signature and payload for transfer exception", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.TransferException,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransferException)
+        assert.equal(webhookNotification.transfer.id, "my_id")
+        assert.equal(webhookNotification.transfer.amount, '100.00')
+        assert.equal(webhookNotification.transfer.disbursementDate, '2014-02-10')
+        assert.equal(webhookNotification.transfer.message, "invalid_account_number")
+        assert.equal(webhookNotification.transfer.merchantAccountId, "abcdef")
+
+        done()
+
 
     it "builds a sample notification for a partner merchant connected webhook", (done) ->
       {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(

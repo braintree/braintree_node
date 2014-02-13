@@ -1,6 +1,7 @@
 {AttributeSetter} = require('./attribute_setter')
 {MerchantAccount} = require('./merchant_account')
 {Transaction} = require('./transaction')
+{Transfer} = require('./transfer')
 {PartnerMerchant} = require('./partner_merchant')
 {Subscription} = require('./subscription')
 {ValidationErrorsCollection} = require('./validation_errors_collection')
@@ -20,6 +21,7 @@ class WebhookNotification extends AttributeSetter
     SubMerchantAccountApproved: "sub_merchant_account_approved"
     SubMerchantAccountDeclined: "sub_merchant_account_declined"
     TransactionDisbursed: "transaction_disbursed"
+    TransferException: "transfer_exception"
 
   constructor: (attributes) ->
     super attributes
@@ -34,6 +36,9 @@ class WebhookNotification extends AttributeSetter
 
     if wrapper_node.merchantAccount?
       @merchantAccount = new MerchantAccount(wrapper_node.merchantAccount)
+
+    if wrapper_node.transfer?
+      @transfer = new Transfer(wrapper_node.transfer)
 
     if wrapper_node.transaction?
       @transaction = new Transaction(wrapper_node.transaction)
