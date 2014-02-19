@@ -3,7 +3,7 @@ require('../../spec_helper')
 braintree = specHelper.braintree
 {Transfer} = require('../../../lib/braintree/transfer')
 
-describe "Transfer", ->
+describe "TransferGateway", ->
   describe "merchant_account", ->
     it "retrieves merchant account that owns the transfer", (done) ->
       transferParams =
@@ -16,7 +16,7 @@ describe "Transfer", ->
 
       transfer = new Transfer(transferParams)
 
-      transfer.merchantAccount(specHelper.defaultGateway, (err, merchantAccount) ->
+      specHelper.defaultGateway.transfer.merchantAccount(transfer, (err, merchantAccount) ->
         assert.isNull(err)
         assert.equal(merchantAccount.id, "sandbox_sub_merchant_account")
         done()
@@ -34,7 +34,7 @@ describe "Transfer", ->
 
       transfer = new Transfer(transferParams)
 
-      transfer.transactions(specHelper.defaultGateway, (err, transactions) ->
+      specHelper.defaultGateway.transfer.transactions(transfer, (err, transactions) ->
         assert.isNull(err)
         assert.equal(transactions.length(), 1)
         transactions.first((err, transaction) ->
