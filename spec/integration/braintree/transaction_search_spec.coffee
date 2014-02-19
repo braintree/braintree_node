@@ -1,11 +1,11 @@
+Braintree = require("../../../lib/braintree")
 require("../../spec_helper")
 _ = require("underscore")
-{TransactionSearch} = require('../../../lib/braintree/transaction_search')
-{Transaction} = require('../../../lib/braintree/transaction')
-{CreditCard} = require('../../../lib/braintree/credit_card')
+Transaction = Braintree.Transaction
+CreditCard = Braintree.CreditCard
 {Util} = require('../../../lib/braintree/util')
 {Writable} = require('stream')
-braintree = specHelper.braintree 
+braintree = specHelper.braintree
 
 describe "TransactionSearch", ->
   describe "search", ->
@@ -215,10 +215,6 @@ describe "TransactionSearch", ->
                 done()
 
     it "allows stream style interation of results", (done) ->
-      unless Util.supportsStreams()
-        done()
-        return
-
       random = specHelper.randomId()
       transactionParams =
         amount: '10.00'
@@ -246,8 +242,27 @@ describe "TransactionSearch", ->
 
           search.resume()
 
+    it "allows checking length on streams on the ready event", (done) ->
+      random = specHelper.randomId()
+      transactionParams =
+        amount: '10.00'
+        orderId: random
+        creditCard:
+          number: '4111111111111111'
+          expirationDate: '01/2015'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          search = specHelper.defaultGateway.transaction.search (search) ->
+            search.orderId().is(random)
+
+          search.on 'ready', ->
+            assert.equal(search.searchResponse.length(), 2)
+
+            done()
+
     it "allows piping results to a writable stream", (done) ->
-      unless Util.supportsStreams()
+      unless Util.supportsStreams2()
         done()
         return
 
@@ -280,10 +295,6 @@ describe "TransactionSearch", ->
           search.pipe(ws)
 
     it "emits error events when appropriate", (done) ->
-      unless Util.supportsStreams()
-        done()
-        return
-
       search = specHelper.defaultGateway.transaction.search (search) ->
         search.amount().is(-10)
 

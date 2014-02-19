@@ -1,3 +1,11 @@
+## 1.12.0
+
+* Expose constants for advanced search 
+
+## 1.11.2
+
+* Adds ability to consume search results as a readable stream in node versions prior to 0.10
+
 ## 1.11.1
 
 * Adds ability to consume credit card verification search results as a readable stream

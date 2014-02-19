@@ -1,8 +1,7 @@
+Braintree = require("../../../lib/braintree")
 require("../../spec_helper")
-{CreditCardVerificationSearch} = require('../../../lib/braintree/credit_card_verification_search')
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
-{CreditCard} = require('../../../lib/braintree/credit_card')
-{Util} = require('../../../lib/braintree/util')
+CreditCard = Braintree.CreditCard 
 
 describe "CreditCardVerification", ->
   describe "search", ->
@@ -36,10 +35,6 @@ describe "CreditCardVerification", ->
             done()
 
     it "allows stream style interation of results", (done) ->
-      unless Util.supportsStreams()
-        done()
-        return
-
       name = specHelper.randomId() + ' Smith'
       customerParams =
         creditCard:

@@ -1,7 +1,6 @@
+Braintree = require("../../../lib/braintree")
 require("../../spec_helper")
-{SubscriptionSearch} = require("../../../lib/braintree/subscription_search")
-{Subscription} = require("../../../lib/braintree/subscription")
-{Util} = require('../../../lib/braintree/util')
+Subscription = Braintree.Subscription
 
 describe "SubscriptionSearch", ->
   describe "search", ->
@@ -72,10 +71,6 @@ describe "SubscriptionSearch", ->
               done()
 
     it "allows stream style interation of results", (done) ->
-      unless Util.supportsStreams()
-        done()
-        return
-
       customerParams =
         creditCard:
           number: '5105105105105100'

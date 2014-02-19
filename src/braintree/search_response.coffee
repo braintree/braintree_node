@@ -1,5 +1,5 @@
 _ = require('underscore')
-{Util} = require('./util')
+{SearchResponseStream} = require('./search_response_stream')
 
 class SearchResponse
   constructor: (pagingFunction, results) ->
@@ -9,9 +9,7 @@ class SearchResponse
     if results?
       @setResponse(results)
 
-    if Util.supportsStreams()
-      {SearchResponseStream} = require('./search_response_stream')
-      @stream = new SearchResponseStream(this)
+    @stream = new SearchResponseStream(this)
 
     @success = true
 
@@ -29,7 +27,7 @@ class SearchResponse
     @ids.length
 
   ready: ->
-    @stream.ready() if @stream?
+    @stream.ready()
 
   setFatalError: (error) ->
     @fatalError = error
