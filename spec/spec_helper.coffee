@@ -123,23 +123,25 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
   myHttp = new ClientApiHttp(new Config(specHelper.defaultConfig))
   clientTokenOptions = {}
   clientTokenOptions.customerId = customerId if customerId
-  rawAuthorizationFingerprint = specHelper.defaultGateway.generateClientToken(clientTokenOptions)
-  authorizationFingerprint = JSON.parse(rawAuthorizationFingerprint).authorizationFingerprint
-  params = {
-    authorizationFingerprint: authorizationFingerprint,
-    sharedCustomerIdentifierType: "testing",
-    sharedCustomerIdentifier: "testing-identifier",
-    share: true,
-    credit_card: {
-      number: cardNumber || "4111111111111111",
-      expiration_month: "11",
-      expiration_year: "2099"
+  specHelper.defaultGateway.clientToken.generate(clientTokenOptions, (err, result) ->
+    clientToken = JSON.parse(result.clientToken)
+    authorizationFingerprint = clientToken.authorizationFingerprint
+    params = {
+      authorizationFingerprint: authorizationFingerprint,
+      sharedCustomerIdentifierType: "testing",
+      sharedCustomerIdentifier: "testing-identifier",
+      share: true,
+      credit_card: {
+        number: cardNumber || "4111111111111111",
+        expiration_month: "11",
+        expiration_year: "2099"
+      }
     }
-  }
 
-  myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
-    nonce = JSON.parse(body).nonce
-    callback(nonce)
+    myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
+      nonce = JSON.parse(body).nonce
+      callback(nonce)
+    )
   )
 
 class ClientApiHttp

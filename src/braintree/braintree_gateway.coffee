@@ -1,6 +1,6 @@
 {Http} = require('./http')
 {AddressGateway} = require("./address_gateway")
-{ClientToken} = require("./client_token")
+{ClientTokenGateway} = require("./client_token_gateway")
 {CreditCardGateway} = require("./credit_card_gateway")
 {CreditCardVerificationGateway} = require("./credit_card_verification_gateway")
 {CustomerGateway} = require("./customer_gateway")
@@ -17,6 +17,7 @@ class BraintreeGateway
   constructor: (@config) ->
     @http = new Http(@config)
     @address = new AddressGateway(this)
+    @clientToken = new ClientTokenGateway(this)
     @creditCard = new CreditCardGateway(this)
     @creditCardVerification = new CreditCardVerificationGateway(this)
     @customer = new CustomerGateway(this)
@@ -28,15 +29,5 @@ class BraintreeGateway
     @transparentRedirect = new TransparentRedirectGateway(this)
     @webhookNotification = new WebhookNotificationGateway(this)
     @webhookTesting = new WebhookTestingGateway(this)
-
-  generateClientToken: (options) ->
-    ClientToken.generate(
-      @config.merchantId,
-      @config.publicKey,
-      @config.privateKey,
-      "#{@config.baseMerchantUrl()}/client_api",
-      @config.environment.authUrl,
-      options
-    )
 
 exports.BraintreeGateway = BraintreeGateway

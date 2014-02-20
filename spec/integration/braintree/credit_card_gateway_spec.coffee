@@ -143,31 +143,35 @@ describe "CreditCardGateway", ->
 
     it "accepts a payment method nonce", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      authorizationFingerprint = JSON.parse(specHelper.defaultGateway.generateClientToken()).authorizationFingerprint
-      params = {
-        authorizationFingerprint: authorizationFingerprint,
-        sharedCustomerIdentifierType: "testing",
-        sharedCustomerIdentifier: "testing-identifier",
-        share: true,
-        credit_card: {
-          number: "4111111111111111",
-          expiration_month: "11",
-          expiration_year: "2099"
+      specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
+
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          sharedCustomerIdentifierType: "testing",
+          sharedCustomerIdentifier: "testing-identifier",
+          share: true,
+          credit_card: {
+            number: "4111111111111111",
+            expiration_month: "11",
+            expiration_year: "2099"
+          }
         }
-      }
 
-      myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
-        nonce = JSON.parse(body).nonce
-        creditCardParams =
-          customerId: customerId
-          paymentMethodNonce: nonce
+        myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).nonce
+          creditCardParams =
+            customerId: customerId
+            paymentMethodNonce: nonce
 
-        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-          assert.equal(response.creditCard.maskedNumber, '411111******1111')
+          specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.creditCard.maskedNumber, '411111******1111')
 
-          done()
+            done()
+        )
       )
 
     context "card type indicators", ->

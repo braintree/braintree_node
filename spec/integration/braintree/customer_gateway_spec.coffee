@@ -231,31 +231,34 @@ describe "CustomerGateway", ->
 
     it "creates a customer with a payment method nonce", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      authorizationFingerprint = JSON.parse(specHelper.defaultGateway.generateClientToken()).authorizationFingerprint
-      params = {
-        authorizationFingerprint: authorizationFingerprint,
-        sharedCustomerIdentifierType: "testing",
-        sharedCustomerIdentifier: "testing-identifier",
-        share: true,
-        credit_card: {
-          number: "4111111111111111",
-          expiration_month: "11",
-          expiration_year: "2099"
+      specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          sharedCustomerIdentifierType: "testing",
+          sharedCustomerIdentifier: "testing-identifier",
+          share: true,
+          credit_card: {
+            number: "4111111111111111",
+            expiration_month: "11",
+            expiration_year: "2099"
+          }
         }
-      }
 
-      myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
-        nonce = JSON.parse(body).nonce
-        customerParams = 
-          creditCard:
-            paymentMethodNonce: nonce
+        myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).nonce
+          customerParams =
+            creditCard:
+              paymentMethodNonce: nonce
 
-        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-          assert.equal(response.customer.creditCards[0].bin, "411111")
+          specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.customer.creditCards[0].bin, "411111")
 
-          done()
+            done()
+        )
       )
 
   describe "delete", ->
