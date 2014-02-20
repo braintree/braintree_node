@@ -22,6 +22,28 @@ describe "TransferGateway", ->
         done()
       )
 
+    it "memoizes the merchant account", (done) ->
+      transferParams =
+        merchant_account_id: "sandbox_sub_merchant_account",
+        id:  "123456",
+        message:  "invalid_account_number",
+        amount:  "100.00",
+        disbursement_date:  "2014-02-10",
+        follow_up_action:  "update"
+
+      transfer = new Transfer(transferParams)
+
+      specHelper.defaultGateway.transfer.merchantAccount(transfer, (err, merchantAccount) ->
+        assert.isNull(err)
+        firstMerchantAccount = merchantAccount
+
+        transfer.merchant_account_id = 'non_existant'
+        specHelper.defaultGateway.transfer.merchantAccount(transfer, (err, merchantAccount) ->
+          assert.equal(merchantAccount, firstMerchantAccount)
+          done()
+        )
+      )
+
   describe "transactions", ->
     it "retrieves transactions associated with the transfer", (done) ->
       transferParams =

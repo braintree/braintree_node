@@ -4,9 +4,16 @@ exceptions = require('./exceptions')
 
 class TransferGateway extends Gateway
   constructor: (@gateway) ->
+    @memoizedMerchantAccount = null
 
   merchantAccount: (transfer, callback) ->
-    @gateway.merchantAccount.find(transfer.merchant_account_id, callback)
+    if (@memoizedMerchantAccount == null)
+      @gateway.merchantAccount.find(transfer.merchant_account_id, (err, merchantAccount) =>
+        @memoizedMerchantAccount = merchantAccount unless err
+        callback(err, @memoizedMerchantAccount)
+      )
+    else
+      callback(null, @memoizedMerchantAccount)
 
   transactions: (transfer, callback) ->
     merchant_account_id = transfer.merchant_account_id
