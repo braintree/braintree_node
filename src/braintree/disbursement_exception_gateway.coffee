@@ -1,26 +1,26 @@
 {Gateway} = require('./gateway')
-{Transfer} = require('./transfer')
+{DisbursementException} = require('./disbursement_exception')
 exceptions = require('./exceptions')
 
-class TransferGateway extends Gateway
+class DisbursementExceptionGateway extends Gateway
   constructor: (@gateway) ->
     @memoizedMerchantAccount = null
 
-  merchantAccount: (transfer, callback) ->
+  merchantAccount: (disbursementException, callback) ->
     if (@memoizedMerchantAccount == null)
-      @gateway.merchantAccount.find(transfer.merchant_account_id, (err, merchantAccount) =>
+      @gateway.merchantAccount.find(disbursementException.merchant_account_id, (err, merchantAccount) =>
         @memoizedMerchantAccount = merchantAccount unless err
         callback(err, @memoizedMerchantAccount)
       )
     else
       callback(null, @memoizedMerchantAccount)
 
-  transactions: (transfer, callback) ->
-    merchant_account_id = transfer.merchant_account_id
-    disbursement_date = transfer.disbursement_date
+  transactions: (disbursementException, callback) ->
+    merchant_account_id = disbursementException.merchant_account_id
+    disbursement_date = disbursementException.disbursement_date
     @gateway.transaction.search(((search) ->
       search.merchantAccountId().is(merchant_account_id)
       search.disbursementDate().is(disbursement_date)),
       callback)
 
-exports.TransferGateway = TransferGateway
+exports.DisbursementExceptionGateway = DisbursementExceptionGateway

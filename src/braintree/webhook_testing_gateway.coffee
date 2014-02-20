@@ -27,7 +27,7 @@ class WebhookTestingGateway extends Gateway
   subjectXmlFor: (kind, id) ->
     switch kind
       when WebhookNotification.Kind.TransactionDisbursed then @subjectXmlForTransactionDisbursed(id)
-      when WebhookNotification.Kind.TransferException then @subjectXmlForTransferException(id)
+      when WebhookNotification.Kind.DisbursementException then @subjectXmlForDisbursementException(id)
       when WebhookNotification.Kind.SubMerchantAccountApproved then @subjectXmlForSubMerchantAccountApproved(id)
       when WebhookNotification.Kind.SubMerchantAccountDeclined then @subjectXmlForSubMerchantAccountDeclined(id)
       when WebhookNotification.Kind.PartnerMerchantConnected then @subjectXmlForPartnerMerchantConnected()
@@ -46,16 +46,16 @@ class WebhookTestingGateway extends Gateway
     </transaction>
     """
 
-  subjectXmlForTransferException: (id) ->
+  subjectXmlForDisbursementException: (id) ->
     """
-    <transfer>
+    <disbursement-exception>
       <merchant-account-id>abcdef</merchant-account-id>
       <id>#{id}</id>
       <message>invalid_account_number</message>
       <amount>100.00</amount>
       <disbursement-date>2014-02-10</disbursement-date>
       <follow-up-action>update</follow-up-action>
-    </transfer>
+    </disbursement-exception>
     """
 
   subjectXmlForSubMerchantAccountApproved: (id) ->

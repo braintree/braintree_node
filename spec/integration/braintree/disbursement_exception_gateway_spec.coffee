@@ -1,12 +1,12 @@
 require('../../spec_helper')
 
 braintree = specHelper.braintree
-{Transfer} = require('../../../lib/braintree/transfer')
+{DisbursementException} = require('../../../lib/braintree/disbursement_exception')
 
-describe "TransferGateway", ->
+describe "DisbursementExceptionGateway", ->
   describe "merchant_account", ->
-    it "retrieves merchant account that owns the transfer", (done) ->
-      transferParams =
+    it "retrieves merchant account that owns the disbursement exception", (done) ->
+      disbursementExceptionParams =
         merchant_account_id: "sandbox_sub_merchant_account",
         id:  "123456",
         message:  "invalid_account_number",
@@ -14,16 +14,16 @@ describe "TransferGateway", ->
         disbursement_date:  "2014-02-10",
         follow_up_action:  "update"
 
-      transfer = new Transfer(transferParams)
+      disbursementException = new DisbursementException(disbursementExceptionParams)
 
-      specHelper.defaultGateway.transfer.merchantAccount(transfer, (err, merchantAccount) ->
+      specHelper.defaultGateway.disbursementException.merchantAccount(disbursementException, (err, merchantAccount) ->
         assert.isNull(err)
         assert.equal(merchantAccount.id, "sandbox_sub_merchant_account")
         done()
       )
 
     it "memoizes the merchant account", (done) ->
-      transferParams =
+      disbursementExceptionParams =
         merchant_account_id: "sandbox_sub_merchant_account",
         id:  "123456",
         message:  "invalid_account_number",
@@ -31,22 +31,22 @@ describe "TransferGateway", ->
         disbursement_date:  "2014-02-10",
         follow_up_action:  "update"
 
-      transfer = new Transfer(transferParams)
+      disbursementException = new DisbursementException(disbursementExceptionParams)
 
-      specHelper.defaultGateway.transfer.merchantAccount(transfer, (err, merchantAccount) ->
+      specHelper.defaultGateway.disbursementException.merchantAccount(disbursementException, (err, merchantAccount) ->
         assert.isNull(err)
         firstMerchantAccount = merchantAccount
 
-        transfer.merchant_account_id = 'non_existant'
-        specHelper.defaultGateway.transfer.merchantAccount(transfer, (err, merchantAccount) ->
+        disbursementException.merchant_account_id = 'non_existant'
+        specHelper.defaultGateway.disbursementException.merchantAccount(disbursementException, (err, merchantAccount) ->
           assert.equal(merchantAccount, firstMerchantAccount)
           done()
         )
       )
 
   describe "transactions", ->
-    it "retrieves transactions associated with the transfer", (done) ->
-      transferParams =
+    it "retrieves transactions associated with the disbursement exception", (done) ->
+      disbursementExceptionParams =
         merchant_account_id: "sandbox_sub_merchant_account",
         id:  "123456",
         message:  "invalid_account_number",
@@ -54,9 +54,9 @@ describe "TransferGateway", ->
         disbursement_date:  "2013-04-10",
         follow_up_action:  "update"
 
-      transfer = new Transfer(transferParams)
+      disbursementException = new DisbursementException(disbursementExceptionParams)
 
-      specHelper.defaultGateway.transfer.transactions(transfer, (err, transactions) ->
+      specHelper.defaultGateway.disbursementException.transactions(disbursementException, (err, transactions) ->
         assert.isNull(err)
         assert.equal(transactions.length(), 1)
         transactions.first((err, transaction) ->
