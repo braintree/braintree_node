@@ -1,8 +1,8 @@
 require('../../spec_helper')
 
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
-{WebhookNotification} = require('../../../lib/braintree/webhook_notification')
-errorTypes = require('../../../lib/braintree/error_types')
+{WebhookNotification} = require('../../../lib/braintree')
+{errorTypes} = require('../../../lib/braintree')
 
 describe "WebhookNotificationGateway", ->
   describe "verify", ->
