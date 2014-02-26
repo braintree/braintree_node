@@ -1,4 +1,3 @@
-require('../../spec_helper')
 
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 {WebhookNotification} = require('../../../lib/braintree')
@@ -101,11 +100,11 @@ describe "WebhookNotificationGateway", ->
 
       specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisbursementException)
-        assert.equal(webhookNotification.disbursementException.id, "my_id")
-        assert.equal(webhookNotification.disbursementException.amount, '100.00')
-        assert.equal(webhookNotification.disbursementException.disbursementDate, '2014-02-10')
-        assert.equal(webhookNotification.disbursementException.message, "invalid_account_number")
-        assert.equal(webhookNotification.disbursementException.merchantAccountId, "abcdef")
+        assert.equal(webhookNotification.disbursement.id, "my_id")
+        assert.equal(webhookNotification.disbursement.amount, '100.00')
+        assert.equal(webhookNotification.disbursement.disbursementDate, '2014-02-10')
+        assert.equal(webhookNotification.disbursement.message, "invalid_account_number")
+        assert.equal(webhookNotification.disbursement.merchantAccountId, "abcdef")
 
         done()
 

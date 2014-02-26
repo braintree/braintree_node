@@ -1,7 +1,7 @@
 {AttributeSetter} = require('./attribute_setter')
 {MerchantAccount} = require('./merchant_account')
 {Transaction} = require('./transaction')
-{DisbursementException} = require('./disbursement_exception')
+{Disbursement} = require('./disbursement')
 {PartnerMerchant} = require('./partner_merchant')
 {Subscription} = require('./subscription')
 {ValidationErrorsCollection} = require('./validation_errors_collection')
@@ -37,8 +37,8 @@ class WebhookNotification extends AttributeSetter
     if wrapper_node.merchantAccount?
       @merchantAccount = new MerchantAccount(wrapper_node.merchantAccount)
 
-    if wrapper_node.disbursementException?
-      @disbursementException = new DisbursementException(wrapper_node.disbursementException)
+    if wrapper_node.disbursement?
+      @disbursement= new Disbursement(wrapper_node.disbursement)
 
     if wrapper_node.transaction?
       @transaction = new Transaction(wrapper_node.transaction)

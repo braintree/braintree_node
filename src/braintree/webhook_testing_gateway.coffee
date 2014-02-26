@@ -48,14 +48,14 @@ class WebhookTestingGateway extends Gateway
 
   subjectXmlForDisbursementException: (id) ->
     """
-    <disbursement-exception>
+    <disbursement>
       <merchant-account-id>abcdef</merchant-account-id>
       <id>#{id}</id>
       <message>invalid_account_number</message>
       <amount>100.00</amount>
       <disbursement-date>2014-02-10</disbursement-date>
       <follow-up-action>update</follow-up-action>
-    </disbursement-exception>
+    </disbursement>
     """
 
   subjectXmlForSubMerchantAccountApproved: (id) ->
