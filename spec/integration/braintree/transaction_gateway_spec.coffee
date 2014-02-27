@@ -540,6 +540,7 @@ describe "TransactionGateway", ->
         assert.equal(disbursementDetails.settlementCurrencyIsoCode, 'USD')
         assert.equal(disbursementDetails.settlementCurrencyExchangeRate, '1')
         assert.equal(disbursementDetails.disbursementDate, '2013-04-10')
+        assert.equal(disbursementDetails.success, true)
         assert.equal(disbursementDetails.fundsHeld, false)
 
         done()
