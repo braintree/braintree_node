@@ -8,6 +8,8 @@
 
 class WebhookNotification extends AttributeSetter
   @Kind =
+    Disbursement: "disbursement"
+    DisbursementException: "disbursement_exception"
     PartnerMerchantConnected: "partner_merchant_connected"
     PartnerMerchantDisconnected: "partner_merchant_disconnected"
     PartnerMerchantDeclined: "partner_merchant_declined"
@@ -21,7 +23,6 @@ class WebhookNotification extends AttributeSetter
     SubMerchantAccountApproved: "sub_merchant_account_approved"
     SubMerchantAccountDeclined: "sub_merchant_account_declined"
     TransactionDisbursed: "transaction_disbursed"
-    DisbursementException: "disbursement_exception"
 
   constructor: (attributes) ->
     super attributes
