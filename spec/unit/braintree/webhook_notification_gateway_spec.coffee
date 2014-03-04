@@ -1,8 +1,6 @@
-require('../../spec_helper')
-
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
-{WebhookNotification} = require('../../../lib/braintree/webhook_notification')
-errorTypes = require('../../../lib/braintree/error_types')
+{WebhookNotification} = require('../../../lib/braintree')
+{errorTypes} = require('../../../lib/braintree')
 
 describe "WebhookNotificationGateway", ->
   describe "verify", ->
@@ -93,6 +91,51 @@ describe "WebhookNotificationGateway", ->
         assert.ok(webhookNotification.transaction.disbursementDetails.disbursementDate?)
         done()
 
+    it "returns a parsable signature and payload for a disbursed webhook", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.Disbursement,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.Disbursement)
+        assert.equal(webhookNotification.disbursement.id, "my_id")
+        assert.equal(webhookNotification.disbursement.amount, "100.00")
+        assert.equal(webhookNotification.disbursement.transactionIds[0], "afv56j")
+        assert.equal(webhookNotification.disbursement.transactionIds[1], "kj8hjk")
+        assert.equal(webhookNotification.disbursement.success, true)
+        assert.equal(webhookNotification.disbursement.retry, false)
+        assert.equal(webhookNotification.disbursement.disbursementDate, "2014-02-10")
+        assert.equal(webhookNotification.disbursement.merchantAccount.id, "merchant_account_token")
+        assert.equal(webhookNotification.disbursement.merchantAccount.currencyIsoCode, "USD")
+        assert.equal(webhookNotification.disbursement.merchantAccount.subMerchantAccount, false)
+        assert.equal(webhookNotification.disbursement.merchantAccount.status, "active")
+
+        done()
+
+    it "returns a parsable signature and payload for disbursement exception webhook", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.DisbursementException,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisbursementException)
+        assert.equal(webhookNotification.disbursement.id, "my_id")
+        assert.equal(webhookNotification.disbursement.amount, "100.00")
+        assert.equal(webhookNotification.disbursement.transactionIds[0], "afv56j")
+        assert.equal(webhookNotification.disbursement.transactionIds[1], "kj8hjk")
+        assert.equal(webhookNotification.disbursement.success, false)
+        assert.equal(webhookNotification.disbursement.retry, false)
+        assert.equal(webhookNotification.disbursement.disbursementDate, "2014-02-10")
+        assert.equal(webhookNotification.disbursement.exceptionMessage, "bank_rejected")
+        assert.equal(webhookNotification.disbursement.followUpAction, "update_funding_information")
+        assert.equal(webhookNotification.disbursement.merchantAccount.id, "merchant_account_token")
+        assert.equal(webhookNotification.disbursement.merchantAccount.currencyIsoCode, "USD")
+        assert.equal(webhookNotification.disbursement.merchantAccount.subMerchantAccount, false)
+        assert.equal(webhookNotification.disbursement.merchantAccount.status, "active")
+
+        done()
 
     it "builds a sample notification for a partner merchant connected webhook", (done) ->
       {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(

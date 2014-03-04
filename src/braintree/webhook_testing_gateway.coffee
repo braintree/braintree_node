@@ -27,6 +27,8 @@ class WebhookTestingGateway extends Gateway
   subjectXmlFor: (kind, id) ->
     switch kind
       when WebhookNotification.Kind.TransactionDisbursed then @subjectXmlForTransactionDisbursed(id)
+      when WebhookNotification.Kind.DisbursementException then @subjectXmlForDisbursementException(id)
+      when WebhookNotification.Kind.Disbursement then @subjectXmlForDisbursement(id)
       when WebhookNotification.Kind.SubMerchantAccountApproved then @subjectXmlForSubMerchantAccountApproved(id)
       when WebhookNotification.Kind.SubMerchantAccountDeclined then @subjectXmlForSubMerchantAccountDeclined(id)
       when WebhookNotification.Kind.PartnerMerchantConnected then @subjectXmlForPartnerMerchantConnected()
@@ -43,6 +45,52 @@ class WebhookTestingGateway extends Gateway
         <disbursement-date type="datetime">2013-07-09T18:23:29Z</disbursement-date>
       </disbursement-details>
     </transaction>
+    """
+
+  subjectXmlForDisbursementException: (id) ->
+    """
+    <disbursement>
+      <id>#{id}</id>
+      <transaction-ids type="array">
+        <item>afv56j</item>
+        <item>kj8hjk</item>
+      </transaction-ids>
+      <success type="boolean">false</success>
+      <retry type="boolean">false</retry>
+      <merchant-account>
+        <id>merchant_account_token</id>
+        <currency-iso-code>USD</currency-iso-code>
+        <sub-merchant-account type="boolean">false</sub-merchant-account>
+        <status>active</status>
+      </merchant-account>
+      <amount>100.00</amount>
+      <disbursement-date type="date">2014-02-10</disbursement-date>
+      <exception-message>bank_rejected</exception-message>
+      <follow-up-action>update_funding_information</follow-up-action>
+    </disbursement>
+    """
+
+  subjectXmlForDisbursement: (id) ->
+    """
+    <disbursement>
+      <id>#{id}</id>
+      <transaction-ids type="array">
+        <item>afv56j</item>
+        <item>kj8hjk</item>
+      </transaction-ids>
+      <success type="boolean">true</success>
+      <retry type="boolean">false</retry>
+      <merchant-account>
+        <id>merchant_account_token</id>
+        <currency-iso-code>USD</currency-iso-code>
+        <sub-merchant-account type="boolean">false</sub-merchant-account>
+        <status>active</status>
+      </merchant-account>
+      <amount>100.00</amount>
+      <disbursement-date type="date">2014-02-10</disbursement-date>
+      <exception-message nil="true"/>
+      <follow-up-action nil="true"/>
+    </disbursement>
     """
 
   subjectXmlForSubMerchantAccountApproved: (id) ->
