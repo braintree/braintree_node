@@ -151,7 +151,13 @@ class ClientApiHttp
     @parser = new xml2js.Parser
       explicitRoot: true
 
-  get: (url, callback) ->
+  get: (url, params, callback) ->
+    if params
+      url += '?'
+      for key, value of params
+        url += "#{encodeURIComponent(key)}=#{encodeURIComponent(value)}&"
+      url = url.slice(0, -1)
+
     @request('GET', url, null, callback)
 
   post: (url, body, callback) ->

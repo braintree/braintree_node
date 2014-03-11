@@ -21,6 +21,16 @@ class CreditCardGateway extends Gateway
         else
           callback(null, new CreditCard(response.creditCard))
 
+  fromNonce: (nonce, callback) ->
+    if(nonce.trim() == '')
+      callback(exceptions.NotFoundError(), null)
+    else
+      @gateway.http.get "/payment_methods/from_nonce/#{nonce}", (err, response) ->
+        if err
+          callback(err, null)
+        else
+          callback(null, new CreditCard(response.creditCard))
+
   update: (token, attributes, callback) ->
     @gateway.http.put("/payment_methods/#{token}", {creditCard: attributes}, @responseHandler(callback))
 

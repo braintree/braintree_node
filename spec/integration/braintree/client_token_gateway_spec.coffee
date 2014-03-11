@@ -9,13 +9,15 @@ describe "ClientTokenGateway", ->
     specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
       assert.isTrue(result.success)
       clientToken = JSON.parse(result.clientToken)
-      encodedFingerprint = encodeURIComponent(clientToken.authorizationFingerprint)
-      url = "/client_api/credit_cards.json?"
-      url += "authorizationFingerprint=#{encodedFingerprint}"
-      url += "&sharedCustomerIdentifierType=testing"
-      url += "&sharedCustomerIdentifier=test-identifier"
+      encodedFingerprint = clientToken.authorizationFingerprint
 
-      myHttp.get(url, (statusCode) ->
+      params = {
+        authorizationFingerprint: encodedFingerprint,
+        sharedCustomerIdentifier: "test-identifier",
+        sharedCustomerIdentifierType: "testing"
+      }
+
+      myHttp.get("/client_api/credit_cards.json", params, (statusCode) ->
         assert.equal(statusCode, 200)
         done()
       )
