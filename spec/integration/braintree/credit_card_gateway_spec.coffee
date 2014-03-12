@@ -505,6 +505,7 @@ describe "CreditCardGateway", ->
           specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
             assert.isNull(creditCard)
             assert.equal(err.type, "notFoundError")
+            assert.include(err.message, "not found")
 
             done()
 
@@ -539,6 +540,7 @@ describe "CreditCardGateway", ->
             specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
               assert.isNull(creditCard)
               assert.equal(err.type, "notFoundError")
+              assert.include(err.message, "locked")
 
               done()
     
@@ -567,6 +569,7 @@ describe "CreditCardGateway", ->
             specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
               assert.isNull(creditCard)
               assert.equal(err.type, "notFoundError")
+              assert.include(err.message, "consumed")
 
               done()
 
