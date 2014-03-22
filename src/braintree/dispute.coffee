@@ -1,5 +1,6 @@
 class Dispute
   @Status =
+    Open : 'open'
     Lost : 'lost'
     Won  : 'won'
   @Reason =
