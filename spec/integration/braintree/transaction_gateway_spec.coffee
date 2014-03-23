@@ -556,6 +556,7 @@ describe "TransactionGateway", ->
         assert.equal(dispute.currencyIsoCode, 'USD')
         assert.equal(dispute.status, Dispute.Status.Won)
         assert.equal(dispute.receivedDate, '2014-03-01')
+        assert.equal(dispute.replyByDate, '2014-03-21')
         assert.equal(dispute.reason, Dispute.Reason.Fraud)
 
         done()
