@@ -67,6 +67,17 @@ settleTransaction = (transactionId, callback) ->
     callback
   )
 
+create3DSVerification = (merchantAccountId, params, callback) ->
+  responseCallback = (err, response) ->
+    threeDSecureToken = response.cardinalVerification.publicId
+    callback(threeDSecureToken)
+
+  defaultGateway.http.post(
+    "/three_d_secure/create_test_3ds/#{merchantAccountId}",
+    {cardinal_verification: params},
+    responseCallback
+  )
+
 simulateTrFormPost = (url, trData, inputFormData, callback) ->
   headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -204,6 +215,7 @@ class ClientApiHttp
 GLOBAL.specHelper = {
   addOns: addOns
   braintree: braintree
+  create3DSVerification: create3DSVerification
   dateToMdy: dateToMdy
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
@@ -219,6 +231,7 @@ GLOBAL.specHelper = {
   defaultMerchantAccountId: "sandbox_credit_card"
   nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
   nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
+  threeDSecureMerchantAccountId: "three_d_secure_merchant_account"
   clientApiHttp: ClientApiHttp
   generateNonceForNewCreditCard: generateNonceForNewCreditCard
 }
