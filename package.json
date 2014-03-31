@@ -1,6 +1,6 @@
 {
   "name"                : "braintree",
-  "version"             : "1.13.1",
+  "version"             : "1.14.0",
   "description"         : "A library for integrating with Braintree.",
   "keywords"            : ["payments"],
   "homepage"            : "http://github.com/braintree/braintree_node",

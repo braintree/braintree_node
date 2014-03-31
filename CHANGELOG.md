@@ -1,3 +1,8 @@
+## 1.14.0
+
+* Include Dispute information on Transaction
+* Search for Transactions disputed on a certain date
+
 ## 1.13.0
 
 * Disbursement Webhooks
