@@ -331,6 +331,27 @@ describe "TransactionSearch", ->
 
             done()
 
+    it "can find transactions by dispute date", (done) ->
+      yesterday = new Date("March 1, 2014")
+      tomorrow =  new Date("March 2, 2014")
+
+      search = (s) ->
+        s.id().is("disputedtransaction")
+        s.disputeDate().min(yesterday)
+        s.disputeDate().max(tomorrow)
+
+      specHelper.defaultGateway.transaction.search search, (err, response) ->
+        transactions = []
+
+        response.each (err, transaction) ->
+          transactions.push(transaction)
+
+          if transactions.length == 1
+            assert.equal(transactions.length, 1)
+            assert.equal(transactions[0].disputes[0].receivedDate, "2014-03-01")
+
+            done()
+
     it "filters on valid merchant account ids", (done) ->
       random = specHelper.randomId()
       transactionParams =

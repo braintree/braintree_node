@@ -7,6 +7,7 @@ braintree = specHelper.braintree
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 {Transaction} = require('../../../lib/braintree/transaction')
+{Dispute} = require('../../../lib/braintree/dispute')
 
 createTransactionToRefund = (callback) ->
   transactionParams =
@@ -542,6 +543,21 @@ describe "TransactionGateway", ->
         assert.equal(disbursementDetails.disbursementDate, '2013-04-10')
         assert.equal(disbursementDetails.success, true)
         assert.equal(disbursementDetails.fundsHeld, false)
+
+        done()
+
+    it "exposes disputes", (done) ->
+      transactionId = "disputedtransaction"
+
+      specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
+
+        dispute = transaction.disputes[0]
+        assert.equal(dispute.amount, '250.00')
+        assert.equal(dispute.currencyIsoCode, 'USD')
+        assert.equal(dispute.status, Dispute.Status.Won)
+        assert.equal(dispute.receivedDate, '2014-03-01')
+        assert.equal(dispute.replyByDate, '2014-03-21')
+        assert.equal(dispute.reason, Dispute.Reason.Fraud)
 
         done()
 

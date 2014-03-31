@@ -12,7 +12,7 @@ connect = (config) ->
   new BraintreeGateway(new Config(config))
 
 exports.connect = connect
-exports.version = '1.13.1'
+exports.version = '1.14.0'
 exports.Environment = Environment
 exports.errorTypes = errorTypes
 
