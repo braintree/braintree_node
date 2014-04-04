@@ -17,7 +17,7 @@ describe "ClientTokenGateway", ->
         sharedCustomerIdentifierType: "testing"
       }
 
-      myHttp.get("/client_api/credit_cards.json", params, (statusCode) ->
+      myHttp.get("/client_api/nonces.json", params, (statusCode) ->
         assert.equal(statusCode, 200)
         done()
       )
@@ -49,7 +49,7 @@ describe "ClientTokenGateway", ->
           }
         }
 
-        myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
+        myHttp.post("/client_api/nonces.json", params, (statusCode) ->
           assert.equal(statusCode, 422)
           done()
         )
@@ -87,7 +87,7 @@ describe "ClientTokenGateway", ->
             }
           }
 
-          myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
+          myHttp.post("/client_api/nonces.json", params, (statusCode) ->
             assert.equal(statusCode, 201)
             specHelper.defaultGateway.customer.find(customerId, (err, customer) ->
               assert.equal(2, customer.creditCards.length)
@@ -123,7 +123,7 @@ describe "ClientTokenGateway", ->
           }
         }
 
-        myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
+        myHttp.post("/client_api/nonces.json", params, (statusCode) ->
           assert.equal(statusCode, 201)
           specHelper.defaultGateway.clientToken.generate({
             customerId: customer.id,
@@ -135,7 +135,7 @@ describe "ClientTokenGateway", ->
             authorizationFingerprint = clientToken.authorizationFingerprint
             params.authorizationFingerprint = authorizationFingerprint
 
-            myHttp.post("/client_api/credit_cards.json", params, (statusCode) ->
+            myHttp.post("/client_api/nonces.json", params, (statusCode) ->
               assert.equal(statusCode, 422)
               done()
             )

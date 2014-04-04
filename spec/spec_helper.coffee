@@ -138,7 +138,7 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
       }
     }
 
-    myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
+    myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
       nonce = JSON.parse(body).nonce
       callback(nonce)
     )
