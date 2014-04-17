@@ -159,7 +159,7 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post("/client_api/credit_cards.json", params, (statusCode, body) ->
+        myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
           nonce = JSON.parse(body).nonce
           creditCardParams =
             customerId: customerId
@@ -471,7 +471,7 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post "/client_api/credit_cards.json", params, (statusCode, body) ->
+        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
           nonce = JSON.parse(body).nonce
 
           specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
@@ -499,7 +499,7 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post "/client_api/credit_cards.json", params, (statusCode, body) ->
+        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
           nonce = JSON.parse(body).nonce
 
           specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
@@ -527,14 +527,14 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post "/client_api/credit_cards.json", params, (statusCode, body) ->
+        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
           params = {
             authorizationFingerprint: authorizationFingerprint,
             sharedCustomerIdentifierType: "testing",
             sharedCustomerIdentifier: "testing-identifier"
           }
 
-          myHttp.get "/client_api/credit_cards.json", params, (statusCode, body) ->
+          myHttp.get "/client_api/nonces.json", params, (statusCode, body) ->
             nonce = JSON.parse(body).creditCards[0].nonce
 
             specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
@@ -561,7 +561,7 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post "/client_api/credit_cards.json", params, (statusCode, body) ->
+        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
           nonce = JSON.parse(body).nonce
 
           specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
