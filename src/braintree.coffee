@@ -6,15 +6,17 @@ errorTypes = require("./braintree/error_types")
 {Transaction} = require("./braintree/transaction")
 {CreditCard} = require("./braintree/credit_card")
 {Subscription} = require("./braintree/subscription")
+{WebhookNotification} = require("./braintree/webhook_notification")
 
 connect = (config) ->
   new BraintreeGateway(new Config(config))
 
 exports.connect = connect
-exports.version = '1.11.2'
+exports.version = '1.14.0'
 exports.Environment = Environment
 exports.errorTypes = errorTypes
 
 exports.Transaction = Transaction
 exports.CreditCard = CreditCard
 exports.Subscription = Subscription
+exports.WebhookNotification = WebhookNotification

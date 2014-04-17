@@ -66,6 +66,7 @@ class TransactionSearch extends AdvancedSearch
       "authorizedAt"
       "createdAt"
       "disbursementDate"
+      "disputeDate"
       "failedAt"
       "gatewayRejectedAt"
       "processorDeclinedAt"
