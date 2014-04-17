@@ -69,12 +69,12 @@ settleTransaction = (transactionId, callback) ->
 
 create3DSVerification = (merchantAccountId, params, callback) ->
   responseCallback = (err, response) ->
-    threeDSecureToken = response.cardinalVerification.publicId
+    threeDSecureToken = response.threeDSecureVerification.threeDSecureToken
     callback(threeDSecureToken)
 
   defaultGateway.http.post(
-    "/three_d_secure/create_test_3ds/#{merchantAccountId}",
-    {cardinal_verification: params},
+    "/three_d_secure/create_verification/#{merchantAccountId}",
+    {three_d_secure_verification: params},
     responseCallback
   )
 
