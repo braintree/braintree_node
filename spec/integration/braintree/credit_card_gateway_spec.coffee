@@ -6,6 +6,7 @@ util = require('util')
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
 {CreditCardDefaults} = require('../../../lib/braintree/test/credit_card_defaults')
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
+{Config} = require('../../../lib/braintree/config')
 
 describe "CreditCardGateway", ->
   describe "create", ->
@@ -139,6 +140,39 @@ describe "CreditCardGateway", ->
         assert.isFalse(response.creditCard.venmoSdk)
 
         done()
+
+    it "accepts a payment method nonce", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+      specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
+
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          sharedCustomerIdentifierType: "testing",
+          sharedCustomerIdentifier: "testing-identifier",
+          share: true,
+          credit_card: {
+            number: "4111111111111111",
+            expiration_month: "11",
+            expiration_year: "2099"
+          }
+        }
+
+        myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).nonce
+          creditCardParams =
+            customerId: customerId
+            paymentMethodNonce: nonce
+
+          specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.creditCard.maskedNumber, '411111******1111')
+
+            done()
+        )
+      )
 
     context "card type indicators", ->
       it "handles prepaid cards", (done) ->
@@ -412,6 +446,132 @@ describe "CreditCardGateway", ->
         assert.equal(err.type, braintree.errorTypes.notFoundError)
 
         done()
+
+  describe "fromNonce", ->
+    customerId = null
+    before (done) ->
+      specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
+        customerId = response.customer.id
+        done()
+
+    it "returns a credit card for the supplied nonce", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+      specHelper.defaultGateway.clientToken.generate {customerId: customerId}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
+
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          sharedCustomerIdentifierType: "testing",
+          sharedCustomerIdentifier: "testing-identifier",
+          credit_card: {
+            number: "4111111111111111",
+            expiration_month: "11",
+            expiration_year: "2099"
+          }
+        }
+
+        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).nonce
+
+          specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
+            assert.isNull(err)
+            assert.equal(creditCard.maskedNumber, '411111******1111')
+            assert.equal(creditCard.expirationDate, '11/2099')
+
+            done()
+
+    it "returns an error if the supplied nonce points to a shared card", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+      specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
+
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          sharedCustomerIdentifierType: "testing",
+          sharedCustomerIdentifier: "testing-identifier",
+          share: true,
+          credit_card: {
+            number: "4111111111111111",
+            expiration_month: "11",
+            expiration_year: "2099"
+          }
+        }
+
+        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).nonce
+
+          specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
+            assert.isNull(creditCard)
+            assert.equal(err.type, "notFoundError")
+            assert.include(err.message, "not found")
+
+            done()
+
+    it "returns an error if the supplied nonce is locked", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+      specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
+
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          sharedCustomerIdentifierType: "testing",
+          sharedCustomerIdentifier: "testing-identifier",
+          share: true,
+          credit_card: {
+            number: "4111111111111111",
+            expiration_month: "11",
+            expiration_year: "2099"
+          }
+        }
+
+        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
+          params = {
+            authorizationFingerprint: authorizationFingerprint,
+            sharedCustomerIdentifierType: "testing",
+            sharedCustomerIdentifier: "testing-identifier"
+          }
+
+          myHttp.get "/client_api/nonces.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).creditCards[0].nonce
+
+            specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
+              assert.isNull(creditCard)
+              assert.equal(err.type, "notFoundError")
+              assert.include(err.message, "locked")
+
+              done()
+    
+    it "returns an error if the supplied nonce is consumed", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+      specHelper.defaultGateway.clientToken.generate {customerId: customerId}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
+
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          sharedCustomerIdentifierType: "testing",
+          sharedCustomerIdentifier: "testing-identifier",
+          credit_card: {
+            number: "4111111111111111",
+            expiration_month: "11",
+            expiration_year: "2099"
+          }
+        }
+
+        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).nonce
+
+          specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
+            assert.isNull(err)
+            specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
+              assert.isNull(creditCard)
+              assert.equal(err.type, "notFoundError")
+              assert.include(err.message, "consumed")
+
+              done()
 
   describe "update", ->
     creditCardToken = null

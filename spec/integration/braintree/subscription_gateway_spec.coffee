@@ -70,6 +70,19 @@ describe "SubscriptionGateway", ->
 
         done()
 
+    it "creates a subscription with a payment method nonce", (done) ->
+      specHelper.generateNonceForNewCreditCard("4111111111111111", customerId, (nonce) ->
+        subscriptionParams =
+          paymentMethodNonce: nonce,
+          planId: specHelper.plans.trialless.id
+
+        specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.subscription.transactions[0].creditCard.maskedNumber, '411111******1111')
+          done()
+      )
+
     it "allows setting the first billing date", (done) ->
       firstBillingDate = new Date()
       firstBillingDate.setFullYear(firstBillingDate.getFullYear() + 1)
@@ -259,6 +272,22 @@ describe "SubscriptionGateway", ->
         assert.equal(response.subscription.price, '8.00')
 
         done()
+
+    it "updates the payment method using a payment method nonce", (done) ->
+      specHelper.generateNonceForNewCreditCard("4111111111111111", customerId, (nonce) ->
+        subscriptionParams =
+          paymentMethodNonce: nonce,
+          planId: specHelper.plans.trialless.id
+
+        specHelper.defaultGateway.subscription.update subscription.id, subscriptionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+
+          specHelper.defaultGateway.creditCard.find(response.subscription.paymentMethodToken, (err, creditCard) ->
+            assert.equal(creditCard.maskedNumber, '411111******1111')
+            done()
+          )
+      )
 
     it "handles validation erros", (done) ->
       subscriptionParams =

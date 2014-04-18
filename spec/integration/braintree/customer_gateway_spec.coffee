@@ -2,6 +2,7 @@ require('../../spec_helper')
 
 {_} = require('underscore')
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
+{Config} = require('../../../lib/braintree/config')
 braintree = specHelper.braintree
 
 describe "CustomerGateway", ->
@@ -228,6 +229,37 @@ describe "CustomerGateway", ->
 
         done()
 
+    it "creates a customer with a payment method nonce", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+      specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          sharedCustomerIdentifierType: "testing",
+          sharedCustomerIdentifier: "testing-identifier",
+          share: true,
+          credit_card: {
+            number: "4111111111111111",
+            expiration_month: "11",
+            expiration_year: "2099"
+          }
+        }
+
+        myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).nonce
+          customerParams =
+            creditCard:
+              paymentMethodNonce: nonce
+
+          specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.customer.creditCards[0].bin, "411111")
+
+            done()
+        )
+      )
 
   describe "delete", ->
     it "deletes a customer", (done) ->

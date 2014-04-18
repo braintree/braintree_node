@@ -516,6 +516,19 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "can use payment method nonce", (done) ->
+      specHelper.generateNonceForNewCreditCard(null, null, (nonce) ->
+        transactionParams =
+          amount: '1.00'
+          paymentMethodNonce: nonce
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+
+          done()
+      )
+
   describe "find", ->
     it "finds a transaction", (done) ->
       transactionParams =
