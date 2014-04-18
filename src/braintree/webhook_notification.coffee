@@ -10,6 +10,9 @@ class WebhookNotification extends AttributeSetter
   @Kind =
     Disbursement: "disbursement"
     DisbursementException: "disbursement_exception"
+    DisputeOpened: "dispute_opened"
+    DisputeLost: "dispute_lost"
+    DisputeWon: "dispute_won"
     PartnerMerchantConnected: "partner_merchant_connected"
     PartnerMerchantDisconnected: "partner_merchant_disconnected"
     PartnerMerchantDeclined: "partner_merchant_declined"
