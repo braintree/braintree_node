@@ -25,7 +25,7 @@ class TransactionGateway extends Gateway
 
   find: (transactionId, callback) ->
     if(transactionId.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/transactions/#{transactionId}", (err, response) ->
         if err

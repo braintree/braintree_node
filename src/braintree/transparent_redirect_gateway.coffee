@@ -58,7 +58,7 @@ class TransparentRedirectGateway
       error = @gateway.http.checkHttpStatus(statusMatch[1])
       return callback(error, null) if error
     if !@validateQueryString(queryString)
-      return callback(exceptions.InvalidTransparentRedirectHashError(), null)
+      return callback(exceptions.InvalidTransparentRedirectHashError("The transparent redirect hash is invalid"), null)
     params = querystring.parse(queryString)
     confirmCallback = null
 

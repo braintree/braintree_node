@@ -12,7 +12,7 @@ class WebhookNotificationGateway extends Gateway
 
   parse: (signature, payload, callback) ->
     unless @validateSignature(signature, payload)
-      callback(InvalidSignatureError(), null)
+      callback(InvalidSignatureError("Invalid signature"), null)
       return
 
     xmlPayload = new Buffer(payload, "base64").toString("utf8")

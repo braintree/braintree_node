@@ -13,7 +13,7 @@ class CreditCardGateway extends Gateway
 
   find: (token, callback) ->
     if(token.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/payment_methods/#{token}", (err, response) ->
         if err
@@ -23,7 +23,7 @@ class CreditCardGateway extends Gateway
 
   fromNonce: (nonce, callback) ->
     if(nonce.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/payment_methods/from_nonce/#{nonce}", (err, response) ->
         if err
