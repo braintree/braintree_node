@@ -8,7 +8,7 @@ class WebhookTestingGateway extends Gateway
   constructor: (@gateway) ->
 
   sampleNotification: (kind, id) ->
-    payload = new Buffer(@sampleXml(kind, id)).toString("base64")
+    payload = new Buffer(@sampleXml(kind, id)).toString("base64") + '\n'
     signature = "#{@gateway.config.publicKey}|#{Digest.Sha1hexdigest(@gateway.config.privateKey, payload)}"
     {
       signature: signature,
