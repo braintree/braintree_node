@@ -1,6 +1,7 @@
 {AttributeSetter} = require('./attribute_setter')
 {CreditCard} = require('./credit_card')
 {DisbursementDetails} = require('./disbursement_details')
+{Dispute} = require('./dispute')
 
 class Transaction extends AttributeSetter
   @CreatedUsing =
@@ -51,6 +52,7 @@ class Transaction extends AttributeSetter
     super attributes
     @creditCard = new CreditCard(attributes.creditCard)
     @disbursementDetails = new DisbursementDetails(attributes.disbursementDetails)
+    @disputes = (new Dispute(disputeAttributes) for disputeAttributes in attributes.disputes) if attributes.disputes?
 
   isDisbursed: ->
     @disbursementDetails.isValid()
