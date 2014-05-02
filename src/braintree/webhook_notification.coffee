@@ -2,6 +2,7 @@
 {MerchantAccount} = require('./merchant_account')
 {Transaction} = require('./transaction')
 {Disbursement} = require('./disbursement')
+{Dispute} = require('./dispute')
 {PartnerMerchant} = require('./partner_merchant')
 {Subscription} = require('./subscription')
 {ValidationErrorsCollection} = require('./validation_errors_collection')
@@ -49,6 +50,10 @@ class WebhookNotification extends AttributeSetter
 
     if wrapper_node.partnerMerchant?
       @partnerMerchant = new PartnerMerchant(wrapper_node.partnerMerchant)
+
+    if wrapper_node.dispute?
+      @dispute= new Dispute(wrapper_node.dispute)
+
 
     if wrapper_node.errors?
       @errors = new ValidationErrorsCollection(wrapper_node.errors)

@@ -572,7 +572,7 @@ describe "TransactionGateway", ->
         assert.equal(dispute.replyByDate, '2014-03-21')
         assert.equal(dispute.reason, Dispute.Reason.Fraud)
         assert.equal(dispute.transactionDetails.id, transactionId)
-        assert.equal(dispute.transactionDetails.amount, '250.00')
+        assert.equal(dispute.transactionDetails.amount, '1000.00')
 
         done()
 

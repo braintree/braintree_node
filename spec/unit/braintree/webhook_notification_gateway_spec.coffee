@@ -100,7 +100,7 @@ describe "WebhookNotificationGateway", ->
 
       specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeOpened)
-        assert.equal(Dispute.Status.Open, webhookNotification.transaction.disputes[0].status)
+        assert.equal(Dispute.Status.Open, webhookNotification.dispute.status)
         done()
 
     it "returns a parsable signature and payload for dispute lost", (done) ->
@@ -111,7 +111,7 @@ describe "WebhookNotificationGateway", ->
 
       specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeLost)
-        assert.equal(Dispute.Status.Lost, webhookNotification.transaction.disputes[0].status)
+        assert.equal(Dispute.Status.Lost, webhookNotification.dispute.status)
         done()
 
     it "returns a parsable signature and payload for dispute won", (done) ->
@@ -122,7 +122,7 @@ describe "WebhookNotificationGateway", ->
 
       specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeWon)
-        assert.equal(Dispute.Status.Won, webhookNotification.transaction.disputes[0].status)
+        assert.equal(Dispute.Status.Won, webhookNotification.dispute.status)
         done()
 
     it "returns a parsable signature and payload for a disbursed webhook", (done) ->
