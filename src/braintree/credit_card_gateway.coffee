@@ -13,10 +13,21 @@ class CreditCardGateway extends Gateway
 
   find: (token, callback) ->
     if(token.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/payment_methods/#{token}", (err, response) ->
         if err
+          callback(err, null)
+        else
+          callback(null, new CreditCard(response.creditCard))
+
+  fromNonce: (nonce, callback) ->
+    if(nonce.trim() == '')
+      callback(exceptions.NotFoundError("Not Found"), null)
+    else
+      @gateway.http.get "/payment_methods/from_nonce/#{nonce}", (err, response) ->
+        if err
+          err.message = "Payment method with nonce " + nonce + " locked, consumed or not found"
           callback(err, null)
         else
           callback(null, new CreditCard(response.creditCard))
@@ -37,7 +48,7 @@ class CreditCardGateway extends Gateway
   dateFormat: (date) ->
     month = date.getMonth() + 1
     if month < 10
-      month = "0#{month}" 
+      month = "0#{month}"
     else
       month = "#{month}"
     return month + date.getFullYear()

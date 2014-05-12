@@ -1,4 +1,5 @@
 xml2js = require('xml2js')
+_ = require('underscore')
 {Digest} = require('./digest')
 {Gateway} = require('./gateway')
 {InvalidSignatureError} = require('./exceptions')
@@ -11,9 +12,11 @@ class WebhookNotificationGateway extends Gateway
       explicitRoot: true
 
   parse: (signature, payload, callback) ->
-    unless @validateSignature(signature, payload)
-      callback(InvalidSignatureError(), null)
+    if payload.match(/[^A-Za-z0-9+=\/\n]/)
+      callback(InvalidSignatureError("payload contains illegal characters"), null)
       return
+    err = @validateSignature(signature, payload)
+    return callback(err, null) if err
 
     xmlPayload = new Buffer(payload, "base64").toString("utf8")
     @parser.parseString xmlPayload, (err, result) =>
@@ -22,12 +25,23 @@ class WebhookNotificationGateway extends Gateway
         callback(null, result.notification)
       handler(null, attributes)
 
-  validateSignature: (signature, payload) ->
-    signaturePairs = (pair.split("|") for pair in signature.split("&") when pair.indexOf("|") isnt -1)
-    Digest.secureCompare(@matchingSignature(signaturePairs), Digest.hexdigest(@gateway.config.privateKey, payload))
+  validateSignature: (signatureString, payload) ->
+    signaturePairs = (pair.split("|") for pair in signatureString.split("&") when pair.indexOf("|") isnt -1)
+    signature = @matchingSignature(signaturePairs)
+    unless signature
+      return InvalidSignatureError("no matching public key")
+
+    self = @
+    matches = _.some([payload, payload + '\n'], (payload) ->
+      Digest.secureCompare(signature, Digest.Sha1hexdigest(self.gateway.config.privateKey, payload))
+    )
+    unless matches
+      return InvalidSignatureError("signature does not match payload - one has been modified")
+    null
+
 
   verify: (challenge) ->
-    digest = Digest.hexdigest(@gateway.config.privateKey, challenge)
+    digest = Digest.Sha1hexdigest(@gateway.config.privateKey, challenge)
     "#{@gateway.config.publicKey}|#{digest}"
 
   matchingSignature: (signaturePairs) ->

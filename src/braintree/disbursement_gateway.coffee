@@ -1,6 +1,5 @@
 {Gateway} = require('./gateway')
 {Disbursement} = require('./disbursement')
-exceptions = require('./exceptions')
 
 class DisbursementGateway extends Gateway
   constructor: (@gateway) ->

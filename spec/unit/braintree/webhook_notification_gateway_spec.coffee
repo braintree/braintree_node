@@ -22,6 +22,19 @@ describe "WebhookNotificationGateway", ->
         assert.ok(webhookNotification.timestamp?)
         done()
 
+    it "retries a payload with a newline", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubscriptionWentPastDue,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload.replace(/\n$/,''), (err, webhookNotification) ->
+        assert.equal(err, null)
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionWentPastDue)
+        assert.equal(webhookNotification.subscription.id, "my_id")
+        assert.ok(webhookNotification.timestamp?)
+        done()
+
     it "returns an errback with InvalidSignatureError when signature is invalid", (done) ->
       {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
@@ -32,7 +45,7 @@ describe "WebhookNotificationGateway", ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
         done()
 
-    it "returns an errback with InvalidSignatureError when the public key is modified", (done) ->
+    it "returns an errback with InvalidSignatureError when the public key does not match", (done) ->
       {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
@@ -40,6 +53,7 @@ describe "WebhookNotificationGateway", ->
 
       specHelper.defaultGateway.webhookNotification.parse "bad#{signature}", payload, (err, webhookNotification) ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
+        assert.equal(err.message, "no matching public key")
         done()
 
     it "returns an errback with InvalidSignatureError when the signature is modified", (done) ->
@@ -52,6 +66,40 @@ describe "WebhookNotificationGateway", ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
         done()
 
+    it "returns an errback with InvalidSignatureError when the payload is modified", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubscriptionWentPastDue,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, "bad#{payload}", (err, webhookNotification) ->
+        assert.equal(err.type, errorTypes.invalidSignatureError)
+        assert.equal(err.message, "signature does not match payload - one has been modified")
+        done()
+
+    it "returns an errback with InvalidSignatureError when the payload contains invalid characters", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubscriptionWentPastDue,
+        "my_id"
+      )
+
+      payload = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+=/\n"
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(err.type, errorTypes.invalidSignatureError)
+        assert.notEqual(err.message, "payload contains illegal characters")
+        done()
+
+    it "allows all valid characters", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubscriptionWentPastDue,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, "^& bad ,* chars @!", (err, webhookNotification) ->
+        assert.equal(err.type, errorTypes.invalidSignatureError)
+        assert.equal(err.message, "payload contains illegal characters")
+        done()
     it "returns a parsable signature and payload for merchant account approvals", (done) ->
       {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubMerchantAccountApproved,

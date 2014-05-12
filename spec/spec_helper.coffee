@@ -4,8 +4,11 @@ catch err
 
 http = require('http')
 {Util} = require('../lib/braintree/util')
+{Config} = require('../lib/braintree/config')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
 chai = require("chai")
+{Buffer} = require('buffer')
+xml2js = require('xml2js')
 
 GLOBAL.assert = chai.assert
 
@@ -116,6 +119,88 @@ randomId = ->
 doesNotInclude = (array, value) ->
   assert.isTrue(array.indexOf(value) is -1)
 
+generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
+  myHttp = new ClientApiHttp(new Config(specHelper.defaultConfig))
+  clientTokenOptions = {}
+  clientTokenOptions.customerId = customerId if customerId
+  specHelper.defaultGateway.clientToken.generate(clientTokenOptions, (err, result) ->
+    clientToken = JSON.parse(result.clientToken)
+    authorizationFingerprint = clientToken.authorizationFingerprint
+    params = {
+      authorizationFingerprint: authorizationFingerprint,
+      sharedCustomerIdentifierType: "testing",
+      sharedCustomerIdentifier: "testing-identifier",
+      share: true,
+      credit_card: {
+        number: cardNumber || "4111111111111111",
+        expiration_month: "11",
+        expiration_year: "2099"
+      }
+    }
+
+    myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
+      nonce = JSON.parse(body).nonce
+      callback(nonce)
+    )
+  )
+
+class ClientApiHttp
+  timeout: 60000
+
+  constructor: (@config) ->
+    @parser = new xml2js.Parser
+      explicitRoot: true
+
+  get: (url, params, callback) ->
+    if params
+      url += '?'
+      for key, value of params
+        url += "#{encodeURIComponent(key)}=#{encodeURIComponent(value)}&"
+      url = url.slice(0, -1)
+
+    @request('GET', url, null, callback)
+
+  post: (url, body, callback) ->
+    @request('POST', url, body, callback)
+
+  checkHttpStatus: (status) ->
+    switch status.toString()
+      when '200', '201', '422' then null
+      else status.toString()
+
+  request: (method, url, body, callback) ->
+    client = http
+
+    options = {
+      host: @config.environment.server,
+      port: @config.environment.port,
+      method: method,
+      path: "/merchants/" + @config.merchantId + url,
+      headers: {
+        'X-ApiVersion': @config.apiVersion,
+        'Accept': 'application/xml',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Braintree Node ' + braintree.version
+      }
+    }
+
+    if body
+      requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(body))
+      options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString()
+
+    theRequest = client.request(options, (response) =>
+      body = ''
+      response.on('data', (responseBody) -> body += responseBody )
+      response.on('end', => callback(response.statusCode, body))
+      response.on('error', (err) -> callback("Unexpected response error: #{err}"))
+    )
+
+    theRequest.setTimeout(@timeout, -> callback("timeout"))
+    theRequest.on('error', (err) -> callback("Unexpected request error: #{err}"))
+
+    theRequest.write(requestBody) if body
+    theRequest.end()
+
 GLOBAL.specHelper = {
   addOns: addOns
   braintree: braintree
@@ -134,4 +219,6 @@ GLOBAL.specHelper = {
   defaultMerchantAccountId: "sandbox_credit_card"
   nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
   nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
+  clientApiHttp: ClientApiHttp
+  generateNonceForNewCreditCard: generateNonceForNewCreditCard
 }

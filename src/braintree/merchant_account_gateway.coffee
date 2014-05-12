@@ -13,7 +13,7 @@ class MerchantAccountGateway extends Gateway
 
   find: (id, callback) ->
     if(id.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/merchant_accounts/#{id}", (err, response) ->
         if err

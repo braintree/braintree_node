@@ -6,6 +6,7 @@ dateFormat = require('dateformat')
 {CreditCardGateway} = require('./credit_card_gateway')
 {CustomerGateway} = require('./customer_gateway')
 {TransactionGateway} = require('./transaction_gateway')
+{SignatureService} = require('./signature_service')
 exceptions = require('./exceptions')
 
 class TransparentRedirectGateway
@@ -17,12 +18,7 @@ class TransparentRedirectGateway
     CREATE_TRANSACTION: 'create_transaction'
 
   constructor: (@gateway) ->
-    uriScheme = if @gateway.config.environment.ssl then 'https://' else 'http://'
-    fullHost  = if @gateway.config.environment is Environment.Development
-      "#{@gateway.config.environment.server}:#{@gateway.config.environment.port}"
-    else
-      @gateway.config.environment.server
-    @url = "#{uriScheme}#{fullHost}#{@gateway.config.baseMerchantPath}/transparent_redirect_requests"
+    @url = "#{@gateway.config.baseMerchantUrl()}/transparent_redirect_requests"
 
   generateTrData: (inputData) ->
     data = Util.convertObjectKeysToUnderscores(inputData)
@@ -30,8 +26,7 @@ class TransparentRedirectGateway
     data.time = dateFormat(new Date(), 'yyyymmddHHMMss', true)
     data.public_key = @gateway.config.publicKey
     dataSegment = querystring.stringify(data)
-    trDataHash = Digest.hexdigest(@gateway.config.privateKey, dataSegment)
-    trDataHash + "|" + dataSegment
+    new SignatureService(@gateway.config.privateKey, Digest.Sha1hexdigest).sign(dataSegment)
 
   createCreditCardData: (data) ->
     data.kind = KIND.CREATE_CREDIT_CARD
@@ -55,7 +50,7 @@ class TransparentRedirectGateway
 
   validateQueryString: (queryString) ->
     matches = queryString.match(/^(.+)&hash=(.+?)$/)
-    (Digest.hexdigest(@gateway.config.privateKey, matches[1]) is matches[2])
+    (Digest.Sha1hexdigest(@gateway.config.privateKey, matches[1]) is matches[2])
 
   confirm: (queryString, callback) ->
     statusMatch = queryString.match(/http_status=(\d+)/)
@@ -63,7 +58,7 @@ class TransparentRedirectGateway
       error = @gateway.http.checkHttpStatus(statusMatch[1])
       return callback(error, null) if error
     if !@validateQueryString(queryString)
-      return callback(exceptions.InvalidTransparentRedirectHashError(), null)
+      return callback(exceptions.InvalidTransparentRedirectHashError("The transparent redirect hash is invalid"), null)
     params = querystring.parse(queryString)
     confirmCallback = null
 

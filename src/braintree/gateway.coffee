@@ -30,7 +30,7 @@ class Gateway
         else if (response.apiErrorResponse)
           searchResponse.setFatalError(new ErrorResponse(response.apiErrorResponse))
         else
-          searchResponse.setFatalError(exceptions.DownForMaintenanceError())
+          searchResponse.setFatalError(exceptions.DownForMaintenanceError("Down for Maintenance"))
 
         searchResponse.ready()
 
@@ -45,7 +45,7 @@ class Gateway
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
       else
-        callback(exceptions.DownForMaintenanceError(), null)
+        callback(exceptions.DownForMaintenanceError("Down for Maintenance"), null)
 
   pagingFunctionGenerator: (search, url, subjectType, getSubject) ->
     (ids, callback) =>

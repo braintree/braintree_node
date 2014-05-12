@@ -7,4 +7,6 @@ class Config
     @privateKey = rawConfig.privateKey
     @baseMerchantPath = "/merchants/#{rawConfig.merchantId}"
 
+  baseMerchantUrl: -> @environment.baseUrl() + @baseMerchantPath
+
 exports.Config = Config

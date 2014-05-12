@@ -17,12 +17,12 @@ class Http
   checkHttpStatus: (status) ->
     switch status.toString()
       when '200', '201', '422' then null
-      when '401' then exceptions.AuthenticationError()
-      when '403' then exceptions.AuthorizationError()
-      when '404' then exceptions.NotFoundError()
-      when '426' then exceptions.UpgradeRequired()
-      when '500' then exceptions.ServerError()
-      when '503' then exceptions.DownForMaintenanceError()
+      when '401' then exceptions.AuthenticationError("Authentication Error")
+      when '403' then exceptions.AuthorizationError("Authorization Error")
+      when '404' then exceptions.NotFoundError("Not Found")
+      when '426' then exceptions.UpgradeRequired("Upgrade Required")
+      when '500' then exceptions.ServerError("Server Error")
+      when '503' then exceptions.DownForMaintenanceError("Down for Maintenance")
       else exceptions.UnexpectedError('Unexpected HTTP response: ' + status)
 
   delete: (url, callback) ->
@@ -80,7 +80,7 @@ class Http
     )
 
     theRequest.setTimeout(@timeout, ->
-      error = exceptions.UnexpectedError()
+      error = exceptions.UnexpectedError("Request timed out")
       return callback(error, null)
     )
 
