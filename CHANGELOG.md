@@ -1,3 +1,9 @@
+## 1.14.1
+
+* Changed Braintree exceptions to Error objects (thanks Raynos)
+* Make webhook parsing more robust with newlines
+* Add messages to InvalidSignature exceptions
+
 ## 1.14.0
 
 * Include Dispute information on Transaction
