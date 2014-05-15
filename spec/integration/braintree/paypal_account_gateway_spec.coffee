@@ -148,9 +148,9 @@ describe "PayPalGatewayGateway", ->
           assert.equal(err.type, braintree.errorTypes.notFoundError)
           done()
 
-  #   it "handles invalid tokens", (done) ->
-  #     specHelper.defaultGateway.creditCard.delete 'nonexistent_token', (err) ->
-  #       assert.equal(err.type, braintree.errorTypes.notFoundError)
+    it "handles invalid tokens", (done) ->
+      specHelper.paypalMerchantGateway.paypalAccount.delete 'NON_EXISTENT_TOKEN', (err) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
 
-  #       done()
+        done()
 
