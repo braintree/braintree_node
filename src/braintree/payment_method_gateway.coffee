@@ -19,10 +19,10 @@ class PaymentMethodGateway extends Gateway
       @gateway.http.get "/payment_methods/any/#{token}", (err, response) ->
         if err
           callback(err, null)
-        else if repsonse.creditCard
+        else if response.creditCard
           callback(null, new CreditCard(response.creditCard))
-        else if repsonse.paypalAccount
-          callback(null, new PaypalAccount(response.paypalAccount))
+        else if response.paypalAccount
+          callback(null, new PayPalAccount(response.paypalAccount))
 
   delete: (token, callback) ->
     @gateway.http.delete("/payment_methods/any/#{token}", callback)

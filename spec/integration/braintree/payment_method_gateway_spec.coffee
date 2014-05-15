@@ -70,25 +70,12 @@ describe "PaymentMethodGateway", ->
       )
 
   describe "find", ->
-    # customerToken = null
+    it "finds the card", (done) ->
+      specHelper.paypalMerchantGateway.paymentMethod.find 'PAYPAL_ACCOUNT', (err, paypalAccount) ->
+        assert.isNull(err)
+        assert.isNotNull(paypalAccount.email)
 
-    # before (done) ->
-    #   customerParams =
-    #     creditCard:
-    #       number: '5105105105105100',
-    #       expirationDate: '05/2014'
-
-    #   specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
-    #     customerToken = response.customer.creditCards[0].token
-    #     done()
-
-    it "finds the card"#, (done) ->
-      # specHelper.paypalMerchantGateway.creditCard.find customerToken, (err, creditCard) ->
-      #   assert.isNull(err)
-      #   assert.equal(creditCard.maskedNumber, '510510******5100')
-      #   assert.equal(creditCard.expirationDate, '05/2014')
-
-      #   done()
+        done()
 
     it "handles not finding the card"#, (done) ->
       # specHelper.paypalMerchantGateway.creditCard.find 'nonexistent_token', (err, creditCard) ->
