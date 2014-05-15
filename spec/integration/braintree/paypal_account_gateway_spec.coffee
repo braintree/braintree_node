@@ -28,6 +28,7 @@ describe "PayPalGatewayGateway", ->
 
   describe "update", ->
     paymentMethodToken = Math.floor(Math.random() * Math.pow(36,3)).toString(36)
+    customerId = null
 
     before (done) ->
       specHelper.paypalMerchantGateway.customer.create {firstName: 'Jane', lastName: 'Doe'}, (err, response) ->
@@ -73,51 +74,64 @@ describe "PayPalGatewayGateway", ->
 
           done()
 
-    it "handles errors"#, (done) ->
-      # updateParams =
-      #   number: 'invalid'
+    it "handles errors", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+      specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
 
-      # specHelper.defaultGateway.creditCard.update creditCardToken, updateParams, (err, response) ->
-      #   assert.isFalse(response.success)
-      #   assert.equal(response.message, 'Credit card number must be 12-19 digits.')
-      #   assert.equal(
-      #     response.errors.for('creditCard').on('number')[0].code,
-      #     '81716'
-      #   )
-      #   assert.equal(
-      #     response.errors.for('creditCard').on('number')[0].attribute,
-      #     'number'
-      #   )
-      #   errorCodes = (error.code for error in response.errors.deepErrors())
-      #   assert.equal(1, errorCodes.length)
-      #   assert.include(errorCodes, '81716')
+        params =
+          authorizationFingerprint: authorizationFingerprint
+          paypalAccount:
+            consentCode: 'PAYPAL_CONSENT_CODE'
 
-      #   done()
+        myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).paypalAccounts[0].nonce
+          paypalAccountParams =
+            customerId: customerId
+            paymentMethodNonce: nonce
 
-  describe "delete", (done) ->
-    customerToken = null
+          specHelper.paypalMerchantGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+            newPaymentMethodToken = response.paypalAccount.token
 
-    # before (done) ->
-      # customerParams =
-      #   creditCard:
-      #     number: '5105105105105100',
-      #     expirationDate: '05/2014'
+            updateParams =
+              token: 'PAYPAL_ACCOUNT'
 
-      # specHelper.defaultGateway.customer.create customerParams, (err, response) ->
-      #   customerToken = response.customer.creditCards[0].token
-      #   done()
+            specHelper.paypalMerchantGateway.paypalAccount.update newPaymentMethodToken, updateParams, (err, response) ->
+              assert.isFalse(response.success)
+              assert.equal(
+                response.errors.for('paypalAccount').on('token')[0].code,
+                '92906'
+              )
 
-    it "deletes the credit card"#, (done) ->
-      # specHelper.defaultGateway.creditCard.delete customerToken, (err) ->
-      #   assert.isNull(err)
+              done()
+        )
+      )
 
-      #   specHelper.defaultGateway.creditCard.find customerToken, (err, response) ->
-      #     assert.equal(err.type, braintree.errorTypes.notFoundError)
-      #     done()
+  # describe "delete", (done) ->
+  #   customerToken = null
 
-    it "handles invalid tokens"#, (done) ->
-      # specHelper.defaultGateway.creditCard.delete 'nonexistent_token', (err) ->
-      #   assert.equal(err.type, braintree.errorTypes.notFoundError)
+  #   before (done) ->
+  #     customerParams =
+  #       creditCard:
+  #         number: '5105105105105100',
+  #         expirationDate: '05/2014'
 
-      #   done()
+  #     specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+  #       customerToken = response.customer.creditCards[0].token
+  #       done()
+
+  #   it "deletes the credit card", (done) ->
+  #     specHelper.defaultGateway.creditCard.delete customerToken, (err) ->
+  #       assert.isNull(err)
+
+  #       specHelper.defaultGateway.creditCard.find customerToken, (err, response) ->
+  #         assert.equal(err.type, braintree.errorTypes.notFoundError)
+  #         done()
+
+  #   it "handles invalid tokens", (done) ->
+  #     specHelper.defaultGateway.creditCard.delete 'nonexistent_token', (err) ->
+  #       assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+  #       done()
 
