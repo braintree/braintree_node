@@ -8,6 +8,7 @@ braintree = specHelper.braintree
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 {Transaction} = require('../../../lib/braintree/transaction')
 {Dispute} = require('../../../lib/braintree/dispute')
+{Config} = require('../../../lib/braintree/config')
 
 describe "TransactionGateway", ->
   describe "sale", ->
@@ -79,6 +80,84 @@ describe "TransactionGateway", ->
           assert.equal(response.transaction.creditCard.expirationDate, '05/2014')
 
           done()
+
+    context "with a paypal acount", ->
+      context "authorized for future payments", ->
+        it "successfully creates a transaction but doesn't vault a paypal account", (done) ->
+          paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
+
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+          specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+            clientToken = JSON.parse(result.clientToken)
+            authorizationFingerprint = clientToken.authorizationFingerprint
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              paypalAccount:
+                consentCode: 'PAYPAL_CONSENT_CODE'
+                token: paymentMethodToken
+
+            myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).paypalAccounts[0].nonce
+
+              specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+                transactionParams =
+                  paymentMethodNonce: nonce
+                  amount: '100.00'
+
+                specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+                  assert.isNull(err)
+                  assert.isTrue(response.success)
+                  assert.equal(response.transaction.type, 'sale')
+                  assert.isNull(response.transaction.paypal.token)
+                  assert.isNotNull(response.transaction.paypal.email)
+                  assert.isNotNull(response.transaction.paypal.transactionId)
+                  assert.isNotNull(response.transaction.paypal.authorizationId)
+
+                  specHelper.paypalMerchantGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
+                    assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+                    done()
+            )
+          )
+
+        it "vaults when explicitly asked", (done) ->
+          paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
+
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+          specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+            clientToken = JSON.parse(result.clientToken)
+            authorizationFingerprint = clientToken.authorizationFingerprint
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              paypalAccount:
+                consentCode: 'PAYPAL_CONSENT_CODE'
+                token: paymentMethodToken
+
+            myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).paypalAccounts[0].nonce
+
+              specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+                transactionParams =
+                  paymentMethodNonce: nonce
+                  amount: '100.00'
+                  options:
+                    storeInVault: true
+
+                specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+                  assert.isNull(err)
+                  assert.isTrue(response.success)
+                  assert.equal(response.transaction.type, 'sale')
+                  assert.equal(response.transaction.paypal.token, paymentMethodToken)
+                  assert.isNotNull(response.transaction.paypal.email)
+                  assert.isNotNull(response.transaction.paypal.transactionId)
+                  assert.isNotNull(response.transaction.paypal.authorizationId)
+
+                  specHelper.paypalMerchantGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
+                    assert.isNull(err)
+
+                    done()
+            )
+          )
 
     it "allows submitting for settlement", (done) ->
       transactionParams =
