@@ -41,28 +41,33 @@ describe "PaymentMethodGateway", ->
         )
       )
 
-    it "handles errors"#, (done) ->
-      # creditCardParams =
-      #   customerId: customerId
-      #   number: 'invalid'
-      #   expirationDate: '05/2012'
+    it "handles errors", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+      specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
 
-      # specHelper.paypalMerchantGateway.creditCard.create creditCardParams, (err, response) ->
-      #   assert.isFalse(response.success)
-      #   assert.equal(response.message, 'Credit card number must be 12-19 digits.')
-      #   assert.equal(
-      #     response.errors.for('creditCard').on('number')[0].code,
-      #     '81716'
-      #   )
-      #   assert.equal(
-      #     response.errors.for('creditCard').on('number')[0].attribute,
-      #     'number'
-      #   )
-      #   errorCodes = (error.code for error in response.errors.deepErrors())
-      #   assert.equal(1, errorCodes.length)
-      #   assert.include(errorCodes, '81716')
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          paypalAccount: {}
+        }
 
-      #   done()
+        myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).paypalAccounts[0].nonce
+          paypalAccountParams =
+            customerId: customerId
+            paymentMethodNonce: nonce
+
+          specHelper.paypalMerchantGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+            assert.isFalse(response.success)
+            assert.equal(
+              response.errors.for('paypalAccount').on('base')[0].code,
+              '82902'
+            )
+
+            done()
+        )
+      )
 
   describe "find", ->
     # customerToken = null
