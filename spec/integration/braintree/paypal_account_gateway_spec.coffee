@@ -27,37 +27,51 @@ describe "PayPalGatewayGateway", ->
         done()
 
   describe "update", ->
-    creditCardToken = null
+    paymentMethodToken = Math.floor(Math.random() * Math.pow(36,3)).toString(36)
 
-    # before (done) ->
-      # customerParams =
-      #   creditCard:
-      #     cardholderName: 'Old Cardholder Name',
-      #     number: '5105105105105100',
-      #     expirationDate: '05/2014'
-      #     billingAddress:
-      #       streetAddress: '123 Old St',
-      #       locality: 'Old City',
-      #       region: 'Old Region'
+    before (done) ->
+      specHelper.paypalMerchantGateway.customer.create {firstName: 'Jane', lastName: 'Doe'}, (err, response) ->
+        customerId = response.customer.id
 
-      # specHelper.defaultGateway.customer.create customerParams, (err, response) ->
-      #   creditCardToken = response.customer.creditCards[0].token
-      #   done()
+        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+          clientToken = JSON.parse(result.clientToken)
+          authorizationFingerprint = clientToken.authorizationFingerprint
 
-    it "updates the card"#, (done) ->
-      # updateParams =
-      #   cardholderName: 'New Cardholder Name',
-      #   number: '4111111111111111',
-      #   expirationDate: '12/2015'
+          params = {
+            authorizationFingerprint: authorizationFingerprint,
+            paypalAccount: {
+              consentCode: 'PAYPAL_CONSENT_CODE'
+              token: paymentMethodToken
+            }
+          }
 
-      # specHelper.defaultGateway.creditCard.update creditCardToken, updateParams, (err, response) ->
-      #   assert.isNull(err)
-      #   assert.isTrue(response.success)
-      #   assert.equal(response.creditCard.cardholderName, 'New Cardholder Name')
-      #   assert.equal(response.creditCard.maskedNumber, '411111******1111')
-      #   assert.equal(response.creditCard.expirationDate, '12/2015')
+          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).paypalAccounts[0].nonce
+            paypalAccountParams =
+              customerId: customerId
+              paymentMethodNonce: nonce
 
-      #   done()
+            specHelper.paypalMerchantGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+              paymentMethodToken = response.paypalAccount.token
+
+              done()
+          )
+        )
+
+    it "updates the paypal account", (done) ->
+      updateParams =
+        token: paymentMethodToken+'123'
+
+      specHelper.paypalMerchantGateway.paypalAccount.update paymentMethodToken, updateParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.paypalAccount.token, paymentMethodToken+'123')
+
+        specHelper.paypalMerchantGateway.paypalAccount.find paymentMethodToken, (err, response) ->
+          assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+          done()
 
     it "handles errors"#, (done) ->
       # updateParams =
