@@ -77,17 +77,17 @@ describe "PaymentMethodGateway", ->
 
         done()
 
-    it "handles not finding the card"#, (done) ->
-      # specHelper.paypalMerchantGateway.creditCard.find 'nonexistent_token', (err, creditCard) ->
-      #   assert.equal(err.type, braintree.errorTypes.notFoundError)
+    it "handles not finding the card", (done) ->
+      specHelper.paypalMerchantGateway.paymentMethod.find 'NONEXISTENT_PAYPAL_ACCOUNT', (err, paypalAccount) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
 
-      #   done()
+        done()
 
-    it "handles whitespace"#, (done) ->
-      # specHelper.paypalMerchantGateway.creditCard.find ' ', (err, creditCard) ->
-      #   assert.equal(err.type, braintree.errorTypes.notFoundError)
+    it "handles whitespace", (done) ->
+      specHelper.paypalMerchantGateway.paymentMethod.find ' ', (err, paypalAccount) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
 
-      #   done()
+        done()
 
   describe "update", ->
     # creditCardToken = null
