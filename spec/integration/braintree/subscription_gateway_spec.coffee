@@ -18,41 +18,6 @@ describe "SubscriptionGateway", ->
       creditCardToken = response.customer.creditCards[0].token
       done()
 
-  describe "cancel", ->
-    it "cancels a subscription", (done) ->
-      subscriptionParams =
-        paymentMethodToken: creditCardToken
-        planId: specHelper.plans.trialless.id
-
-      specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
-        specHelper.defaultGateway.subscription.cancel response.subscription.id, (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-          assert.equal(response.subscription.status, 'Canceled')
-
-          done()
-
-    it "handles validation errors", (done) ->
-      subscriptionParams =
-        paymentMethodToken: creditCardToken
-        planId: specHelper.plans.trialless.id
-
-      specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
-        subscriptionId = response.subscription.id
-        specHelper.defaultGateway.subscription.cancel subscriptionId, (err, response) ->
-          specHelper.defaultGateway.subscription.cancel subscriptionId, (err, response) ->
-            assert.isFalse(response.success)
-            assert.equal(response.message, 'Subscription has already been canceled.')
-            assert.equal(response.errors.for('subscription').on('status')[0].code, '81905')
-
-            done()
-
-    it "returns a not found error if provided a bad id", (done) ->
-      specHelper.defaultGateway.subscription.cancel 'nonexistent_subscription', (err, response) ->
-        assert.equal(err.type, braintree.errorTypes.notFoundError)
-
-        done()
-
   describe "create", ->
     it "creates a subscription", (done) ->
       subscriptionParams =
@@ -216,39 +181,6 @@ describe "SubscriptionGateway", ->
 
         done()
 
-  describe "retryCharge", ->
-    subscription = null
-
-    beforeEach (done) ->
-      subscriptionParams =
-        paymentMethodToken: creditCardToken
-        planId: specHelper.plans.trialless.id
-
-      specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
-        subscription = response.subscription
-        specHelper.makePastDue response.subscription, (err, response) ->
-          done()
-
-    it "retries charging a failed subscription", (done) ->
-      specHelper.defaultGateway.subscription.retryCharge subscription.id, (err, response) ->
-        assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.transaction.amount, specHelper.plans.trialless.price)
-        assert.equal(response.transaction.type, 'sale')
-        assert.equal(response.transaction.status, 'authorized')
-
-        done()
-
-    it "allows specifying an amount", (done) ->
-      specHelper.defaultGateway.subscription.retryCharge subscription.id, '6.00', (err, response) ->
-        assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.transaction.amount, '6.00')
-        assert.equal(response.transaction.type, 'sale')
-        assert.equal(response.transaction.status, 'authorized')
-
-        done()
-
   describe "update", ->
     subscription = null
 
@@ -300,3 +232,72 @@ describe "SubscriptionGateway", ->
         assert.equal(response.errors.for('subscription').on('price')[0].code, '81904')
 
         done()
+
+  describe "retryCharge", ->
+    subscription = null
+
+    beforeEach (done) ->
+      subscriptionParams =
+        paymentMethodToken: creditCardToken
+        planId: specHelper.plans.trialless.id
+
+      specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+        subscription = response.subscription
+        specHelper.makePastDue response.subscription, (err, response) ->
+          done()
+
+    it "retries charging a failed subscription", (done) ->
+      specHelper.defaultGateway.subscription.retryCharge subscription.id, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.amount, specHelper.plans.trialless.price)
+        assert.equal(response.transaction.type, 'sale')
+        assert.equal(response.transaction.status, 'authorized')
+
+        done()
+
+    it "allows specifying an amount", (done) ->
+      specHelper.defaultGateway.subscription.retryCharge subscription.id, '6.00', (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.amount, '6.00')
+        assert.equal(response.transaction.type, 'sale')
+        assert.equal(response.transaction.status, 'authorized')
+
+        done()
+
+  describe "cancel", ->
+    it "cancels a subscription", (done) ->
+      subscriptionParams =
+        paymentMethodToken: creditCardToken
+        planId: specHelper.plans.trialless.id
+
+      specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+        specHelper.defaultGateway.subscription.cancel response.subscription.id, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.subscription.status, 'Canceled')
+
+          done()
+
+    it "handles validation errors", (done) ->
+      subscriptionParams =
+        paymentMethodToken: creditCardToken
+        planId: specHelper.plans.trialless.id
+
+      specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+        subscriptionId = response.subscription.id
+        specHelper.defaultGateway.subscription.cancel subscriptionId, (err, response) ->
+          specHelper.defaultGateway.subscription.cancel subscriptionId, (err, response) ->
+            assert.isFalse(response.success)
+            assert.equal(response.message, 'Subscription has already been canceled.')
+            assert.equal(response.errors.for('subscription').on('status')[0].code, '81905')
+
+            done()
+
+    it "returns a not found error if provided a bad id", (done) ->
+      specHelper.defaultGateway.subscription.cancel 'nonexistent_subscription', (err, response) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
+
