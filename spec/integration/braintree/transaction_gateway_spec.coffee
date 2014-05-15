@@ -10,50 +10,6 @@ braintree = specHelper.braintree
 {Dispute} = require('../../../lib/braintree/dispute')
 
 describe "TransactionGateway", ->
-  describe "credit", ->
-    it "creates a credit", (done) ->
-      transactionParams =
-        amount: '5.00'
-        creditCard:
-          number: '5105105105105100'
-          expirationDate: '05/12'
-
-      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
-        assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.transaction.type, 'credit')
-        assert.equal(response.transaction.amount, '5.00')
-        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100')
-
-        done()
-
-    it "handles validation errors", (done) ->
-      transactionParams =
-        creditCard:
-          number: '5105105105105100'
-
-      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
-        assert.isFalse(response.success)
-        assert.equal(response.message, 'Amount is required.\nExpiration date is required.')
-        assert.equal(
-          response.errors.for('transaction').on('amount')[0].code,
-          '81502'
-        )
-        assert.equal(
-          response.errors.for('transaction').on('amount')[0].attribute,
-          'amount'
-        )
-        assert.equal(
-          response.errors.for('transaction').for('creditCard').on('expirationDate')[0].code,
-          '81709'
-        )
-        errorCodes = (error.code for error in response.errors.deepErrors())
-        assert.equal(errorCodes.length, 2)
-        assert.include(errorCodes, '81502')
-        assert.include(errorCodes, '81709')
-
-        done()
-
   describe "sale", ->
     it "charges a card", (done) ->
       transactionParams =
@@ -499,6 +455,50 @@ describe "TransactionGateway", ->
           done()
       )
 
+  describe "credit", ->
+    it "creates a credit", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.type, 'credit')
+        assert.equal(response.transaction.amount, '5.00')
+        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100')
+
+        done()
+
+    it "handles validation errors", (done) ->
+      transactionParams =
+        creditCard:
+          number: '5105105105105100'
+
+      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
+        assert.isFalse(response.success)
+        assert.equal(response.message, 'Amount is required.\nExpiration date is required.')
+        assert.equal(
+          response.errors.for('transaction').on('amount')[0].code,
+          '81502'
+        )
+        assert.equal(
+          response.errors.for('transaction').on('amount')[0].attribute,
+          'amount'
+        )
+        assert.equal(
+          response.errors.for('transaction').for('creditCard').on('expirationDate')[0].code,
+          '81709'
+        )
+        errorCodes = (error.code for error in response.errors.deepErrors())
+        assert.equal(errorCodes.length, 2)
+        assert.include(errorCodes, '81502')
+        assert.include(errorCodes, '81709')
+
+        done()
+
   describe "find", ->
     it "finds a transaction", (done) ->
       transactionParams =
@@ -737,3 +737,4 @@ describe "TransactionGateway", ->
           assert.isTrue(response.success)
           assert.equal(response.transaction.status, 'submitted_for_settlement')
           done()
+
