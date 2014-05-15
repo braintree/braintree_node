@@ -122,6 +122,39 @@ describe "CustomerGateway", ->
           )
         )
 
+      it "does not vault a paypal account only authorized for one-time use", (done) ->
+        paymentMethodToken = Math.floor(Math.random() * Math.pow(36,3)).toString(36)
+
+        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+          clientToken = JSON.parse(result.clientToken)
+          authorizationFingerprint = clientToken.authorizationFingerprint
+          params =
+            authorizationFingerprint: authorizationFingerprint
+            paypalAccount:
+              accessToken: 'PAYPAL_ACCESS_TOKEN'
+              token: paymentMethodToken
+
+          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).paypalAccounts[0].nonce
+            customerParams =
+              paymentMethodNonce: nonce
+
+            specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
+              assert.isNull(err)
+              assert.isFalse(response.success)
+              assert.equal(
+                response.errors.for('customer').for('paypalAccount').on('base')[0].code,
+                '82902'
+              )
+
+              specHelper.paypalMerchantGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
+                assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+              done()
+          )
+        )
+
     it "fails on duplicate payment methods when provided the option to do so", (done) ->
       customerParams =
         firstName: 'John',
