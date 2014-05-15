@@ -59,9 +59,7 @@ class Gateway
   pagingFunctionGenerator: (search, url, subjectType, getSubject) ->
     (ids, callback) =>
       search.ids().in(ids)
-      @gateway.http.post("/" + url + "/advanced_search",
-        { search : search.toHash() },
-        (err, response) ->
+      @gateway.http.post("/" + url + "/advanced_search", { search : search.toHash() }, (err, response) ->
           if err
             callback(err, null)
           else
