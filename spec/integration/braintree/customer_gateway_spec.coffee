@@ -432,47 +432,53 @@ describe "CustomerGateway", ->
           done()
 
       it "vaults a paypal account", (done) ->
-        paymentMethodToken = Math.floor(Math.random() * Math.pow(36,3)).toString(36)
+        paymentMethodToken = specHelper.randomId()
 
-        customerParams =
-          firstName: 'New First Name'
-          lastName: 'New Last Name'
-          paypalAccount:
-            consentCode: 'PAYPAL_CONSENT_CODE'
-            token: paymentMethodToken
+        specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+          paypalCustomerId = response.customer.id
 
-        specHelper.paypalMerchantGateway.customer.update customerId, customerParams, (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-          assert.equal(response.customer.firstName, 'New First Name')
-          assert.equal(response.customer.lastName, 'New Last Name')
-          assert.isNotNull(response.customer.paypalAccounts[0].email)
-          assert.equal(response.customer.paypalAccounts[0].token, paymentMethodToken)
+          customerParams =
+            firstName: 'New First Name'
+            lastName: 'New Last Name'
+            paypalAccount:
+              consentCode: 'PAYPAL_CONSENT_CODE'
+              token: paymentMethodToken
 
-          done()
+          specHelper.paypalMerchantGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.customer.firstName, 'New First Name')
+            assert.equal(response.customer.lastName, 'New Last Name')
+            assert.isNotNull(response.customer.paypalAccounts[0].email)
+            assert.equal(response.customer.paypalAccounts[0].token, paymentMethodToken)
+
+            done()
 
       it "does not vault a one-time use paypal account", (done) ->
-        paymentMethodToken = Math.floor(Math.random() * Math.pow(36,3)).toString(36)
+        paymentMethodToken = specHelper.randomId()
 
-        customerParams =
-          firstName: 'New First Name'
-          lastName: 'New Last Name'
-          paypalAccount:
-            accessToken: 'PAYPAL_ACCESS_TOKEN'
-            token: paymentMethodToken
+        specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+          paypalCustomerId = response.customer.id
 
-        specHelper.paypalMerchantGateway.customer.update customerId, customerParams, (err, response) ->
-          assert.isNull(err)
-          assert.isFalse(response.success)
-          assert.equal(
-            response.errors.for('customer').for('paypalAccount').on('base')[0].code,
-            '82902'
-          )
+          customerParams =
+            firstName: 'New First Name'
+            lastName: 'New Last Name'
+            paypalAccount:
+              accessToken: 'PAYPAL_ACCESS_TOKEN'
+              token: paymentMethodToken
 
-          specHelper.paypalMerchantGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
-            assert.equal(err.type, braintree.errorTypes.notFoundError)
+          specHelper.paypalMerchantGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
+            assert.isNull(err)
+            assert.isFalse(response.success)
+            assert.equal(
+              response.errors.for('customer').for('paypalAccount').on('base')[0].code,
+              '82902'
+            )
 
-          done()
+            specHelper.paypalMerchantGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
+              assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+            done()
 
     it "returns an error when not found", (done) ->
       specHelper.defaultGateway.customer.update 'nonexistent_customer', {}, (err, response) ->
