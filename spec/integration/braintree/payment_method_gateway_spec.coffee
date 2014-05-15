@@ -41,6 +41,37 @@ describe "PaymentMethodGateway", ->
         )
       )
 
+    it "returns an error when trying to create a paypal account only authorized for one-time use", (done) ->
+      myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+      specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+        clientToken = JSON.parse(result.clientToken)
+        authorizationFingerprint = clientToken.authorizationFingerprint
+
+        params = {
+          authorizationFingerprint: authorizationFingerprint,
+          paypalAccount: {
+            accessToken: 'PAYPAL_ACCESS_TOKEN'
+          }
+        }
+
+        myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).paypalAccounts[0].nonce
+          paypalAccountParams =
+            customerId: customerId
+            paymentMethodNonce: nonce
+
+          specHelper.paypalMerchantGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+            assert.isNull(err)
+            assert.isFalse(response.success)
+            assert.equal(
+              response.errors.for('paypalAccount').on('base')[0].code,
+              '82902'
+            )
+
+            done()
+        )
+      )
+
     it "handles errors", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
       specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
