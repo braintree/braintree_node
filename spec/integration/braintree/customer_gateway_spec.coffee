@@ -261,23 +261,6 @@ describe "CustomerGateway", ->
         )
       )
 
-  describe "delete", ->
-    it "deletes a customer", (done) ->
-      specHelper.defaultGateway.customer.create {}, (err, response) ->
-        specHelper.defaultGateway.customer.delete response.customer.id, (err) ->
-          assert.isNull(err)
-
-          specHelper.defaultGateway.customer.find response.customer.id, (err, customer) ->
-            assert.equal(err.type, braintree.errorTypes.notFoundError)
-
-            done()
-
-    it "handles invalid customer ids", (done) ->
-      specHelper.defaultGateway.customer.delete 'nonexistent_customer', (err) ->
-        assert.equal(err.type, braintree.errorTypes.notFoundError)
-        
-        done()
-
   describe "find", ->
     it "finds a custoemr", (done) ->
       customerParams =
@@ -338,7 +321,7 @@ describe "CustomerGateway", ->
         assert.isTrue(response.success)
         assert.equal(response.customer.firstName, 'New First Name')
         assert.equal(response.customer.lastName, 'New Last Name')
-        
+
         done()
 
     it "can add a new card to a customer", (done) ->
@@ -499,3 +482,21 @@ describe "CustomerGateway", ->
           assert.equal(billingAddress.streetAddress, null)
 
           done()
+
+  describe "delete", ->
+    it "deletes a customer", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        specHelper.defaultGateway.customer.delete response.customer.id, (err) ->
+          assert.isNull(err)
+
+          specHelper.defaultGateway.customer.find response.customer.id, (err, customer) ->
+            assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+            done()
+
+    it "handles invalid customer ids", (done) ->
+      specHelper.defaultGateway.customer.delete 'nonexistent_customer', (err) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
+
