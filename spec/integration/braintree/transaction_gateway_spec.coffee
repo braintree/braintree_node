@@ -9,36 +9,6 @@ braintree = specHelper.braintree
 {Transaction} = require('../../../lib/braintree/transaction')
 {Dispute} = require('../../../lib/braintree/dispute')
 
-createTransactionToRefund = (callback) ->
-  transactionParams =
-    amount: '5.00'
-    creditCard:
-      number: '5105105105105100'
-      expirationDate: '05/2012'
-    options:
-      submitForSettlement: true
-
-  specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
-    specHelper.settleTransaction result.transaction.id, (err, settleResult) ->
-      specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
-        callback(transaction)
-
-createEscrowedTransaction = (callback) ->
-  transactionParams =
-    merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
-    amount: '5.00'
-    serviceFeeAmount: '1.00'
-    creditCard:
-      number: '5105105105105100'
-      expirationDate: '05/2012'
-    options:
-      holdInEscrow: true
-
-  specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
-    specHelper.escrowTransaction result.transaction.id, (err, settleResult) ->
-      specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
-        callback(transaction)
-
 describe "TransactionGateway", ->
   describe "credit", ->
     it "creates a credit", (done) ->
@@ -398,7 +368,7 @@ describe "TransactionGateway", ->
 
     context "releaseFromEscrow", ->
       it "can release an escrowed transaction", (done) ->
-        createEscrowedTransaction (transaction) ->
+        specHelper.createEscrowedTransaction (transaction) ->
           specHelper.defaultGateway.transaction.releaseFromEscrow transaction.id, (err, response) ->
             assert.isNull(err)
             assert.isTrue(response.success)
@@ -427,7 +397,7 @@ describe "TransactionGateway", ->
 
     context "cancelRelease", ->
       it "can cancel release for a transaction that has been submitted for release", (done) ->
-        createEscrowedTransaction (transaction) ->
+        specHelper.createEscrowedTransaction (transaction) ->
           specHelper.defaultGateway.transaction.releaseFromEscrow transaction.id, (err, response) ->
             specHelper.defaultGateway.transaction.cancelRelease transaction.id, (err, response) ->
               assert.isNull(err)
@@ -439,7 +409,7 @@ describe "TransactionGateway", ->
               done()
 
       it "cannot cancel release a transaction that has not been submitted for release", (done) ->
-        createEscrowedTransaction (transaction) ->
+        specHelper.createEscrowedTransaction (transaction) ->
           specHelper.defaultGateway.transaction.cancelRelease transaction.id, (err, response) ->
             assert.isNull(err)
             assert.isFalse(response.success)
@@ -588,7 +558,7 @@ describe "TransactionGateway", ->
 
   describe "refund", ->
     it "refunds a transaction", (done) ->
-      createTransactionToRefund (transaction) ->
+      specHelper.createTransactionToRefund (transaction) ->
         specHelper.defaultGateway.transaction.refund transaction.id, (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
@@ -598,7 +568,7 @@ describe "TransactionGateway", ->
           done()
 
     it "allows refunding partial amounts", (done) ->
-      createTransactionToRefund (transaction) ->
+      specHelper.createTransactionToRefund (transaction) ->
         specHelper.defaultGateway.transaction.refund transaction.id, '1.00', (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)

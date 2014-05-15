@@ -172,6 +172,36 @@ generateNonceForPayPalAccount = (callback) ->
     )
   )
 
+createTransactionToRefund = (callback) ->
+  transactionParams =
+    amount: '5.00'
+    creditCard:
+      number: '5105105105105100'
+      expirationDate: '05/2012'
+    options:
+      submitForSettlement: true
+
+  specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
+    specHelper.settleTransaction result.transaction.id, (err, settleResult) ->
+      specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
+        callback(transaction)
+
+createEscrowedTransaction = (callback) ->
+  transactionParams =
+    merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
+    amount: '5.00'
+    serviceFeeAmount: '1.00'
+    creditCard:
+      number: '5105105105105100'
+      expirationDate: '05/2012'
+    options:
+      holdInEscrow: true
+
+  specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
+    specHelper.escrowTransaction result.transaction.id, (err, settleResult) ->
+      specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
+        callback(transaction)
+
 class ClientApiHttp
   timeout: 60000
 
@@ -252,4 +282,6 @@ GLOBAL.specHelper =
   clientApiHttp: ClientApiHttp
   generateNonceForNewCreditCard: generateNonceForNewCreditCard
   generateNonceForPayPalAccount: generateNonceForPayPalAccount
+  createTransactionToRefund: createTransactionToRefund
+  createEscrowedTransaction: createEscrowedTransaction
 
