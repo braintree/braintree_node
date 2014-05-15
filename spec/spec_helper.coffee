@@ -10,6 +10,8 @@ chai = require("chai")
 {Buffer} = require('buffer')
 xml2js = require('xml2js')
 
+chai.Assertion.includeStack = true
+
 GLOBAL.assert = chai.assert
 
 GLOBAL.assert.isEmptyArray = (array) ->
@@ -29,6 +31,15 @@ defaultConfig = {
 }
 
 defaultGateway = braintree.connect(defaultConfig)
+
+paypalMerchantConfig = {
+  environment: braintree.Environment.Development
+  merchantId: 'altpay_merchant'
+  publicKey: 'altpay_merchant_public_key'
+  privateKey: 'altpay_merchant_private_key'
+}
+
+paypalMerchantGateway = braintree.connect(paypalMerchantConfig)
 
 multiplyString = (string, times) ->
   (new Array(times+1)).join(string)
@@ -207,6 +218,8 @@ GLOBAL.specHelper = {
   dateToMdy: dateToMdy
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
+  paypalMerchantConfig: paypalMerchantConfig
+  paypalMerchantGateway: paypalMerchantGateway
   doesNotInclude: doesNotInclude
   escrowTransaction: escrowTransaction
   makePastDue: makePastDue
