@@ -48,6 +48,42 @@ describe "SubscriptionGateway", ->
           done()
       )
 
+    it "creates a subscription with a vaulted paypal account", (done) ->
+      specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+        paypalCustomerId = response.customer.id
+
+        specHelper.generateNonceForPayPalAccount (nonce) ->
+          paymentMethodParams =
+            paymentMethodNonce: nonce
+            customerId: paypalCustomerId
+
+          specHelper.paypalMerchantGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            paymentMethodToken = response.paypalAccount.token
+
+            subscriptionParams =
+              paymentMethodToken: paymentMethodToken
+              planId: specHelper.plans.trialless.id
+
+            specHelper.paypalMerchantGateway.subscription.create subscriptionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.isNotNull(response.subscription.transactions[0].paypal.email)
+
+              done()
+
+    it "does not vault an unverify paypal account payment method nonce", (done) ->
+      specHelper.generateNonceForPayPalAccount (nonce) ->
+        subscriptionParams =
+          paymentMethodNonce: nonce,
+          planId: specHelper.plans.trialless.id
+
+        specHelper.paypalMerchantGateway.subscription.create subscriptionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(response.errors.for('subscription').on('paymentMethodNonce')[0].code, '91925')
+
+          done()
+
     it "allows setting the first billing date", (done) ->
       firstBillingDate = new Date()
       firstBillingDate.setFullYear(firstBillingDate.getFullYear() + 1)

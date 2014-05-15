@@ -155,6 +155,23 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
     )
   )
 
+generateNonceForPayPalAccount = (callback) ->
+  myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+  specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+    clientToken = JSON.parse(result.clientToken)
+    authorizationFingerprint = clientToken.authorizationFingerprint
+    params =
+      authorizationFingerprint: authorizationFingerprint
+      paypalAccount:
+        consentCode: 'PAYPAL_CONSENT_CODE'
+        token: "PAYPAL_ACCOUNT_#{randomId()}"
+
+    myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+      nonce = JSON.parse(body).paypalAccounts[0].nonce
+      callback(nonce)
+    )
+  )
+
 class ClientApiHttp
   timeout: 60000
 
@@ -212,7 +229,7 @@ class ClientApiHttp
     theRequest.write(requestBody) if body
     theRequest.end()
 
-GLOBAL.specHelper = {
+GLOBAL.specHelper =
   addOns: addOns
   braintree: braintree
   dateToMdy: dateToMdy
@@ -234,4 +251,5 @@ GLOBAL.specHelper = {
   nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
   clientApiHttp: ClientApiHttp
   generateNonceForNewCreditCard: generateNonceForNewCreditCard
-}
+  generateNonceForPayPalAccount: generateNonceForPayPalAccount
+
