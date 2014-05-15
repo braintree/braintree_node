@@ -399,36 +399,58 @@ describe "CustomerGateway", ->
 
         done()
 
-    it "can add a new card and billing address", (done) ->
-      customerParams =
-        firstName: 'New First Name'
-        lastName: 'New Last Name'
-        creditCard:
-          number: '5105105105105100'
-          expirationDate: '05/2014'
-          billingAddress:
-            streetAddress: '123 E Fake St'
-            locality: 'Chicago'
-            region: 'IL'
-            postalCode: '60607'
+    context "vaulting a payment method", ->
+      it "can add a new card and billing address", (done) ->
+        customerParams =
+          firstName: 'New First Name'
+          lastName: 'New Last Name'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2014'
+            billingAddress:
+              streetAddress: '123 E Fake St'
+              locality: 'Chicago'
+              region: 'IL'
+              postalCode: '60607'
 
-      specHelper.defaultGateway.customer.update customerId, customerParams, (err, response) ->
-        assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.customer.firstName, 'New First Name')
-        assert.equal(response.customer.lastName, 'New Last Name')
-        assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
-        billingAddress = response.customer.creditCards[0].billingAddress
-        assert.equal(billingAddress.streetAddress, '123 E Fake St')
-        assert.equal(billingAddress.locality, 'Chicago')
-        assert.equal(billingAddress.region, 'IL')
-        assert.equal(billingAddress.postalCode, '60607')
-        assert.equal(response.customer.addresses[0].streetAddress, '123 E Fake St')
-        assert.equal(response.customer.addresses[0].locality, 'Chicago')
-        assert.equal(response.customer.addresses[0].region, 'IL')
-        assert.equal(response.customer.addresses[0].postalCode, '60607')
+        specHelper.defaultGateway.customer.update customerId, customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.customer.firstName, 'New First Name')
+          assert.equal(response.customer.lastName, 'New Last Name')
+          assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
+          billingAddress = response.customer.creditCards[0].billingAddress
+          assert.equal(billingAddress.streetAddress, '123 E Fake St')
+          assert.equal(billingAddress.locality, 'Chicago')
+          assert.equal(billingAddress.region, 'IL')
+          assert.equal(billingAddress.postalCode, '60607')
+          assert.equal(response.customer.addresses[0].streetAddress, '123 E Fake St')
+          assert.equal(response.customer.addresses[0].locality, 'Chicago')
+          assert.equal(response.customer.addresses[0].region, 'IL')
+          assert.equal(response.customer.addresses[0].postalCode, '60607')
 
-        done()
+          done()
+
+      it "vaults a paypal account", (done) ->
+        paymentMethodToken = Math.floor(Math.random() * Math.pow(36,3)).toString(36)
+
+        customerParams =
+          firstName: 'New First Name'
+          lastName: 'New Last Name'
+          paypalAccount:
+            consentCode: 'PAYPAL_CONSENT_CODE'
+            token: paymentMethodToken
+
+        specHelper.paypalMerchantGateway.customer.update customerId, customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.customer.firstName, 'New First Name')
+          assert.equal(response.customer.lastName, 'New Last Name')
+          assert.isNotNull(response.customer.paypalAccounts[0].email)
+          assert.equal(response.customer.paypalAccounts[0].token, paymentMethodToken)
+
+          done()
+
 
     it "returns an error when not found", (done) ->
       specHelper.defaultGateway.customer.update 'nonexistent_customer', {}, (err, response) ->
