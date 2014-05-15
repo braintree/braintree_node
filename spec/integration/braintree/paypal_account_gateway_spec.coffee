@@ -108,26 +108,45 @@ describe "PayPalGatewayGateway", ->
         )
       )
 
-  # describe "delete", (done) ->
-  #   customerToken = null
+  describe "delete", (done) ->
+    paymentMethodToken = null
 
-  #   before (done) ->
-  #     customerParams =
-  #       creditCard:
-  #         number: '5105105105105100',
-  #         expirationDate: '05/2014'
+    before (done) ->
+      specHelper.paypalMerchantGateway.customer.create {firstName: 'Jane', lastName: 'Doe'}, (err, response) ->
+        customerId = response.customer.id
 
-  #     specHelper.defaultGateway.customer.create customerParams, (err, response) ->
-  #       customerToken = response.customer.creditCards[0].token
-  #       done()
+        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+          clientToken = JSON.parse(result.clientToken)
+          authorizationFingerprint = clientToken.authorizationFingerprint
 
-  #   it "deletes the credit card", (done) ->
-  #     specHelper.defaultGateway.creditCard.delete customerToken, (err) ->
-  #       assert.isNull(err)
+          params = {
+            authorizationFingerprint: authorizationFingerprint,
+            paypalAccount: {
+              consentCode: 'PAYPAL_CONSENT_CODE'
+            }
+          }
 
-  #       specHelper.defaultGateway.creditCard.find customerToken, (err, response) ->
-  #         assert.equal(err.type, braintree.errorTypes.notFoundError)
-  #         done()
+          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).paypalAccounts[0].nonce
+            paypalAccountParams =
+              customerId: customerId
+              paymentMethodNonce: nonce
+
+            specHelper.paypalMerchantGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+              paymentMethodToken = response.paypalAccount.token
+
+              done()
+          )
+        )
+
+    it "deletes the paypal account", (done) ->
+      specHelper.paypalMerchantGateway.paypalAccount.delete paymentMethodToken, (err) ->
+        assert.isNull(err)
+
+        specHelper.paypalMerchantGateway.paypalAccount.find paymentMethodToken, (err, response) ->
+          assert.equal(err.type, braintree.errorTypes.notFoundError)
+          done()
 
   #   it "handles invalid tokens", (done) ->
   #     specHelper.defaultGateway.creditCard.delete 'nonexistent_token', (err) ->
