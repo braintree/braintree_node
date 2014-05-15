@@ -44,26 +44,83 @@ describe "CustomerGateway", ->
 
         done()
 
-    it "creates customers with credit cards", (done) ->
-      customerParams =
-        firstName: 'John'
-        lastName: 'Smith'
-        creditCard:
-          number: '5105105105105100'
-          expirationDate: '05/2012'
+    context "and vaults a payment method", ->
+      it "creates customers with credit cards", (done) ->
+        customerParams =
+          firstName: 'John'
+          lastName: 'Smith'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2012'
 
-      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
-        assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.customer.firstName, 'John')
-        assert.equal(response.customer.lastName, 'Smith')
-        assert.equal(response.customer.creditCards.length, 1)
-        assert.equal(response.customer.creditCards[0].expirationMonth, '05')
-        assert.equal(response.customer.creditCards[0].expirationYear, '2012')
-        assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
-        assert.isTrue(/^\w{32}$/.test(response.customer.creditCards[0].uniqueNumberIdentifier))
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.customer.firstName, 'John')
+          assert.equal(response.customer.lastName, 'Smith')
+          assert.equal(response.customer.creditCards.length, 1)
+          assert.equal(response.customer.creditCards[0].expirationMonth, '05')
+          assert.equal(response.customer.creditCards[0].expirationYear, '2012')
+          assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
+          assert.isTrue(/^\w{32}$/.test(response.customer.creditCards[0].uniqueNumberIdentifier))
 
-        done()
+          done()
+
+      it "creates a customer with a payment method nonce backed by a credit card", (done) ->
+        myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+        specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+          clientToken = JSON.parse(result.clientToken)
+          authorizationFingerprint = clientToken.authorizationFingerprint
+          params = {
+            authorizationFingerprint: authorizationFingerprint,
+            sharedCustomerIdentifierType: "testing",
+            sharedCustomerIdentifier: "testing-identifier",
+            share: true,
+            credit_card: {
+              number: "4111111111111111",
+              expiration_month: "11",
+              expiration_year: "2099"
+            }
+          }
+
+          myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).nonce
+            customerParams =
+              creditCard:
+                paymentMethodNonce: nonce
+
+            specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.customer.creditCards[0].bin, "411111")
+
+              done()
+          )
+        )
+
+      it "creates a customer with a paypal account payment method nonce", (done) ->
+        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+          clientToken = JSON.parse(result.clientToken)
+          authorizationFingerprint = clientToken.authorizationFingerprint
+          params =
+            authorizationFingerprint: authorizationFingerprint
+            paypalAccount:
+              consentCode: 'PAYPAL_CONSENT_CODE'
+
+          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).paypalAccounts[0].nonce
+            customerParams =
+              paymentMethodNonce: nonce
+
+            specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.isNotNull(response.customer.paypalAccounts[0].email)
+
+              done()
+          )
+        )
 
     it "fails on duplicate payment methods when provided the option to do so", (done) ->
       customerParams =
@@ -139,7 +196,7 @@ describe "CustomerGateway", ->
 
         done()
 
-    it "allows creating a customer with a billing addres", (done) ->  
+    it "allows creating a customer with a billing addres", (done) ->
       customerParams =
         firstName: 'John'
         lastName: 'Smith'
@@ -203,7 +260,7 @@ describe "CustomerGateway", ->
         done()
 
     it "creates a customer with venmo sdk payment method code", (done) ->
-      customerParams = 
+      customerParams =
         creditCard:
           venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode
 
@@ -228,38 +285,6 @@ describe "CustomerGateway", ->
         assert.isTrue(response.customer.creditCards[0].venmoSdk)
 
         done()
-
-    it "creates a customer with a payment method nonce", (done) ->
-      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
-        clientToken = JSON.parse(result.clientToken)
-        authorizationFingerprint = clientToken.authorizationFingerprint
-        params = {
-          authorizationFingerprint: authorizationFingerprint,
-          sharedCustomerIdentifierType: "testing",
-          sharedCustomerIdentifier: "testing-identifier",
-          share: true,
-          credit_card: {
-            number: "4111111111111111",
-            expiration_month: "11",
-            expiration_year: "2099"
-          }
-        }
-
-        myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
-          nonce = JSON.parse(body).nonce
-          customerParams =
-            creditCard:
-              paymentMethodNonce: nonce
-
-          specHelper.defaultGateway.customer.create customerParams, (err, response) ->
-            assert.isNull(err)
-            assert.isTrue(response.success)
-            assert.equal(response.customer.creditCards[0].bin, "411111")
-
-            done()
-        )
-      )
 
   describe "find", ->
     it "finds a custoemr", (done) ->
