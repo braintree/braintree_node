@@ -121,7 +121,7 @@ describe "PaymentMethodGateway", ->
         done()
 
   describe "delete", (done) ->
-    it "deletes the credit card", (done) ->
+    it "deletes the paypal account", (done) ->
       specHelper.paypalMerchantGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
         customerId = response.customer.id
 
@@ -149,7 +149,7 @@ describe "PaymentMethodGateway", ->
               specHelper.paypalMerchantGateway.paymentMethod.delete paymentMethodToken, (err) ->
                 assert.isNull(err)
 
-                specHelper.paypalMerchantGateway.creditCard.find paymentMethodToken, (err, response) ->
+                specHelper.paypalMerchantGateway.paymentMethod.find paymentMethodToken, (err, response) ->
                   assert.equal(err.type, braintree.errorTypes.notFoundError)
                   done()
           )
