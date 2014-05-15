@@ -90,18 +90,6 @@ describe "PaymentMethodGateway", ->
         done()
 
   describe "delete", (done) ->
-    # customerToken = null
-
-    # before (done) ->
-    #   customerParams =
-    #     creditCard:
-    #       number: '5105105105105100',
-    #       expirationDate: '05/2014'
-
-    #   specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
-    #     customerToken = response.customer.creditCards[0].token
-    #     done()
-
     it "deletes the credit card", (done) ->
       specHelper.paypalMerchantGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
         customerId = response.customer.id
@@ -136,9 +124,9 @@ describe "PaymentMethodGateway", ->
           )
         )
 
-    it "handles invalid tokens"#, (done) ->
-      # specHelper.paypalMerchantGateway.creditCard.delete 'nonexistent_token', (err) ->
-      #   assert.equal(err.type, braintree.errorTypes.notFoundError)
+    it "handles invalid tokens", (done) ->
+      specHelper.paypalMerchantGateway.paymentMethod.delete 'NONEXISTENT_TOKEN', (err) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
 
-      #   done()
+        done()
 
