@@ -82,7 +82,34 @@ describe "TransactionGateway", ->
           done()
 
     context "with a paypal acount", ->
-      context "authorized for future payments", ->
+      context "as a vaulted payment method", ->
+        it "successfully creates a transaction", (done) ->
+          specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+            customerId = response.customer.id
+
+            specHelper.generateNonceForPayPalAccount (nonce) ->
+              paymentMethodParams =
+                paymentMethodNonce: nonce
+                customerId: customerId
+
+              specHelper.paypalMerchantGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+                paymentMethodToken = response.paypalAccount.token
+
+                transactionParams =
+                  paymentMethodToken: paymentMethodToken
+                  amount: '100.00'
+
+                specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+                  assert.isNull(err)
+                  assert.isTrue(response.success)
+                  assert.equal(response.transaction.type, 'sale')
+                  assert.isNotNull(response.transaction.paypal.email)
+                  assert.isNotNull(response.transaction.paypal.transactionId)
+                  assert.isNotNull(response.transaction.paypal.authorizationId)
+
+                  done()
+
+      context "as a payment method nonce authorized for future payments", ->
         it "successfully creates a transaction but doesn't vault a paypal account", (done) ->
           paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
 
@@ -159,7 +186,7 @@ describe "TransactionGateway", ->
             )
           )
 
-      context "authorized for one-time use", ->
+      context "as a payment method nonce authorized for one-time use", ->
         it "successfully creates a transaction", (done) ->
           paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
 
