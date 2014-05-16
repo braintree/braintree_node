@@ -858,6 +858,19 @@ describe "TransactionGateway", ->
 
           done()
 
+    it "voids a paypal transaction", (done) ->
+      transactionParams =
+        amount: '5.00'
+        paymentMethodToken: 'PAYPAL_ACCOUNT'
+
+      specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.paypalMerchantGateway.transaction.void response.transaction.id, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'voided')
+
+          done()
+
     it "handles validation errors", (done) ->
       transactionParams =
         amount: '5.00'
