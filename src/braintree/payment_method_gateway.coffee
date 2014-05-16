@@ -7,7 +7,10 @@ class PaymentMethodGateway extends Gateway
   constructor: (@gateway) ->
 
   responseHandler: (callback) ->
-    @createResponseHandler({paypalAccount: PayPalAccount}, null, callback)
+    responseMapping =
+      paypalAccount: PayPalAccount
+      creditCard: CreditCard
+    @createResponseHandler(responseMapping, null, callback)
 
   create: (attributes, callback) ->
     @gateway.http.post('/payment_methods', {paymentMethod: attributes}, @responseHandler(callback))
