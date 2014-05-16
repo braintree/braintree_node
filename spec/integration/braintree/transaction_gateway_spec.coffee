@@ -795,6 +795,20 @@ describe "TransactionGateway", ->
 
           done()
 
+    it "submits a paypal transaction for settlement", (done) ->
+      transactionParams =
+        amount: '5.00'
+        paymentMethodToken: 'PAYPAL_ACCOUNT'
+
+      specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.paypalMerchantGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'submitted_for_settlement')
+          assert.equal(response.transaction.amount, '5.00')
+
+          done()
+
     it "allows submitting for a partial amount", (done) ->
       transactionParams =
         amount: '5.00'
