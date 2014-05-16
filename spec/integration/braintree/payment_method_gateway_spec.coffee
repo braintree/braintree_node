@@ -45,8 +45,7 @@ describe "PaymentMethodGateway", ->
           done()
 
       it "creates a paypal account from a payment method nonce", (done) ->
-        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+        specHelper.paypalMerchantGateway.clientToken.generate {}, (err, result) ->
           clientToken = JSON.parse(result.clientToken)
           authorizationFingerprint = clientToken.authorizationFingerprint
 
@@ -55,7 +54,8 @@ describe "PaymentMethodGateway", ->
             paypalAccount:
               consentCode: 'PAYPAL_CONSENT_CODE'
 
-          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+          myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
             nonce = JSON.parse(body).paypalAccounts[0].nonce
             paypalAccountParams =
               customerId: customerId
@@ -67,12 +67,9 @@ describe "PaymentMethodGateway", ->
               assert.isNotNull(response.paypalAccount.email)
 
               done()
-          )
-        )
 
       it "returns an error when trying to create a paypal account only authorized for one-time use", (done) ->
-        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+        specHelper.paypalMerchantGateway.clientToken.generate {}, (err, result) ->
           clientToken = JSON.parse(result.clientToken)
           authorizationFingerprint = clientToken.authorizationFingerprint
 
@@ -83,7 +80,8 @@ describe "PaymentMethodGateway", ->
             }
           }
 
-          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+          myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
             nonce = JSON.parse(body).paypalAccounts[0].nonce
             paypalAccountParams =
               customerId: customerId
@@ -98,12 +96,9 @@ describe "PaymentMethodGateway", ->
               )
 
               done()
-          )
-        )
 
       it "handles errors", (done) ->
-        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+        specHelper.paypalMerchantGateway.clientToken.generate {}, (err, result) ->
           clientToken = JSON.parse(result.clientToken)
           authorizationFingerprint = clientToken.authorizationFingerprint
 
@@ -112,7 +107,8 @@ describe "PaymentMethodGateway", ->
             paypalAccount: {}
           }
 
-          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
+          myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
             nonce = JSON.parse(body).paypalAccounts[0].nonce
             paypalAccountParams =
               customerId: customerId
@@ -120,31 +116,61 @@ describe "PaymentMethodGateway", ->
 
             specHelper.paypalMerchantGateway.paymentMethod.create paypalAccountParams, (err, response) ->
               assert.isFalse(response.success)
-              assert.equal(
-                response.errors.for('paypalAccount').on('base')[0].code,
-                '82902'
-              )
+              assert.equal(response.errors.for('paypalAccount').on('base')[0].code, '82902')
 
               done()
-          )
-        )
 
   describe "find", ->
-    it "finds the card", (done) ->
-      specHelper.paypalMerchantGateway.paymentMethod.find 'PAYPAL_ACCOUNT', (err, paypalAccount) ->
-        assert.isNull(err)
-        assert.isNotNull(paypalAccount.email)
+    context 'credit card', ->
+      paymentMethodToken = null
 
-        done()
+      before (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
+          customerId = response.customer.id
+          paymentMethodToken = specHelper.randomId()
 
-    it "handles not finding the card", (done) ->
-      specHelper.paypalMerchantGateway.paymentMethod.find 'NONEXISTENT_PAYPAL_ACCOUNT', (err, paypalAccount) ->
+          specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+            clientToken = JSON.parse(result.clientToken)
+            authorizationFingerprint = clientToken.authorizationFingerprint
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              creditCard:
+                token: paymentMethodToken
+                number: '4111111111111111'
+                expirationDate: '01/2020'
+
+            myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+            myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).creditCards[0].nonce
+              paymentMethodParams =
+                customerId: customerId
+                paymentMethodNonce: nonce
+              specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, creditCard) ->
+                done()
+
+      it 'finds the card', (done) ->
+        specHelper.defaultGateway.paymentMethod.find paymentMethodToken, (err, creditCard) ->
+          assert.isNull(err)
+          assert.equal(creditCard.maskedNumber, '411111******1111')
+
+          done()
+
+    context 'paypal account', ->
+      it "finds the paypal account", (done) ->
+        specHelper.paypalMerchantGateway.paymentMethod.find 'PAYPAL_ACCOUNT', (err, paypalAccount) ->
+          assert.isNull(err)
+          assert.isNotNull(paypalAccount.email)
+
+          done()
+
+    it "handles not finding the paypal account", (done) ->
+      specHelper.defaultGateway.paymentMethod.find 'NON_EXISTENT_TOKEN', (err, paypalAccount) ->
         assert.equal(err.type, braintree.errorTypes.notFoundError)
 
         done()
 
     it "handles whitespace", (done) ->
-      specHelper.paypalMerchantGateway.paymentMethod.find ' ', (err, paypalAccount) ->
+      specHelper.defaultGateway.paymentMethod.find ' ', (err, paypalAccount) ->
         assert.equal(err.type, braintree.errorTypes.notFoundError)
 
         done()
