@@ -750,6 +750,16 @@ describe "TransactionGateway", ->
 
           done()
 
+    it "refunds a paypal transaction", (done) ->
+      specHelper.createPayPalTransactionToRefund (transaction) ->
+        specHelper.paypalMerchantGateway.transaction.refund transaction.id, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.type, 'credit')
+          assert.match(response.transaction.refund_id, /^\w+$/)
+
+          done()
+
     it "allows refunding partial amounts", (done) ->
       specHelper.createTransactionToRefund (transaction) ->
         specHelper.defaultGateway.transaction.refund transaction.id, '1.00', (err, response) ->

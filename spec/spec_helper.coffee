@@ -3,6 +3,7 @@ try
 catch err
 
 http = require('http')
+{TransactionAmounts} = require('../lib/braintree/test/transaction_amounts')
 {Util} = require('../lib/braintree/util')
 {Config} = require('../lib/braintree/config')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
@@ -73,6 +74,13 @@ makePastDue = (subscription, callback) ->
 
 settleTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
+    "/transactions/#{transactionId}/settle",
+    null,
+    callback
+  )
+
+settlePayPalTransaction = (transactionId, callback) ->
+  paypalMerchantGateway.http.put(
     "/transactions/#{transactionId}/settle",
     null,
     callback
@@ -186,6 +194,22 @@ createTransactionToRefund = (callback) ->
       specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
         callback(transaction)
 
+createPayPalTransactionToRefund = (callback) ->
+  generateNonceForPayPalAccount (nonce) ->
+    transactionParams =
+      amount: TransactionAmounts.Authorize
+      merchantAccountId: 'altpay_merchant_paypal_merchant_account'
+      paymentMethodNonce: nonce
+      options:
+        submitForSettlement: true
+
+    paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+      transactionId = response.transaction.id
+
+      specHelper.settlePayPalTransaction transactionId, (err, settleResult) ->
+        paypalMerchantGateway.transaction.find transactionId, (err, transaction) ->
+          callback(transaction)
+                                                                                     
 createEscrowedTransaction = (callback) ->
   transactionParams =
     merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
@@ -275,6 +299,7 @@ GLOBAL.specHelper =
   plans: plans
   randomId: randomId
   settleTransaction: settleTransaction
+  settlePayPalTransaction: settlePayPalTransaction
   simulateTrFormPost: simulateTrFormPost
   defaultMerchantAccountId: "sandbox_credit_card"
   nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
@@ -283,5 +308,6 @@ GLOBAL.specHelper =
   generateNonceForNewCreditCard: generateNonceForNewCreditCard
   generateNonceForPayPalAccount: generateNonceForPayPalAccount
   createTransactionToRefund: createTransactionToRefund
+  createPayPalTransactionToRefund: createPayPalTransactionToRefund
   createEscrowedTransaction: createEscrowedTransaction
 
