@@ -162,6 +162,34 @@ describe "TransactionSearch", ->
 
                 done()
 
+    it "finds paypal transactions", (done) ->
+      @timeout 10000
+
+      transactionParams =
+        amount: "5.00"
+        paymentMethodToken: 'PAYPAL_ACCOUNT'
+        options:
+          submitForSettlement: true
+
+      specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.settlePayPalTransaction response.transaction.id, (err, settleResult) ->
+          specHelper.paypalMerchantGateway.transaction.find response.transaction.id, (err, transaction) ->
+
+            search = (search) ->
+              search.paypalPayerEmail().is(transaction.paypal.payerEmail)
+              search.paypalPaymentId().is(transaction.paypal.paymentId)
+              search.paypalSaleId().is(transaction.paypal.saleId)
+
+            specHelper.paypalMerchantGateway.transaction.search search, (err, response) ->
+              assert.isTrue(response.success)
+              assert.equal(response.length(), 1)
+
+              response.first (err, transaction) ->
+                assert.isObject(transaction)
+                assert.isNull(err)
+
+                done()
+
     xit "pages correctly (slow test)", (done) ->
       random = specHelper.randomId()
       transactionParams =
