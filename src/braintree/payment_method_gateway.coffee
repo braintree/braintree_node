@@ -1,6 +1,7 @@
 {Gateway} = require('./gateway')
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
+{UnknownPaymentMethod} = require('./unknown_payment_method')
 exceptions = require('./exceptions')
 
 class PaymentMethodGateway extends Gateway
@@ -22,10 +23,16 @@ class PaymentMethodGateway extends Gateway
       @gateway.http.get "/payment_methods/any/#{token}", (err, response) ->
         if err
           callback(err, null)
-        else if response.creditCard
-          callback(null, new CreditCard(response.creditCard))
-        else if response.paypalAccount
-          callback(null, new PayPalAccount(response.paypalAccount))
+        else
+          callback(null, PaymentMethodGateway.parsePaymentMethod(response))
+
+  @parsePaymentMethod: (response) ->
+    if response.creditCard
+      new CreditCard(response.creditCard)
+    else if response.paypalAccount
+      new PayPalAccount(response.paypalAccount)
+    else
+      new UnknownPaymentMethod(response)
 
   delete: (token, callback) ->
     @gateway.http.delete("/payment_methods/any/#{token}", callback)
