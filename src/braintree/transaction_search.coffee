@@ -28,7 +28,7 @@ class TransactionSearch extends AdvancedSearch
       "paymentMethodToken"
       "paypalPayerEmail"
       "paypalPaymentId"
-      "paypalSaleId"
+      "paypalAuthorizationId"
       "processorAuthorizationCode"
       "settlementBatchId"
       "shippingCompany"

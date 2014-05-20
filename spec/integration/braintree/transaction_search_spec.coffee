@@ -178,9 +178,10 @@ describe "TransactionSearch", ->
             search = (search) ->
               search.paypalPayerEmail().is(transaction.paypal.payerEmail)
               search.paypalPaymentId().is(transaction.paypal.paymentId)
-              search.paypalSaleId().is(transaction.paypal.saleId)
+              search.paypalAuthorizationId().is(transaction.paypal.authorizationId)
 
             specHelper.paypalMerchantGateway.transaction.search search, (err, response) ->
+              assert.isNull(err)
               assert.isTrue(response.success)
               assert.equal(response.length(), 1)
 

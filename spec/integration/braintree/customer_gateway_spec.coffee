@@ -2,6 +2,7 @@ require('../../spec_helper')
 
 {_} = require('underscore')
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
+{Nonce} = require('../../../lib/braintree/test/nonce')
 {Config} = require('../../../lib/braintree/config')
 braintree = specHelper.braintree
 
@@ -335,6 +336,7 @@ describe "CustomerGateway", ->
             postalCode: '60607'
 
       specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        assert.isNull(err)
         specHelper.defaultGateway.customer.find response.customer.id, (err, customer) ->
           assert.isNull(err)
           assert.equal(customer.firstName, 'John')
@@ -344,6 +346,41 @@ describe "CustomerGateway", ->
           assert.equal(billingAddress.company, '')
 
           done()
+
+    it "returns both credit cards and paypal accounts for a given customer", (done) ->
+      customerParams =
+        firstName: 'John'
+        lastName: 'Smith'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/2014'
+          billingAddress:
+            company: ''
+            streetAddress: '123 E Fake St'
+            locality: 'Chicago'
+            region: 'IL'
+            postalCode: '60607'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, customerResponse) ->
+        assert.isNull(err)
+        assert.equal(customerResponse.success, true)
+
+        paypalAccountParams =
+          customerId: customerResponse.customer.id,
+          paymentMethodNonce: Nonce.PayPalFuturePayment
+
+        specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, paypalResponse) ->
+          assert.isNull(err)
+          assert.equal(paypalResponse.success, true)
+
+          specHelper.defaultGateway.customer.find customerResponse.customer.id, (err, customer) ->
+            assert.isNull(err)
+            assert.equal(customer.firstName, 'John')
+            assert.equal(customer.lastName, 'Smith')
+            assert.equal(customer.creditCards.length, 1)
+            assert.equal(customer.paypalAccounts.length, 1)
+
+            done()
 
     it "returns an error if unable to find the customer", (done) ->
       specHelper.defaultGateway.customer.find 'nonexistent_customer', (err, customer) ->

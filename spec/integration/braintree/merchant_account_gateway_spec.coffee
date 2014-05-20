@@ -57,6 +57,7 @@ describe "MerchantAccountGateway", ->
   describe "create", ->
     it "accepts the legacy parameters", (done) ->
       specHelper.defaultGateway.merchantAccount.create legacyMerchantAccountParams, (err, response) ->
+        assert.isNull(err)
         assert.isTrue(response.success)
         assert.equal(response.merchantAccount.status, MerchantAccount.Status.Pending)
         assert.equal(response.merchantAccount.masterMerchantAccount.id, "sandbox_master_merchant_account")
