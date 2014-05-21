@@ -103,7 +103,7 @@ describe "CustomerGateway", ->
         customerParams =
           paymentMethodNonce: Nonces.PayPalFuturePayment
 
-        specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.isNotNull(response.customer.paypalAccounts[0].email)
@@ -114,7 +114,7 @@ describe "CustomerGateway", ->
         customerParams =
           paymentMethodNonce: Nonces.PayPalOneTimePayment
 
-        specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
           assert.isNull(err)
           assert.isFalse(response.success)
           assert.equal(
@@ -439,7 +439,7 @@ describe "CustomerGateway", ->
       it "vaults a paypal account", (done) ->
         paymentMethodToken = specHelper.randomId()
 
-        specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
           paypalCustomerId = response.customer.id
 
           customerParams =
@@ -449,7 +449,7 @@ describe "CustomerGateway", ->
               consentCode: 'PAYPAL_CONSENT_CODE'
               token: paymentMethodToken
 
-          specHelper.paypalMerchantGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
+          specHelper.defaultGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
             assert.isNull(err)
             assert.isTrue(response.success)
             assert.equal(response.customer.firstName, 'New First Name')
@@ -462,7 +462,7 @@ describe "CustomerGateway", ->
       it "does not vault a one-time use paypal account", (done) ->
         paymentMethodToken = specHelper.randomId()
 
-        specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
           paypalCustomerId = response.customer.id
 
           customerParams =
@@ -472,7 +472,7 @@ describe "CustomerGateway", ->
               accessToken: 'PAYPAL_ACCESS_TOKEN'
               token: paymentMethodToken
 
-          specHelper.paypalMerchantGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
+          specHelper.defaultGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
             assert.isNull(err)
             assert.isFalse(response.success)
             assert.equal(
@@ -480,7 +480,7 @@ describe "CustomerGateway", ->
               '82902'
             )
 
-            specHelper.paypalMerchantGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
+            specHelper.defaultGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
               assert.equal(err.type, braintree.errorTypes.notFoundError)
 
             done()

@@ -85,7 +85,7 @@ describe "TransactionGateway", ->
     context "with a paypal acount", ->
       context "as a vaulted payment method", ->
         it "successfully creates a transaction", (done) ->
-          specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
             customerId = response.customer.id
 
             specHelper.generateNonceForPayPalAccount (nonce) ->
@@ -93,14 +93,14 @@ describe "TransactionGateway", ->
                 paymentMethodNonce: nonce
                 customerId: customerId
 
-              specHelper.paypalMerchantGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+              specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
                 paymentMethodToken = response.paypalAccount.token
 
                 transactionParams =
                   paymentMethodToken: paymentMethodToken
                   amount: '100.00'
 
-                specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+                specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
                   assert.isNull(err)
                   assert.isTrue(response.success)
                   assert.equal(response.transaction.type, 'sale')
@@ -114,8 +114,8 @@ describe "TransactionGateway", ->
         it "successfully creates a transaction but doesn't vault a paypal account", (done) ->
           paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
 
-          myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-          specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+          specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
             clientToken = JSON.parse(result.clientToken)
             authorizationFingerprint = clientToken.authorizationFingerprint
             params =
@@ -127,12 +127,12 @@ describe "TransactionGateway", ->
             myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
               nonce = JSON.parse(body).paypalAccounts[0].nonce
 
-              specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+              specHelper.defaultGateway.customer.create {}, (err, response) ->
                 transactionParams =
                   paymentMethodNonce: nonce
                   amount: '100.00'
 
-                specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+                specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
                   assert.isNull(err)
                   assert.isTrue(response.success)
                   assert.equal(response.transaction.type, 'sale')
@@ -141,7 +141,7 @@ describe "TransactionGateway", ->
                   assert.isNotNull(response.transaction.paypal.transactionId)
                   assert.isNotNull(response.transaction.paypal.authorizationId)
 
-                  specHelper.paypalMerchantGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
+                  specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
                     assert.equal(err.type, braintree.errorTypes.notFoundError)
 
                     done()
@@ -151,8 +151,8 @@ describe "TransactionGateway", ->
         it "vaults when explicitly asked", (done) ->
           paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
 
-          myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-          specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+          specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
             clientToken = JSON.parse(result.clientToken)
             authorizationFingerprint = clientToken.authorizationFingerprint
             params =
@@ -164,14 +164,14 @@ describe "TransactionGateway", ->
             myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
               nonce = JSON.parse(body).paypalAccounts[0].nonce
 
-              specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+              specHelper.defaultGateway.customer.create {}, (err, response) ->
                 transactionParams =
                   paymentMethodNonce: nonce
                   amount: '100.00'
                   options:
                     storeInVault: true
 
-                specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+                specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
                   assert.isNull(err)
                   assert.isTrue(response.success)
                   assert.equal(response.transaction.type, 'sale')
@@ -180,7 +180,7 @@ describe "TransactionGateway", ->
                   assert.isNotNull(response.transaction.paypal.transactionId)
                   assert.isNotNull(response.transaction.paypal.authorizationId)
 
-                  specHelper.paypalMerchantGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
+                  specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
                     assert.isNull(err)
 
                     done()
@@ -191,12 +191,12 @@ describe "TransactionGateway", ->
         it "successfully creates a transaction", (done) ->
           nonce = Nonces.PayPalOneTimePayment
 
-          specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
             transactionParams =
               paymentMethodNonce: nonce
               amount: '100.00'
 
-            specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
               assert.equal(response.transaction.type, 'sale')
@@ -210,14 +210,14 @@ describe "TransactionGateway", ->
         it "does not vault even when explicitly asked", (done) ->
           nonce = Nonces.PayPalOneTimePayment
 
-          specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
             transactionParams =
               paymentMethodNonce: nonce
               amount: '100.00'
               options:
                 storeInVault: true
 
-            specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
               assert.equal(response.transaction.type, 'sale')
@@ -717,7 +717,7 @@ describe "TransactionGateway", ->
 
     it "refunds a paypal transaction", (done) ->
       specHelper.createPayPalTransactionToRefund (transaction) ->
-        specHelper.paypalMerchantGateway.transaction.refund transaction.id, (err, response) ->
+        specHelper.defaultGateway.transaction.refund transaction.id, (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.equal(response.transaction.type, 'credit')
@@ -775,8 +775,8 @@ describe "TransactionGateway", ->
         amount: '5.00'
         paymentMethodToken: 'PAYPAL_ACCOUNT'
 
-      specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
-        specHelper.paypalMerchantGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.equal(response.transaction.status, 'submitted_for_settlement')
@@ -838,8 +838,8 @@ describe "TransactionGateway", ->
         amount: '5.00'
         paymentMethodToken: 'PAYPAL_ACCOUNT'
 
-      specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
-        specHelper.paypalMerchantGateway.transaction.void response.transaction.id, (err, response) ->
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.void response.transaction.id, (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.equal(response.transaction.status, 'voided')

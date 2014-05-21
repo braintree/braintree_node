@@ -33,15 +33,6 @@ defaultConfig = {
 
 defaultGateway = braintree.connect(defaultConfig)
 
-paypalMerchantConfig = {
-  environment: braintree.Environment.Development
-  merchantId: 'altpay_merchant'
-  publicKey: 'altpay_merchant_public_key'
-  privateKey: 'altpay_merchant_private_key'
-}
-
-paypalMerchantGateway = braintree.connect(paypalMerchantConfig)
-
 multiplyString = (string, times) ->
   (new Array(times+1)).join(string)
 
@@ -80,7 +71,7 @@ settleTransaction = (transactionId, callback) ->
   )
 
 settlePayPalTransaction = (transactionId, callback) ->
-  paypalMerchantGateway.http.put(
+  defaultGateway.http.put(
     "/transactions/#{transactionId}/settle",
     null,
     callback
@@ -164,8 +155,8 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
   )
 
 generateNonceForPayPalAccount = (callback) ->
-  myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-  specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+  myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+  specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
     clientToken = JSON.parse(result.clientToken)
     authorizationFingerprint = clientToken.authorizationFingerprint
     params =
@@ -198,16 +189,15 @@ createPayPalTransactionToRefund = (callback) ->
   generateNonceForPayPalAccount (nonce) ->
     transactionParams =
       amount: TransactionAmounts.Authorize
-      merchantAccountId: 'altpay_merchant_paypal_merchant_account'
       paymentMethodNonce: nonce
       options:
         submitForSettlement: true
 
-    paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+    defaultGateway.transaction.sale transactionParams, (err, response) ->
       transactionId = response.transaction.id
 
       specHelper.settlePayPalTransaction transactionId, (err, settleResult) ->
-        paypalMerchantGateway.transaction.find transactionId, (err, transaction) ->
+        defaultGateway.transaction.find transactionId, (err, transaction) ->
           callback(transaction)
                                                                                      
 createEscrowedTransaction = (callback) ->
@@ -289,8 +279,8 @@ GLOBAL.specHelper =
   dateToMdy: dateToMdy
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
-  paypalMerchantConfig: paypalMerchantConfig
-  paypalMerchantGateway: paypalMerchantGateway
+  defaultConfig: defaultConfig
+  defaultGateway: defaultGateway
   doesNotInclude: doesNotInclude
   escrowTransaction: escrowTransaction
   makePastDue: makePastDue

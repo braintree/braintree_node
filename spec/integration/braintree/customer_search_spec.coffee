@@ -172,10 +172,10 @@ describe "CustomerSearch", ->
         firstName: firstName
         lastName: lastName
 
-      specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
 
-        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
+        myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+        specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
           clientToken = JSON.parse(result.clientToken)
           authorizationFingerprint = clientToken.authorizationFingerprint
 
@@ -191,13 +191,13 @@ describe "CustomerSearch", ->
               customerId: customerId
               paymentMethodNonce: nonce
 
-            specHelper.paypalMerchantGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+            specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
 
               search = (search) ->
                 search.paypalAccountEmail().is(response.paypalAccount.email)
                 search.id().is(customerId)
 
-              specHelper.paypalMerchantGateway.customer.search search, (err, response) ->
+              specHelper.defaultGateway.customer.search search, (err, response) ->
                 assert.isTrue(response.success)
                 assert.equal(response.length(), 1)
 

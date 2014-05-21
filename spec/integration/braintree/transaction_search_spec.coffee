@@ -171,16 +171,16 @@ describe "TransactionSearch", ->
         options:
           submitForSettlement: true
 
-      specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         specHelper.settlePayPalTransaction response.transaction.id, (err, settleResult) ->
-          specHelper.paypalMerchantGateway.transaction.find response.transaction.id, (err, transaction) ->
+          specHelper.defaultGateway.transaction.find response.transaction.id, (err, transaction) ->
 
             search = (search) ->
               search.paypalPayerEmail().is(transaction.paypal.payerEmail)
               search.paypalPaymentId().is(transaction.paypal.paymentId)
               search.paypalAuthorizationId().is(transaction.paypal.authorizationId)
 
-            specHelper.paypalMerchantGateway.transaction.search search, (err, response) ->
+            specHelper.defaultGateway.transaction.search search, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
               assert.equal(response.length(), 1)

@@ -50,7 +50,7 @@ describe "SubscriptionGateway", ->
       )
 
     it "creates a subscription with a vaulted paypal account", (done) ->
-      specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
         paypalCustomerId = response.customer.id
 
         specHelper.generateNonceForPayPalAccount (nonce) ->
@@ -58,14 +58,14 @@ describe "SubscriptionGateway", ->
             paymentMethodNonce: nonce
             customerId: paypalCustomerId
 
-          specHelper.paypalMerchantGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
             paymentMethodToken = response.paypalAccount.token
 
             subscriptionParams =
               paymentMethodToken: paymentMethodToken
               planId: specHelper.plans.trialless.id
 
-            specHelper.paypalMerchantGateway.subscription.create subscriptionParams, (err, response) ->
+            specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
               assert.isNotNull(response.subscription.transactions[0].paypal.email)
@@ -77,7 +77,7 @@ describe "SubscriptionGateway", ->
         paymentMethodNonce: Nonces.PayPalOneTimePayment,
         planId: specHelper.plans.trialless.id
 
-      specHelper.paypalMerchantGateway.subscription.create subscriptionParams, (err, response) ->
+      specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
         assert.isNull(err)
         assert.isFalse(response.success)
         assert.equal(response.errors.for('subscription').on('paymentMethodNonce')[0].code, '91925')
