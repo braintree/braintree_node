@@ -2,6 +2,7 @@ require('../../spec_helper')
 dateFormat = require('dateformat')
 _ = require('underscore')._
 braintree = specHelper.braintree
+{Nonces} = require('../../../lib/braintree/test/nonces')
 
 describe "SubscriptionGateway", ->
   customerId = null
@@ -71,18 +72,17 @@ describe "SubscriptionGateway", ->
 
               done()
 
-    it "does not vault an unverify paypal account payment method nonce", (done) ->
-      specHelper.generateNonceForPayPalAccount (nonce) ->
-        subscriptionParams =
-          paymentMethodNonce: nonce,
-          planId: specHelper.plans.trialless.id
+    it "does not vault an unverified paypal account payment method nonce", (done) ->
+      subscriptionParams =
+        paymentMethodNonce: Nonces.PayPalOneTimePayment,
+        planId: specHelper.plans.trialless.id
 
-        specHelper.paypalMerchantGateway.subscription.create subscriptionParams, (err, response) ->
-          assert.isNull(err)
-          assert.isFalse(response.success)
-          assert.equal(response.errors.for('subscription').on('paymentMethodNonce')[0].code, '91925')
+      specHelper.paypalMerchantGateway.subscription.create subscriptionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isFalse(response.success)
+        assert.equal(response.errors.for('subscription').on('paymentMethodNonce')[0].code, '91925')
 
-          done()
+        done()
 
     it "allows setting the first billing date", (done) ->
       firstBillingDate = new Date()

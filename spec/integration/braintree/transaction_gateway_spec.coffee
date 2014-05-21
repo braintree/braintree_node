@@ -3,6 +3,7 @@ require('../../spec_helper')
 {_} = require('underscore')
 braintree = specHelper.braintree
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
+{Nonces} = require('../../../lib/braintree/test/nonces')
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
@@ -188,80 +189,44 @@ describe "TransactionGateway", ->
 
       context "as a payment method nonce authorized for one-time use", ->
         it "successfully creates a transaction", (done) ->
-          paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
+          nonce = Nonces.PayPalOneTimePayment
 
-          myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-          specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
-            clientToken = JSON.parse(result.clientToken)
-            authorizationFingerprint = clientToken.authorizationFingerprint
-            params =
-              authorizationFingerprint: authorizationFingerprint
-              paypalAccount:
-                accessToken: 'PAYPAL_ACCESS_TOKEN'
-                token: paymentMethodToken
+          specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
 
-            myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
-              nonce = JSON.parse(body).paypalAccounts[0].nonce
+            specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.type, 'sale')
+              assert.isNull(response.transaction.paypal.token)
+              assert.isNotNull(response.transaction.paypal.email)
+              assert.isNotNull(response.transaction.paypal.transactionId)
+              assert.isNotNull(response.transaction.paypal.authorizationId)
 
-              specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
-                transactionParams =
-                  paymentMethodNonce: nonce
-                  amount: '100.00'
+              done()
 
-                specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
-                  assert.isNull(err)
-                  assert.isTrue(response.success)
-                  assert.equal(response.transaction.type, 'sale')
-                  assert.isNull(response.transaction.paypal.token)
-                  assert.isNotNull(response.transaction.paypal.email)
-                  assert.isNotNull(response.transaction.paypal.transactionId)
-                  assert.isNotNull(response.transaction.paypal.authorizationId)
+        it "does not vault even when explicitly asked", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
 
-                  specHelper.paypalMerchantGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
-                    assert.equal(err.type, braintree.errorTypes.notFoundError)
+          specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              options:
+                storeInVault: true
 
-                    done()
-            )
-          )
+            specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.type, 'sale')
+              assert.isNull(response.transaction.paypal.token)
+              assert.isNotNull(response.transaction.paypal.email)
+              assert.isNotNull(response.transaction.paypal.transactionId)
+              assert.isNotNull(response.transaction.paypal.authorizationId)
 
-        it "vaults when explicitly asked", (done) ->
-          paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
-
-          myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-          specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
-            clientToken = JSON.parse(result.clientToken)
-            authorizationFingerprint = clientToken.authorizationFingerprint
-            params =
-              authorizationFingerprint: authorizationFingerprint
-              paypalAccount:
-                accessToken: 'PAYPAL_ACCESS_TOKEN'
-                token: paymentMethodToken
-
-            myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
-              nonce = JSON.parse(body).paypalAccounts[0].nonce
-
-              specHelper.paypalMerchantGateway.customer.create {}, (err, response) ->
-                transactionParams =
-                  paymentMethodNonce: nonce
-                  amount: '100.00'
-                  options:
-                    storeInVault: true
-
-                specHelper.paypalMerchantGateway.transaction.sale transactionParams, (err, response) ->
-                  assert.isNull(err)
-                  assert.isTrue(response.success)
-                  assert.equal(response.transaction.type, 'sale')
-                  assert.isNull(response.transaction.paypal.token)
-                  assert.isNotNull(response.transaction.paypal.email)
-                  assert.isNotNull(response.transaction.paypal.transactionId)
-                  assert.isNotNull(response.transaction.paypal.authorizationId)
-
-                  specHelper.paypalMerchantGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
-                    assert.equal(err.type, braintree.errorTypes.notFoundError)
-
-                    done()
-            )
-          )
+              done()
 
     it "allows submitting for settlement", (done) ->
       transactionParams =

@@ -12,7 +12,7 @@ errorTypes = require("./braintree/error_types")
 {CreditCardDefaults} = require("./braintree/test/credit_card_defaults")
 {CreditCardNumbers} = require("./braintree/test/credit_card_numbers")
 {MerchantAccountTest} = require("./braintree/test/merchant_account")
-{Nonce} = require("./braintree/test/nonce")
+{Nonces} = require("./braintree/test/nonces")
 {TransactionAmounts} = require("./braintree/test/transaction_amounts")
 {VenmoSdk} = require("./braintree/test/venmo_sdk")
 
@@ -34,6 +34,6 @@ exports.Test = {
   CreditCardDefaults: CreditCardDefaults,
   CreditCardNumbers: CreditCardNumbers,
   MerchantAccountTest: MerchantAccountTest,
-  Nonce: Nonce,
+  Nonces: Nonces,
   TransactionAmounts: TransactionAmounts,
 }

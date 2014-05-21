@@ -2,7 +2,7 @@ require('../../spec_helper')
 
 {_} = require('underscore')
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
-{Nonce} = require('../../../lib/braintree/test/nonce')
+{Nonces} = require('../../../lib/braintree/test/nonces')
 {Config} = require('../../../lib/braintree/config')
 braintree = specHelper.braintree
 
@@ -100,61 +100,29 @@ describe "CustomerGateway", ->
         )
 
       it "creates a customer with a paypal account payment method nonce", (done) ->
-        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
-          clientToken = JSON.parse(result.clientToken)
-          authorizationFingerprint = clientToken.authorizationFingerprint
-          params =
-            authorizationFingerprint: authorizationFingerprint
-            paypalAccount:
-              consentCode: 'PAYPAL_CONSENT_CODE'
+        customerParams =
+          paymentMethodNonce: Nonces.PayPalFuturePayment
 
-          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
-            nonce = JSON.parse(body).paypalAccounts[0].nonce
-            customerParams =
-              paymentMethodNonce: nonce
+        specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.isNotNull(response.customer.paypalAccounts[0].email)
 
-            specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
-              assert.isNull(err)
-              assert.isTrue(response.success)
-              assert.isNotNull(response.customer.paypalAccounts[0].email)
-
-              done()
-          )
-        )
+          done()
 
       it "does not vault a paypal account only authorized for one-time use", (done) ->
-        paymentMethodToken = Math.floor(Math.random() * Math.pow(36,3)).toString(36)
+        customerParams =
+          paymentMethodNonce: Nonces.PayPalOneTimePayment
 
-        myHttp = new specHelper.clientApiHttp(new Config(specHelper.paypalMerchantConfig))
-        specHelper.paypalMerchantGateway.clientToken.generate({}, (err, result) ->
-          clientToken = JSON.parse(result.clientToken)
-          authorizationFingerprint = clientToken.authorizationFingerprint
-          params =
-            authorizationFingerprint: authorizationFingerprint
-            paypalAccount:
-              accessToken: 'PAYPAL_ACCESS_TOKEN'
-              token: paymentMethodToken
-
-          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
-            nonce = JSON.parse(body).paypalAccounts[0].nonce
-            customerParams =
-              paymentMethodNonce: nonce
-
-            specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
-              assert.isNull(err)
-              assert.isFalse(response.success)
-              assert.equal(
-                response.errors.for('customer').for('paypalAccount').on('base')[0].code,
-                '82902'
-              )
-
-              specHelper.paypalMerchantGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
-                assert.equal(err.type, braintree.errorTypes.notFoundError)
-
-              done()
+        specHelper.paypalMerchantGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('customer').for('paypalAccount').on('base')[0].code,
+            '82902'
           )
-        )
+
+        done()
 
     it "fails on duplicate payment methods when provided the option to do so", (done) ->
       customerParams =
@@ -367,7 +335,7 @@ describe "CustomerGateway", ->
 
         paypalAccountParams =
           customerId: customerResponse.customer.id,
-          paymentMethodNonce: Nonce.PayPalFuturePayment
+          paymentMethodNonce: Nonces.PayPalFuturePayment
 
         specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, paypalResponse) ->
           assert.isNull(err)
