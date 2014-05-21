@@ -144,6 +144,19 @@ describe "ClientTokenGateway", ->
       )
     )
 
+  it "can pass merchantAccountId", (done) ->
+    myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+    clientTokenParams = {
+      merchantAccountId: "my_merchant_account"
+    }
+
+    specHelper.defaultGateway.clientToken.generate(clientTokenParams, (err, result) ->
+      assert.isTrue(result.success)
+      clientToken = JSON.parse(result.clientToken)
+      assert.equal(clientToken.merchantAccountId, "my_merchant_account")
+      done()
+    )
+
   it "returns an error when an invalid parameter is supplied", (done) ->
     specHelper.defaultGateway.clientToken.generate({
       customrId: "1234"

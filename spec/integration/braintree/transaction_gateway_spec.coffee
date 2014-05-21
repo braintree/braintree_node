@@ -529,6 +529,68 @@ describe "TransactionGateway", ->
           done()
       )
 
+    context "three d secure", (done) ->
+      it "creates a transaction with threeDSecureToken", (done) ->
+        threeDVerificationParams =
+          number: '4111111111111111'
+          expirationMonth: '05'
+          expirationYear: '2009'
+        specHelper.create3DSVerification specHelper.threeDSecureMerchantAccountId, threeDVerificationParams, (threeDSecureToken) ->
+          transactionParams =
+            merchantAccountId: specHelper.threeDSecureMerchantAccountId
+            amount: '5.00'
+            creditCard:
+              number: '4111111111111111'
+              expirationDate: '05/2009'
+            threeDSecureToken: threeDSecureToken
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+
+            done()
+
+      it "returns an error if sent null threeDSecureToken", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId
+          amount: '5.00'
+          creditCard:
+            number: '4111111111111111'
+            expirationDate: '05/2009'
+          threeDSecureToken: null
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').on('threeDSecureToken')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureTokenIsInvalid
+          )
+
+          done()
+
+      it "returns an error if 3ds lookup data doesn't match txn data", (done) ->
+        threeDVerificationParams =
+          number: '4111111111111111'
+          expirationMonth: '05'
+          expirationYear: '2009'
+        specHelper.create3DSVerification specHelper.threeDSecureMerchantAccountId, threeDVerificationParams, (threeDSecureToken) ->
+          transactionParams =
+            merchantAccountId: specHelper.threeDSecureMerchantAccountId
+            amount: '5.00'
+            creditCard:
+              number: '5105105105105100'
+              expirationDate: '05/2009'
+            threeDSecureToken: threeDSecureToken
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isFalse(response.success)
+            assert.equal(
+              response.errors.for('transaction').on('threeDSecureToken')[0].code,
+              ValidationErrorCodes.Transaction.ThreeDSecureTransactionDataDoesntMatchVerify
+            )
+
+            done()
+
   describe "find", ->
     it "finds a transaction", (done) ->
       transactionParams =
