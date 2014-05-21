@@ -6,4 +6,3 @@ Nonce = {
 }
 
 exports.Nonce = Nonce
-
