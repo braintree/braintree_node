@@ -166,8 +166,8 @@ describe "TransactionSearch", ->
       @timeout 10000
 
       transactionParams =
-        amount: "5.00"
-        paymentMethodToken: 'PAYPAL_ACCOUNT'
+        amount: Braintree.Test.TransactionAmounts.Authorize
+        paymentMethodNonce: Braintree.Test.Nonces.PayPalFuturePayment
         options:
           submitForSettlement: true
 

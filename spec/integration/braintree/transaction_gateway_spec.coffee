@@ -833,18 +833,24 @@ describe "TransactionGateway", ->
           done()
 
     it "submits a paypal transaction for settlement", (done) ->
-      transactionParams =
-        amount: '5.00'
-        paymentMethodToken: 'PAYPAL_ACCOUNT'
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        paymentMethodParams =
+          customerId: response.customer.id
+          paymentMethodNonce: Nonces.PayPalFuturePayment
 
-      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-        specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-          assert.equal(response.transaction.status, 'submitted_for_settlement')
-          assert.equal(response.transaction.amount, '5.00')
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          transactionParams =
+            amount: '5.00'
+            paymentMethodToken: response.paypalAccount.token
 
-          done()
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.status, 'submitted_for_settlement')
+              assert.equal(response.transaction.amount, '5.00')
+
+              done()
 
     it "allows submitting for a partial amount", (done) ->
       transactionParams =
@@ -896,17 +902,23 @@ describe "TransactionGateway", ->
           done()
 
     it "voids a paypal transaction", (done) ->
-      transactionParams =
-        amount: '5.00'
-        paymentMethodToken: 'PAYPAL_ACCOUNT'
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        paymentMethodParams =
+          customerId: response.customer.id
+          paymentMethodNonce: Nonces.PayPalFuturePayment
 
-      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-        specHelper.defaultGateway.transaction.void response.transaction.id, (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-          assert.equal(response.transaction.status, 'voided')
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          transactionParams =
+            amount: '5.00'
+            paymentMethodToken: response.paypalAccount.token
 
-          done()
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            specHelper.defaultGateway.transaction.void response.transaction.id, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.status, 'voided')
+
+              done()
 
     it "handles validation errors", (done) ->
       transactionParams =
