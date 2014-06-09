@@ -64,11 +64,10 @@ class Util
     return true
 
   @toCamelCase: (string) ->
-
     string.replace(/([\-\_][a-z0-9])/g, (match) -> match.toUpperCase().replace('-','').replace('_',''))
 
   @toUnderscore: (string) ->
-    string.replace(/([A-Z])/g, (match) -> "_" + match.toLowerCase())
+    string.replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2').replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()
 
   @flatten: (array) ->
     while @_containsArray(array)

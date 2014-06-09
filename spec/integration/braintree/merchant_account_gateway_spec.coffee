@@ -259,7 +259,7 @@ describe "MerchantAccountGateway", ->
         )
         assert.equal(
           response.errors.for("merchantAccount").for("individual").on("email")[0].code,
-          ValidationErrorCodes.MerchantAccount.Individual.EmailAddressIsRequired
+          ValidationErrorCodes.MerchantAccount.Individual.EmailIsRequired
         )
         assert.equal(
           response.errors.for("merchantAccount").for("individual").for("address").on("streetAddress")[0].code,
@@ -331,7 +331,7 @@ describe "MerchantAccountGateway", ->
         )
         assert.equal(
           response.errors.for("merchantAccount").for("individual").on("email")[0].code,
-          ValidationErrorCodes.MerchantAccount.Individual.EmailAddressIsInvalid
+          ValidationErrorCodes.MerchantAccount.Individual.EmailIsInvalid
         )
         assert.equal(
           response.errors.for("merchantAccount").for("individual").on("phone")[0].code,
@@ -393,7 +393,7 @@ describe "MerchantAccountGateway", ->
         )
         assert.equal(
           response.errors.for("merchantAccount").for("funding").on("email")[0].code,
-          ValidationErrorCodes.MerchantAccount.Funding.EmailAddressIsInvalid
+          ValidationErrorCodes.MerchantAccount.Funding.EmailIsInvalid
         )
         assert.equal(
           response.errors.for("merchantAccount").for("funding").on("mobilePhone")[0].code,
@@ -482,7 +482,7 @@ describe "MerchantAccountGateway", ->
 
         assert.equal(
           response.errors.for("merchantAccount").for("funding").on("email")[0].code,
-          ValidationErrorCodes.MerchantAccount.Funding.EmailAddressIsRequired
+          ValidationErrorCodes.MerchantAccount.Funding.EmailIsRequired
         )
 
         done()

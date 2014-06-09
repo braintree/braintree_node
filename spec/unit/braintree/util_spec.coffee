@@ -266,6 +266,12 @@ describe "Util", ->
 
       assert.equal(result, 'one_two_three')
 
+    it "handles words with contiguous uppercase letters", ->
+      result = Util.toUnderscore('headlineCNNNews')
+
+      assert.equal(result, 'headline_cnn_news')
+
+
   describe "flatten", ->
     it "flattens a deeply nested array", ->
       result = Util.flatten([[1], [2, [3, [4, [5, [6, [7, [8, [9]]]]]]]]])
