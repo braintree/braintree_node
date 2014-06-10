@@ -59,7 +59,7 @@ describe "SubscriptionGateway", ->
             customerId: paypalCustomerId
 
           specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
-            paymentMethodToken = response.paypalAccount.token
+            paymentMethodToken = response.paymentMethod.token
 
             subscriptionParams =
               paymentMethodToken: paymentMethodToken

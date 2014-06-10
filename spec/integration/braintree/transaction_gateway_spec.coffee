@@ -94,7 +94,7 @@ describe "TransactionGateway", ->
                 customerId: customerId
 
               specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
-                paymentMethodToken = response.paypalAccount.token
+                paymentMethodToken = response.paymentMethod.token
 
                 transactionParams =
                   paymentMethodToken: paymentMethodToken
@@ -841,7 +841,7 @@ describe "TransactionGateway", ->
         specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
           transactionParams =
             amount: '5.00'
-            paymentMethodToken: response.paypalAccount.token
+            paymentMethodToken: response.paymentMethod.token
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
@@ -910,7 +910,7 @@ describe "TransactionGateway", ->
         specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
           transactionParams =
             amount: '5.00'
-            paymentMethodToken: response.paypalAccount.token
+            paymentMethodToken: response.paymentMethod.token
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             specHelper.defaultGateway.transaction.void response.transaction.id, (err, response) ->

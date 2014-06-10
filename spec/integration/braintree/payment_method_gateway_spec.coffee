@@ -35,7 +35,7 @@ describe "PaymentMethodGateway", ->
               specHelper.defaultGateway.paymentMethod.create creditCardParams, (err, response) ->
                 assert.isNull(err)
                 assert.isTrue(response.success)
-                assert.equal(response.creditCard.maskedNumber, '411111******1111')
+                assert.equal(response.paymentMethod.maskedNumber, '411111******1111')
 
                 done()
 
@@ -67,7 +67,7 @@ describe "PaymentMethodGateway", ->
             specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
-              assert.isNotNull(response.paypalAccount.email)
+              assert.isNotNull(response.paymentMethod.email)
 
               done()
 
@@ -172,7 +172,7 @@ describe "PaymentMethodGateway", ->
             paymentMethodNonce: Nonces.PayPalFuturePayment
 
           specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
-            paymentMethodToken = response.paypalAccount.token
+            paymentMethodToken = response.paymentMethod.token
             specHelper.defaultGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
               assert.isNull(err)
               assert.isNotNull(paypalAccount.email)
@@ -215,7 +215,7 @@ describe "PaymentMethodGateway", ->
                 customerId: customerId
                 paymentMethodNonce: nonce
               specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
-                paymentMethodToken = response.creditCard.token
+                paymentMethodToken = response.paymentMethod.token
                 done()
 
       it 'deletes the credit card', (done) ->
@@ -248,7 +248,7 @@ describe "PaymentMethodGateway", ->
                 paymentMethodNonce: nonce
 
               specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
-                paymentMethodToken = response.paypalAccount.token
+                paymentMethodToken = response.paymentMethod.token
                 done()
 
 

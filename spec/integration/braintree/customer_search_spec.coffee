@@ -194,7 +194,7 @@ describe "CustomerSearch", ->
             specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
 
               search = (search) ->
-                search.paypalAccountEmail().is(response.paypalAccount.email)
+                search.paypalAccountEmail().is(response.paymentMethod.email)
                 search.id().is(customerId)
 
               specHelper.defaultGateway.customer.search search, (err, response) ->

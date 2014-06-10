@@ -15,7 +15,7 @@ describe "PayPalGateway", ->
           paymentMethodNonce: Nonces.PayPalFuturePayment
 
         specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
-          paymentMethodToken = response.paypalAccount.token
+          paymentMethodToken = response.paymentMethod.token
           specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
             assert.isNull(err)
             assert.isNotNull(paypalAccount.email)
@@ -62,7 +62,7 @@ describe "PayPalGateway", ->
               paymentMethodNonce: nonce
 
             specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
-              paymentMethodToken = response.paypalAccount.token
+              paymentMethodToken = response.paymentMethod.token
 
               done()
           )
@@ -89,10 +89,10 @@ describe "PayPalGateway", ->
 
       specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
         assert.isTrue(response.success)
-        originalToken = response.paypalAccount.token
+        originalToken = response.paymentMethod.token
 
         specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
-          newPaymentMethodToken = response.paypalAccount.token
+          newPaymentMethodToken = response.paymentMethod.token
 
           updateParams =
             token: originalToken
@@ -132,7 +132,7 @@ describe "PayPalGateway", ->
               paymentMethodNonce: nonce
 
             specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
-              paymentMethodToken = response.paypalAccount.token
+              paymentMethodToken = response.paymentMethod.token
 
               done()
           )

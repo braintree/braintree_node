@@ -11,7 +11,12 @@ class PaymentMethodGateway extends Gateway
     responseMapping =
       paypalAccount: PayPalAccount
       creditCard: CreditCard
-    @createResponseHandler(responseMapping, null, callback)
+    @createResponseHandler(responseMapping, null, (err, response) ->
+      response.paymentMethod = response.paypalAccount || response.creditCard
+      delete response.paypalAccount
+      delete response.creditCard
+      callback(err, response)
+    )
 
   create: (attributes, callback) ->
     @gateway.http.post('/payment_methods', {paymentMethod: attributes}, @responseHandler(callback))
