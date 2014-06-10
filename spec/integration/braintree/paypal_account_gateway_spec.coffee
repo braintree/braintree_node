@@ -35,10 +35,12 @@ describe "PayPalGateway", ->
         done()
 
   describe "update", ->
-    paymentMethodToken = Math.floor(Math.random() * Math.pow(36,3)).toString(36)
+    paymentMethodToken = null
     customerId = null
 
-    before (done) ->
+    beforeEach (done) ->
+      paymentMethodToken = Math.floor(Math.random() * Math.pow(36,3)).toString(36)
+
       specHelper.defaultGateway.customer.create {firstName: 'Jane', lastName: 'Doe'}, (err, response) ->
         customerId = response.customer.id
 
@@ -80,6 +82,28 @@ describe "PayPalGateway", ->
         specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, response) ->
           assert.equal(err.type, braintree.errorTypes.notFoundError)
 
+          done()
+
+    it "updates and makes an account the default", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '5105105105105100'
+        expirationDate: '05/2012'
+        options:
+          makeDefault: true
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isTrue(response.success)
+        assert.isTrue(response.creditCard.default)
+
+        updateParams =
+          token: paymentMethodToken
+          options:
+            makeDefault: true
+
+        specHelper.defaultGateway.paypalAccount.update paymentMethodToken, updateParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.isTrue(response.paypalAccount.default)
           done()
 
     it "handles errors", (done) ->
