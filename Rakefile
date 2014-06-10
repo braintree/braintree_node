@@ -7,12 +7,12 @@ namespace :spec do
   end
 
   desc "Run integration"
-  task :integration => [:compile_coffee, :npm_install] do
+  task :integration => [:npm_install, :compile_coffee] do
     sh "#{local_mocha} spec_compiled/integration --recursive"
   end
 
   desc "Run tests in a specific file, e.g. rake spec:focused[spec/integration/braintree/credit_card_gateway_spec]"
-  task :focused, [:filename] => [:compile_coffee, :npm_install] do |t, args|
+  task :focused, [:filename] => [:npm_install, :compile_coffee] do |t, args|
     compiled_filename = args[:filename].sub(/\Aspec/, "spec_compiled").sub(/\.coffee\z/, ".js")
 
     sh "#{local_mocha} #{compiled_filename}"
