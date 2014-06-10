@@ -71,6 +71,41 @@ describe "PaymentMethodGateway", ->
 
               done()
 
+    it "can create a payment method and make it the default", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        creditCardParams =
+          customerId: response.customer.id
+          number: '5105105105105100'
+          expirationDate: '05/2012'
+
+        specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+         specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+           clientToken = JSON.parse(result.clientToken)
+           authorizationFingerprint = clientToken.authorizationFingerprint
+
+           params =
+             authorizationFingerprint: authorizationFingerprint
+             creditCard:
+               number: '4111111111111111'
+               expirationDate: '01/2020'
+
+           myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+           myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+             nonce = JSON.parse(body).creditCards[0].nonce
+
+             creditCardParams =
+               customerId: customerId
+               paymentMethodNonce: nonce
+               options:
+                 makeDefault: true
+
+             specHelper.defaultGateway.paymentMethod.create creditCardParams, (err, response) ->
+               assert.isNull(err)
+               assert.isTrue(response.success)
+               assert.isTrue(response.paymentMethod.default)
+
+               done()
+
    it "returns an error when trying to create a paypal account only authorized for one-time use", (done) ->
      specHelper.defaultGateway.customer.create {}, (err, response) ->
        customerId = response.customer.id
