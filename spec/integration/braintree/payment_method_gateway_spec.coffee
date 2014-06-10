@@ -106,63 +106,63 @@ describe "PaymentMethodGateway", ->
 
                done()
 
-   it "returns an error when trying to create a paypal account only authorized for one-time use", (done) ->
-     specHelper.defaultGateway.customer.create {}, (err, response) ->
-       customerId = response.customer.id
+    it "returns an error when trying to create a paypal account only authorized for one-time use", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        customerId = response.customer.id
 
-       specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-         clientToken = JSON.parse(result.clientToken)
-         authorizationFingerprint = clientToken.authorizationFingerprint
+        specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+          clientToken = JSON.parse(result.clientToken)
+          authorizationFingerprint = clientToken.authorizationFingerprint
 
-         params = {
-           authorizationFingerprint: authorizationFingerprint,
-           paypalAccount: {
-             accessToken: 'PAYPAL_ACCESS_TOKEN'
-           }
-         }
+          params = {
+            authorizationFingerprint: authorizationFingerprint,
+            paypalAccount: {
+              accessToken: 'PAYPAL_ACCESS_TOKEN'
+            }
+          }
 
-         myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-         myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
-           nonce = JSON.parse(body).paypalAccounts[0].nonce
-           paypalAccountParams =
-             customerId: customerId
-             paymentMethodNonce: nonce
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+          myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).paypalAccounts[0].nonce
+            paypalAccountParams =
+              customerId: customerId
+              paymentMethodNonce: nonce
 
-           specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
-             assert.isNull(err)
-             assert.isFalse(response.success)
-             assert.equal(
-               response.errors.for('paypalAccount').on('base')[0].code,
-               '82902'
-             )
+            specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+              assert.isNull(err)
+              assert.isFalse(response.success)
+              assert.equal(
+                response.errors.for('paypalAccount').on('base')[0].code,
+                '82902'
+              )
 
-             done()
+              done()
 
-   it "handles errors", (done) ->
-     specHelper.defaultGateway.customer.create {}, (err, response) ->
-       customerId = response.customer.id
+    it "handles errors", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        customerId = response.customer.id
 
-       specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-         clientToken = JSON.parse(result.clientToken)
-         authorizationFingerprint = clientToken.authorizationFingerprint
+        specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+          clientToken = JSON.parse(result.clientToken)
+          authorizationFingerprint = clientToken.authorizationFingerprint
 
-         params = {
-           authorizationFingerprint: authorizationFingerprint,
-           paypalAccount: {}
-         }
+          params = {
+            authorizationFingerprint: authorizationFingerprint,
+            paypalAccount: {}
+          }
 
-         myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-         myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
-           nonce = JSON.parse(body).paypalAccounts[0].nonce
-           paypalAccountParams =
-             customerId: customerId
-             paymentMethodNonce: nonce
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+          myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).paypalAccounts[0].nonce
+            paypalAccountParams =
+              customerId: customerId
+              paymentMethodNonce: nonce
 
-           specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
-             assert.isFalse(response.success)
-             assert.equal(response.errors.for('paypalAccount').on('base')[0].code, '82902')
+            specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+              assert.isFalse(response.success)
+              assert.equal(response.errors.for('paypalAccount').on('base')[0].code, '82902')
 
-             done()
+              done()
 
   describe "find", ->
     context 'credit card', ->
