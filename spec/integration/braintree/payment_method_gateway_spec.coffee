@@ -71,7 +71,7 @@ describe "PaymentMethodGateway", ->
 
               done()
 
-    it "can create a payment method and make it the default", (done) ->
+    it "can create a payment method and set the token and default", (done) ->
       specHelper.defaultGateway.customer.create {}, (err, response) ->
         creditCardParams =
           customerId: response.customer.id
@@ -93,9 +93,11 @@ describe "PaymentMethodGateway", ->
            myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
              nonce = JSON.parse(body).creditCards[0].nonce
 
+             paymentMethodToken = specHelper.randomId()
              creditCardParams =
                customerId: customerId
                paymentMethodNonce: nonce
+               token: paymentMethodToken
                options:
                  makeDefault: true
 
@@ -103,6 +105,7 @@ describe "PaymentMethodGateway", ->
                assert.isNull(err)
                assert.isTrue(response.success)
                assert.isTrue(response.paymentMethod.default)
+               assert.equal(paymentMethodToken, response.paymentMethod.token)
 
                done()
 
