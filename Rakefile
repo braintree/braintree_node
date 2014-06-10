@@ -2,7 +2,7 @@ task :default => %w[spec:unit spec:integration]
 
 namespace :spec do
   desc "Run units"
-  task :unit => [:compile_coffee, :npm_install] do
+  task :unit => [:npm_install, :compile_coffee] do
     sh "#{local_mocha} spec_compiled/unit --recursive"
   end
 
@@ -19,12 +19,6 @@ namespace :spec do
   end
 end
 
-task :install_coffee do
-  unless File.exist?(local_coffee)
-    sh "npm install coffee-script"
-  end
-end
-
 task :npm_install do
   sh "npm install --force"
 end
@@ -35,7 +29,7 @@ task :clean do
   end
 end
 
-task :compile_coffee => [:clean, :install_coffee] do
+task :compile_coffee => [:clean] do
   sh "#{local_coffee} --map -cbo ./lib ./src"
   sh "#{local_coffee} --map -cbo ./spec_compiled ./spec"
 end
