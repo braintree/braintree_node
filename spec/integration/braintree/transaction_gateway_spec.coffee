@@ -104,8 +104,8 @@ describe "TransactionGateway", ->
                   assert.isNull(err)
                   assert.isTrue(response.success)
                   assert.equal(response.transaction.type, 'sale')
-                  assert.isString(response.transaction.paypal.payerEmail)
-                  assert.isString(response.transaction.paypal.authorizationId)
+                  assert.isString(response.transaction.paypalAccount.payerEmail)
+                  assert.isString(response.transaction.paypalAccount.authorizationId)
 
                   done()
 
@@ -135,9 +135,9 @@ describe "TransactionGateway", ->
                   assert.isNull(err)
                   assert.isTrue(response.success)
                   assert.equal(response.transaction.type, 'sale')
-                  assert.isNull(response.transaction.paypal.token)
-                  assert.isString(response.transaction.paypal.payerEmail)
-                  assert.isString(response.transaction.paypal.authorizationId)
+                  assert.isNull(response.transaction.paypalAccount.token)
+                  assert.isString(response.transaction.paypalAccount.payerEmail)
+                  assert.isString(response.transaction.paypalAccount.authorizationId)
 
                   specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
                     assert.equal(err.type, braintree.errorTypes.notFoundError)
@@ -173,9 +173,9 @@ describe "TransactionGateway", ->
                   assert.isNull(err)
                   assert.isTrue(response.success)
                   assert.equal(response.transaction.type, 'sale')
-                  assert.equal(response.transaction.paypal.token, paymentMethodToken)
-                  assert.isString(response.transaction.paypal.payerEmail)
-                  assert.isString(response.transaction.paypal.authorizationId)
+                  assert.equal(response.transaction.paypalAccount.token, paymentMethodToken)
+                  assert.isString(response.transaction.paypalAccount.payerEmail)
+                  assert.isString(response.transaction.paypalAccount.authorizationId)
 
                   specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
                     assert.isNull(err)
@@ -197,9 +197,9 @@ describe "TransactionGateway", ->
               assert.isNull(err)
               assert.isTrue(response.success)
               assert.equal(response.transaction.type, 'sale')
-              assert.isNull(response.transaction.paypal.token)
-              assert.isString(response.transaction.paypal.payerEmail)
-              assert.isString(response.transaction.paypal.authorizationId)
+              assert.isNull(response.transaction.paypalAccount.token)
+              assert.isString(response.transaction.paypalAccount.payerEmail)
+              assert.isString(response.transaction.paypalAccount.authorizationId)
 
               done()
 
@@ -217,9 +217,9 @@ describe "TransactionGateway", ->
               assert.isNull(err)
               assert.isTrue(response.success)
               assert.equal(response.transaction.type, 'sale')
-              assert.isNull(response.transaction.paypal.token)
-              assert.isString(response.transaction.paypal.payerEmail)
-              assert.isString(response.transaction.paypal.authorizationId)
+              assert.isNull(response.transaction.paypalAccount.token)
+              assert.isString(response.transaction.paypalAccount.payerEmail)
+              assert.isString(response.transaction.paypalAccount.authorizationId)
 
               done()
 
