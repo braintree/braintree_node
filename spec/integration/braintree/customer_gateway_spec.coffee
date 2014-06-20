@@ -106,7 +106,7 @@ describe "CustomerGateway", ->
         specHelper.defaultGateway.customer.create customerParams, (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
-          assert.isNotNull(response.customer.paypalAccounts[0].email)
+          assert.isString(response.customer.paypalAccounts[0].email)
 
           done()
 
@@ -454,7 +454,7 @@ describe "CustomerGateway", ->
             assert.isTrue(response.success)
             assert.equal(response.customer.firstName, 'New First Name')
             assert.equal(response.customer.lastName, 'New Last Name')
-            assert.isNotNull(response.customer.paypalAccounts[0].email)
+            assert.isString(response.customer.paypalAccounts[0].email)
             assert.equal(response.customer.paypalAccounts[0].token, paymentMethodToken)
 
             done()

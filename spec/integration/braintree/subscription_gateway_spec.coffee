@@ -68,8 +68,7 @@ describe "SubscriptionGateway", ->
             specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
-              assert.isNotNull(response.subscription.transactions[0].paypal.email)
-
+              assert.isString(response.subscription.transactions[0].paypal.payerEmail)
               done()
 
     it "does not vault an unverified paypal account payment method nonce", (done) ->

@@ -18,7 +18,7 @@ describe "PayPalGateway", ->
           paymentMethodToken = response.paymentMethod.token
           specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
             assert.isNull(err)
-            assert.isNotNull(paypalAccount.email)
+            assert.isString(paypalAccount.email)
 
             done()
 
