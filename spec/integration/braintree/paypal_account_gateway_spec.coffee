@@ -19,6 +19,7 @@ describe "PayPalGateway", ->
           specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
             assert.isNull(err)
             assert.isString(paypalAccount.email)
+            assert.isString(paypalAccount.imageUrl)
 
             done()
 

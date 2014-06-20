@@ -68,7 +68,7 @@ describe "PaymentMethodGateway", ->
               assert.isNull(err)
               assert.isTrue(response.success)
               assert.isString(response.paymentMethod.email)
-
+              assert.isString(response.paymentMethod.imageUrl)
               done()
 
     it "can create a payment method and set the token and default", (done) ->

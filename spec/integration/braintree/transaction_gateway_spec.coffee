@@ -106,6 +106,7 @@ describe "TransactionGateway", ->
                   assert.equal(response.transaction.type, 'sale')
                   assert.isString(response.transaction.paypalAccount.payerEmail)
                   assert.isString(response.transaction.paypalAccount.authorizationId)
+                  assert.isString(response.transaction.paypalAccount.imageUrl)
 
                   done()
 
