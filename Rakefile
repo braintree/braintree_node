@@ -39,5 +39,5 @@ def local_coffee
 end
 
 def local_mocha
-  "./node_modules/mocha/bin/mocha --timeout 62000"
+  "./node_modules/mocha/bin/mocha --timeout 62000 --reporter spec"
 end
