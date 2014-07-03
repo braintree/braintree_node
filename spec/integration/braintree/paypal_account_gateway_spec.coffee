@@ -20,6 +20,8 @@ describe "PayPalGateway", ->
             assert.isNull(err)
             assert.isString(paypalAccount.email)
             assert.isString(paypalAccount.imageUrl)
+            assert.isString(paypalAccount.createdAt)
+            assert.isString(paypalAccount.updatedAt)
 
             done()
 
