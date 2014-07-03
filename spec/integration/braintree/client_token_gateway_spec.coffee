@@ -8,7 +8,7 @@ describe "ClientTokenGateway", ->
 
     specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
       assert.isTrue(result.success)
-      clientToken = JSON.parse(result.clientToken)
+      clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
       encodedFingerprint = clientToken.authorizationFingerprint
 
       params = {
@@ -33,6 +33,18 @@ describe "ClientTokenGateway", ->
       done()
     )
 
+  it "defaults to version 2", (done) ->
+    myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+
+    specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+      encoded_client_token = result.clientToken
+      decoded_client_token = new Buffer(encoded_client_token, "base64").toString("utf8")
+      unescaped_client_token = decoded_client_token.replace("\\u0026", "&")
+      clientToken = JSON.parse(decoded_client_token)
+      assert.equal(clientToken.version, "2")
+      done()
+    )
+
   it "can pass verifyCard", (done) ->
     specHelper.defaultGateway.customer.create({}, (err, result) ->
       customerId = result.customer.id
@@ -45,7 +57,7 @@ describe "ClientTokenGateway", ->
         }
       }, (err, result) ->
         assert.isTrue(result.success)
-        clientToken = JSON.parse(result.clientToken)
+        clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
         authorizationFingerprint = clientToken.authorizationFingerprint
 
         params = {
@@ -84,7 +96,7 @@ describe "ClientTokenGateway", ->
           }
         }, (err,result) ->
           assert.isTrue(result.success)
-          clientToken = JSON.parse(result.clientToken)
+          clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
           authorizationFingerprint = clientToken.authorizationFingerprint
           params = {
             authorizationFingerprint: authorizationFingerprint,
@@ -119,7 +131,7 @@ describe "ClientTokenGateway", ->
       specHelper.defaultGateway.clientToken.generate({
         customerId: customer.id
       }, (err, result) ->
-        clientToken = JSON.parse(result.clientToken)
+        clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
         authorizationFingerprint = clientToken.authorizationFingerprint
 
         params = {
@@ -141,7 +153,7 @@ describe "ClientTokenGateway", ->
               failOnDuplicatePaymentMethod: true
             }
           }, (err, result) ->
-            clientToken = JSON.parse(result.clientToken)
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
             authorizationFingerprint = clientToken.authorizationFingerprint
             params.authorizationFingerprint = authorizationFingerprint
 
@@ -162,7 +174,7 @@ describe "ClientTokenGateway", ->
 
     specHelper.defaultGateway.clientToken.generate(clientTokenParams, (err, result) ->
       assert.isTrue(result.success)
-      clientToken = JSON.parse(result.clientToken)
+      clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
       assert.equal(clientToken.merchantAccountId, "my_merchant_account")
       done()
     )

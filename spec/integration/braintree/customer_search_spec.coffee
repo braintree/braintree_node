@@ -176,7 +176,7 @@ describe "CustomerSearch", ->
 
         myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
         specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
-          clientToken = JSON.parse(result.clientToken)
+          clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
           authorizationFingerprint = clientToken.authorizationFingerprint
 
           params =

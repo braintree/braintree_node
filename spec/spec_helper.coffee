@@ -145,7 +145,7 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
   clientTokenOptions = {}
   clientTokenOptions.customerId = customerId if customerId
   specHelper.defaultGateway.clientToken.generate(clientTokenOptions, (err, result) ->
-    clientToken = JSON.parse(result.clientToken)
+    clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
     authorizationFingerprint = clientToken.authorizationFingerprint
     params = {
       authorizationFingerprint: authorizationFingerprint,
@@ -168,7 +168,7 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
 generateNonceForPayPalAccount = (callback) ->
   myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
   specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
-    clientToken = JSON.parse(result.clientToken)
+    clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
     authorizationFingerprint = clientToken.authorizationFingerprint
     params =
       authorizationFingerprint: authorizationFingerprint
@@ -226,6 +226,12 @@ createEscrowedTransaction = (callback) ->
     specHelper.escrowTransaction result.transaction.id, (err, settleResult) ->
       specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
         callback(transaction)
+
+decodeClientToken = (encodedClientToken) ->
+  decodedClientToken = new Buffer(encodedClientToken, "base64").toString("utf8")
+  unescapedClientToken = decodedClientToken.replace("\\u0026", "&")
+
+  unescapedClientToken
 
 class ClientApiHttp
   timeout: 60000
@@ -310,6 +316,7 @@ GLOBAL.specHelper =
   clientApiHttp: ClientApiHttp
   generateNonceForNewCreditCard: generateNonceForNewCreditCard
   generateNonceForPayPalAccount: generateNonceForPayPalAccount
+  decodeClientToken: decodeClientToken
   createTransactionToRefund: createTransactionToRefund
   createPayPalTransactionToRefund: createPayPalTransactionToRefund
   createEscrowedTransaction: createEscrowedTransaction

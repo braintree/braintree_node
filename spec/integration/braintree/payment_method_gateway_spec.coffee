@@ -15,7 +15,7 @@ describe "PaymentMethodGateway", ->
           customerId = response.customer.id
 
           specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-            clientToken = JSON.parse(result.clientToken)
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
             authorizationFingerprint = clientToken.authorizationFingerprint
 
             params =
@@ -49,7 +49,7 @@ describe "PaymentMethodGateway", ->
       specHelper.defaultGateway.customer.create {}, (err, response) ->
         customerId = response.customer.id
         specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-          clientToken = JSON.parse(result.clientToken)
+          clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
           authorizationFingerprint = clientToken.authorizationFingerprint
 
           params =
@@ -79,42 +79,42 @@ describe "PaymentMethodGateway", ->
           expirationDate: '05/2012'
 
         specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
-         specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-           clientToken = JSON.parse(result.clientToken)
-           authorizationFingerprint = clientToken.authorizationFingerprint
+          specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
 
-           params =
-             authorizationFingerprint: authorizationFingerprint
-             creditCard:
-               number: '4111111111111111'
-               expirationDate: '01/2020'
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              creditCard:
+                number: '4111111111111111'
+                expirationDate: '01/2020'
 
-           myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-           myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
-             nonce = JSON.parse(body).creditCards[0].nonce
+            myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+            myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).creditCards[0].nonce
 
-             paymentMethodToken = specHelper.randomId()
-             creditCardParams =
-               customerId: customerId
-               paymentMethodNonce: nonce
-               token: paymentMethodToken
-               options:
-                 makeDefault: true
+              paymentMethodToken = specHelper.randomId()
+              creditCardParams =
+                customerId: customerId
+                paymentMethodNonce: nonce
+                token: paymentMethodToken
+                options:
+                  makeDefault: true
 
-             specHelper.defaultGateway.paymentMethod.create creditCardParams, (err, response) ->
-               assert.isNull(err)
-               assert.isTrue(response.success)
-               assert.isTrue(response.paymentMethod.default)
-               assert.equal(paymentMethodToken, response.paymentMethod.token)
+              specHelper.defaultGateway.paymentMethod.create creditCardParams, (err, response) ->
+                assert.isNull(err)
+                assert.isTrue(response.success)
+                assert.isTrue(response.paymentMethod.default)
+                assert.equal(paymentMethodToken, response.paymentMethod.token)
 
-               done()
+                done()
 
     it "returns an error when trying to create a paypal account only authorized for one-time use", (done) ->
       specHelper.defaultGateway.customer.create {}, (err, response) ->
         customerId = response.customer.id
 
         specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-          clientToken = JSON.parse(result.clientToken)
+          clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
           authorizationFingerprint = clientToken.authorizationFingerprint
 
           params = {
@@ -146,7 +146,7 @@ describe "PaymentMethodGateway", ->
         customerId = response.customer.id
 
         specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-          clientToken = JSON.parse(result.clientToken)
+          clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
           authorizationFingerprint = clientToken.authorizationFingerprint
 
           params = {
@@ -177,7 +177,7 @@ describe "PaymentMethodGateway", ->
           paymentMethodToken = specHelper.randomId()
 
           specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-            clientToken = JSON.parse(result.clientToken)
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
             authorizationFingerprint = clientToken.authorizationFingerprint
             params =
               authorizationFingerprint: authorizationFingerprint
@@ -238,7 +238,7 @@ describe "PaymentMethodGateway", ->
           customerId = response.customer.id
 
           specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-            clientToken = JSON.parse(result.clientToken)
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
             authorizationFingerprint = clientToken.authorizationFingerprint
             params =
               authorizationFingerprint: authorizationFingerprint
@@ -270,7 +270,7 @@ describe "PaymentMethodGateway", ->
           customerId = response.customer.id
 
           specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-            clientToken = JSON.parse(result.clientToken)
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
             authorizationFingerprint = clientToken.authorizationFingerprint
 
             params =
