@@ -7,6 +7,7 @@ braintree = specHelper.braintree
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
+{PaymentInstrumentTypes} = require('../../../lib/braintree/payment_instrument_types')
 {Transaction} = require('../../../lib/braintree/transaction')
 {Dispute} = require('../../../lib/braintree/dispute')
 {Config} = require('../../../lib/braintree/config')
@@ -82,7 +83,36 @@ describe "TransactionGateway", ->
 
           done()
 
+    it "returns payment_instrument_type for credit_card", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CreditCard)
+
+        done()
+
+
     context "with a paypal acount", ->
+
+      it "returns PayPalAccount for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.PayPalOneTimePayment
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.PayPalAccount)
+
+            done()
+
       context "as a vaulted payment method", ->
         it "successfully creates a transaction", (done) ->
           specHelper.defaultGateway.customer.create {}, (err, response) ->
