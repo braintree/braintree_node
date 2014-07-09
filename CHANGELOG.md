@@ -1,3 +1,6 @@
+## 1.15.0
+* Support for v.zero SDKs.
+
 ## 1.14.1
 
 * Changed Braintree exceptions to Error objects (thanks Raynos)
