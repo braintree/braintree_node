@@ -144,7 +144,8 @@ describe "CreditCardGateway", ->
     it "accepts a payment method nonce", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
       specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
-        clientToken = JSON.parse(result.clientToken)
+        assert.isTrue(result.success)
+        clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
         authorizationFingerprint = clientToken.authorizationFingerprint
 
         params = {
@@ -457,7 +458,7 @@ describe "CreditCardGateway", ->
     it "returns a credit card for the supplied nonce", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
       specHelper.defaultGateway.clientToken.generate {customerId: customerId}, (err, result) ->
-        clientToken = JSON.parse(result.clientToken)
+        clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
         authorizationFingerprint = clientToken.authorizationFingerprint
 
         params = {
@@ -484,7 +485,7 @@ describe "CreditCardGateway", ->
     it "returns an error if the supplied nonce points to a shared card", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
       specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-        clientToken = JSON.parse(result.clientToken)
+        clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
         authorizationFingerprint = clientToken.authorizationFingerprint
 
         params = {
@@ -512,7 +513,7 @@ describe "CreditCardGateway", ->
     it "returns an error if the supplied nonce is locked", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
       specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-        clientToken = JSON.parse(result.clientToken)
+        clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
         authorizationFingerprint = clientToken.authorizationFingerprint
 
         params = {
@@ -547,7 +548,7 @@ describe "CreditCardGateway", ->
     it "returns an error if the supplied nonce is consumed", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
       specHelper.defaultGateway.clientToken.generate {customerId: customerId}, (err, result) ->
-        clientToken = JSON.parse(result.clientToken)
+        clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
         authorizationFingerprint = clientToken.authorizationFingerprint
 
         params = {
