@@ -42,6 +42,7 @@ class ValidationErrorCodes
     MakeDefaultRequiresCustomerId : "92801"
     ProxyMerchantDoesNotExist : "92805"
     VerifyCardRequiresCustomerId : "92802"
+    UnsupportedVersion : "92806"
 
   @CreditCard =
     BillingAddressConflict : "91701"
@@ -59,6 +60,7 @@ class ValidationErrorCodes
     CustomerIdIsRequired : "91704"
     CvvIsInvalid : "81707"
     CvvIsRequired : "81706"
+    CvvVerificationFailed : "81736"
     DuplicateCardExists : "81724"
     ExpirationDateConflict : "91708"
     ExpirationDateIsInvalid : "81710"
@@ -77,6 +79,7 @@ class ValidationErrorCodes
     PaymentMethodNonceConsumed : "91731"
     PaymentMethodNonceLocked : "91733"
     PaymentMethodNonceUnknown : "91732"
+    PostalCodeVerificationFailed : "81737"
     TokenFormatIsInvalid : "91718"
     TokenInvalid : "91718"
     TokenIsInUse : "91719"
@@ -205,6 +208,7 @@ class ValidationErrorCodes
     TosAcceptedIsRequired : "82610"
 
   @PaymentMethod =
+    CannotForwardPaymentMethodType : "93106"
     CustomerIdIsInvalid : "93105"
     CustomerIdIsRequired : "93104"
     NonceIsInvalid : "93102"
@@ -384,5 +388,10 @@ class ValidationErrorCodes
     TypeIsInvalid : "91523"
     TypeIsRequired : "91524"
     UnsupportedVoiceAuthorization : "91539"
+    CannotRefundSettlingTransaction : "91574"
+    CannotSimulateSettlement : "91575"
+    PaymentInstrumentNotSupportedByMerchantAccount : "91577"
+    PayPalNotEnabled : "91576"
+    ThreeDSecureAuthenticationFailed : "81571"
 
 exports.ValidationErrorCodes = ValidationErrorCodes
