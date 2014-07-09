@@ -1,6 +1,6 @@
 class Config
   constructor: (rawConfig) ->
-    @apiVersion = '3'
+    @apiVersion = '4'
     @environment = rawConfig.environment
     @merchantId = rawConfig.merchantId || rawConfig.partnerId
     @publicKey = rawConfig.publicKey

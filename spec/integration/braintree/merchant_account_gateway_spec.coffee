@@ -57,6 +57,7 @@ describe "MerchantAccountGateway", ->
   describe "create", ->
     it "accepts the legacy parameters", (done) ->
       specHelper.defaultGateway.merchantAccount.create legacyMerchantAccountParams, (err, response) ->
+        assert.isNull(err)
         assert.isTrue(response.success)
         assert.equal(response.merchantAccount.status, MerchantAccount.Status.Pending)
         assert.equal(response.merchantAccount.masterMerchantAccount.id, "sandbox_master_merchant_account")
@@ -258,7 +259,7 @@ describe "MerchantAccountGateway", ->
         )
         assert.equal(
           response.errors.for("merchantAccount").for("individual").on("email")[0].code,
-          ValidationErrorCodes.MerchantAccount.Individual.EmailAddressIsRequired
+          ValidationErrorCodes.MerchantAccount.Individual.EmailIsRequired
         )
         assert.equal(
           response.errors.for("merchantAccount").for("individual").for("address").on("streetAddress")[0].code,
@@ -330,7 +331,7 @@ describe "MerchantAccountGateway", ->
         )
         assert.equal(
           response.errors.for("merchantAccount").for("individual").on("email")[0].code,
-          ValidationErrorCodes.MerchantAccount.Individual.EmailAddressIsInvalid
+          ValidationErrorCodes.MerchantAccount.Individual.EmailIsInvalid
         )
         assert.equal(
           response.errors.for("merchantAccount").for("individual").on("phone")[0].code,
@@ -392,7 +393,7 @@ describe "MerchantAccountGateway", ->
         )
         assert.equal(
           response.errors.for("merchantAccount").for("funding").on("email")[0].code,
-          ValidationErrorCodes.MerchantAccount.Funding.EmailAddressIsInvalid
+          ValidationErrorCodes.MerchantAccount.Funding.EmailIsInvalid
         )
         assert.equal(
           response.errors.for("merchantAccount").for("funding").on("mobilePhone")[0].code,
@@ -481,7 +482,7 @@ describe "MerchantAccountGateway", ->
 
         assert.equal(
           response.errors.for("merchantAccount").for("funding").on("email")[0].code,
-          ValidationErrorCodes.MerchantAccount.Funding.EmailAddressIsRequired
+          ValidationErrorCodes.MerchantAccount.Funding.EmailIsRequired
         )
 
         done()

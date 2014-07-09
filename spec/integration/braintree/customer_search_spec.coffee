@@ -1,4 +1,5 @@
 require("../../spec_helper")
+{Config} = require('../../../lib/braintree/config')
 
 describe "CustomerSearch", ->
   describe "search", ->
@@ -159,3 +160,52 @@ describe "CustomerSearch", ->
             assert.isNull(err)
 
             done()
+
+    it "searches on customer's paypal account by email", (done) ->
+      customerId = "CUSTOMER_#{specHelper.randomId()}"
+      firstName = "John_#{specHelper.randomId()}"
+      lastName = "Smith_#{specHelper.randomId()}"
+      paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
+
+      customerParams =
+        id: customerId
+        firstName: firstName
+        lastName: lastName
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+
+        myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+        specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+          clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+          authorizationFingerprint = clientToken.authorizationFingerprint
+
+          params =
+            authorizationFingerprint: authorizationFingerprint
+            paypalAccount:
+              consentCode: 'PAYPAL_CONSENT_CODE'
+              token: paymentMethodToken
+
+          myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).paypalAccounts[0].nonce
+            paypalAccountParams =
+              customerId: customerId
+              paymentMethodNonce: nonce
+
+            specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+
+              search = (search) ->
+                search.paypalAccountEmail().is(response.paymentMethod.email)
+                search.id().is(customerId)
+
+              specHelper.defaultGateway.customer.search search, (err, response) ->
+                assert.isTrue(response.success)
+                assert.equal(response.length(), 1)
+
+                response.first (err, customer) ->
+                  assert.isObject(customer)
+                  assert.equal(customer.paypalAccounts[0].token, paymentMethodToken)
+                  assert.isNull(err)
+
+                  done()
+          )
+        )

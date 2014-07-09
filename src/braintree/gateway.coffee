@@ -4,16 +4,25 @@ exceptions = require('./exceptions')
 _ = require('underscore')
 
 class Gateway
-  createResponseHandler: (attributeName, klass, callback) ->
+  createResponseHandler: (attributeKlassMap, klass, callback) ->
     (err, response) ->
       return callback(err, response) if err
 
-      if (response[attributeName])
-        response.success = true
-        response[attributeName] = new klass(response[attributeName]) if klass?
-        callback(null, response)
-      else if (response.apiErrorResponse)
+      if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
+      else
+        if typeof(attributeKlassMap) == 'string'
+          attributeName = attributeKlassMap
+          if (response[attributeName])
+            response.success = true
+            response[attributeName] = new klass(response[attributeName]) if klass?
+            callback(null, response)
+        else
+          for attributeName, klass of attributeKlassMap
+            if (response[attributeName])
+              response.success = true
+              response[attributeName] = new klass(response[attributeName]) if klass?
+              callback(null, response)
 
   createSearchResponse: (url, search, pagingFunction, callback) ->
     if callback?
@@ -50,9 +59,7 @@ class Gateway
   pagingFunctionGenerator: (search, url, subjectType, getSubject) ->
     (ids, callback) =>
       search.ids().in(ids)
-      @gateway.http.post("/" + url + "/advanced_search",
-        { search : search.toHash() },
-        (err, response) ->
+      @gateway.http.post("/" + url + "/advanced_search", { search : search.toHash() }, (err, response) ->
           if err
             callback(err, null)
           else

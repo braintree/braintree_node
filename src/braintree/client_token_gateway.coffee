@@ -1,14 +1,17 @@
 {Gateway} = require('./gateway')
 exceptions = require('./exceptions')
 
+DEFAULT_VERSION = 2
+
 class ClientTokenGateway extends Gateway
   constructor: (@gateway) ->
 
-  generate: (params, callback) ->
-    if params
-      err = @validateParams(params)
-      return callback(err, null) if err
-      params = {client_token: params}
+  generate: (params={}, callback) ->
+    params.version ||= DEFAULT_VERSION
+
+    err = @validateParams(params)
+    return callback(err, null) if err
+    params = {client_token: params}
 
     responseHandler = @responseHandler(callback)
     @gateway.http.post("/client_token", params, responseHandler)
