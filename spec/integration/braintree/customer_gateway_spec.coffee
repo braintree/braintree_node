@@ -2,6 +2,7 @@ require('../../spec_helper')
 
 {_} = require('underscore')
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
+{Nonces} = require('../../../lib/braintree/test/nonces')
 {Config} = require('../../../lib/braintree/config')
 braintree = specHelper.braintree
 
@@ -44,24 +45,82 @@ describe "CustomerGateway", ->
 
         done()
 
-    it "creates customers with credit cards", (done) ->
-      customerParams =
-        firstName: 'John'
-        lastName: 'Smith'
-        creditCard:
-          number: '5105105105105100'
-          expirationDate: '05/2012'
+    context "and vaults a payment method", ->
+      it "creates customers with credit cards", (done) ->
+        customerParams =
+          firstName: 'John'
+          lastName: 'Smith'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2012'
 
-      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
-        assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.customer.firstName, 'John')
-        assert.equal(response.customer.lastName, 'Smith')
-        assert.equal(response.customer.creditCards.length, 1)
-        assert.equal(response.customer.creditCards[0].expirationMonth, '05')
-        assert.equal(response.customer.creditCards[0].expirationYear, '2012')
-        assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
-        assert.isTrue(/^\w{32}$/.test(response.customer.creditCards[0].uniqueNumberIdentifier))
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.customer.firstName, 'John')
+          assert.equal(response.customer.lastName, 'Smith')
+          assert.equal(response.customer.creditCards.length, 1)
+          assert.equal(response.customer.creditCards[0].expirationMonth, '05')
+          assert.equal(response.customer.creditCards[0].expirationYear, '2012')
+          assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
+          assert.isTrue(/^\w{32}$/.test(response.customer.creditCards[0].uniqueNumberIdentifier))
+
+          done()
+
+      it "creates a customer with a payment method nonce backed by a credit card", (done) ->
+        myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+        specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+          clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+          authorizationFingerprint = clientToken.authorizationFingerprint
+          params = {
+            authorizationFingerprint: authorizationFingerprint,
+            sharedCustomerIdentifierType: "testing",
+            sharedCustomerIdentifier: "testing-identifier",
+            share: true,
+            credit_card: {
+              number: "4111111111111111",
+              expiration_month: "11",
+              expiration_year: "2099"
+            }
+          }
+
+          myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).nonce
+            customerParams =
+              creditCard:
+                paymentMethodNonce: nonce
+
+            specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.customer.creditCards[0].bin, "411111")
+
+              done()
+          )
+        )
+
+      it "creates a customer with a paypal account payment method nonce", (done) ->
+        customerParams =
+          paymentMethodNonce: Nonces.PayPalFuturePayment
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.isString(response.customer.paypalAccounts[0].email)
+
+          done()
+
+      it "does not vault a paypal account only authorized for one-time use", (done) ->
+        customerParams =
+          paymentMethodNonce: Nonces.PayPalOneTimePayment
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('customer').for('paypalAccount').on('base')[0].code,
+            '82902'
+          )
 
         done()
 
@@ -139,7 +198,7 @@ describe "CustomerGateway", ->
 
         done()
 
-    it "allows creating a customer with a billing addres", (done) ->  
+    it "allows creating a customer with a billing addres", (done) ->
       customerParams =
         firstName: 'John'
         lastName: 'Smith'
@@ -203,7 +262,7 @@ describe "CustomerGateway", ->
         done()
 
     it "creates a customer with venmo sdk payment method code", (done) ->
-      customerParams = 
+      customerParams =
         creditCard:
           venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode
 
@@ -229,55 +288,6 @@ describe "CustomerGateway", ->
 
         done()
 
-    it "creates a customer with a payment method nonce", (done) ->
-      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
-        clientToken = JSON.parse(result.clientToken)
-        authorizationFingerprint = clientToken.authorizationFingerprint
-        params = {
-          authorizationFingerprint: authorizationFingerprint,
-          sharedCustomerIdentifierType: "testing",
-          sharedCustomerIdentifier: "testing-identifier",
-          share: true,
-          credit_card: {
-            number: "4111111111111111",
-            expiration_month: "11",
-            expiration_year: "2099"
-          }
-        }
-
-        myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
-          nonce = JSON.parse(body).nonce
-          customerParams =
-            creditCard:
-              paymentMethodNonce: nonce
-
-          specHelper.defaultGateway.customer.create customerParams, (err, response) ->
-            assert.isNull(err)
-            assert.isTrue(response.success)
-            assert.equal(response.customer.creditCards[0].bin, "411111")
-
-            done()
-        )
-      )
-
-  describe "delete", ->
-    it "deletes a customer", (done) ->
-      specHelper.defaultGateway.customer.create {}, (err, response) ->
-        specHelper.defaultGateway.customer.delete response.customer.id, (err) ->
-          assert.isNull(err)
-
-          specHelper.defaultGateway.customer.find response.customer.id, (err, customer) ->
-            assert.equal(err.type, braintree.errorTypes.notFoundError)
-
-            done()
-
-    it "handles invalid customer ids", (done) ->
-      specHelper.defaultGateway.customer.delete 'nonexistent_customer', (err) ->
-        assert.equal(err.type, braintree.errorTypes.notFoundError)
-        
-        done()
-
   describe "find", ->
     it "finds a custoemr", (done) ->
       customerParams =
@@ -294,6 +304,7 @@ describe "CustomerGateway", ->
             postalCode: '60607'
 
       specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        assert.isNull(err)
         specHelper.defaultGateway.customer.find response.customer.id, (err, customer) ->
           assert.isNull(err)
           assert.equal(customer.firstName, 'John')
@@ -303,6 +314,41 @@ describe "CustomerGateway", ->
           assert.equal(billingAddress.company, '')
 
           done()
+
+    it "returns both credit cards and paypal accounts for a given customer", (done) ->
+      customerParams =
+        firstName: 'John'
+        lastName: 'Smith'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/2014'
+          billingAddress:
+            company: ''
+            streetAddress: '123 E Fake St'
+            locality: 'Chicago'
+            region: 'IL'
+            postalCode: '60607'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, customerResponse) ->
+        assert.isNull(err)
+        assert.equal(customerResponse.success, true)
+
+        paypalAccountParams =
+          customerId: customerResponse.customer.id,
+          paymentMethodNonce: Nonces.PayPalFuturePayment
+
+        specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, paypalResponse) ->
+          assert.isNull(err)
+          assert.equal(paypalResponse.success, true)
+
+          specHelper.defaultGateway.customer.find customerResponse.customer.id, (err, customer) ->
+            assert.isNull(err)
+            assert.equal(customer.firstName, 'John')
+            assert.equal(customer.lastName, 'Smith')
+            assert.equal(customer.creditCards.length, 1)
+            assert.equal(customer.paypalAccounts.length, 1)
+
+            done()
 
     it "returns an error if unable to find the customer", (done) ->
       specHelper.defaultGateway.customer.find 'nonexistent_customer', (err, customer) ->
@@ -338,7 +384,7 @@ describe "CustomerGateway", ->
         assert.isTrue(response.success)
         assert.equal(response.customer.firstName, 'New First Name')
         assert.equal(response.customer.lastName, 'New Last Name')
-        
+
         done()
 
     it "can add a new card to a customer", (done) ->
@@ -358,36 +404,86 @@ describe "CustomerGateway", ->
 
         done()
 
-    it "can add a new card and billing address", (done) ->
-      customerParams =
-        firstName: 'New First Name'
-        lastName: 'New Last Name'
-        creditCard:
-          number: '5105105105105100'
-          expirationDate: '05/2014'
-          billingAddress:
-            streetAddress: '123 E Fake St'
-            locality: 'Chicago'
-            region: 'IL'
-            postalCode: '60607'
+    context "vaulting a payment method", ->
+      it "can add a new card and billing address", (done) ->
+        customerParams =
+          firstName: 'New First Name'
+          lastName: 'New Last Name'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2014'
+            billingAddress:
+              streetAddress: '123 E Fake St'
+              locality: 'Chicago'
+              region: 'IL'
+              postalCode: '60607'
 
-      specHelper.defaultGateway.customer.update customerId, customerParams, (err, response) ->
-        assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.customer.firstName, 'New First Name')
-        assert.equal(response.customer.lastName, 'New Last Name')
-        assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
-        billingAddress = response.customer.creditCards[0].billingAddress
-        assert.equal(billingAddress.streetAddress, '123 E Fake St')
-        assert.equal(billingAddress.locality, 'Chicago')
-        assert.equal(billingAddress.region, 'IL')
-        assert.equal(billingAddress.postalCode, '60607')
-        assert.equal(response.customer.addresses[0].streetAddress, '123 E Fake St')
-        assert.equal(response.customer.addresses[0].locality, 'Chicago')
-        assert.equal(response.customer.addresses[0].region, 'IL')
-        assert.equal(response.customer.addresses[0].postalCode, '60607')
+        specHelper.defaultGateway.customer.update customerId, customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.customer.firstName, 'New First Name')
+          assert.equal(response.customer.lastName, 'New Last Name')
+          assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
+          billingAddress = response.customer.creditCards[0].billingAddress
+          assert.equal(billingAddress.streetAddress, '123 E Fake St')
+          assert.equal(billingAddress.locality, 'Chicago')
+          assert.equal(billingAddress.region, 'IL')
+          assert.equal(billingAddress.postalCode, '60607')
+          assert.equal(response.customer.addresses[0].streetAddress, '123 E Fake St')
+          assert.equal(response.customer.addresses[0].locality, 'Chicago')
+          assert.equal(response.customer.addresses[0].region, 'IL')
+          assert.equal(response.customer.addresses[0].postalCode, '60607')
 
-        done()
+          done()
+
+      it "vaults a paypal account", (done) ->
+        paymentMethodToken = specHelper.randomId()
+
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          paypalCustomerId = response.customer.id
+
+          customerParams =
+            firstName: 'New First Name'
+            lastName: 'New Last Name'
+            paypalAccount:
+              consentCode: 'PAYPAL_CONSENT_CODE'
+              token: paymentMethodToken
+
+          specHelper.defaultGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.customer.firstName, 'New First Name')
+            assert.equal(response.customer.lastName, 'New Last Name')
+            assert.isString(response.customer.paypalAccounts[0].email)
+            assert.equal(response.customer.paypalAccounts[0].token, paymentMethodToken)
+
+            done()
+
+      it "does not vault a one-time use paypal account", (done) ->
+        paymentMethodToken = specHelper.randomId()
+
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          paypalCustomerId = response.customer.id
+
+          customerParams =
+            firstName: 'New First Name'
+            lastName: 'New Last Name'
+            paypalAccount:
+              accessToken: 'PAYPAL_ACCESS_TOKEN'
+              token: paymentMethodToken
+
+          specHelper.defaultGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
+            assert.isNull(err)
+            assert.isFalse(response.success)
+            assert.equal(
+              response.errors.for('customer').for('paypalAccount').on('base')[0].code,
+              '82902'
+            )
+
+            specHelper.defaultGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
+              assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+            done()
 
     it "returns an error when not found", (done) ->
       specHelper.defaultGateway.customer.update 'nonexistent_customer', {}, (err, response) ->
@@ -499,3 +595,21 @@ describe "CustomerGateway", ->
           assert.equal(billingAddress.streetAddress, null)
 
           done()
+
+  describe "delete", ->
+    it "deletes a customer", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        specHelper.defaultGateway.customer.delete response.customer.id, (err) ->
+          assert.isNull(err)
+
+          specHelper.defaultGateway.customer.find response.customer.id, (err, customer) ->
+            assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+            done()
+
+    it "handles invalid customer ids", (done) ->
+      specHelper.defaultGateway.customer.delete 'nonexistent_customer', (err) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
+

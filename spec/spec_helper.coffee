@@ -3,12 +3,15 @@ try
 catch err
 
 http = require('http')
+{TransactionAmounts} = require('../lib/braintree/test/transaction_amounts')
 {Util} = require('../lib/braintree/util')
 {Config} = require('../lib/braintree/config')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
 chai = require("chai")
 {Buffer} = require('buffer')
 xml2js = require('xml2js')
+
+chai.Assertion.includeStack = true
 
 GLOBAL.assert = chai.assert
 
@@ -65,6 +68,24 @@ settleTransaction = (transactionId, callback) ->
     "/transactions/#{transactionId}/settle",
     null,
     callback
+  )
+
+settlePayPalTransaction = (transactionId, callback) ->
+  defaultGateway.http.put(
+    "/transactions/#{transactionId}/settle",
+    null,
+    callback
+  )
+
+create3DSVerification = (merchantAccountId, params, callback) ->
+  responseCallback = (err, response) ->
+    threeDSecureToken = response.threeDSecureVerification.threeDSecureToken
+    callback(threeDSecureToken)
+
+  defaultGateway.http.post(
+    "/three_d_secure/create_verification/#{merchantAccountId}",
+    {three_d_secure_verification: params},
+    responseCallback
   )
 
 simulateTrFormPost = (url, trData, inputFormData, callback) ->
@@ -124,7 +145,7 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
   clientTokenOptions = {}
   clientTokenOptions.customerId = customerId if customerId
   specHelper.defaultGateway.clientToken.generate(clientTokenOptions, (err, result) ->
-    clientToken = JSON.parse(result.clientToken)
+    clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
     authorizationFingerprint = clientToken.authorizationFingerprint
     params = {
       authorizationFingerprint: authorizationFingerprint,
@@ -143,6 +164,74 @@ generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
       callback(nonce)
     )
   )
+
+generateNonceForPayPalAccount = (callback) ->
+  myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+  specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+    clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+    authorizationFingerprint = clientToken.authorizationFingerprint
+    params =
+      authorizationFingerprint: authorizationFingerprint
+      paypalAccount:
+        consentCode: 'PAYPAL_CONSENT_CODE'
+        token: "PAYPAL_ACCOUNT_#{randomId()}"
+
+    myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+      nonce = JSON.parse(body).paypalAccounts[0].nonce
+      callback(nonce)
+    )
+  )
+
+createTransactionToRefund = (callback) ->
+  transactionParams =
+    amount: '5.00'
+    creditCard:
+      number: '5105105105105100'
+      expirationDate: '05/2012'
+    options:
+      submitForSettlement: true
+
+  specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
+    specHelper.settleTransaction result.transaction.id, (err, settleResult) ->
+      specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
+        callback(transaction)
+
+createPayPalTransactionToRefund = (callback) ->
+  generateNonceForPayPalAccount (nonce) ->
+    transactionParams =
+      amount: TransactionAmounts.Authorize
+      paymentMethodNonce: nonce
+      options:
+        submitForSettlement: true
+
+    defaultGateway.transaction.sale transactionParams, (err, response) ->
+      transactionId = response.transaction.id
+
+      specHelper.settlePayPalTransaction transactionId, (err, settleResult) ->
+        defaultGateway.transaction.find transactionId, (err, transaction) ->
+          callback(transaction)
+                                                                                     
+createEscrowedTransaction = (callback) ->
+  transactionParams =
+    merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
+    amount: '5.00'
+    serviceFeeAmount: '1.00'
+    creditCard:
+      number: '5105105105105100'
+      expirationDate: '05/2012'
+    options:
+      holdInEscrow: true
+
+  specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
+    specHelper.escrowTransaction result.transaction.id, (err, settleResult) ->
+      specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
+        callback(transaction)
+
+decodeClientToken = (encodedClientToken) ->
+  decodedClientToken = new Buffer(encodedClientToken, "base64").toString("utf8")
+  unescapedClientToken = decodedClientToken.replace("\\u0026", "&")
+
+  unescapedClientToken
 
 class ClientApiHttp
   timeout: 60000
@@ -201,10 +290,13 @@ class ClientApiHttp
     theRequest.write(requestBody) if body
     theRequest.end()
 
-GLOBAL.specHelper = {
+GLOBAL.specHelper =
   addOns: addOns
   braintree: braintree
+  create3DSVerification: create3DSVerification
   dateToMdy: dateToMdy
+  defaultConfig: defaultConfig
+  defaultGateway: defaultGateway
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
   doesNotInclude: doesNotInclude
@@ -215,10 +307,17 @@ GLOBAL.specHelper = {
   plans: plans
   randomId: randomId
   settleTransaction: settleTransaction
+  settlePayPalTransaction: settlePayPalTransaction
   simulateTrFormPost: simulateTrFormPost
   defaultMerchantAccountId: "sandbox_credit_card"
   nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
   nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
+  threeDSecureMerchantAccountId: "three_d_secure_merchant_account"
   clientApiHttp: ClientApiHttp
   generateNonceForNewCreditCard: generateNonceForNewCreditCard
-}
+  generateNonceForPayPalAccount: generateNonceForPayPalAccount
+  decodeClientToken: decodeClientToken
+  createTransactionToRefund: createTransactionToRefund
+  createPayPalTransactionToRefund: createPayPalTransactionToRefund
+  createEscrowedTransaction: createEscrowedTransaction
+

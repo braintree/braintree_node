@@ -15,7 +15,7 @@ class AddressGateway extends Gateway
 
   find: (customerId, id, callback) ->
     if(customerId.trim() == '' || id.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/customers/#{customerId}/addresses/#{id}", (err, response) ->
         if err

@@ -162,6 +162,35 @@ describe "TransactionSearch", ->
 
                 done()
 
+    it "finds paypal transactions", (done) ->
+      @timeout 10000
+
+      transactionParams =
+        amount: Braintree.Test.TransactionAmounts.Authorize
+        paymentMethodNonce: Braintree.Test.Nonces.PayPalFuturePayment
+        options:
+          submitForSettlement: true
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.settlePayPalTransaction response.transaction.id, (err, settleResult) ->
+          specHelper.defaultGateway.transaction.find response.transaction.id, (err, transaction) ->
+
+            search = (search) ->
+              search.paypalPayerEmail().is(transaction.paypal.payerEmail)
+              search.paypalPaymentId().is(transaction.paypal.paymentId)
+              search.paypalAuthorizationId().is(transaction.paypal.authorizationId)
+
+            specHelper.defaultGateway.transaction.search search, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.length(), 1)
+
+              response.first (err, transaction) ->
+                assert.isObject(transaction)
+                assert.isNull(err)
+
+                done()
+
     xit "pages correctly (slow test)", (done) ->
       random = specHelper.randomId()
       transactionParams =

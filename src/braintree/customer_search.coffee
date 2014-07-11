@@ -18,6 +18,7 @@ class CustomerSearch extends AdvancedSearch
     "id"
     "lastName"
     "paymentMethodToken"
+    "paypalAccountEmail"
     "phone"
     "website"
   )

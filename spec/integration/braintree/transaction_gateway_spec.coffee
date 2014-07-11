@@ -3,87 +3,16 @@ require('../../spec_helper')
 {_} = require('underscore')
 braintree = specHelper.braintree
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
+{Nonces} = require('../../../lib/braintree/test/nonces')
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
 {CreditCard} = require('../../../lib/braintree/credit_card')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
+{PaymentInstrumentTypes} = require('../../../lib/braintree/payment_instrument_types')
 {Transaction} = require('../../../lib/braintree/transaction')
 {Dispute} = require('../../../lib/braintree/dispute')
-
-createTransactionToRefund = (callback) ->
-  transactionParams =
-    amount: '5.00'
-    creditCard:
-      number: '5105105105105100'
-      expirationDate: '05/2012'
-    options:
-      submitForSettlement: true
-
-  specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
-    specHelper.settleTransaction result.transaction.id, (err, settleResult) ->
-      specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
-        callback(transaction)
-
-createEscrowedTransaction = (callback) ->
-  transactionParams =
-    merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
-    amount: '5.00'
-    serviceFeeAmount: '1.00'
-    creditCard:
-      number: '5105105105105100'
-      expirationDate: '05/2012'
-    options:
-      holdInEscrow: true
-
-  specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
-    specHelper.escrowTransaction result.transaction.id, (err, settleResult) ->
-      specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
-        callback(transaction)
+{Config} = require('../../../lib/braintree/config')
 
 describe "TransactionGateway", ->
-  describe "credit", ->
-    it "creates a credit", (done) ->
-      transactionParams =
-        amount: '5.00'
-        creditCard:
-          number: '5105105105105100'
-          expirationDate: '05/12'
-
-      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
-        assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.transaction.type, 'credit')
-        assert.equal(response.transaction.amount, '5.00')
-        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100')
-
-        done()
-
-    it "handles validation errors", (done) ->
-      transactionParams =
-        creditCard:
-          number: '5105105105105100'
-
-      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
-        assert.isFalse(response.success)
-        assert.equal(response.message, 'Amount is required.\nExpiration date is required.')
-        assert.equal(
-          response.errors.for('transaction').on('amount')[0].code,
-          '81502'
-        )
-        assert.equal(
-          response.errors.for('transaction').on('amount')[0].attribute,
-          'amount'
-        )
-        assert.equal(
-          response.errors.for('transaction').for('creditCard').on('expirationDate')[0].code,
-          '81709'
-        )
-        errorCodes = (error.code for error in response.errors.deepErrors())
-        assert.equal(errorCodes.length, 2)
-        assert.include(errorCodes, '81502')
-        assert.include(errorCodes, '81709')
-
-        done()
-
   describe "sale", ->
     it "charges a card", (done) ->
       transactionParams =
@@ -153,6 +82,177 @@ describe "TransactionGateway", ->
           assert.equal(response.transaction.creditCard.expirationDate, '05/2014')
 
           done()
+
+    it "returns payment_instrument_type for credit_card", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CreditCard)
+
+        done()
+
+
+    context "with a paypal acount", ->
+
+      it "returns PayPalAccount for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.PayPalOneTimePayment
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.PayPalAccount)
+
+            done()
+
+      context "as a vaulted payment method", ->
+        it "successfully creates a transaction", (done) ->
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            customerId = response.customer.id
+
+            specHelper.generateNonceForPayPalAccount (nonce) ->
+              paymentMethodParams =
+                paymentMethodNonce: nonce
+                customerId: customerId
+
+              specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+                paymentMethodToken = response.paymentMethod.token
+
+                transactionParams =
+                  paymentMethodToken: paymentMethodToken
+                  amount: '100.00'
+
+                specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+                  assert.isNull(err)
+                  assert.isTrue(response.success)
+                  assert.equal(response.transaction.type, 'sale')
+                  assert.isString(response.transaction.paypalAccount.payerEmail)
+                  assert.isString(response.transaction.paypalAccount.authorizationId)
+                  assert.isString(response.transaction.paypalAccount.imageUrl)
+
+                  done()
+
+      context "as a payment method nonce authorized for future payments", ->
+        it "successfully creates a transaction but doesn't vault a paypal account", (done) ->
+          paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
+
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+          specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              paypalAccount:
+                consentCode: 'PAYPAL_CONSENT_CODE'
+                token: paymentMethodToken
+
+            myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).paypalAccounts[0].nonce
+
+              specHelper.defaultGateway.customer.create {}, (err, response) ->
+                transactionParams =
+                  paymentMethodNonce: nonce
+                  amount: '100.00'
+
+                specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+                  assert.isNull(err)
+                  assert.isTrue(response.success)
+                  assert.equal(response.transaction.type, 'sale')
+                  assert.isNull(response.transaction.paypalAccount.token)
+                  assert.isString(response.transaction.paypalAccount.payerEmail)
+                  assert.isString(response.transaction.paypalAccount.authorizationId)
+
+                  specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
+                    assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+                    done()
+            )
+          )
+
+        it "vaults when explicitly asked", (done) ->
+          paymentMethodToken = "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
+
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+          specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              paypalAccount:
+                consentCode: 'PAYPAL_CONSENT_CODE'
+                token: paymentMethodToken
+
+            myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).paypalAccounts[0].nonce
+
+              specHelper.defaultGateway.customer.create {}, (err, response) ->
+                transactionParams =
+                  paymentMethodNonce: nonce
+                  amount: '100.00'
+                  options:
+                    storeInVault: true
+
+                specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+                  assert.isNull(err)
+                  assert.isTrue(response.success)
+                  assert.equal(response.transaction.type, 'sale')
+                  assert.equal(response.transaction.paypalAccount.token, paymentMethodToken)
+                  assert.isString(response.transaction.paypalAccount.payerEmail)
+                  assert.isString(response.transaction.paypalAccount.authorizationId)
+
+                  specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
+                    assert.isNull(err)
+
+                    done()
+            )
+          )
+
+      context "as a payment method nonce authorized for one-time use", ->
+        it "successfully creates a transaction", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.type, 'sale')
+              assert.isNull(response.transaction.paypalAccount.token)
+              assert.isString(response.transaction.paypalAccount.payerEmail)
+              assert.isString(response.transaction.paypalAccount.authorizationId)
+
+              done()
+
+        it "does not vault even when explicitly asked", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              options:
+                storeInVault: true
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.type, 'sale')
+              assert.isNull(response.transaction.paypalAccount.token)
+              assert.isString(response.transaction.paypalAccount.payerEmail)
+              assert.isString(response.transaction.paypalAccount.authorizationId)
+
+              done()
 
     it "allows submitting for settlement", (done) ->
       transactionParams =
@@ -398,7 +498,7 @@ describe "TransactionGateway", ->
 
     context "releaseFromEscrow", ->
       it "can release an escrowed transaction", (done) ->
-        createEscrowedTransaction (transaction) ->
+        specHelper.createEscrowedTransaction (transaction) ->
           specHelper.defaultGateway.transaction.releaseFromEscrow transaction.id, (err, response) ->
             assert.isNull(err)
             assert.isTrue(response.success)
@@ -427,7 +527,7 @@ describe "TransactionGateway", ->
 
     context "cancelRelease", ->
       it "can cancel release for a transaction that has been submitted for release", (done) ->
-        createEscrowedTransaction (transaction) ->
+        specHelper.createEscrowedTransaction (transaction) ->
           specHelper.defaultGateway.transaction.releaseFromEscrow transaction.id, (err, response) ->
             specHelper.defaultGateway.transaction.cancelRelease transaction.id, (err, response) ->
               assert.isNull(err)
@@ -439,7 +539,7 @@ describe "TransactionGateway", ->
               done()
 
       it "cannot cancel release a transaction that has not been submitted for release", (done) ->
-        createEscrowedTransaction (transaction) ->
+        specHelper.createEscrowedTransaction (transaction) ->
           specHelper.defaultGateway.transaction.cancelRelease transaction.id, (err, response) ->
             assert.isNull(err)
             assert.isFalse(response.success)
@@ -529,6 +629,112 @@ describe "TransactionGateway", ->
           done()
       )
 
+  describe "credit", ->
+    it "creates a credit", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.type, 'credit')
+        assert.equal(response.transaction.amount, '5.00')
+        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100')
+
+        done()
+
+    it "handles validation errors", (done) ->
+      transactionParams =
+        creditCard:
+          number: '5105105105105100'
+
+      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
+        assert.isFalse(response.success)
+        assert.equal(response.message, 'Amount is required.\nExpiration date is required.')
+        assert.equal(
+          response.errors.for('transaction').on('amount')[0].code,
+          '81502'
+        )
+        assert.equal(
+          response.errors.for('transaction').on('amount')[0].attribute,
+          'amount'
+        )
+        assert.equal(
+          response.errors.for('transaction').for('creditCard').on('expirationDate')[0].code,
+          '81709'
+        )
+        errorCodes = (error.code for error in response.errors.deepErrors())
+        assert.equal(errorCodes.length, 2)
+        assert.include(errorCodes, '81502')
+        assert.include(errorCodes, '81709')
+
+        done()
+
+    context "three d secure", (done) ->
+      it "creates a transaction with threeDSecureToken", (done) ->
+        threeDVerificationParams =
+          number: '4111111111111111'
+          expirationMonth: '05'
+          expirationYear: '2009'
+        specHelper.create3DSVerification specHelper.threeDSecureMerchantAccountId, threeDVerificationParams, (threeDSecureToken) ->
+          transactionParams =
+            merchantAccountId: specHelper.threeDSecureMerchantAccountId
+            amount: '5.00'
+            creditCard:
+              number: '4111111111111111'
+              expirationDate: '05/2009'
+            threeDSecureToken: threeDSecureToken
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+
+            done()
+
+      it "returns an error if sent null threeDSecureToken", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId
+          amount: '5.00'
+          creditCard:
+            number: '4111111111111111'
+            expirationDate: '05/2009'
+          threeDSecureToken: null
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').on('threeDSecureToken')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureTokenIsInvalid
+          )
+
+          done()
+
+      it "returns an error if 3ds lookup data doesn't match txn data", (done) ->
+        threeDVerificationParams =
+          number: '4111111111111111'
+          expirationMonth: '05'
+          expirationYear: '2009'
+        specHelper.create3DSVerification specHelper.threeDSecureMerchantAccountId, threeDVerificationParams, (threeDSecureToken) ->
+          transactionParams =
+            merchantAccountId: specHelper.threeDSecureMerchantAccountId
+            amount: '5.00'
+            creditCard:
+              number: '5105105105105100'
+              expirationDate: '05/2009'
+            threeDSecureToken: threeDSecureToken
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isFalse(response.success)
+            assert.equal(
+              response.errors.for('transaction').on('threeDSecureToken')[0].code,
+              ValidationErrorCodes.Transaction.ThreeDSecureTransactionDataDoesntMatchVerify
+            )
+
+            done()
+
   describe "find", ->
     it "finds a transaction", (done) ->
       transactionParams =
@@ -590,7 +796,17 @@ describe "TransactionGateway", ->
 
   describe "refund", ->
     it "refunds a transaction", (done) ->
-      createTransactionToRefund (transaction) ->
+      specHelper.createTransactionToRefund (transaction) ->
+        specHelper.defaultGateway.transaction.refund transaction.id, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.type, 'credit')
+          assert.match(response.transaction.refund_id, /^\w+$/)
+
+          done()
+
+    it "refunds a paypal transaction", (done) ->
+      specHelper.createPayPalTransactionToRefund (transaction) ->
         specHelper.defaultGateway.transaction.refund transaction.id, (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
@@ -600,7 +816,7 @@ describe "TransactionGateway", ->
           done()
 
     it "allows refunding partial amounts", (done) ->
-      createTransactionToRefund (transaction) ->
+      specHelper.createTransactionToRefund (transaction) ->
         specHelper.defaultGateway.transaction.refund transaction.id, '1.00', (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
@@ -643,6 +859,26 @@ describe "TransactionGateway", ->
           assert.equal(response.transaction.amount, '5.00')
 
           done()
+
+    it "submits a paypal transaction for settlement", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        paymentMethodParams =
+          customerId: response.customer.id
+          paymentMethodNonce: Nonces.PayPalFuturePayment
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          transactionParams =
+            amount: '5.00'
+            paymentMethodToken: response.paymentMethod.token
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.status, 'submitted_for_settlement')
+              assert.equal(response.transaction.amount, '5.00')
+
+              done()
 
     it "allows submitting for a partial amount", (done) ->
       transactionParams =
@@ -692,6 +928,25 @@ describe "TransactionGateway", ->
           assert.equal(response.transaction.status, 'voided')
 
           done()
+
+    it "voids a paypal transaction", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        paymentMethodParams =
+          customerId: response.customer.id
+          paymentMethodNonce: Nonces.PayPalFuturePayment
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          transactionParams =
+            amount: '5.00'
+            paymentMethodToken: response.paymentMethod.token
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            specHelper.defaultGateway.transaction.void response.transaction.id, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.status, 'voided')
+
+              done()
 
     it "handles validation errors", (done) ->
       transactionParams =
@@ -769,3 +1024,4 @@ describe "TransactionGateway", ->
           assert.isTrue(response.success)
           assert.equal(response.transaction.status, 'submitted_for_settlement')
           done()
+

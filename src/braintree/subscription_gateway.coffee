@@ -15,7 +15,7 @@ class SubscriptionGateway extends Gateway
 
   find: (subscriptionId, callback) ->
     if(subscriptionId.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/subscriptions/#{subscriptionId}", (err, response) ->
         if err

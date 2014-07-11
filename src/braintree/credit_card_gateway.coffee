@@ -9,13 +9,13 @@ class CreditCardGateway extends Gateway
     @gateway.http.post('/payment_methods', {creditCard: attributes}, @responseHandler(callback))
 
   delete: (token, callback) ->
-    @gateway.http.delete("/payment_methods/#{token}", callback)
+    @gateway.http.delete("/payment_methods/credit_card/#{token}", callback)
 
   find: (token, callback) ->
     if(token.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
-      @gateway.http.get "/payment_methods/#{token}", (err, response) ->
+      @gateway.http.get "/payment_methods/credit_card/#{token}", (err, response) ->
         if err
           callback(err, null)
         else
@@ -23,7 +23,7 @@ class CreditCardGateway extends Gateway
 
   fromNonce: (nonce, callback) ->
     if(nonce.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/payment_methods/from_nonce/#{nonce}", (err, response) ->
         if err
@@ -33,7 +33,7 @@ class CreditCardGateway extends Gateway
           callback(null, new CreditCard(response.creditCard))
 
   update: (token, attributes, callback) ->
-    @gateway.http.put("/payment_methods/#{token}", {creditCard: attributes}, @responseHandler(callback))
+    @gateway.http.put("/payment_methods/credit_card/#{token}", {creditCard: attributes}, @responseHandler(callback))
 
   responseHandler: (callback) ->
     @createResponseHandler("creditCard", CreditCard, callback)

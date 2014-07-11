@@ -12,7 +12,7 @@ class CreditCardVerificationGateway extends Gateway
 
   find: (creditCardVerificationId, callback) ->
     if(creditCardVerificationId.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/verifications/#{creditCardVerificationId}", (err, response) ->
         if err

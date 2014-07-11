@@ -8,7 +8,7 @@ class WebhookTestingGateway extends Gateway
   constructor: (@gateway) ->
 
   sampleNotification: (kind, id) ->
-    payload = new Buffer(@sampleXml(kind, id)).toString("base64")
+    payload = new Buffer(@sampleXml(kind, id)).toString("base64") + '\n'
     signature = "#{@gateway.config.publicKey}|#{Digest.Sha1hexdigest(@gateway.config.privateKey, payload)}"
     {
       signature: signature,
@@ -202,27 +202,27 @@ class WebhookTestingGateway extends Gateway
 
   subjectXmlForPartnerMerchantConnected: () ->
     """
-        <partner_merchant>
-          <merchant_public_id>public_id</merchant_public_id>
-          <public_key>public_key</public_key>
-          <private_key>private_key</private_key>
-          <partner_merchant_id>abc123</partner_merchant_id>
-          <client_side_encryption_key>cse_key</client_side_encryption_key>
-        </partner_merchant>
+        <partner-merchant>
+          <merchant-public-id>public_id</merchant-public-id>
+          <public-key>public_key</public-key>
+          <private-key>private_key</private-key>
+          <partner-merchant-id>abc123</partner-merchant-id>
+          <client-side-encryption-key>cse_key</client-side-encryption-key>
+        </partner-merchant>
     """
 
   subjectXmlForPartnerMerchantDisconnected: () ->
     """
-        <partner_merchant>
-          <partner_merchant_id>abc123</partner_merchant_id>
-        </partner_merchant>
+        <partner-merchant>
+          <partner-merchant-id>abc123</partner-merchant-id>
+        </partner-merchant>
     """
 
   subjectXmlForPartnerMerchantDeclined: () ->
     """
-        <partner_merchant>
-          <partner_merchant_id>abc123</partner_merchant_id>
-        </partner_merchant>
+        <partner-merchant>
+          <partner-merchant-id>abc123</partner-merchant-id>
+        </partner-merchant>
     """
 
 exports.WebhookTestingGateway = WebhookTestingGateway

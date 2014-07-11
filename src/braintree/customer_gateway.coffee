@@ -16,7 +16,7 @@ class CustomerGateway extends Gateway
 
   find: (customerId, callback) ->
     if(customerId.trim() == '')
-      callback(exceptions.NotFoundError(), null)
+      callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.get "/customers/#{customerId}", (err, response) ->
         if err
