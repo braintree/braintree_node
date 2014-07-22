@@ -36,8 +36,13 @@ describe "SubscriptionGateway", ->
 
         done()
 
-    it "creates a subscription with a payment method nonce", (done) ->
-      specHelper.generateNonceForNewCreditCard("4111111111111111", customerId, (nonce) ->
+    it "creates a subscription with a vaulted card nonce", (done) ->
+      paymentMethodParams =
+        creditCard:
+          number: "4111111111111111"
+          expirationMonth: "12"
+          expirationYear: "2099"
+      specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, customerId, (nonce) ->
         subscriptionParams =
           paymentMethodNonce: nonce,
           planId: specHelper.plans.trialless.id
@@ -49,11 +54,31 @@ describe "SubscriptionGateway", ->
           done()
       )
 
-    it "creates a subscription with a vaulted paypal account", (done) ->
+    it "creates a subscription with a vaulted paypal account nonce", (done) ->
+      paymentMethodParams =
+        paypalAccount:
+          consentCode: "PAYPAL_CONSENT_CODE"
+      specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, customerId, (nonce) ->
+        subscriptionParams =
+          paymentMethodNonce: nonce,
+          planId: specHelper.plans.trialless.id
+
+        specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.isString(response.subscription.transactions[0].paypalAccount.payerEmail)
+          done()
+      )
+
+    it "creates a subscription with a vaulted paypal account token", (done) ->
       specHelper.defaultGateway.customer.create {}, (err, response) ->
         paypalCustomerId = response.customer.id
+        paymentMethodParams =
+          paypalAccount:
+            consentCode: 'PAYPAL_CONSENT_CODE'
+            token: "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
 
-        specHelper.generateNonceForPayPalAccount (nonce) ->
+        specHelper.generateNonceForNewPaymentMethod paymentMethodParams, null, (nonce) ->
           paymentMethodParams =
             paymentMethodNonce: nonce
             customerId: paypalCustomerId
@@ -241,7 +266,12 @@ describe "SubscriptionGateway", ->
         done()
 
     it "updates the payment method using a payment method nonce", (done) ->
-      specHelper.generateNonceForNewCreditCard("4111111111111111", customerId, (nonce) ->
+      nonceParams =
+        creditCard:
+          number: "4111111111111111"
+          expirationMonth: "12"
+          expirationYear: "2099"
+      specHelper.generateNonceForNewPaymentMethod(nonceParams, customerId, (nonce) ->
         subscriptionParams =
           paymentMethodNonce: nonce,
           planId: specHelper.plans.trialless.id
@@ -256,7 +286,7 @@ describe "SubscriptionGateway", ->
           )
       )
 
-    it "handles validation erros", (done) ->
+    it "handles validation errors", (done) ->
       subscriptionParams =
         price: 'invalid'
 
