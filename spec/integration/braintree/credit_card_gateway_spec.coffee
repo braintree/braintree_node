@@ -160,8 +160,8 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
-          nonce = JSON.parse(body).nonce
+        myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).creditCards[0].nonce
           creditCardParams =
             customerId: customerId
             paymentMethodNonce: nonce
@@ -472,8 +472,8 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
-          nonce = JSON.parse(body).nonce
+        myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).creditCards[0].nonce
 
           specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
             assert.isNull(err)
@@ -500,8 +500,8 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
-          nonce = JSON.parse(body).nonce
+        myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).creditCards[0].nonce
 
           specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
             assert.isNull(creditCard)
@@ -528,15 +528,15 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
+        myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
           params = {
             authorizationFingerprint: authorizationFingerprint,
             sharedCustomerIdentifierType: "testing",
             sharedCustomerIdentifier: "testing-identifier"
           }
 
-          myHttp.get "/client_api/nonces.json", params, (statusCode, body) ->
-            nonce = JSON.parse(body).creditCards[0].nonce
+          myHttp.get "/client_api/v1/payment_methods.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).paymentMethods[0].nonce
 
             specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
               assert.isNull(creditCard)
@@ -562,8 +562,8 @@ describe "CreditCardGateway", ->
           }
         }
 
-        myHttp.post "/client_api/nonces.json", params, (statusCode, body) ->
-          nonce = JSON.parse(body).nonce
+        myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+          nonce = JSON.parse(body).creditCards[0].nonce
 
           specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
             assert.isNull(err)

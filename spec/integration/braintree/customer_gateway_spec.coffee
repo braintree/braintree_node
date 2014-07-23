@@ -84,8 +84,8 @@ describe "CustomerGateway", ->
             }
           }
 
-          myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
-            nonce = JSON.parse(body).nonce
+          myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).creditCards[0].nonce
             customerParams =
               creditCard:
                 paymentMethodNonce: nonce
