@@ -41,7 +41,7 @@ describe "ClientTokenGateway", ->
       decoded_client_token = new Buffer(encoded_client_token, "base64").toString("utf8")
       unescaped_client_token = decoded_client_token.replace("\\u0026", "&")
       clientToken = JSON.parse(decoded_client_token)
-      assert.equal(clientToken.version, "2")
+      assert.equal(clientToken.version, 2)
       done()
     )
 
