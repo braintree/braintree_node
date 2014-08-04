@@ -39,6 +39,129 @@ describe "PaymentMethodGateway", ->
 
                 done()
 
+      it 'allows passing the billing address outside of the nonce', (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
+
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              creditCard:
+                number: '4111111111111111'
+                expirationMonth: '12'
+                expirationYear: '2020'
+                options:
+                  validate: 'false'
+
+            myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+            myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).creditCards[0].nonce
+
+              creditCardParams =
+                paymentMethodNonce: nonce
+                customerId: customerId
+                billingAddress:
+                  streetAddress: "123 Abc Way"
+
+              specHelper.defaultGateway.paymentMethod.create creditCardParams, (err, response) ->
+                assert.isNull(err)
+                assert.isTrue(response.success)
+
+                assert.isTrue(response.paymentMethod.constructor.name == "CreditCard")
+                token = response.paymentMethod.token
+                specHelper.defaultGateway.paymentMethod.find token, (err, creditCard) ->
+                  assert.isNull(err)
+                  assert.isTrue(creditCard != null)
+                  assert.equal(creditCard.billingAddress.streetAddress, "123 Abc Way")
+
+                  done()
+
+      it 'overrides the billing address in the nonce', (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
+
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              creditCard:
+                number: '4111111111111111'
+                expirationMonth: '12'
+                expirationYear: '2020'
+                options:
+                  validate: 'false'
+                billingAddress:
+                  streetAddress: "456 Xyz Way"
+
+            myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+            myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).creditCards[0].nonce
+
+              creditCardParams =
+                paymentMethodNonce: nonce
+                customerId: customerId
+                billingAddress:
+                  streetAddress: "123 Abc Way"
+
+              specHelper.defaultGateway.paymentMethod.create creditCardParams, (err, response) ->
+                assert.isNull(err)
+                assert.isTrue(response.success)
+
+                assert.isTrue(response.paymentMethod.constructor.name == "CreditCard")
+                token = response.paymentMethod.token
+                specHelper.defaultGateway.paymentMethod.find token, (err, creditCard) ->
+                  assert.isNull(err)
+                  assert.isTrue(creditCard != null)
+                  assert.equal(creditCard.billingAddress.streetAddress, "123 Abc Way")
+
+                  done()
+
+      it 'does not override the billing address for a vaulted credit card', (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          specHelper.defaultGateway.clientToken.generate {customerId: customerId}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
+
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              creditCard:
+                number: '4111111111111111'
+                expirationMonth: '12'
+                expirationYear: '2020'
+                billingAddress:
+                  streetAddress: "456 Xyz Way"
+
+            myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+            myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+              assert.equal(statusCode, "201")
+              nonce = JSON.parse(body).creditCards[0].nonce
+
+              creditCardParams =
+                paymentMethodNonce: nonce
+                customerId: customerId
+                billingAddress:
+                  streetAddress: "123 Abc Way"
+
+              specHelper.defaultGateway.paymentMethod.create creditCardParams, (err, response) ->
+                assert.isNull(err)
+                assert.isTrue(response.success)
+
+                assert.isTrue(response.paymentMethod.constructor.name == "CreditCard")
+                token = response.paymentMethod.token
+                specHelper.defaultGateway.paymentMethod.find token, (err, creditCard) ->
+                  assert.isNull(err)
+                  assert.isTrue(creditCard != null)
+                  assert.equal(creditCard.billingAddress.streetAddress, "456 Xyz Way")
+
+                  done()
+
       it 'allows passing a billing address id outside of the nonce', (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
           customerId = response.customer.id
@@ -93,6 +216,42 @@ describe "PaymentMethodGateway", ->
         specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
           customerId = response.customer.id
           done()
+
+      it 'ignores passed billing address params', (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
+
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              paypalAccount:
+                consentCode: 'PAYPAL_CONSENT_CODE'
+
+            myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+            myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).paypalAccounts[0].nonce
+
+              paypalAccountParams =
+                paymentMethodNonce: nonce
+                customerId: customerId
+                billingAddress:
+                  streetAddress: "123 Abc Way"
+
+              specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+                assert.isNull(err)
+                assert.isTrue(response.success)
+
+                assert.equal(response.paymentMethod.constructor.name, "PayPalAccount")
+                assert.isTrue(response.paymentMethod.imageUrl != null)
+                token = response.paymentMethod.token
+                specHelper.defaultGateway.paymentMethod.find token, (err, paypalAccount) ->
+                  assert.isNull(err)
+                  assert.isTrue(paypalAccount != null)
+
+                  done()
 
       it 'ignores passed billing address id', (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
