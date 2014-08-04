@@ -294,6 +294,44 @@ describe "PaymentMethodGateway", ->
           customerId = response.customer.id
           done()
 
+      it 'does not return an error if credit card options are present for a paypal nonce', (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
+
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              paypalAccount:
+                consentCode: 'consent-code'
+
+            myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+            myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).paypalAccounts[0].nonce
+
+              paypalAccountParams =
+                paymentMethodNonce: nonce
+                customerId: customerId
+                options:
+                  verifyCard: "true"
+                  failOnDuplicatePaymentMethod: "true"
+                  verificationMerchantAccountId: "notARealMerchantAccountId"
+
+              specHelper.defaultGateway.paymentMethod.create paypalAccountParams, (err, response) ->
+                assert.isNull(err)
+                assert.isTrue(response.success)
+
+                assert.equal(response.paymentMethod.constructor.name, "PayPalAccount")
+                assert.isTrue(response.paymentMethod.imageUrl != null)
+                token = response.paymentMethod.token
+                specHelper.defaultGateway.paymentMethod.find token, (err, paypalAccount) ->
+                  assert.isNull(err)
+                  assert.isTrue(paypalAccount != null)
+
+                  done()
+
       it 'ignores passed billing address params', (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
           customerId = response.customer.id
