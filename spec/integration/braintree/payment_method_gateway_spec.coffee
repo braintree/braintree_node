@@ -39,6 +39,83 @@ describe "PaymentMethodGateway", ->
 
                 done()
 
+      it 'respects verify_card and verification_merchant_account_id when included outside of the nonce', (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
+
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              creditCard:
+                number: '4000111111111115'
+                expirationMonth: '11'
+                expirationYear: '2099'
+
+            myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+            myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).creditCards[0].nonce
+
+              creditCardParams =
+                paymentMethodNonce: nonce
+                customerId: customerId
+                options:
+                  verifyCard: "true"
+                  verificationMerchantAccountId: specHelper.nonDefaultMerchantAccountId
+
+              specHelper.defaultGateway.paymentMethod.create creditCardParams, (err, response) ->
+                assert.isNull(err)
+                assert.isFalse(response.success)
+
+                assert.equal(response.verification.status, 'processor_declined')
+                assert.equal(response.verification.processorResponseCode, '2000')
+                assert.equal(response.verification.processorResponseText, 'Do Not Honor')
+                assert.equal(response.verification.merchantAccountId, specHelper.nonDefaultMerchantAccountId)
+
+                done()
+
+      it 'respects failOnDuplicatePaymentMethod when included outside of the nonce', (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          creditCardParams =
+            customerId: customerId
+            number: '4111111111111111'
+            expirationDate: '05/2012'
+
+          specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+
+          specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+            clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+            authorizationFingerprint = clientToken.authorizationFingerprint
+
+            params =
+              authorizationFingerprint: authorizationFingerprint
+              creditCard:
+                number: '4111111111111111'
+                expirationDate: '05/2012'
+
+            myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+            myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+              nonce = JSON.parse(body).creditCards[0].nonce
+
+              creditCardParams =
+                customerId: customerId
+                paymentMethodNonce: nonce
+                options:
+                  failOnDuplicatePaymentMethod: 'true'
+
+              specHelper.defaultGateway.paymentMethod.create creditCardParams, (err, response) ->
+                assert.isNull(err)
+                assert.isFalse(response.success)
+                assert.equal(response.errors.deepErrors()[0].code, '81724')
+
+                done()
+
       it 'allows passing the billing address outside of the nonce', (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
           customerId = response.customer.id
