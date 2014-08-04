@@ -1,4 +1,5 @@
 {Gateway} = require('./gateway')
+{ErrorResponse} = require('./error_response')
 exceptions = require('./exceptions')
 
 DEFAULT_VERSION = 2
