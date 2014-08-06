@@ -1,3 +1,11 @@
+## 1.16.0
+* Allow credit card verification options to be passed outside of the nonce for PaymentMethod.create
+* Allow billing_address parameters and billing_address_id to be passed outside of the nonce for PaymentMethod.create
+* Add Subscriptions to paypal accounts
+* Add PaymentMethod.update
+* Add fail_on_duplicate_payment_method option to PaymentMethod.create
+* Add supoort for dispute webhooks
+
 ## 1.15.0
 * Support for v.zero SDKs.
 
