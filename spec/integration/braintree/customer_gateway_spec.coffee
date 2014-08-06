@@ -84,8 +84,8 @@ describe "CustomerGateway", ->
             }
           }
 
-          myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
-            nonce = JSON.parse(body).nonce
+          myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).creditCards[0].nonce
             customerParams =
               creditCard:
                 paymentMethodNonce: nonce
@@ -287,6 +287,26 @@ describe "CustomerGateway", ->
         assert.isTrue(response.customer.creditCards[0].venmoSdk)
 
         done()
+
+    it "creates a customer with a params nonce", (done) ->
+      paymentMethodParams =
+        creditCard:
+          number: "4111111111111111"
+          expirationMonth: "12"
+          expirationYear: "2099"
+      specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, (nonce) ->
+        customerParams =
+          firstName: "Bob"
+          lastName: "Fisher"
+          paymentMethodNonce: nonce
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.customer.creditCards[0].bin, "411111")
+
+          done()
+      )
 
   describe "find", ->
     it "finds a custoemr", (done) ->

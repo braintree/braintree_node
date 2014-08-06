@@ -1,4 +1,7 @@
-class Dispute
+{AttributeSetter} = require('./attribute_setter')
+{TransactionDetails} = require('./transaction_details')
+
+class Dispute extends AttributeSetter
   @Status =
     Open : 'open'
     Lost : 'lost'
@@ -14,5 +17,9 @@ class Dispute
     ProductNotReceived            : 'product_not_received'
     ProductUnsatisfactory         : 'product_unsatisfactory'
     TransactionAmountDiffers      : 'transaction_amount_differs'
+
+  constructor: (attributes) ->
+    super attributes
+    @transactionDetails = new TransactionDetails(attributes.transaction)
 
 exports.Dispute = Dispute

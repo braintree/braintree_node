@@ -29,6 +29,9 @@ class WebhookTestingGateway extends Gateway
       when WebhookNotification.Kind.TransactionDisbursed then @subjectXmlForTransactionDisbursed(id)
       when WebhookNotification.Kind.DisbursementException then @subjectXmlForDisbursementException(id)
       when WebhookNotification.Kind.Disbursement then @subjectXmlForDisbursement(id)
+      when WebhookNotification.Kind.DisputeOpened then @subjectXmlForDisputeOpened(id)
+      when WebhookNotification.Kind.DisputeLost then @subjectXmlForDisputeLost(id)
+      when WebhookNotification.Kind.DisputeWon then @subjectXmlForDisputeWon(id)
       when WebhookNotification.Kind.SubMerchantAccountApproved then @subjectXmlForSubMerchantAccountApproved(id)
       when WebhookNotification.Kind.SubMerchantAccountDeclined then @subjectXmlForSubMerchantAccountDeclined(id)
       when WebhookNotification.Kind.PartnerMerchantConnected then @subjectXmlForPartnerMerchantConnected()
@@ -46,6 +49,57 @@ class WebhookTestingGateway extends Gateway
       </disbursement-details>
     </transaction>
     """
+
+  subjectXmlForDisputeOpened: (id) ->
+    """
+    <dispute>
+      <amount>250.00</amount>
+      <currency-iso-code>USD</currency-iso-code>
+      <received-date type="date">2014-03-01</received-date>
+      <reply-by-date type="date">2014-03-21</reply-by-date>
+      <status>open</status>
+      <reason>fraud</reason>
+      <id>#{id}</id>
+      <transaction>
+        <id>#{id}</id>
+        <amount>250.00</amount>
+      </transaction>
+    </dispute>
+    """
+
+  subjectXmlForDisputeLost: (id) ->
+    """
+    <dispute>
+      <amount>250.00</amount>
+      <currency-iso-code>USD</currency-iso-code>
+      <received-date type="date">2014-03-01</received-date>
+      <reply-by-date type="date">2014-03-21</reply-by-date>
+      <status>lost</status>
+      <reason>fraud</reason>
+      <id>#{id}</id>
+      <transaction>
+        <id>#{id}</id>
+        <amount>250.00</amount>
+      </transaction>
+    </dispute>
+    """
+
+  subjectXmlForDisputeWon: (id) ->
+    """
+    <dispute>
+      <amount>250.00</amount>
+      <currency-iso-code>USD</currency-iso-code>
+      <received-date type="date">2014-03-01</received-date>
+      <reply-by-date type="date">2014-03-21</reply-by-date>
+      <status>won</status>
+      <reason>fraud</reason>
+      <id>#{id}</id>
+      <transaction>
+        <id>#{id}</id>
+        <amount>250.00</amount>
+      </transaction>
+    </dispute>
+   """
 
   subjectXmlForDisbursementException: (id) ->
     """

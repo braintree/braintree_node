@@ -140,46 +140,26 @@ randomId = ->
 doesNotInclude = (array, value) ->
   assert.isTrue(array.indexOf(value) is -1)
 
-generateNonceForNewCreditCard = (cardNumber, customerId, callback) ->
+generateNonceForNewPaymentMethod = (paymentMethodParams, customerId, callback) ->
   myHttp = new ClientApiHttp(new Config(specHelper.defaultConfig))
   clientTokenOptions = {}
   clientTokenOptions.customerId = customerId if customerId
   specHelper.defaultGateway.clientToken.generate(clientTokenOptions, (err, result) ->
     clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
-    authorizationFingerprint = clientToken.authorizationFingerprint
-    params = {
-      authorizationFingerprint: authorizationFingerprint,
-      sharedCustomerIdentifierType: "testing",
-      sharedCustomerIdentifier: "testing-identifier",
-      share: true,
-      credit_card: {
-        number: cardNumber || "4111111111111111",
-        expiration_month: "11",
-        expiration_year: "2099"
-      }
-    }
+    params = { authorizationFingerprint: clientToken.authorizationFingerprint }
 
-    myHttp.post("/client_api/nonces.json", params, (statusCode, body) ->
-      nonce = JSON.parse(body).nonce
-      callback(nonce)
-    )
-  )
-
-generateNonceForPayPalAccount = (callback) ->
-  myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-  specHelper.defaultGateway.clientToken.generate({}, (err, result) ->
-    clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
-    authorizationFingerprint = clientToken.authorizationFingerprint
-    params =
-      authorizationFingerprint: authorizationFingerprint
-      paypalAccount:
-        consentCode: 'PAYPAL_CONSENT_CODE'
-        token: "PAYPAL_ACCOUNT_#{randomId()}"
-
-    myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
-      nonce = JSON.parse(body).paypalAccounts[0].nonce
-      callback(nonce)
-    )
+    if paymentMethodParams["paypalAccount"]?
+      params["paypalAccount"] = paymentMethodParams["paypalAccount"]
+      myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+        nonce = JSON.parse(body).paypalAccounts[0].nonce
+        callback(nonce)
+      )
+    else
+      params["creditCard"] = paymentMethodParams["creditCard"]
+      myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
+        nonce = JSON.parse(body).creditCards[0].nonce
+        callback(nonce)
+      )
   )
 
 createTransactionToRefund = (callback) ->
@@ -197,7 +177,11 @@ createTransactionToRefund = (callback) ->
         callback(transaction)
 
 createPayPalTransactionToRefund = (callback) ->
-  generateNonceForPayPalAccount (nonce) ->
+  nonceParams =
+    paypalAccount:
+      consentCode: 'PAYPAL_CONSENT_CODE'
+      token: "PAYPAL_ACCOUNT_#{randomId()}"
+  generateNonceForNewPaymentMethod nonceParams, null, (nonce) ->
     transactionParams =
       amount: TransactionAmounts.Authorize
       paymentMethodNonce: nonce
@@ -314,10 +298,8 @@ GLOBAL.specHelper =
   nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
   threeDSecureMerchantAccountId: "three_d_secure_merchant_account"
   clientApiHttp: ClientApiHttp
-  generateNonceForNewCreditCard: generateNonceForNewCreditCard
-  generateNonceForPayPalAccount: generateNonceForPayPalAccount
   decodeClientToken: decodeClientToken
   createTransactionToRefund: createTransactionToRefund
   createPayPalTransactionToRefund: createPayPalTransactionToRefund
   createEscrowedTransaction: createEscrowedTransaction
-
+  generateNonceForNewPaymentMethod: generateNonceForNewPaymentMethod

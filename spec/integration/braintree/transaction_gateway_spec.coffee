@@ -117,8 +117,12 @@ describe "TransactionGateway", ->
         it "successfully creates a transaction", (done) ->
           specHelper.defaultGateway.customer.create {}, (err, response) ->
             customerId = response.customer.id
+            nonceParams =
+              paypalAccount:
+                consentCode: 'PAYPAL_CONSENT_CODE'
+                token: "PAYPAL_ACCOUNT_#{specHelper.randomId()}"
 
-            specHelper.generateNonceForPayPalAccount (nonce) ->
+            specHelper.generateNonceForNewPaymentMethod nonceParams, customerId, (nonce) ->
               paymentMethodParams =
                 paymentMethodNonce: nonce
                 customerId: customerId
@@ -616,8 +620,59 @@ describe "TransactionGateway", ->
 
         done()
 
-    it "can use payment method nonce", (done) ->
-      specHelper.generateNonceForNewCreditCard(null, null, (nonce) ->
+    it "can use vaulted credit card nonce", (done) ->
+      customerParams =
+        firstName: 'Adam'
+        lastName: 'Jones'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        customerId = response.customer.id
+        paymentMethodParams =
+          creditCard:
+            number: "4111111111111111"
+            expirationMonth: "12"
+            expirationYear: "2099"
+        specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, customerId, (nonce) ->
+          transactionParams =
+            amount: '1.00'
+            paymentMethodNonce: nonce
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+
+            done()
+        )
+
+    it "can use vaulted PayPal account nonce", (done) ->
+      customerParams =
+        firstName: 'Adam'
+        lastName: 'Jones'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        customerId = response.customer.id
+        paymentMethodParams =
+          paypalAccount:
+            consent_code: "PAYPAL_CONSENT_CODE"
+        specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, customerId, (nonce) ->
+          transactionParams =
+            amount: '1.00'
+            paymentMethodNonce: nonce
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+
+            done()
+        )
+
+    it "can use params nonce", (done) ->
+      paymentMethodParams =
+        creditCard:
+          number: "4111111111111111"
+          expirationMonth: "12"
+          expirationYear: "2099"
+      specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, (nonce) ->
         transactionParams =
           amount: '1.00'
           paymentMethodNonce: nonce
@@ -777,6 +832,8 @@ describe "TransactionGateway", ->
         assert.equal(dispute.receivedDate, '2014-03-01')
         assert.equal(dispute.replyByDate, '2014-03-21')
         assert.equal(dispute.reason, Dispute.Reason.Fraud)
+        assert.equal(dispute.transactionDetails.id, transactionId)
+        assert.equal(dispute.transactionDetails.amount, '1000.00')
 
         done()
 

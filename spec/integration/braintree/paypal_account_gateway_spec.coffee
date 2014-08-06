@@ -37,6 +37,41 @@ describe "PayPalGateway", ->
 
         done()
 
+    it "returns subscriptions associated with a paypal account", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        paymentMethodParams =
+          customerId: response.customer.id
+          paymentMethodNonce: Nonces.PayPalFuturePayment
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          token = response.paymentMethod.token
+
+          subscriptionParams =
+            paymentMethodToken: token
+            planId: specHelper.plans.trialless.id
+
+          specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+
+            subscription1 = response.subscription
+
+            specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+
+              subscription2 = response.subscription
+
+              specHelper.defaultGateway.paypalAccount.find token, (err, paypalAccount) ->
+                assert.isNull(err)
+
+                assert.equal(paypalAccount.subscriptions.length, 2)
+                subscriptionIds = [paypalAccount.subscriptions[0].id, paypalAccount.subscriptions[1].id]
+                assert.include(subscriptionIds, subscription1.id)
+                assert.include(subscriptionIds, subscription2.id)
+
+                done()
+
   describe "update", ->
     paymentMethodToken = null
     customerId = null

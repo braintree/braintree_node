@@ -17,7 +17,7 @@ describe "ClientTokenGateway", ->
         sharedCustomerIdentifierType: "testing"
       }
 
-      myHttp.get("/client_api/nonces.json", params, (statusCode) ->
+      myHttp.get("/client_api/v1/payment_methods.json", params, (statusCode) ->
         assert.equal(statusCode, 200)
         done()
       )
@@ -41,7 +41,7 @@ describe "ClientTokenGateway", ->
       decoded_client_token = new Buffer(encoded_client_token, "base64").toString("utf8")
       unescaped_client_token = decoded_client_token.replace("\\u0026", "&")
       clientToken = JSON.parse(decoded_client_token)
-      assert.equal(clientToken.version, "2")
+      assert.equal(clientToken.version, 2)
       done()
     )
 
@@ -71,7 +71,7 @@ describe "ClientTokenGateway", ->
           }
         }
 
-        myHttp.post("/client_api/nonces.json", params, (statusCode) ->
+        myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, (statusCode) ->
           assert.equal(statusCode, 422)
           done()
         )
@@ -109,7 +109,7 @@ describe "ClientTokenGateway", ->
             }
           }
 
-          myHttp.post("/client_api/nonces.json", params, (statusCode) ->
+          myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, (statusCode) ->
             assert.equal(statusCode, 201)
             specHelper.defaultGateway.customer.find(customerId, (err, customer) ->
               assert.equal(2, customer.creditCards.length)
@@ -145,7 +145,7 @@ describe "ClientTokenGateway", ->
           }
         }
 
-        myHttp.post("/client_api/nonces.json", params, (statusCode) ->
+        myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, (statusCode) ->
           assert.equal(statusCode, 201)
           specHelper.defaultGateway.clientToken.generate({
             customerId: customer.id,
@@ -157,7 +157,7 @@ describe "ClientTokenGateway", ->
             authorizationFingerprint = clientToken.authorizationFingerprint
             params.authorizationFingerprint = authorizationFingerprint
 
-            myHttp.post("/client_api/nonces.json", params, (statusCode) ->
+            myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, (statusCode) ->
               assert.equal(statusCode, 422)
               done()
             )

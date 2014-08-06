@@ -2,6 +2,7 @@
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
 {DisbursementDetails} = require('./disbursement_details')
+{Dispute} = require('./dispute')
 
 class Transaction extends AttributeSetter
   @CreatedUsing =
@@ -53,6 +54,7 @@ class Transaction extends AttributeSetter
     @creditCard = new CreditCard(attributes.creditCard)
     @paypalAccount = new PayPalAccount(attributes.paypal)
     @disbursementDetails = new DisbursementDetails(attributes.disbursementDetails)
+    @disputes = (new Dispute(disputeAttributes) for disputeAttributes in attributes.disputes) if attributes.disputes?
 
   isDisbursed: ->
     @disbursementDetails.isValid()

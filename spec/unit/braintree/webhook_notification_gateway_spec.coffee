@@ -1,5 +1,6 @@
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 {WebhookNotification} = require('../../../lib/braintree')
+{Dispute} = require('../../../lib/braintree/dispute')
 {errorTypes} = require('../../../lib/braintree')
 
 describe "WebhookNotificationGateway", ->
@@ -137,6 +138,39 @@ describe "WebhookNotificationGateway", ->
         assert.equal(webhookNotification.transaction.id, "my_id")
         assert.equal(webhookNotification.transaction.amount, '100')
         assert.ok(webhookNotification.transaction.disbursementDetails.disbursementDate?)
+        done()
+
+    it "returns a parsable signature and payload for dispute opened", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.DisputeOpened,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeOpened)
+        assert.equal(Dispute.Status.Open, webhookNotification.dispute.status)
+        done()
+
+    it "returns a parsable signature and payload for dispute lost", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.DisputeLost,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeLost)
+        assert.equal(Dispute.Status.Lost, webhookNotification.dispute.status)
+        done()
+
+    it "returns a parsable signature and payload for dispute won", (done) ->
+      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.DisputeWon,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeWon)
+        assert.equal(Dispute.Status.Won, webhookNotification.dispute.status)
         done()
 
     it "returns a parsable signature and payload for a disbursed webhook", (done) ->

@@ -31,6 +31,12 @@ class PaymentMethodGateway extends Gateway
         else
           callback(null, PaymentMethodGateway.parsePaymentMethod(response))
 
+  update: (token, attributes, callback) ->
+    if(token.trim() == '')
+      callback(exceptions.NotFoundError("Not Found"), null)
+    else
+      @gateway.http.put("/payment_methods/any/#{token}", {paymentMethod: attributes}, @responseHandler(callback))
+
   @parsePaymentMethod: (response) ->
     if response.creditCard
       new CreditCard(response.creditCard)
