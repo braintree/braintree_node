@@ -407,6 +407,45 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "handles descriptors", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+        descriptor:
+          name: 'abc*def'
+          phone: '1234567890'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.descriptor.name, 'abc*def')
+        assert.equal(response.transaction.descriptor.phone, '1234567890')
+
+        done()
+
+    it "handles descriptor validations", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+        descriptor:
+          name: 'abc'
+          phone: '1234567'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isFalse(response.success)
+        assert.equal(
+          response.errors.for('transaction').for('descriptor').on('name')[0].code,
+          ValidationErrorCodes.Descriptor.NameFormatIsInvalid
+        )
+        assert.equal(
+          response.errors.for('transaction').for('descriptor').on('phone')[0].code,
+          ValidationErrorCodes.Descriptor.PhoneFormatIsInvalid
+        )
+        done()
+
     context "with a service fee", ->
       it "persists the service fee", (done) ->
         transactionParams =
