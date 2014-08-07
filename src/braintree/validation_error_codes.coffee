@@ -118,6 +118,7 @@ class ValidationErrorCodes
     DynamicDescriptorsDisabled : "92203"
     NameFormatIsInvalid : "92201"
     InternationalPhoneFormatIsInvalid : "92205"
+    UrlFormatIsInvalid : "92206"
 
   @MerchantAccount =
     ApplicantDetails:

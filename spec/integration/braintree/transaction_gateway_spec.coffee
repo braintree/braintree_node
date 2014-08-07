@@ -416,11 +416,13 @@ describe "TransactionGateway", ->
         descriptor:
           name: 'abc*def'
           phone: '1234567890'
+          url: 'ebay.com'
 
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         assert.isTrue(response.success)
         assert.equal(response.transaction.descriptor.name, 'abc*def')
         assert.equal(response.transaction.descriptor.phone, '1234567890')
+        assert.equal(response.transaction.descriptor.url, 'ebay.com')
 
         done()
 
@@ -433,6 +435,7 @@ describe "TransactionGateway", ->
         descriptor:
           name: 'abc'
           phone: '1234567'
+          url: '12345678901234'
 
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         assert.isFalse(response.success)
@@ -443,6 +446,10 @@ describe "TransactionGateway", ->
         assert.equal(
           response.errors.for('transaction').for('descriptor').on('phone')[0].code,
           ValidationErrorCodes.Descriptor.PhoneFormatIsInvalid
+        )
+        assert.equal(
+          response.errors.for('transaction').for('descriptor').on('url')[0].code,
+          ValidationErrorCodes.Descriptor.UrlFormatIsInvalid
         )
         done()
 
