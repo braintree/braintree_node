@@ -141,6 +141,7 @@ describe "TransactionGateway", ->
                   assert.isString(response.transaction.paypalAccount.payerEmail)
                   assert.isString(response.transaction.paypalAccount.authorizationId)
                   assert.isString(response.transaction.paypalAccount.imageUrl)
+                  assert.isString(response.transaction.paypalAccount.debugId)
 
                   done()
 
@@ -173,6 +174,7 @@ describe "TransactionGateway", ->
                   assert.isNull(response.transaction.paypalAccount.token)
                   assert.isString(response.transaction.paypalAccount.payerEmail)
                   assert.isString(response.transaction.paypalAccount.authorizationId)
+                  assert.isString(response.transaction.paypalAccount.debugId)
 
                   specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
                     assert.equal(err.type, braintree.errorTypes.notFoundError)
@@ -211,6 +213,7 @@ describe "TransactionGateway", ->
                   assert.equal(response.transaction.paypalAccount.token, paymentMethodToken)
                   assert.isString(response.transaction.paypalAccount.payerEmail)
                   assert.isString(response.transaction.paypalAccount.authorizationId)
+                  assert.isString(response.transaction.paypalAccount.debugId)
 
                   specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
                     assert.isNull(err)
@@ -235,6 +238,7 @@ describe "TransactionGateway", ->
               assert.isNull(response.transaction.paypalAccount.token)
               assert.isString(response.transaction.paypalAccount.payerEmail)
               assert.isString(response.transaction.paypalAccount.authorizationId)
+              assert.isString(response.transaction.paypalAccount.debugId)
 
               done()
 
@@ -255,6 +259,7 @@ describe "TransactionGateway", ->
               assert.isNull(response.transaction.paypalAccount.token)
               assert.isString(response.transaction.paypalAccount.payerEmail)
               assert.isString(response.transaction.paypalAccount.authorizationId)
+              assert.isString(response.transaction.paypalAccount.debugId)
 
               done()
 
