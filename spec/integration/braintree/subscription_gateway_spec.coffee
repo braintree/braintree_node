@@ -33,6 +33,8 @@ describe "SubscriptionGateway", ->
         assert.match(response.subscription.transactions[0].id, /^\w{6,7}$/)
         assert.equal(response.subscription.transactions[0].creditCard.maskedNumber, '510510******5100')
         assert.equal(response.subscription.transactions[0].planId, specHelper.plans.trialless.id)
+        assert.isNotNull(response.subscription.createdAt)
+        assert.isNotNull(response.subscription.updatedAt)
 
         done()
 
