@@ -242,7 +242,7 @@ describe "TransactionGateway", ->
 
               done()
 
-        it "successfully creates a transaction with a payee email and bn code", (done) ->
+        it "successfully creates a transaction with a payee email", (done) ->
           nonce = Nonces.PayPalOneTimePayment
 
           specHelper.defaultGateway.customer.create {}, (err, response) ->
@@ -251,7 +251,6 @@ describe "TransactionGateway", ->
               amount: '100.00'
               paypalAccount:
                 payeeEmail: 'payee@example.com'
-                bnCode: 'BN12345'
 
             specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
               assert.isNull(err)
@@ -262,7 +261,6 @@ describe "TransactionGateway", ->
               assert.isString(response.transaction.paypalAccount.authorizationId)
               assert.isString(response.transaction.paypalAccount.debugId)
               assert.equal(response.transaction.paypalAccount.payeeEmail, 'payee@example.com')
-              assert.equal(response.transaction.paypalAccount.bnCode, 'BN12345')
 
               done()
 
