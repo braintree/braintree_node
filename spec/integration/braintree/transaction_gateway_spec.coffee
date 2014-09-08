@@ -113,6 +113,41 @@ describe "TransactionGateway", ->
 
             done()
 
+      context "settlement", ->
+        it "can have a status of settlement declined", (done) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.PayPalOneTimePayment
+            amount: '100.00'
+            options:
+              submitForSettlement: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            transactionID = response.transaction.id
+            specHelper.declineSettlingTransaction transactionID, (err, response) ->
+              specHelper.defaultGateway.transaction.find response.transaction.id, (err, transaction) ->
+                assert.equal(transaction.status, 'settlement_declined')
+
+          done()
+
+        it "can have a status of settlement pending", (done) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.PayPalOneTimePayment
+            amount: '100.00'
+            options:
+              submitForSettlement: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            transactionID = response.transaction.id
+            specHelper.pendSettlingTransaction transactionID, (err, response) ->
+              specHelper.defaultGateway.transaction.find response.transaction.id, (err, transaction) ->
+                assert.equal(transaction.status, 'settlement_pending')
+
+          done()
+
       context "as a vaulted payment method", ->
         it "successfully creates a transaction", (done) ->
           specHelper.defaultGateway.customer.create {}, (err, response) ->

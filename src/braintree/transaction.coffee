@@ -41,6 +41,8 @@ class Transaction extends AttributeSetter
     ProcessorDeclined : 'processor_declined'
     Settled : 'settled'
     Settling : 'settling'
+    SettlementDeclined: 'settlement_declined'
+    SettlementPending: 'settlement_pending'
     SubmittedForSettlement : 'submitted_for_settlement'
     Voided : 'voided'
     All: ->
