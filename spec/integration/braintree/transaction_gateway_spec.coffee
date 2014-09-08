@@ -113,38 +113,29 @@ describe "TransactionGateway", ->
 
             done()
 
-      context "settlement", ->
-        it "can have a status of settlement declined", (done) ->
-          transactionParams =
-            paymentMethodNonce: Nonces.PayPalOneTimePayment
-            amount: '100.00'
-            options:
-              submitForSettlement: true
+      context "in-line capture", ->
+        it "includes processorSettlementResponse_code and processorSettlementResponseText for settlement declined transactions", (done) ->
+          search = (search) ->
+            search.status().is Transaction.Status.SettlementDeclined
 
-          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-            assert.isNull(err)
-            assert.isTrue(response.success)
-            transactionID = response.transaction.id
-            specHelper.declineSettlingTransaction transactionID, (err, response) ->
-              specHelper.defaultGateway.transaction.find response.transaction.id, (err, transaction) ->
-                assert.equal(transaction.status, 'settlement_declined')
+          specHelper.defaultGateway.transaction.search search, (err, response) ->
+            response.first (err, transaction) ->
+              assert.equal(transaction.processorSettlementResponseCode, "4001")
+              assert.equal(transaction.processorSettlementResponseText, "Settlement Declined")
 
           done()
 
-        it "can have a status of settlement pending", (done) ->
-          transactionParams =
-            paymentMethodNonce: Nonces.PayPalOneTimePayment
-            amount: '100.00'
-            options:
-              submitForSettlement: true
+        it "includes processorSettlementResponseCode and processorSettlementResponseText for settlement pending transactions", (done) ->
+          search = (search) ->
+            search.status().is Transaction.Status.SettlementPending
 
-          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          specHelper.defaultGateway.transaction.search search, (err, response) ->
             assert.isNull(err)
             assert.isTrue(response.success)
-            transactionID = response.transaction.id
-            specHelper.pendSettlingTransaction transactionID, (err, response) ->
-              specHelper.defaultGateway.transaction.find response.transaction.id, (err, transaction) ->
-                assert.equal(transaction.status, 'settlement_pending')
+
+            response.first (err, transaction) ->
+              assert.equal(transaction.processorSettlementResponseCode, "4002")
+              assert.equal(transaction.processorSettlementResponseText, "Settlement Pending")
 
           done()
 
