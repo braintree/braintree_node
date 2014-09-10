@@ -113,6 +113,44 @@ describe "TransactionGateway", ->
 
             done()
 
+      context "in-line capture", ->
+        it "includes processorSettlementResponse_code and processorSettlementResponseText for settlement declined transactions", (done) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.PayPalOneTimePayment
+            amount: '10.00'
+            options:
+              submitForSettlement: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            transactionId = response.transaction.id
+
+            specHelper.declineSettlingTransaction transactionId, (err, response) ->
+              specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
+                assert.equal(transaction.processorSettlementResponseCode, "4001")
+                assert.equal(transaction.processorSettlementResponseText, "Settlement Declined")
+                done()
+
+
+        it "includes processorSettlementResponseCode and processorSettlementResponseText for settlement pending transactions", (done) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.PayPalOneTimePayment
+            amount: '10.00'
+            options:
+              submitForSettlement: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            transactionId = response.transaction.id
+
+            specHelper.pendSettlingTransaction transactionId, (err, response) ->
+              specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
+                assert.equal(transaction.processorSettlementResponseCode, "4002")
+                assert.equal(transaction.processorSettlementResponseText, "Settlement Pending")
+                done()
+
       context "as a vaulted payment method", ->
         it "successfully creates a transaction", (done) ->
           specHelper.defaultGateway.customer.create {}, (err, response) ->
@@ -141,6 +179,7 @@ describe "TransactionGateway", ->
                   assert.isString(response.transaction.paypalAccount.payerEmail)
                   assert.isString(response.transaction.paypalAccount.authorizationId)
                   assert.isString(response.transaction.paypalAccount.imageUrl)
+                  assert.isString(response.transaction.paypalAccount.debugId)
 
                   done()
 
@@ -173,6 +212,7 @@ describe "TransactionGateway", ->
                   assert.isNull(response.transaction.paypalAccount.token)
                   assert.isString(response.transaction.paypalAccount.payerEmail)
                   assert.isString(response.transaction.paypalAccount.authorizationId)
+                  assert.isString(response.transaction.paypalAccount.debugId)
 
                   specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
                     assert.equal(err.type, braintree.errorTypes.notFoundError)
@@ -211,6 +251,7 @@ describe "TransactionGateway", ->
                   assert.equal(response.transaction.paypalAccount.token, paymentMethodToken)
                   assert.isString(response.transaction.paypalAccount.payerEmail)
                   assert.isString(response.transaction.paypalAccount.authorizationId)
+                  assert.isString(response.transaction.paypalAccount.debugId)
 
                   specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
                     assert.isNull(err)
@@ -235,6 +276,29 @@ describe "TransactionGateway", ->
               assert.isNull(response.transaction.paypalAccount.token)
               assert.isString(response.transaction.paypalAccount.payerEmail)
               assert.isString(response.transaction.paypalAccount.authorizationId)
+              assert.isString(response.transaction.paypalAccount.debugId)
+
+              done()
+
+        it "successfully creates a transaction with a payee email", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              paypalAccount:
+                payeeEmail: 'payee@example.com'
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.type, 'sale')
+              assert.isNull(response.transaction.paypalAccount.token)
+              assert.isString(response.transaction.paypalAccount.payerEmail)
+              assert.isString(response.transaction.paypalAccount.authorizationId)
+              assert.isString(response.transaction.paypalAccount.debugId)
+              assert.equal(response.transaction.paypalAccount.payeeEmail, 'payee@example.com')
 
               done()
 
@@ -255,6 +319,7 @@ describe "TransactionGateway", ->
               assert.isNull(response.transaction.paypalAccount.token)
               assert.isString(response.transaction.paypalAccount.payerEmail)
               assert.isString(response.transaction.paypalAccount.authorizationId)
+              assert.isString(response.transaction.paypalAccount.debugId)
 
               done()
 

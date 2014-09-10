@@ -70,6 +70,20 @@ settleTransaction = (transactionId, callback) ->
     callback
   )
 
+declineSettlingTransaction = (transactionId, callback) ->
+  defaultGateway.http.put(
+    "/transactions/#{transactionId}/settlement_decline",
+    null,
+    callback
+  )
+
+pendSettlingTransaction = (transactionId, callback) ->
+  defaultGateway.http.put(
+    "/transactions/#{transactionId}/settlement_pending",
+    null,
+    callback
+  )
+
 settlePayPalTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
     "/transactions/#{transactionId}/settle",
@@ -291,6 +305,8 @@ GLOBAL.specHelper =
   plans: plans
   randomId: randomId
   settleTransaction: settleTransaction
+  declineSettlingTransaction: declineSettlingTransaction
+  pendSettlingTransaction: pendSettlingTransaction
   settlePayPalTransaction: settlePayPalTransaction
   simulateTrFormPost: simulateTrFormPost
   defaultMerchantAccountId: "sandbox_credit_card"

@@ -1,3 +1,7 @@
+## 1.18.0
+* Added paypal specific fields to transaction calls
+* Added SettlementPending, SettlementDeclined transaction statuses
+
 ## 1.17.0
 * Add descriptor url support
 
@@ -29,7 +33,7 @@
 
 ## 1.12.0
 
-* Expose constants for advanced search 
+* Expose constants for advanced search
 
 ## 1.11.2
 
