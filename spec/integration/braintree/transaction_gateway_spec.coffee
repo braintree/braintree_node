@@ -115,29 +115,41 @@ describe "TransactionGateway", ->
 
       context "in-line capture", ->
         it "includes processorSettlementResponse_code and processorSettlementResponseText for settlement declined transactions", (done) ->
-          search = (search) ->
-            search.status().is Transaction.Status.SettlementDeclined
+          transactionParams =
+            paymentMethodNonce: Nonces.PayPalOneTimePayment
+            amount: '10.00'
+            options:
+              submitForSettlement: true
 
-          specHelper.defaultGateway.transaction.search search, (err, response) ->
-            response.first (err, transaction) ->
-              assert.equal(transaction.processorSettlementResponseCode, "4001")
-              assert.equal(transaction.processorSettlementResponseText, "Settlement Declined")
-
-          done()
-
-        it "includes processorSettlementResponseCode and processorSettlementResponseText for settlement pending transactions", (done) ->
-          search = (search) ->
-            search.status().is Transaction.Status.SettlementPending
-
-          specHelper.defaultGateway.transaction.search search, (err, response) ->
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             assert.isNull(err)
             assert.isTrue(response.success)
+            transactionId = response.transaction.id
 
-            response.first (err, transaction) ->
-              assert.equal(transaction.processorSettlementResponseCode, "4002")
-              assert.equal(transaction.processorSettlementResponseText, "Settlement Pending")
+            specHelper.declineSettlingTransaction transactionId, (err, response) ->
+              specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
+                assert.equal(transaction.processorSettlementResponseCode, "4001")
+                assert.equal(transaction.processorSettlementResponseText, "Settlement Declined")
+                done()
 
-          done()
+
+        it "includes processorSettlementResponseCode and processorSettlementResponseText for settlement pending transactions", (done) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.PayPalOneTimePayment
+            amount: '10.00'
+            options:
+              submitForSettlement: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            transactionId = response.transaction.id
+
+            specHelper.pendSettlingTransaction transactionId, (err, response) ->
+              specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
+                assert.equal(transaction.processorSettlementResponseCode, "4002")
+                assert.equal(transaction.processorSettlementResponseText, "Settlement Pending")
+                done()
 
       context "as a vaulted payment method", ->
         it "successfully creates a transaction", (done) ->
