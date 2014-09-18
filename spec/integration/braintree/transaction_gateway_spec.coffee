@@ -438,6 +438,7 @@ describe "TransactionGateway", ->
         assert.isFalse(response.success)
         assert.equal(response.transaction.amount, '2000.00')
         assert.equal(response.transaction.status, 'processor_declined')
+        assert.equal(response.transaction.processorProvidedResponse, '2000 : Do Not Honor')
 
         done()
 
