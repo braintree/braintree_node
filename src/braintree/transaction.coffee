@@ -27,7 +27,6 @@ class Transaction extends AttributeSetter
         all.push value if key isnt 'All'
       all
   @GatewayRejectionReason =
-    ApplicationIncomplete : 'application_incomplete'
     Avs : 'avs'
     Cvv : 'cvv'
     AvsAndCvv : 'avs_and_cvv'

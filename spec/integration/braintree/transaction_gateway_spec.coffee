@@ -455,19 +455,6 @@ describe "TransactionGateway", ->
         assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud)
         done()
 
-    it "handles application incomplete rejection", (done) ->
-      transactionParams =
-        amount: "5001.00"
-        creditCard:
-          number: '5105105105105100'
-          expirationDate: '05/16'
-
-      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-        assert.isFalse(response.success)
-        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected)
-        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.ApplicationIncomplete)
-        done()
-
     it "allows fraud params", (done) ->
       transactionParams =
         amount: '10.0'
