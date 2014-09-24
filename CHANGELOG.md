@@ -1,3 +1,6 @@
+## 1.19.0
+* Add additional_processor_response to transaction
+
 ## 1.18.1
 * Allow payee_email to be passed in options params for Transaction create
 
