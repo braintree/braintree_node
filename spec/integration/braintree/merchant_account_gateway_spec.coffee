@@ -50,6 +50,7 @@ validMerchantAccountParams =
     destination: MerchantAccount.FundingDestination.Bank
     routingNumber: "011103093"
     accountNumber: "43759348798"
+    descriptor: "Joe Bloggs MI"
   tosAccepted: true
   masterMerchantAccountId: "sandbox_master_merchant_account"
 
@@ -178,6 +179,7 @@ describe "MerchantAccountGateway", ->
       params["funding"]["email"] = "check@this.com"
       params["funding"]["mobile_phone"] = "1234567890"
       params["funding"]["destination"] = MerchantAccount.FundingDestination.MobilePhone
+      params["funding"]["descriptor"] = "James Bloggs FL"
 
       specHelper.defaultGateway.merchantAccount.update "sandbox_sub_merchant_account", params, (err, response) ->
         assert.isTrue(response.success)
@@ -205,6 +207,7 @@ describe "MerchantAccountGateway", ->
         assert.equal(response.merchantAccount.funding.email, "check@this.com")
         assert.equal(response.merchantAccount.funding.mobilePhone, "1234567890")
         assert.equal(response.merchantAccount.funding.destination, MerchantAccount.FundingDestination.MobilePhone)
+        assert.equal(response.merchantAccount.funding.descriptor, "James Bloggs FL")
 
         done()
 
