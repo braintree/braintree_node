@@ -12,9 +12,10 @@ class PaymentMethodGateway extends Gateway
       paypalAccount: PayPalAccount
       creditCard: CreditCard
     @createResponseHandler(responseMapping, null, (err, response) ->
-      response.paymentMethod = response.paypalAccount || response.creditCard
-      delete response.paypalAccount
-      delete response.creditCard
+      if !err
+        response.paymentMethod = response.paypalAccount || response.creditCard
+        delete response.paypalAccount
+        delete response.creditCard
       callback(err, response)
     )
 

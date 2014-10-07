@@ -624,6 +624,20 @@ describe "PaymentMethodGateway", ->
 
               done()
 
+      it "handles a not found error correctly", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+          updateParams =
+            cardholderName: 'New Holder'
+            cvv: '456'
+            number: '5555555555554444'
+            expirationDate: '06/2013'
+
+          specHelper.defaultGateway.paymentMethod.update "doesNotExist", updateParams, (err, response) ->
+            assert.isNull(response)
+            assert.isNotNull(err)
+            done()
+
       it "can pass expirationMonth and expirationYear", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
           customerId = response.customer.id
