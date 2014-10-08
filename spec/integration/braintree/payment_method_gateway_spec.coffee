@@ -9,6 +9,21 @@ describe "PaymentMethodGateway", ->
   describe "create", ->
     customerId = null
 
+    it 'works with an unknown payment method nonce', (done) ->
+      specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
+        customerId = response.customer.id
+
+        paymentMethodParams =
+          customerId: customerId
+          paymentMethodNonce: 'fake-apple-pay-amex-nonce'
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+
+          done()
+
+
     context 'with a credit card payment method nonce', ->
       it 'creates a credit card from the nonce', (done) ->
         specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->

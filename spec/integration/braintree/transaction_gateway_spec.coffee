@@ -819,6 +819,18 @@ describe "TransactionGateway", ->
           done()
       )
 
+    it "works with an unknown payment instrument", (done) ->
+      transactionParams =
+        amount: '1.00'
+        paymentMethodNonce: 'fake-apple-pay-amex-nonce'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+
+        done()
+
+
   describe "credit", ->
     it "creates a credit", (done) ->
       transactionParams =
