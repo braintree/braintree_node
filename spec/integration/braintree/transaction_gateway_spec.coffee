@@ -1065,7 +1065,7 @@ describe "TransactionGateway", ->
             specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
-              assert.equal(response.transaction.status, 'submitted_for_settlement')
+              assert.equal(response.transaction.status, 'settling')
               assert.equal(response.transaction.amount, '5.00')
 
               done()
