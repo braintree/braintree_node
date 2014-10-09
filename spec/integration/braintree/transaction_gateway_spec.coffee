@@ -98,6 +98,24 @@ describe "TransactionGateway", ->
         done()
 
 
+    context "with apple pay", ->
+      it "returns ApplePayCard for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.ApplePayAmex
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard)
+            assert.isNotNull(response.transaction.applePayCard.card_type)
+
+            done()
+
+
+
+
     context "with a paypal acount", ->
 
       it "returns PayPalAccount for payment_instrument", (done) ->

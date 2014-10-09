@@ -20,8 +20,27 @@ describe "PaymentMethodGateway", ->
         specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
           assert.isNull(err)
           assert.isTrue(response.success)
+          assert.isNotNull(response.paymentMethod.token)
 
           done()
+
+    context 'Apple Pay', ->
+      it "vaults an Apple Pay card from the nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
+          customerId = response.customer.id
+
+          paymentMethodParams =
+            customerId: customerId
+            paymentMethodNonce: Nonces.ApplePayAmex
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isNotNull(response.paymentMethod.token)
+            assert.isNotNull(response.paymentMethod.card_type)
+
+            done()
+
 
 
     context 'with a credit card payment method nonce', ->
