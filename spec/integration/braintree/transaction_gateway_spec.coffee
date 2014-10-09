@@ -822,7 +822,7 @@ describe "TransactionGateway", ->
     it "works with an unknown payment instrument", (done) ->
       transactionParams =
         amount: '1.00'
-        paymentMethodNonce: 'fake-apple-pay-amex-nonce'
+        paymentMethodNonce: Nonces.AbstractTransactable
 
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         assert.isNull(err)

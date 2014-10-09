@@ -15,7 +15,7 @@ describe "PaymentMethodGateway", ->
 
         paymentMethodParams =
           customerId: customerId
-          paymentMethodNonce: 'fake-apple-pay-amex-nonce'
+          paymentMethodNonce: Nonces.AbstractTransactable
 
         specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
           assert.isNull(err)
