@@ -1,4 +1,5 @@
 {AttributeSetter} = require('./attribute_setter')
+{ApplePayCard} = require('./apple_pay_card')
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
 {DisbursementDetails} = require('./disbursement_details')
@@ -55,6 +56,7 @@ class Transaction extends AttributeSetter
     super attributes
     @creditCard = new CreditCard(attributes.creditCard)
     @paypalAccount = new PayPalAccount(attributes.paypal)
+    @applePayCard = new ApplePayCard(attributes.applePay)
     @disbursementDetails = new DisbursementDetails(attributes.disbursementDetails)
     @disputes = (new Dispute(disputeAttributes) for disputeAttributes in attributes.disputes) if attributes.disputes?
 

@@ -9,6 +9,40 @@ describe "PaymentMethodGateway", ->
   describe "create", ->
     customerId = null
 
+    it 'works with an unknown payment method nonce', (done) ->
+      specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
+        customerId = response.customer.id
+
+        paymentMethodParams =
+          customerId: customerId
+          paymentMethodNonce: Nonces.AbstractTransactable
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.isNotNull(response.paymentMethod.token)
+
+          done()
+
+    context 'Apple Pay', ->
+      it "vaults an Apple Pay card from the nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
+          customerId = response.customer.id
+
+          paymentMethodParams =
+            customerId: customerId
+            paymentMethodNonce: Nonces.ApplePayAmex
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isNotNull(response.paymentMethod.token)
+            assert.isNotNull(response.paymentMethod.card_type)
+
+            done()
+
+
+
     context 'with a credit card payment method nonce', ->
       it 'creates a credit card from the nonce', (done) ->
         specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
@@ -623,6 +657,20 @@ describe "PaymentMethodGateway", ->
               assert.equal(updatedCreditCard.expirationDate, '06/2013')
 
               done()
+
+      it "handles a not found error correctly", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+          updateParams =
+            cardholderName: 'New Holder'
+            cvv: '456'
+            number: '5555555555554444'
+            expirationDate: '06/2013'
+
+          specHelper.defaultGateway.paymentMethod.update "doesNotExist", updateParams, (err, response) ->
+            assert.isNull(response)
+            assert.isNotNull(err)
+            done()
 
       it "can pass expirationMonth and expirationYear", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->

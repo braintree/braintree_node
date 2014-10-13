@@ -1,4 +1,5 @@
 {Gateway} = require('./gateway')
+{ApplePayCard} = require('./apple_pay_card')
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
 {UnknownPaymentMethod} = require('./unknown_payment_method')
@@ -11,10 +12,10 @@ class PaymentMethodGateway extends Gateway
     responseMapping =
       paypalAccount: PayPalAccount
       creditCard: CreditCard
+      applePayCard: ApplePayCard
     @createResponseHandler(responseMapping, null, (err, response) ->
-      response.paymentMethod = response.paypalAccount || response.creditCard
-      delete response.paypalAccount
-      delete response.creditCard
+      if !err
+        response.paymentMethod = PaymentMethodGateway.parsePaymentMethod(response)
       callback(err, response)
     )
 
@@ -42,6 +43,8 @@ class PaymentMethodGateway extends Gateway
       new CreditCard(response.creditCard)
     else if response.paypalAccount
       new PayPalAccount(response.paypalAccount)
+    else if response.applePayCard
+      new ApplePayCard(response.applePayCard)
     else
       new UnknownPaymentMethod(response)
 

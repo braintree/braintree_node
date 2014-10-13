@@ -27,6 +27,26 @@ class ValidationErrorCodes
     StreetAddressIsTooLong : "81812"
     TooManyAddressesPerCustomer : "91818"
 
+  @ApplePayCard =
+    ApplePayCardsAreNotAccepted : "83501"
+    CustomerIdIsRequiredForVaulting : "83502"
+    TokenIsInUse : "93503"
+    PaymentMethodNonceConsumed : "93504"
+    PaymentMethodNonceUnknown : "93505"
+    PaymentMethodNonceLocked : "93506"
+    PaymentMethodNonceCardTypeIsNotAccepted : "83518"
+    CannotUpdateApplePayCardUsingPaymentMethodNonce : "93507"
+    NumberIsRequired : "93508"
+    ExpirationMonthIsRequired : "93509"
+    ExpirationYearIsRequired : "93510"
+    CryptogramIsRequired : "93511"
+    DecryptionFailed : "83512"
+    Disabled : "93513"
+    MerchantNotConfigured : "93514"
+    MerchantKeysAlreadyConfigured : "93515"
+    MerchantKeysNotConfigured : "93516"
+    CertificateInvalid : "93517"
+
   @AuthorizationFingerprint =
     InvalidCreatedAt : "93204"
     InvalidFormat : "93202"

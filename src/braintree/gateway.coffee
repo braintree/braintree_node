@@ -11,18 +11,21 @@ class Gateway
       if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
       else
+        response.success = true
         if typeof(attributeKlassMap) == 'string'
           attributeName = attributeKlassMap
           if (response[attributeName])
-            response.success = true
             response[attributeName] = new klass(response[attributeName]) if klass?
-            callback(null, response)
+          callback(null, response)
         else
+          unknown = true
           for attributeName, klass of attributeKlassMap
             if (response[attributeName])
-              response.success = true
+              unknown = false
               response[attributeName] = new klass(response[attributeName]) if klass?
               callback(null, response)
+          if unknown
+            callback(null, response)
 
   createSearchResponse: (url, search, pagingFunction, callback) ->
     if callback?
