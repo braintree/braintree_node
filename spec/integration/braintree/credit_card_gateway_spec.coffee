@@ -509,41 +509,6 @@ describe "CreditCardGateway", ->
             assert.include(err.message, "not found")
 
             done()
-
-    it "returns an error if the supplied nonce is locked", (done) ->
-      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-        clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
-        authorizationFingerprint = clientToken.authorizationFingerprint
-
-        params = {
-          authorizationFingerprint: authorizationFingerprint,
-          sharedCustomerIdentifierType: "testing",
-          sharedCustomerIdentifier: "testing-identifier",
-          share: true,
-          credit_card: {
-            number: "4111111111111111",
-            expiration_month: "11",
-            expiration_year: "2099"
-          }
-        }
-
-        myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
-          params = {
-            authorizationFingerprint: authorizationFingerprint,
-            sharedCustomerIdentifierType: "testing",
-            sharedCustomerIdentifier: "testing-identifier"
-          }
-
-          myHttp.get "/client_api/v1/payment_methods.json", params, (statusCode, body) ->
-            nonce = JSON.parse(body).paymentMethods[0].nonce
-
-            specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
-              assert.isNull(creditCard)
-              assert.equal(err.type, "notFoundError")
-              assert.include(err.message, "locked")
-
-              done()
     
     it "returns an error if the supplied nonce is consumed", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
