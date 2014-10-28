@@ -560,6 +560,90 @@ describe "TransactionGateway", ->
         )
         done()
 
+    it "handles lodging industry data", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+        industry:
+          industryType: Transaction.IndustryData.Lodging
+          data:
+            folioNumber: 'aaa'
+            checkInDate: '2014-07-07'
+            checkOutDate: '2014-08-08'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isTrue(response.success)
+
+        done()
+
+    it "handles lodging industry data validations", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+        industry:
+          industryType: Transaction.IndustryData.Lodging
+          data:
+            folioNumber: 'aaa'
+            checkInDate: '2014-07-07'
+            checkOutDate: '2014-06-06'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isFalse(response.success)
+        assert.equal(
+          response.errors.for('transaction').for('industry').on('checkOutDate')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.Lodging.CheckOutDateMustFollowCheckInDate
+        )
+
+        done()
+
+    it "handles travel cruise industry data", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+        industry:
+          industryType: Transaction.IndustryData.TravelAndCruise
+          data:
+            travelPackage: 'flight'
+            departureDate: '2014-07-07'
+            lodgingCheckInDate: '2014-07-07'
+            lodgingCheckOutDate: '2014-08-08'
+            lodgingName: 'Disney'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isTrue(response.success)
+
+        done()
+
+    it "handles lodging industry data validations", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+        industry:
+          industryType: Transaction.IndustryData.TravelAndCruise
+          data:
+            travelPackage: 'onfoot'
+            departureDate: '2014-07-07'
+            lodgingCheckInDate: '2014-07-07'
+            lodgingCheckOutDate: '2014-08-08'
+            lodgingName: 'Disney'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isFalse(response.success)
+        assert.equal(
+          response.errors.for('transaction').for('industry').on('travelPackage')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.TravelCruise.TravelPackageIsInvalid
+        )
+
+        done()
+
     context "with a service fee", ->
       it "persists the service fee", (done) ->
         transactionParams =
