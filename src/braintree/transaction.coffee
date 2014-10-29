@@ -33,9 +33,6 @@ class Transaction extends AttributeSetter
     AvsAndCvv : 'avs_and_cvv'
     Duplicate : 'duplicate'
     Fraud : 'fraud'
-  @IndustryData =
-    Lodging : 'lodging'
-    TravelAndCruise : 'travel_cruise'
   @Status =
     AuthorizationExpired : 'authorization_expired'
     Authorizing : 'authorizing'
