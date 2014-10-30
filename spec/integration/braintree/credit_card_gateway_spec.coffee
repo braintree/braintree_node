@@ -33,6 +33,43 @@ describe "CreditCardGateway", ->
 
         done()
 
+    it "verifies card if verifyCard is set to true", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '4000111111111115'
+        expirationDate: '05/2012'
+        options:
+          verifyCard: "true"
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isFalse(response.success)
+
+        assert.equal(response.verification.status, 'processor_declined')
+        assert.equal(response.verification.processorResponseCode, '2000')
+        assert.equal(response.verification.processorResponseText, 'Do Not Honor')
+
+        done()
+
+    it "verifies card with custom verification amount", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '4000111111111115'
+        expirationDate: '05/2012'
+        options:
+          verifyCard: "true"
+          verificationAmount: "1.03"
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isFalse(response.success)
+
+        assert.equal(response.verification.status, 'processor_declined')
+        assert.equal(response.verification.processorResponseCode, '2000')
+        assert.equal(response.verification.processorResponseText, 'Do Not Honor')
+
+        done()
+
     it "accepts a billing address", (done) ->
       creditCardParams =
         customerId: customerId
