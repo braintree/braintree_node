@@ -609,6 +609,21 @@ describe "PaymentMethodGateway", ->
 
               done()
 
+    context 'unkown payment method', ->
+      it "finds the unknown payment method", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          paymentMethodParams =
+            customerId: response.customer.id
+            paymentMethodNonce: Nonces.AbstractTransactable
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            paymentMethodToken = response.paymentMethod.token
+            specHelper.defaultGateway.paymentMethod.find paymentMethodToken, (err, paymentMethod) ->
+              assert.isNull(err)
+              assert.isString(paymentMethod.token)
+
+              done()
+
    it "handles not finding the paypal account", (done) ->
      specHelper.defaultGateway.paymentMethod.find 'NON_EXISTENT_TOKEN', (err, paypalAccount) ->
        assert.equal(err.type, braintree.errorTypes.notFoundError)
