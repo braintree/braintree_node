@@ -559,6 +559,31 @@ describe "PaymentMethodGateway", ->
 
               done()
 
+    context 'with a fake apple pay nonce', ->
+      before (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
+          customerId = response.customer.id
+          done()
+
+      it 'creates a payment method', (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          applePayCardParams =
+            paymentMethodNonce: Braintree.Test.Nonces.ApplePayMasterCard
+            customerId: customerId
+
+          specHelper.defaultGateway.paymentMethod.create applePayCardParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+
+            token = response.paymentMethod.token
+            specHelper.defaultGateway.paymentMethod.find token, (err, applePayCard) ->
+              assert.isNull(err)
+              assert.isTrue(applePayCard != null)
+
+              done()
+
   describe "find", ->
     context 'credit card', ->
       paymentMethodToken = null
