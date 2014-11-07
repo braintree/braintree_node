@@ -31,7 +31,7 @@ describe "PaymentMethodGateway", ->
 
           paymentMethodParams =
             customerId: customerId
-            paymentMethodNonce: Nonces.ApplePayAmex
+            paymentMethodNonce: Nonces.ApplePayAmEx
 
           specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
             assert.isNull(err)
@@ -570,7 +570,7 @@ describe "PaymentMethodGateway", ->
           customerId = response.customer.id
 
           applePayCardParams =
-            paymentMethodNonce: Braintree.Test.Nonces.ApplePayMasterCard
+            paymentMethodNonce: Nonces.ApplePayMasterCard
             customerId: customerId
 
           specHelper.defaultGateway.paymentMethod.create applePayCardParams, (err, response) ->
