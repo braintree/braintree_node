@@ -101,7 +101,7 @@ describe "CustomerGateway", ->
 
       it "creates a customer with an Apple Pay payment method nonce", (done) ->
         customerParams =
-          paymentMethodNonce: Nonces.ApplePayAmex
+          paymentMethodNonce: Nonces.ApplePayAmEx
 
         specHelper.defaultGateway.customer.create customerParams, (err, response) ->
           assert.isNull(err)

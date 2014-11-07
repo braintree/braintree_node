@@ -102,7 +102,7 @@ describe "TransactionGateway", ->
       it "returns ApplePayCard for payment_instrument", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
           transactionParams =
-            paymentMethodNonce: Nonces.ApplePayAmex
+            paymentMethodNonce: Nonces.ApplePayAmEx
             amount: '100.00'
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
