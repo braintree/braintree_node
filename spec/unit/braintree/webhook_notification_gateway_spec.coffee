@@ -1,3 +1,4 @@
+require('../../spec_helper')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 {WebhookNotification} = require('../../../lib/braintree')
 {Dispute} = require('../../../lib/braintree/dispute')
@@ -12,24 +13,24 @@ describe "WebhookNotificationGateway", ->
 
   describe "sampleNotification", ->
     it "returns a parsable signature and payload", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionWentPastDue)
         assert.equal(webhookNotification.subscription.id, "my_id")
         assert.ok(webhookNotification.timestamp?)
         done()
 
     it "retries a payload with a newline", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload.replace(/\n$/,''), (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload.replace(/\n$/,''), (err, webhookNotification) ->
         assert.equal(err, null)
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionWentPastDue)
         assert.equal(webhookNotification.subscription.id, "my_id")
@@ -37,89 +38,89 @@ describe "WebhookNotificationGateway", ->
         done()
 
     it "returns an errback with InvalidSignatureError when signature is invalid", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse "bad_signature", payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse "bad_signature", bt_payload, (err, webhookNotification) ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
         done()
 
     it "returns an errback with InvalidSignatureError when the public key does not match", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse "bad#{signature}", payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse "bad#{bt_signature}", bt_payload, (err, webhookNotification) ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
         assert.equal(err.message, "no matching public key")
         done()
 
     it "returns an errback with InvalidSignatureError when the signature is modified", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse "#{signature}bad", payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse "#{bt_signature}bad", bt_payload, (err, webhookNotification) ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
         done()
 
     it "returns an errback with InvalidSignatureError when the payload is modified", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, "bad#{payload}", (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, "bad#{bt_payload}", (err, webhookNotification) ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
         assert.equal(err.message, "signature does not match payload - one has been modified")
         done()
 
     it "returns an errback with InvalidSignatureError when the payload contains invalid characters", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       )
 
-      payload = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+=/\n"
+      bt_payload = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+=/\n"
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
         assert.notEqual(err.message, "payload contains illegal characters")
         done()
 
     it "allows all valid characters", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, "^& bad ,* chars @!", (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, "^& bad ,* chars @!", (err, webhookNotification) ->
         assert.equal(err.type, errorTypes.invalidSignatureError)
         assert.equal(err.message, "payload contains illegal characters")
         done()
     it "returns a parsable signature and payload for merchant account approvals", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubMerchantAccountApproved,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubMerchantAccountApproved)
         assert.equal(webhookNotification.merchantAccount.id, "my_id")
         assert.ok(webhookNotification.timestamp?)
         done()
 
     it "returns a parsable signature and payload for merchant account declines", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubMerchantAccountDeclined,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubMerchantAccountDeclined)
         assert.equal(webhookNotification.merchantAccount.id, "my_id")
         assert.equal(webhookNotification.errors.for("merchantAccount").on("base")[0].code, ValidationErrorCodes.MerchantAccount.ApplicantDetails.DeclinedOFAC)
@@ -128,12 +129,12 @@ describe "WebhookNotificationGateway", ->
         done()
 
     it "returns a parsable signature and payload for disbursed transaction", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.TransactionDisbursed,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionDisbursed)
         assert.equal(webhookNotification.transaction.id, "my_id")
         assert.equal(webhookNotification.transaction.amount, '100')
@@ -141,45 +142,45 @@ describe "WebhookNotificationGateway", ->
         done()
 
     it "returns a parsable signature and payload for dispute opened", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.DisputeOpened,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeOpened)
         assert.equal(Dispute.Status.Open, webhookNotification.dispute.status)
         done()
 
     it "returns a parsable signature and payload for dispute lost", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.DisputeLost,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeLost)
         assert.equal(Dispute.Status.Lost, webhookNotification.dispute.status)
         done()
 
     it "returns a parsable signature and payload for dispute won", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.DisputeWon,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeWon)
         assert.equal(Dispute.Status.Won, webhookNotification.dispute.status)
         done()
 
     it "returns a parsable signature and payload for a disbursed webhook", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.Disbursement,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.Disbursement)
         assert.equal(webhookNotification.disbursement.id, "my_id")
         assert.equal(webhookNotification.disbursement.amount, "100.00")
@@ -196,12 +197,12 @@ describe "WebhookNotificationGateway", ->
         done()
 
     it "returns a parsable signature and payload for disbursement exception webhook", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.DisbursementException,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisbursementException)
         assert.equal(webhookNotification.disbursement.id, "my_id")
         assert.equal(webhookNotification.disbursement.amount, "100.00")
@@ -220,12 +221,12 @@ describe "WebhookNotificationGateway", ->
         done()
 
     it "builds a sample notification for a partner merchant connected webhook", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.PartnerMerchantConnected,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantConnected)
         assert.equal(webhookNotification.partnerMerchant.publicKey, 'public_key')
         assert.equal(webhookNotification.partnerMerchant.privateKey, 'private_key')
@@ -236,24 +237,24 @@ describe "WebhookNotificationGateway", ->
         done()
 
     it "builds a sample notification for a partner merchant disconnected webhook", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.PartnerMerchantDisconnected,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDisconnected)
         assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123')
         assert.ok(webhookNotification.timestamp?)
         done()
 
     it "builds a sample notification for a partner merchant declined webhook", (done) ->
-      {signature, payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.PartnerMerchantDeclined,
         "my_id"
       )
 
-      specHelper.defaultGateway.webhookNotification.parse signature, payload, (err, webhookNotification) ->
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDeclined)
         assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123')
         assert.ok(webhookNotification.timestamp?)
