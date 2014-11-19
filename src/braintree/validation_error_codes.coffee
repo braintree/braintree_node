@@ -414,5 +414,21 @@ class ValidationErrorCodes
     PaymentInstrumentNotSupportedByMerchantAccount : "91577"
     PayPalNotEnabled : "91576"
     ThreeDSecureAuthenticationFailed : "81571"
+    IndustryData:
+      IndustryTypeIsInvalid : "93401"
+      Lodging:
+        EmptyData : "93402"
+        FolioNumberIsInvalid : "93403"
+        CheckInDateIsInvalid : "93404"
+        CheckOutDateIsInvalid : "93405"
+        CheckOutDateMustFollowCheckInDate : "93406"
+        UnknownDataField : "93407"
+      TravelCruise:
+        EmptyData : "93408"
+        UnknownDataField : "93409"
+        TravelPackageIsInvalid : "93410"
+        DepartureDateIsInvalid : "93411"
+        CheckInDateIsInvalid : "93412"
+        CheckOutDateIsInvalid : "93413"
 
 exports.ValidationErrorCodes = ValidationErrorCodes
