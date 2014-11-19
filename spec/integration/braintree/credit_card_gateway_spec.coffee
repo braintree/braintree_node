@@ -51,6 +51,23 @@ describe "CreditCardGateway", ->
 
         done()
 
+    it "includes the verification on the credit card with risk data", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '4111111111111111'
+        expirationDate: '05/2020'
+        options:
+          verifyCard: "true"
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+
+        assert.equal(response.creditCard.verification.riskData.decision, "Not Evaluated")
+        assert.equal(response.creditCard.verification.riskData.id, null)
+
+        done()
+
     it "verifies card with custom verification amount", (done) ->
       creditCardParams =
         customerId: customerId

@@ -460,6 +460,19 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "handles risk data returned by the gateway", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: "4111111111111111"
+          expirationDate: '05/16'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.riskData.decision, "Not Evaluated")
+        assert.equal(response.transaction.riskData.id, null)
+        done()
+
     it "handles fraud rejection", (done) ->
       transactionParams =
         amount: '10.0'
