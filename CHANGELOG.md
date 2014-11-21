@@ -1,3 +1,12 @@
+## 1.21.0
+* Add risk_data to Transaction and Verification with Kount decision and id
+* Add verification_amount an option when creating a credit card
+* Add TravelCruise industry type to Transaction
+* Add room_rate to Lodging industry type
+* Add CreditCard#verification as the latest verification on that credit card
+* Add ApplePay support to all endpoints that may return ApplePayCard objects
+* Add prefix to sample Webhook to simulate webhook query params
+
 ## 1.20.0
 * Allow descriptor to be passed in Funding Details options params for Merchant Account create and update.
 

@@ -31,7 +31,7 @@ describe "PaymentMethodGateway", ->
 
           paymentMethodParams =
             customerId: customerId
-            paymentMethodNonce: Nonces.ApplePayAmex
+            paymentMethodNonce: Nonces.ApplePayAmEx
 
           specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
             assert.isNull(err)
@@ -559,6 +559,31 @@ describe "PaymentMethodGateway", ->
 
               done()
 
+    context 'with a fake apple pay nonce', ->
+      before (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
+          customerId = response.customer.id
+          done()
+
+      it 'creates a payment method', (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          applePayCardParams =
+            paymentMethodNonce: Nonces.ApplePayMasterCard
+            customerId: customerId
+
+          specHelper.defaultGateway.paymentMethod.create applePayCardParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+
+            token = response.paymentMethod.token
+            specHelper.defaultGateway.paymentMethod.find token, (err, applePayCard) ->
+              assert.isNull(err)
+              assert.isTrue(applePayCard != null)
+
+              done()
+
   describe "find", ->
     context 'credit card', ->
       paymentMethodToken = null
@@ -606,6 +631,21 @@ describe "PaymentMethodGateway", ->
             specHelper.defaultGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
               assert.isNull(err)
               assert.isString(paypalAccount.email)
+
+              done()
+
+    context 'unkown payment method', ->
+      it "finds the unknown payment method", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          paymentMethodParams =
+            customerId: response.customer.id
+            paymentMethodNonce: Nonces.AbstractTransactable
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            paymentMethodToken = response.paymentMethod.token
+            specHelper.defaultGateway.paymentMethod.find paymentMethodToken, (err, paymentMethod) ->
+              assert.isNull(err)
+              assert.isString(paymentMethod.token)
 
               done()
 

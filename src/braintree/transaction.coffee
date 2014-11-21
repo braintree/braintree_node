@@ -4,6 +4,7 @@
 {PayPalAccount} = require('./paypal_account')
 {DisbursementDetails} = require('./disbursement_details')
 {Dispute} = require('./dispute')
+{RiskData} = require('./risk_data')
 
 class Transaction extends AttributeSetter
   @CreatedUsing =
@@ -33,6 +34,9 @@ class Transaction extends AttributeSetter
     AvsAndCvv : 'avs_and_cvv'
     Duplicate : 'duplicate'
     Fraud : 'fraud'
+  @IndustryData =
+    Lodging : 'lodging'
+    TravelAndCruise : 'travel_cruise'
   @Status =
     AuthorizationExpired : 'authorization_expired'
     Authorizing : 'authorizing'
@@ -59,6 +63,7 @@ class Transaction extends AttributeSetter
     @applePayCard = new ApplePayCard(attributes.applePay)
     @disbursementDetails = new DisbursementDetails(attributes.disbursementDetails)
     @disputes = (new Dispute(disputeAttributes) for disputeAttributes in attributes.disputes) if attributes.disputes?
+    @riskData = new RiskData(attributes.riskData) if attributes.riskData
 
   isDisbursed: ->
     @disbursementDetails.isValid()

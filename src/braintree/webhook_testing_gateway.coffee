@@ -11,8 +11,8 @@ class WebhookTestingGateway extends Gateway
     payload = new Buffer(@sampleXml(kind, id)).toString("base64") + '\n'
     signature = "#{@gateway.config.publicKey}|#{Digest.Sha1hexdigest(@gateway.config.privateKey, payload)}"
     {
-      signature: signature,
-      payload: payload
+      bt_signature: signature,
+      bt_payload: payload
     }
 
   sampleXml: (kind, id) ->

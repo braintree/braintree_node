@@ -33,6 +33,60 @@ describe "CreditCardGateway", ->
 
         done()
 
+    it "verifies card if verifyCard is set to true", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '4000111111111115'
+        expirationDate: '05/2012'
+        options:
+          verifyCard: "true"
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isFalse(response.success)
+
+        assert.equal(response.verification.status, 'processor_declined')
+        assert.equal(response.verification.processorResponseCode, '2000')
+        assert.equal(response.verification.processorResponseText, 'Do Not Honor')
+
+        done()
+
+    it "includes the verification on the credit card with risk data", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '4111111111111111'
+        expirationDate: '05/2020'
+        options:
+          verifyCard: "true"
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+
+        assert.equal(response.creditCard.verification.riskData.decision, "Not Evaluated")
+        assert.equal(response.creditCard.verification.riskData.id, null)
+
+        done()
+
+    it "verifies card with custom verification amount", (done) ->
+      creditCardParams =
+        customerId: customerId
+        number: '4000111111111115'
+        expirationDate: '05/2012'
+        options:
+          verifyCard: "true"
+          verificationAmount: "1.03"
+
+      specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+        assert.isNull(err)
+        assert.isFalse(response.success)
+
+        assert.equal(response.verification.status, 'processor_declined')
+        assert.equal(response.verification.processorResponseCode, '2000')
+        assert.equal(response.verification.processorResponseText, 'Do Not Honor')
+
+        done()
+
     it "accepts a billing address", (done) ->
       creditCardParams =
         customerId: customerId
@@ -509,41 +563,6 @@ describe "CreditCardGateway", ->
             assert.include(err.message, "not found")
 
             done()
-
-    it "returns an error if the supplied nonce is locked", (done) ->
-      myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
-      specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
-        clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
-        authorizationFingerprint = clientToken.authorizationFingerprint
-
-        params = {
-          authorizationFingerprint: authorizationFingerprint,
-          sharedCustomerIdentifierType: "testing",
-          sharedCustomerIdentifier: "testing-identifier",
-          share: true,
-          credit_card: {
-            number: "4111111111111111",
-            expiration_month: "11",
-            expiration_year: "2099"
-          }
-        }
-
-        myHttp.post "/client_api/v1/payment_methods/credit_cards.json", params, (statusCode, body) ->
-          params = {
-            authorizationFingerprint: authorizationFingerprint,
-            sharedCustomerIdentifierType: "testing",
-            sharedCustomerIdentifier: "testing-identifier"
-          }
-
-          myHttp.get "/client_api/v1/payment_methods.json", params, (statusCode, body) ->
-            nonce = JSON.parse(body).paymentMethods[0].nonce
-
-            specHelper.defaultGateway.creditCard.fromNonce nonce, (err, creditCard) ->
-              assert.isNull(creditCard)
-              assert.equal(err.type, "notFoundError")
-              assert.include(err.message, "locked")
-
-              done()
     
     it "returns an error if the supplied nonce is consumed", (done) ->
       myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
