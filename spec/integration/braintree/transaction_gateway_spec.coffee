@@ -367,6 +367,30 @@ describe "TransactionGateway", ->
 
               done()
 
+        it "successfully creates a transaction with a PayPal custom field", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              paypalAccount: {}
+              options:
+                paypal:
+                  customField: 'custom field junk'
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.type, 'sale')
+              assert.isNull(response.transaction.paypalAccount.token)
+              assert.isString(response.transaction.paypalAccount.payerEmail)
+              assert.isString(response.transaction.paypalAccount.authorizationId)
+              assert.isString(response.transaction.paypalAccount.debugId)
+              assert.equal(response.transaction.paypalAccount.customField, 'custom field junk')
+
+              done()
+
         it "does not vault even when explicitly asked", (done) ->
           nonce = Nonces.PayPalOneTimePayment
 
