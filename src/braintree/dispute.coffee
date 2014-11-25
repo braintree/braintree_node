@@ -16,6 +16,7 @@ class Dispute extends AttributeSetter
     NotRecognized                 : 'not_recognized'
     ProductNotReceived            : 'product_not_received'
     ProductUnsatisfactory         : 'product_unsatisfactory'
+    Retrieval                     : 'retrieval'
     TransactionAmountDiffers      : 'transaction_amount_differs'
 
   constructor: (attributes) ->

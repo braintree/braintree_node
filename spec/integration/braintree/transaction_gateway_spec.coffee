@@ -1149,6 +1149,21 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "exposes retrievals", (done) ->
+      transactionId = "retrievaltransaction"
+
+      specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
+
+        dispute = transaction.disputes[0]
+        assert.equal(dispute.amount, '1000.00')
+        assert.equal(dispute.currencyIsoCode, 'USD')
+        assert.equal(dispute.status, Dispute.Status.Open)
+        assert.equal(dispute.reason, Dispute.Reason.Retrieval)
+        assert.equal(dispute.transactionDetails.id, transactionId)
+        assert.equal(dispute.transactionDetails.amount, '1000.00')
+
+        done()
+
     it "returns a not found error if given a bad id", (done) ->
       specHelper.defaultGateway.transaction.find 'nonexistent_transaction', (err, response) ->
         assert.equal(err.type, braintree.errorTypes.notFoundError)
