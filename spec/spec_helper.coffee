@@ -231,6 +231,14 @@ decodeClientToken = (encodedClientToken) ->
 
   unescapedClientToken
 
+createPlanForTests = (attributes, callback) ->
+  specHelper.defaultGateway.http.post '/plans/create_plan_for_tests', {plan: attributes}, (err, resp) ->
+    callback()
+
+createModificationForTests = (attributes, callback) ->
+  specHelper.defaultGateway.http.post '/modifications/create_modification_for_tests', {modification: attributes}, (err, resp) ->
+    callback()
+
 class ClientApiHttp
   timeout: 60000
 
@@ -319,3 +327,5 @@ GLOBAL.specHelper =
   createPayPalTransactionToRefund: createPayPalTransactionToRefund
   createEscrowedTransaction: createEscrowedTransaction
   generateNonceForNewPaymentMethod: generateNonceForNewPaymentMethod
+  createPlanForTests: createPlanForTests
+  createModificationForTests: createModificationForTests
