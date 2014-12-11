@@ -1,3 +1,7 @@
+## 1.22.0
+* Add error code constants
+* Allow PayPal parameters inside of options.paypal
+
 ## 1.21.0
 * Add risk_data to Transaction and Verification with Kount decision and id
 * Add verification_amount an option when creating a credit card

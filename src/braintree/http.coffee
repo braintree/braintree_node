@@ -46,7 +46,7 @@ class Http
       method: method,
       path: @config.baseMerchantPath + url,
       headers: {
-        'Authorization': (new Buffer(@config.publicKey + ':' + @config.privateKey)).toString('base64'),
+        'Authorization': 'Basic ' + (new Buffer(@config.publicKey + ':' + @config.privateKey)).toString('base64'),
         'X-ApiVersion': @config.apiVersion,
         'Accept': 'application/xml',
         'Content-Type': 'application/json',

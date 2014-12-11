@@ -343,6 +343,54 @@ describe "TransactionGateway", ->
 
               done()
 
+        it "successfully creates a transaction with a payee email in transaction.options.paypal", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              paypalAccount: {}
+              options:
+                paypal:
+                  payeeEmail: 'payee@example.com'
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.type, 'sale')
+              assert.isNull(response.transaction.paypalAccount.token)
+              assert.isString(response.transaction.paypalAccount.payerEmail)
+              assert.isString(response.transaction.paypalAccount.authorizationId)
+              assert.isString(response.transaction.paypalAccount.debugId)
+              assert.equal(response.transaction.paypalAccount.payeeEmail, 'payee@example.com')
+
+              done()
+
+        it "successfully creates a transaction with a PayPal custom field", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              paypalAccount: {}
+              options:
+                paypal:
+                  customField: 'custom field junk'
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.type, 'sale')
+              assert.isNull(response.transaction.paypalAccount.token)
+              assert.isString(response.transaction.paypalAccount.payerEmail)
+              assert.isString(response.transaction.paypalAccount.authorizationId)
+              assert.isString(response.transaction.paypalAccount.debugId)
+              assert.equal(response.transaction.paypalAccount.customField, 'custom field junk')
+
+              done()
+
         it "does not vault even when explicitly asked", (done) ->
           nonce = Nonces.PayPalOneTimePayment
 
@@ -1096,6 +1144,21 @@ describe "TransactionGateway", ->
         assert.equal(dispute.receivedDate, '2014-03-01')
         assert.equal(dispute.replyByDate, '2014-03-21')
         assert.equal(dispute.reason, Dispute.Reason.Fraud)
+        assert.equal(dispute.transactionDetails.id, transactionId)
+        assert.equal(dispute.transactionDetails.amount, '1000.00')
+
+        done()
+
+    it "exposes retrievals", (done) ->
+      transactionId = "retrievaltransaction"
+
+      specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
+
+        dispute = transaction.disputes[0]
+        assert.equal(dispute.amount, '1000.00')
+        assert.equal(dispute.currencyIsoCode, 'USD')
+        assert.equal(dispute.status, Dispute.Status.Open)
+        assert.equal(dispute.reason, Dispute.Reason.Retrieval)
         assert.equal(dispute.transactionDetails.id, transactionId)
         assert.equal(dispute.transactionDetails.amount, '1000.00')
 

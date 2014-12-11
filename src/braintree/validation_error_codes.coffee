@@ -46,6 +46,10 @@ class ValidationErrorCodes
     MerchantKeysAlreadyConfigured : "93515"
     MerchantKeysNotConfigured : "93516"
     CertificateInvalid : "93517"
+    CertificateMismatch : "93519"
+    InvalidToken : "83520"
+    PrivateKeyMismatch : "93521"
+    KeyMismatchStoringCertificate : "93522"
 
   @AuthorizationFingerprint =
     InvalidCreatedAt : "93204"
@@ -62,6 +66,7 @@ class ValidationErrorCodes
     MakeDefaultRequiresCustomerId : "92801"
     ProxyMerchantDoesNotExist : "92805"
     VerifyCardRequiresCustomerId : "92802"
+    MerchantAccountDoesNotExist : "92807"
     UnsupportedVersion : "92806"
 
   @CreditCard =
@@ -95,6 +100,7 @@ class ValidationErrorCodes
     NumberLengthIsInvalid : "81716"
     NumberMustBeTestNumber : "81717"
     PaymentMethodConflict : "81725"
+    PaymentMethodIsNotACreditCard : "91738"
     PaymentMethodNonceCardTypeIsNotAccepted : "91734"
     PaymentMethodNonceConsumed : "91731"
     PaymentMethodNonceLocked : "91733"
@@ -110,8 +116,11 @@ class ValidationErrorCodes
     VerificationNotSupportedOnThisMerchantAccount : "91730"
     Options:
       UpdateExistingTokenIsInvalid : "91723"
-      VerificationMerchantAccountIdIsInvalid : "91728"
       UpdateExistingTokenNotAllowed : "91729"
+      VerificationMerchantAccountIdIsInvalid : "91728"
+      VerificationAmountCannotBeNegative : "91739"
+      VerificationAmountFormatIsInvalid : "91740"
+      VerificationAmountNotSupportedByProcessor : "91741"
 
   @Customer =
     CompanyIsTooLong : "81601"
@@ -235,6 +244,9 @@ class ValidationErrorCodes
     NonceIsInvalid : "93102"
     NonceIsRequired : "93103"
     PaymentMethodParamsAreRequired : "93101"
+    PaymentMethodNonceConsumed : "93107"
+    PaymentMethodNonceUnknown : "93108"
+    PaymentMethodNonceLocked : "93109"
 
   @PayPalAccount =
     ConsentCodeOrAccessTokenIsRequired : "82901"
@@ -247,6 +259,10 @@ class ValidationErrorCodes
     PaymentMethodNonceUnknown : "92908"
     PaymentMethodNonceLocked : "92909"
     PayPalCommunicationError : "92910"
+    AuthExpired : "92911"
+    CannotHaveFundingSourceWithoutAccessToken : "92912"
+    InvalidFundingSourceSelection : "92913"
+    CannotUpdatePayPalAccountUsingPaymentMethodNonce : "92914"
 
   @SEPABankAccount =
     IBANIsRequired : "93001"
@@ -266,6 +282,7 @@ class ValidationErrorCodes
     IBANInvalidFormat : "83310"
     BillingAddressConflict : "93311"
     BillingAddressIdIsInvalid : "93312"
+    TypeIsInvalid : "93313"
 
   @SettlementBatchSummary =
     SettlementDateIsInvalid : "82302"
@@ -371,6 +388,8 @@ class ValidationErrorCodes
       SubmitForSettlementIsRequiredForCloning : "91544"
       UseBillingForShippingDisabled : "91572"
       VaultIsDisabled : "91525"
+      PayPal:
+        CustomFieldTooLong : "91580"
     OrderIdIsTooLong : "91501"
     PaymentMethodConflict : "91515"
     PaymentMethodConflictWithVenmoSDK : "91549"
@@ -394,8 +413,10 @@ class ValidationErrorCodes
     ServiceFeeAmountIsTooLarge : "91556"
     ServiceFeeAmountNotAllowedOnMasterMerchantAccount : "91557"
     ServiceFeeIsNotAllowedOnCredits : "91552"
+    ServiceFeeNotAcceptedForPayPal : "91578"
     SettlementAmountIsLessThanServiceFeeAmount : "91551"
     SettlementAmountIsTooLarge : "91522"
+    ShippingAddressDoesntMatchCustomer : "91581"
     SubMerchantAccountRequiresServiceFeeAmount : "91553"
     SubscriptionDoesNotBelongToCustomer : "91529"
     SubscriptionIdIsInvalid : "91528"
@@ -413,6 +434,7 @@ class ValidationErrorCodes
     CannotSimulateSettlement : "91575"
     PaymentInstrumentNotSupportedByMerchantAccount : "91577"
     PayPalNotEnabled : "91576"
+    PayPalAuthExpired : "91579"
     ThreeDSecureAuthenticationFailed : "81571"
     IndustryData:
       IndustryTypeIsInvalid : "93401"
