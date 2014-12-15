@@ -3,8 +3,11 @@
 
 class CreditCardVerificationSearch extends AdvancedSearch
     @textFields(
+      "customerId"
+      "customerEmail"
       "creditCardCardholderName"
       "id"
+      "billingAddressDetailsPostalCode"
     )
 
     @equalityFields "creditCardExpirationDate"

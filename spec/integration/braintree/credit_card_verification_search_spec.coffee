@@ -61,26 +61,43 @@ describe "CreditCardVerification", ->
 
         search.resume()
 
-    it "can return multiple results", (done) ->
+    it.only "can return multiple results", (done) ->
       name = specHelper.randomId() + ' Smith'
+      creditCardNumber = CreditCardNumbers.CardTypeIndicators.Debit
+      expirationDate = '12/2016'
+      email = "mike.a@example.com"
+      firstCustomerId = "10"
+      secondCustomerId = "11"
+
       specHelper.defaultGateway.customer.create
+        customerId: firstCustomerId
+        customerEmail: email
         creditCard:
-          cardholderName: name,
-          number: '4000111111111115',
-          expirationDate: '12/2016',
+          cardholderName: name
+          number: creditCardNumber
+          expirationDate: expirationDate
           options:
             verifyCard: true
+
       , (err, response) ->
         specHelper.defaultGateway.customer.create
+        customerId: secondCustomerId 
+        customerEmail: email
           creditCard:
-            cardholderName: name,
-            number: '4000111111111115',
-            expirationDate: '12/2016',
+            cardholderName: name
+            number: creditCardNumber
+            expirationDate: expirationDate
             options:
               verifyCard: true
+
         , (err, response) ->
           specHelper.defaultGateway.creditCardVerification.search (search) ->
             search.creditCardCardholderName().is(name)
+            search.creditCardNumber().is(creditCardNumber)
+            search.creditCardExpirationDate().is(expirationDate)
+            search.creditCardCardType().in(CreditCard.CardType.Visa)
+            search.customerEmail().is(email)
+
           , (err, response) ->
             verifications = []
 
