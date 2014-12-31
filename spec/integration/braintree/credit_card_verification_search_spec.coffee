@@ -66,12 +66,12 @@ describe "CreditCardVerification", ->
       creditCardNumber = CreditCardNumbers.CardTypeIndicators.Debit
       expirationDate = '12/2016'
       email = "mike.a@example.com"
-      firstCustomerId = "10"
-      secondCustomerId = "11"
+      firstCustomerId = specHelper.randomId()
+      secondCustomerId = specHelper.randomId()
 
-      specHelper.defaultGateway.customer.create
-        customerId: firstCustomerId
-        customerEmail: email
+      customerParams = 
+        id: firstCustomerId
+        email: email
         creditCard:
           cardholderName: name
           number: creditCardNumber
@@ -79,25 +79,24 @@ describe "CreditCardVerification", ->
           options:
             verifyCard: true
 
-      , (err, response) ->
-        specHelper.defaultGateway.customer.create
-        customerId: secondCustomerId 
-        customerEmail: email
-          creditCard:
-            cardholderName: name
-            number: creditCardNumber
-            expirationDate: expirationDate
-            options:
-              verifyCard: true
+      customerParams2 = 
+        id: secondCustomerId
+        email: email
+        creditCard:
+          cardholderName: name
+          number: creditCardNumber
+          expirationDate: expirationDate
+          options:
+            verifyCard: true
 
-        , (err, response) ->
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        specHelper.defaultGateway.customer.create customerParams2, (err, response) ->
           specHelper.defaultGateway.creditCardVerification.search (search) ->
             search.creditCardCardholderName().is(name)
             search.creditCardNumber().is(creditCardNumber)
             search.creditCardExpirationDate().is(expirationDate)
             search.creditCardCardType().in(CreditCard.CardType.Visa)
             search.customerEmail().is(email)
-
           , (err, response) ->
             verifications = []
 
