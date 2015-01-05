@@ -8,6 +8,7 @@ class CreditCardVerificationSearch extends AdvancedSearch
       "creditCardCardholderName"
       "id"
       "billingAddressDetailsPostalCode"
+      "paymentMethodToken"
     )
 
     @equalityFields "creditCardExpirationDate"

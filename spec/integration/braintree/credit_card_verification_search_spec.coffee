@@ -15,21 +15,28 @@ describe "CreditCardVerification", ->
         done()
 
     it "handles responses with a single result", (done) ->
+      customerId = specHelper.randomId()
+      paymentMethodToken = specHelper.randomId()
       name = specHelper.randomId() + ' Smith'
+
       customerParams =
+        id: customerId
         creditCard:
-          cardholderName: name,
-          number: '4000111111111115',
-          expirationDate: '12/2016',
+          token: paymentMethodToken
+          cardholderName: name
+          number: '4111111111111111'
+          expirationDate: '12/2016'
           options:
             verifyCard: true
 
       specHelper.defaultGateway.customer.create customerParams, (err, response) ->
         specHelper.defaultGateway.creditCardVerification.search (search) ->
+          search.customerId().is(customerId)
           search.creditCardCardholderName().is(name)
+          search.paymentMethodToken().is(paymentMethodToken)
         , (err, response) ->
           response.first (err, verification) ->
-            assert.equal(verification.creditCard.bin, '400011')
+            assert.equal(verification.creditCard.bin, '411111')
             assert.equal(verification.creditCard.cardholderName, name)
 
             done()
@@ -61,7 +68,7 @@ describe "CreditCardVerification", ->
 
         search.resume()
 
-    it.only "can return multiple results", (done) ->
+    it "can return multiple results", (done) ->
       name = specHelper.randomId() + ' Smith'
       creditCardNumber = CreditCardNumbers.CardTypeIndicators.Debit
       expirationDate = '12/2016'
@@ -69,7 +76,7 @@ describe "CreditCardVerification", ->
       firstCustomerId = specHelper.randomId()
       secondCustomerId = specHelper.randomId()
 
-      customerParams = 
+      customerParams =
         id: firstCustomerId
         email: email
         creditCard:
@@ -79,7 +86,7 @@ describe "CreditCardVerification", ->
           options:
             verifyCard: true
 
-      customerParams2 = 
+      customerParams2 =
         id: secondCustomerId
         email: email
         creditCard:
