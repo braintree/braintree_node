@@ -113,6 +113,23 @@ describe "TransactionGateway", ->
 
             done()
 
+    context "Coinbase", ->
+      it "returns CoinbaseAccount for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.Coinbase
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CoinbaseAccount)
+            assert.isNotNull(response.transaction.coinbaseAccount.user_email)
+
+            done()
+
+
+
 
 
 

@@ -110,6 +110,18 @@ describe "CustomerGateway", ->
 
           done()
 
+      it "creates a customer with a Coinbase account payment method nonce", (done) ->
+        customerParams =
+          paymentMethodNonce: Nonces.Coinbase
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.isNotNull(response.customer.coinbaseAccounts[0])
+
+          done()
+
+
 
       it "creates a customer with a paypal account payment method nonce", (done) ->
         customerParams =

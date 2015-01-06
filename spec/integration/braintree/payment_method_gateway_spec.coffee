@@ -41,6 +41,22 @@ describe "PaymentMethodGateway", ->
 
             done()
 
+    context 'Coinbase', ->
+      it "vaults a Coinbase account from the nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'Paul', lastName: 'Gross'}, (err, response) ->
+          customerId = response.customer.id
+
+          paymentMethodParams =
+            customerId: customerId
+            paymentMethodNonce: Nonces.Coinbase
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isNotNull(response.paymentMethod.token)
+
+            done()
+
 
 
     context 'with a credit card payment method nonce', ->
