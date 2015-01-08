@@ -1,5 +1,6 @@
 try
-  require('source-map-support').install()
+  require('source-map-support').install
+    handleUncaughtExceptions: false
 catch err
 
 http = require('http')
