@@ -38,6 +38,7 @@ describe "PaymentMethodGateway", ->
             assert.isTrue(response.success)
             assert.isNotNull(response.paymentMethod.token)
             assert.isNotNull(response.paymentMethod.card_type)
+            assert.isNotNull(response.paymentMethod.payment_instrument_name)
 
             done()
 

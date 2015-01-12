@@ -110,6 +110,7 @@ describe "TransactionGateway", ->
             assert.isTrue(response.success)
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard)
             assert.isNotNull(response.transaction.applePayCard.card_type)
+            assert.isNotNull(response.transaction.applePayCard.payment_instrument_name)
 
             done()
 

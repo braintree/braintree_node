@@ -107,6 +107,9 @@ describe "CustomerGateway", ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.isNotNull(response.customer.applePayCards[0])
+          applePayCard = response.customer.applePayCards[0]
+          assert.isNotNull(applePayCard.token)
+          assert.isNotNull(applePayCard.payment_instrument_name)
 
           done()
 
