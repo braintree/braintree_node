@@ -94,6 +94,7 @@ describe "CustomerGateway", ->
               assert.isNull(err)
               assert.isTrue(response.success)
               assert.equal(response.customer.creditCards[0].bin, "411111")
+              assert.equal(response.customer.paymentMethods[0].bin, "411111")
 
               done()
           )
