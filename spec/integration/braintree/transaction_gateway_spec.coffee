@@ -1102,6 +1102,29 @@ describe "TransactionGateway", ->
 
             done()
 
+      it "gateway rejects if 3ds is specified as required but not supplied", (done) ->
+        nonceParams =
+          creditCard:
+            number: '4111111111111111'
+            expirationMonth: '05'
+            expirationYear: '2009'
+
+        specHelper.generateNonceForNewPaymentMethod nonceParams, null, (nonce) ->
+          transactionParams =
+            merchantAccountId: specHelper.threeDSecureMerchantAccountId
+            amount: '5.00'
+            paymentMethodNonce: nonce
+            options:
+              threeDSecure:
+                required: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isFalse(response.success)
+            assert.equal(response.transaction.status, Transaction.Status.GatewayRejected)
+            assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.ThreeDSecure)
+
+            done()
+
   describe "find", ->
     it "finds a transaction", (done) ->
       transactionParams =
