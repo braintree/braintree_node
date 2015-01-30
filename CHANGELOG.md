@@ -1,3 +1,8 @@
+## 1.23.0
+* Add Coinbase support
+* Add support for 3DSecure
+* Surface Apple Pay payment instrument name in responses
+
 ## 1.22.0
 * Add error code constants
 * Allow PayPal parameters inside of options.paypal
