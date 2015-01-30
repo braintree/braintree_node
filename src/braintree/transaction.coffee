@@ -35,6 +35,7 @@ class Transaction extends AttributeSetter
     AvsAndCvv : 'avs_and_cvv'
     Duplicate : 'duplicate'
     Fraud : 'fraud'
+    ThreeDSecure : 'three_d_secure'
   @IndustryData =
     Lodging : 'lodging'
     TravelAndCruise : 'travel_cruise'
