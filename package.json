@@ -22,7 +22,7 @@
     "mocha"             : "=1.6.0"
   },
   "optionalDependencies" : {
-    "source-map-support": "=0.1.2"
+    "source-map-support": "=0.2.9"
   },
   "scripts" : {
     "prepublish" : "rake compile_coffee",
