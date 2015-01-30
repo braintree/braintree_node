@@ -110,8 +110,26 @@ describe "TransactionGateway", ->
             assert.isTrue(response.success)
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard)
             assert.isNotNull(response.transaction.applePayCard.card_type)
+            assert.isNotNull(response.transaction.applePayCard.payment_instrument_name)
 
             done()
+
+    context "Coinbase", ->
+      it "returns CoinbaseAccount for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.Coinbase
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CoinbaseAccount)
+            assert.isNotNull(response.transaction.coinbaseAccount.user_email)
+
+            done()
+
+
 
 
 
@@ -1099,6 +1117,29 @@ describe "TransactionGateway", ->
               response.errors.for('transaction').on('threeDSecureToken')[0].code,
               ValidationErrorCodes.Transaction.ThreeDSecureTransactionDataDoesntMatchVerify
             )
+
+            done()
+
+      it "gateway rejects if 3ds is specified as required but not supplied", (done) ->
+        nonceParams =
+          creditCard:
+            number: '4111111111111111'
+            expirationMonth: '05'
+            expirationYear: '2009'
+
+        specHelper.generateNonceForNewPaymentMethod nonceParams, null, (nonce) ->
+          transactionParams =
+            merchantAccountId: specHelper.threeDSecureMerchantAccountId
+            amount: '5.00'
+            paymentMethodNonce: nonce
+            options:
+              threeDSecure:
+                required: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isFalse(response.success)
+            assert.equal(response.transaction.status, Transaction.Status.GatewayRejected)
+            assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.ThreeDSecure)
 
             done()
 

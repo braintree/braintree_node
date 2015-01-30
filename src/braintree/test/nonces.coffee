@@ -6,7 +6,8 @@ Nonces = {
   ApplePayVisa: "fake-apple-pay-visa-nonce",
   ApplePayMasterCard: "fake-apple-pay-mastercard-nonce",
   ApplePayAmEx: "fake-apple-pay-amex-nonce",
-  AbstractTransactable: "fake-abstract-transactable-nonce"
+  AbstractTransactable: "fake-abstract-transactable-nonce",
+  Coinbase: "fake-coinbase-nonce"
 }
 
 exports.Nonces = Nonces

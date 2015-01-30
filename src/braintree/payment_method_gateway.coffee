@@ -2,6 +2,7 @@
 {ApplePayCard} = require('./apple_pay_card')
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
+{CoinbaseAccount} = require('./coinbase_account')
 {UnknownPaymentMethod} = require('./unknown_payment_method')
 exceptions = require('./exceptions')
 
@@ -11,6 +12,7 @@ class PaymentMethodGateway extends Gateway
   responseHandler: (callback) ->
     responseMapping =
       paypalAccount: PayPalAccount
+      coinbaseAccount: CoinbaseAccount
       creditCard: CreditCard
       applePayCard: ApplePayCard
     @createResponseHandler(responseMapping, null, (err, response) ->
@@ -45,6 +47,8 @@ class PaymentMethodGateway extends Gateway
       new PayPalAccount(response.paypalAccount)
     else if response.applePayCard
       new ApplePayCard(response.applePayCard)
+    else if response.coinbaseAccount
+      new CoinbaseAccount(response.coinbaseAccount)
     else
       new UnknownPaymentMethod(response)
 

@@ -2,6 +2,10 @@
 {Transaction} = require('./transaction')
 
 class Subscription extends AttributeSetter
+  @Source =
+    Api : 'api'
+    ControlPanel : 'control_panel'
+    Recurring : 'recurring'
   @Status =
     Active : 'Active'
     Canceled : 'Canceled'

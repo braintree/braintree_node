@@ -2,6 +2,7 @@
 {ApplePayCard} = require('./apple_pay_card')
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
+{CoinbaseAccount} = require('./coinbase_account')
 {DisbursementDetails} = require('./disbursement_details')
 {Dispute} = require('./dispute')
 {RiskData} = require('./risk_data')
@@ -34,6 +35,7 @@ class Transaction extends AttributeSetter
     AvsAndCvv : 'avs_and_cvv'
     Duplicate : 'duplicate'
     Fraud : 'fraud'
+    ThreeDSecure : 'three_d_secure'
   @IndustryData =
     Lodging : 'lodging'
     TravelAndCruise : 'travel_cruise'
@@ -60,6 +62,7 @@ class Transaction extends AttributeSetter
     super attributes
     @creditCard = new CreditCard(attributes.creditCard)
     @paypalAccount = new PayPalAccount(attributes.paypal)
+    @coinbaseAccount = new CoinbaseAccount(attributes.coinbaseAccount)
     @applePayCard = new ApplePayCard(attributes.applePay)
     @disbursementDetails = new DisbursementDetails(attributes.disbursementDetails)
     @disputes = (new Dispute(disputeAttributes) for disputeAttributes in attributes.disputes) if attributes.disputes?

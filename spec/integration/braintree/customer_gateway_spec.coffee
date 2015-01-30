@@ -94,6 +94,7 @@ describe "CustomerGateway", ->
               assert.isNull(err)
               assert.isTrue(response.success)
               assert.equal(response.customer.creditCards[0].bin, "411111")
+              assert.equal(response.customer.paymentMethods[0].bin, "411111")
 
               done()
           )
@@ -107,8 +108,23 @@ describe "CustomerGateway", ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.isNotNull(response.customer.applePayCards[0])
+          applePayCard = response.customer.applePayCards[0]
+          assert.isNotNull(applePayCard.token)
+          assert.isNotNull(applePayCard.payment_instrument_name)
 
           done()
+
+      it "creates a customer with a Coinbase account payment method nonce", (done) ->
+        customerParams =
+          paymentMethodNonce: Nonces.Coinbase
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.isNotNull(response.customer.coinbaseAccounts[0])
+
+          done()
+
 
 
       it "creates a customer with a paypal account payment method nonce", (done) ->

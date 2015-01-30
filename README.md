@@ -13,7 +13,7 @@ This is a Node.js library for integrating with the [Braintree](http://www.braint
 
 ## Links
 
-* [Documentation](http://www.braintreepayments.com/docs/node)
+* [Documentation](https://developers.braintreepayments.com/node/sdk/server/overview)
 * [Bug Tracker](http://github.com/braintree/braintree_node/issues)
 
 ## Quick Start
