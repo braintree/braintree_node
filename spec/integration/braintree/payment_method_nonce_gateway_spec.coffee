@@ -48,3 +48,40 @@ describe "PaymentMethodNonceGateway", ->
         assert.equal(err.type, braintree.errorTypes.notFoundError)
 
         done()
+
+  describe "find", ->
+    it 'find the nonce', (done) ->
+      specHelper.defaultGateway.paymentMethodNonce.find "three-d-secured-nonce", (err, paymentMethodNonce) ->
+        assert.isNull(err)
+        info = paymentMethodNonce.threeDSecureInfo
+        assert.equal(paymentMethodNonce.nonce, "three-d-secured-nonce")
+        assert.isTrue(info.liabilityShifted)
+        assert.isTrue(info.liabilityShiftPossible)
+        assert.equal(info.enrolled, "Y")
+        assert.equal(info.cavv, "somebase64value")
+        assert.equal(info.xid, "xidvalue")
+        assert.equal(info.status, "authenticate_successful")
+
+        done()
+
+    it "returns undefined threeDSecureInfo if there's none present", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        customerId = response.customer.id
+        nonceParams =
+          creditCard:
+            number: '4111111111111111'
+            expirationMonth: '05'
+            expirationYear: '2009'
+
+        specHelper.generateNonceForNewPaymentMethod nonceParams, customerId, (nonce) ->
+          specHelper.defaultGateway.paymentMethodNonce.find nonce, (err, paymentMethodNonce) ->
+            assert.isNull(err)
+            assert.isNull(paymentMethodNonce.threeDSecureInfo)
+            done()
+
+
+    it "returns an error if unable to find the payment_method", (done) ->
+      specHelper.defaultGateway.paymentMethodNonce.find 'not-a-nonce-at-all', (err, nonce) ->
+        assert.equal(err.type, braintree.errorTypes.notFoundError)
+
+        done()
