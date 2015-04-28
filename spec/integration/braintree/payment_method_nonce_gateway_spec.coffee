@@ -34,14 +34,17 @@ describe "PaymentMethodNonceGateway", ->
 
   describe "create", ->
     it 'creates the nonce', (done) ->
-      specHelper.defaultGateway.paymentMethodNonce.create paymentMethodToken, (err, paymentMethodNonce) ->
+      specHelper.defaultGateway.paymentMethodNonce.create paymentMethodToken, (err, response) ->
+        paymentMethodNonce = response.paymentMethodNonce
         assert.isNull(err)
-        assert.isNotNull(paymentMethodNonce.nonce);
+        assert.isTrue(response.success)
+        assert.isNotNull(paymentMethodNonce.nonce)
+        assert.isString(paymentMethodNonce.type)
 
         done()
 
     it "returns an error if unable to find the payment_method", (done) ->
-      specHelper.defaultGateway.paymentMethodNonce.create 'not-a-token-at-all', (err, nonce) ->
+      specHelper.defaultGateway.paymentMethodNonce.create 'not-a-token-at-all', (err, response) ->
         assert.equal(err.type, braintree.errorTypes.notFoundError)
 
         done()
