@@ -44,10 +44,10 @@ describe "PaymentMethodNonceGateway", ->
 
   describe "find", ->
     it 'find the nonce', (done) ->
-      specHelper.defaultGateway.paymentMethodNonce.find "three-d-secured-nonce", (err, paymentMethodNonce) ->
+      specHelper.defaultGateway.paymentMethodNonce.find "threedsecurednonce", (err, paymentMethodNonce) ->
         assert.isNull(err)
         info = paymentMethodNonce.threeDSecureInfo
-        assert.equal(paymentMethodNonce.nonce, "three-d-secured-nonce")
+        assert.equal(paymentMethodNonce.nonce, "threedsecurednonce")
         assert.isTrue(info.liabilityShifted)
         assert.isTrue(info.liabilityShiftPossible)
         assert.equal(info.enrolled, "Y")

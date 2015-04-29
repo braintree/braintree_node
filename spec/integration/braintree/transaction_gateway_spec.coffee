@@ -1232,7 +1232,7 @@ describe "TransactionGateway", ->
 
     context "threeDSecureInfo", ->
       it "returns three_d_secure_info if it's present", (done) ->
-        specHelper.defaultGateway.transaction.find "three-d-secured-transaction", (err, transaction) ->
+        specHelper.defaultGateway.transaction.find "threedsecuredtransaction", (err, transaction) ->
           info = transaction.threeDSecureInfo
           assert.isTrue(info.liabilityShifted)
           assert.isTrue(info.liabilityShiftPossible)
