@@ -51,8 +51,6 @@ describe "PaymentMethodNonceGateway", ->
         assert.isTrue(info.liabilityShifted)
         assert.isTrue(info.liabilityShiftPossible)
         assert.equal(info.enrolled, "Y")
-        assert.equal(info.cavv, "somebase64value")
-        assert.equal(info.xid, "xidvalue")
         assert.equal(info.status, "authenticate_successful")
 
         done()
