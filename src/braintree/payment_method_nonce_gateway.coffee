@@ -15,4 +15,11 @@ class PaymentMethodNonceGateway extends Gateway
   create: (payment_method_token, callback) ->
     @gateway.http.post("/payment_methods/#{payment_method_token}/nonces", {}, @responseHandler(callback))
 
+  find: (payment_method_nonce, callback) ->
+    @gateway.http.get("/payment_method_nonces/#{payment_method_nonce}", (err, response) ->
+      if err
+        callback(err, null)
+      else
+        callback(null, new PaymentMethodNonce(response.paymentMethodNonce)))
+
 exports.PaymentMethodNonceGateway = PaymentMethodNonceGateway

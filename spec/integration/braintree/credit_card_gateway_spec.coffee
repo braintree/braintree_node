@@ -439,7 +439,7 @@ describe "CreditCardGateway", ->
       customerParams =
         creditCard:
           number: '5105105105105100',
-          expirationDate: '01/2010'
+          expirationDate: '01/2015'
 
       specHelper.defaultGateway.customer.create customerParams, (err, response) ->
         testCard = response.customer.creditCards[0]

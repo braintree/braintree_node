@@ -6,6 +6,7 @@
 {DisbursementDetails} = require('./disbursement_details')
 {Dispute} = require('./dispute')
 {RiskData} = require('./risk_data')
+{ThreeDSecureInfo} = require('./three_d_secure_info')
 
 class Transaction extends AttributeSetter
   @CreatedUsing =
@@ -67,6 +68,7 @@ class Transaction extends AttributeSetter
     @disbursementDetails = new DisbursementDetails(attributes.disbursementDetails)
     @disputes = (new Dispute(disputeAttributes) for disputeAttributes in attributes.disputes) if attributes.disputes?
     @riskData = new RiskData(attributes.riskData) if attributes.riskData
+    @threeDSecureInfo = new ThreeDSecureInfo(attributes.threeDSecureInfo) if attributes.threeDSecureInfo
 
   isDisbursed: ->
     @disbursementDetails.isValid()

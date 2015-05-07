@@ -1217,6 +1217,34 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "returns all the required paypal fields", (done) ->
+      specHelper.defaultGateway.transaction.find "settledtransaction", (err, transaction) ->
+        assert.isString(transaction.paypalAccount.debugId)
+        assert.isString(transaction.paypalAccount.payerEmail)
+        assert.isString(transaction.paypalAccount.authorizationId)
+        assert.isString(transaction.paypalAccount.payerId)
+        assert.isString(transaction.paypalAccount.payerFirstName)
+        assert.isString(transaction.paypalAccount.payerLastName)
+        assert.isString(transaction.paypalAccount.sellerProtectionStatus)
+        assert.isString(transaction.paypalAccount.captureId)
+        assert.isString(transaction.paypalAccount.refundId)
+        done()
+
+    context "threeDSecureInfo", ->
+      it "returns three_d_secure_info if it's present", (done) ->
+        specHelper.defaultGateway.transaction.find "threedsecuredtransaction", (err, transaction) ->
+          info = transaction.threeDSecureInfo
+          assert.isTrue(info.liabilityShifted)
+          assert.isTrue(info.liabilityShiftPossible)
+          assert.equal(info.enrolled, "Y")
+          assert.equal(info.status, "authenticate_successful")
+          done()
+
+      it "returns null if it's empty", (done) ->
+        specHelper.defaultGateway.transaction.find "settledtransaction", (err, transaction) ->
+          assert.isNull(transaction.threeDSecureInfo)
+          done()
+
   describe "refund", ->
     it "refunds a transaction", (done) ->
       specHelper.createTransactionToRefund (transaction) ->
