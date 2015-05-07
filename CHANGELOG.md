@@ -1,3 +1,6 @@
+## 1.24.0
+* Add 3DS info to server side
+
 ## 1.23.0
 * Add Coinbase support
 * Add support for 3DSecure
