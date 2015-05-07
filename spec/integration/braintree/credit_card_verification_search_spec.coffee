@@ -1,7 +1,8 @@
 Braintree = require("../../../lib/braintree")
 require("../../spec_helper")
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
-CreditCard = Braintree.CreditCard 
+CreditCard = Braintree.CreditCard
+CreditCardVerification = Braintree.CreditCardVerification
 
 describe "CreditCardVerification", ->
   describe "search", ->
@@ -15,31 +16,72 @@ describe "CreditCardVerification", ->
         done()
 
     it "handles responses with a single result", (done) ->
+      customerEmail = "sandworm" + customerId + "@example.com" 
       customerId = specHelper.randomId()
-      paymentMethodToken = specHelper.randomId()
+      expirationMonth = '12'
+      expirationYear = '2016'
+      expirationDate = expirationMonth + '/' + expirationYear
       name = specHelper.randomId() + ' Smith'
+      number = '4111111111111111'
+      paymentMethodToken = specHelper.randomId()
+      postalCode = '60647'
 
       customerParams =
         id: customerId
+        email: customerEmail
         creditCard:
           token: paymentMethodToken
           cardholderName: name
-          number: '4111111111111111'
-          expirationDate: '12/2016'
+          number: number
+          expirationDate: expirationDate
+          billingAddress:
+            streetAddress: '123 Fake St'
+            extendedAddress: 'Suite 403'
+            locality: 'Chicago'
+            region: 'IL'
+            postalCode: postalCode
+            countryName: 'United States of America'
           options:
             verifyCard: true
 
       specHelper.defaultGateway.customer.create customerParams, (err, response) ->
         specHelper.defaultGateway.creditCardVerification.search (search) ->
-          search.customerId().is(customerId)
+          search.billingAddressDetailsPostalCode().is(postalCode)
+          search.creditCardCardType().is(CreditCard.CardType.Visa)
           search.creditCardCardholderName().is(name)
+          search.creditCardExpirationDate().is(expirationDate)
+          search.creditCardNumber().is(number)
+          search.customerEmail().is(customerEmail)
+          search.customerId().is(customerId)
           search.paymentMethodToken().is(paymentMethodToken)
+          search.status().is(CreditCardVerification.StatusType.Verified)
+
         , (err, response) ->
+          assert.equal(response.length(), 1)
           response.first (err, verification) ->
+            createdAt = verification.createdAt
+            verificationId = verification.id
+
+            assert.equal(verification.billing.postalCode, postalCode) 
             assert.equal(verification.creditCard.bin, '411111')
             assert.equal(verification.creditCard.cardholderName, name)
+            assert.equal(verification.creditCard.expirationMonth, expirationMonth)
+            assert.equal(verification.creditCard.expirationYear, expirationYear)
+            assert.equal(verification.creditCard.cardType, CreditCard.CardType.Visa)
+            assert.equal(verification.status, CreditCardVerification.StatusType.Verified)
 
-            done()
+            specHelper.defaultGateway.creditCardVerification.search (search) ->
+              search.createdAt().is(createdAt)
+              search.id().is(verificationId)
+              search.ids().in(verificationId)
+
+            , (err, response) ->
+              assert.equal(response.length(), 1)
+              response.first (err, verification) ->
+                assert.equal(verification.createdAt, createdAt)
+                assert.equal(verification.id, verificationId)
+
+                done()
 
     it "allows stream style interation of results", (done) ->
       name = specHelper.randomId() + ' Smith'

@@ -5,6 +5,7 @@ errorTypes = require("./braintree/error_types")
 
 {Transaction} = require("./braintree/transaction")
 {CreditCard} = require("./braintree/credit_card")
+{CreditCardVerification} = require("./braintree/credit_card_verification")
 {Subscription} = require("./braintree/subscription")
 {MerchantAccount} = require("./braintree/merchant_account")
 {PaymentInstrumentTypes} = require("./braintree/payment_instrument_types")
@@ -27,6 +28,7 @@ exports.errorTypes = errorTypes
 
 exports.Transaction = Transaction
 exports.CreditCard = CreditCard
+exports.CreditCardVerification = CreditCardVerification
 exports.Subscription = Subscription
 exports.MerchantAccount = MerchantAccount
 exports.WebhookNotification = WebhookNotification
