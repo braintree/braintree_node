@@ -7,9 +7,14 @@ require('../../spec_helper')
 describe "WebhookNotificationGateway", ->
   describe "verify", ->
     it "creates a verification string for the challenge", ->
-      result = specHelper.defaultGateway.webhookNotification.verify("verification_token")
+      result = specHelper.defaultGateway.webhookNotification.verify("20f9f8ed05f77439fe955c977e4c8a53")
 
-      assert.equal(result, "integration_public_key|c9f15b74b0d98635cd182c51e2703cffa83388c3")
+      assert.equal(result, "integration_public_key|d9b899556c966b3f06945ec21311865d35df3ce4")
+
+    it "returns an errback with InvalidChallengeError when challenge contains non-hex chars", (done) ->
+      specHelper.defaultGateway.webhookNotification.verify "bad challenge", (err, response) ->
+        assert.equal(err.type, errorTypes.invalidChallengeError)
+        done()
 
   describe "sampleNotification", ->
     it "returns a parsable signature and payload", (done) ->
