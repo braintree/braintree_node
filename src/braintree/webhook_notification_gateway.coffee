@@ -40,10 +40,9 @@ class WebhookNotificationGateway extends Gateway
       return InvalidSignatureError("signature does not match payload - one has been modified")
     null
 
-  verify: (challenge, callback) ->
+  verify: (challenge) ->
     unless challenge.match(/^[a-f0-9]{20,32}$/)
-      callback(InvalidChallengeError("challenge contains non-hex characters"), null)
-      return
+      throw new InvalidChallengeError("challenge contains non-hex characters")
     digest = Digest.Sha1hexdigest(@gateway.config.privateKey, challenge)
     "#{@gateway.config.publicKey}|#{digest}"
 

@@ -12,9 +12,10 @@ describe "WebhookNotificationGateway", ->
       assert.equal(result, "integration_public_key|d9b899556c966b3f06945ec21311865d35df3ce4")
 
     it "returns an errback with InvalidChallengeError when challenge contains non-hex chars", (done) ->
-      specHelper.defaultGateway.webhookNotification.verify "bad challenge", (err, response) ->
-        assert.equal(err.type, errorTypes.invalidChallengeError)
-        done()
+      webhookNotification = specHelper.defaultGateway.webhookNotification
+
+      assert.throws((-> webhookNotification.verify("bad challenge")), "challenge contains non-hex characters")
+      done()
 
   describe "sampleNotification", ->
     it "returns a parsable signature and payload", (done) ->
