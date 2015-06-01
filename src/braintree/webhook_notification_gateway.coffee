@@ -3,6 +3,7 @@ _ = require('underscore')
 {Digest} = require('./digest')
 {Gateway} = require('./gateway')
 {InvalidSignatureError} = require('./exceptions')
+{InvalidChallengeError} = require('./exceptions')
 {Util} = require('./util')
 {WebhookNotification} = require('./webhook_notification')
 
@@ -39,8 +40,13 @@ class WebhookNotificationGateway extends Gateway
       return InvalidSignatureError("signature does not match payload - one has been modified")
     null
 
-
-  verify: (challenge) ->
+  verify: (challenge, callback) ->
+    unless challenge.match(/^[a-f0-9]{20,32}$/)
+      if callback?
+        callback(InvalidChallengeError("challenge contains non-hex characters"), null)
+        return
+      else
+        throw new InvalidChallengeError("challenge contains non-hex characters")
     digest = Digest.Sha1hexdigest(@gateway.config.privateKey, challenge)
     "#{@gateway.config.publicKey}|#{digest}"
 
