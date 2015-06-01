@@ -1,3 +1,7 @@
+## 1.25.0
+* Validate webhook challenge payload
+* Add missing criteria to CreditCardVerification search
+
 ## 1.24.0
 * Add 3DS info to server side
 
