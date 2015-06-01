@@ -16,7 +16,7 @@ describe "CreditCardVerification", ->
         done()
 
     it "handles responses with a single result", (done) ->
-      customerEmail = "sandworm" + customerId + "@example.com" 
+      customerEmail = "sandworm" + customerId + "@example.com"
       customerId = specHelper.randomId()
       expirationMonth = '12'
       expirationYear = '2016'
@@ -62,7 +62,7 @@ describe "CreditCardVerification", ->
             createdAt = verification.createdAt
             verificationId = verification.id
 
-            assert.equal(verification.billing.postalCode, postalCode) 
+            assert.equal(verification.billing.postalCode, postalCode)
             assert.equal(verification.creditCard.bin, '411111')
             assert.equal(verification.creditCard.cardholderName, name)
             assert.equal(verification.creditCard.expirationMonth, expirationMonth)
