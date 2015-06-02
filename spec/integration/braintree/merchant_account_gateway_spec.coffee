@@ -24,7 +24,7 @@ legacyMerchantAccountParams =
   tosAccepted: true
   masterMerchantAccountId: "sandbox_master_merchant_account"
 
-validMerchantAccountParams =
+validMerchantAccountParams = ->
   individual:
     firstName: "Joe"
     lastName: "Bloggs"
@@ -66,7 +66,7 @@ describe "MerchantAccountGateway", ->
         done()
 
     it "accepts the new paramaters and doesn't require an id", (done) ->
-      specHelper.defaultGateway.merchantAccount.create validMerchantAccountParams, (err, response) ->
+      specHelper.defaultGateway.merchantAccount.create validMerchantAccountParams(), (err, response) ->
         assert.isTrue(response.success)
         assert.equal(response.merchantAccount.status, MerchantAccount.Status.Pending)
         assert.equal(response.merchantAccount.masterMerchantAccount.id, "sandbox_master_merchant_account")
@@ -74,9 +74,7 @@ describe "MerchantAccountGateway", ->
         done()
 
     it "allows an id to be passed", (done) ->
-      paramsWithId = new validMerchantAccountParams.constructor()
-      for key of validMerchantAccountParams
-        paramsWithId[key] = validMerchantAccountParams[key]
+      paramsWithId = validMerchantAccountParams()
       rand = Math.floor(Math.random() * 1000)
       paramsWithId["id"] = "sub_merchant_account_id" + rand
       specHelper.defaultGateway.merchantAccount.create paramsWithId, (err, response) ->
@@ -110,9 +108,7 @@ describe "MerchantAccountGateway", ->
 
     describe "funding destination", ->
       it "accepts a bank", (done) ->
-        params = new validMerchantAccountParams.constructor()
-        for key of validMerchantAccountParams
-          params[key] = validMerchantAccountParams[key]
+        params = validMerchantAccountParams()
         params["funding"]["destination"] = MerchantAccount.FundingDestination.Bank
 
         specHelper.defaultGateway.merchantAccount.create params, (err, response) ->
@@ -123,11 +119,11 @@ describe "MerchantAccountGateway", ->
           done()
 
       it "accepts an email", (done) ->
-        params = new validMerchantAccountParams.constructor()
-        for key of validMerchantAccountParams
-          params[key] = validMerchantAccountParams[key]
+        params = validMerchantAccountParams()
         params["funding"]["destination"] = MerchantAccount.FundingDestination.Email
         params["funding"]["email"] = "joejosey@compuserve.com"
+        delete params["funding"]["accountNumber"]
+        delete params["funding"]["routingNumber"]
 
         specHelper.defaultGateway.merchantAccount.create params, (err, response) ->
           assert.isTrue(response.success)
@@ -137,11 +133,11 @@ describe "MerchantAccountGateway", ->
           done()
 
       it "accepts a mobile phone", (done) ->
-        params = new validMerchantAccountParams.constructor()
-        for key of validMerchantAccountParams
-          params[key] = validMerchantAccountParams[key]
+        params = validMerchantAccountParams()
         params["funding"]["destination"] = MerchantAccount.FundingDestination.MobilePhone
         params["funding"]["mobile_phone"] = "1112223333"
+        delete params["funding"]["accountNumber"]
+        delete params["funding"]["routingNumber"]
 
         specHelper.defaultGateway.merchantAccount.create params, (err, response) ->
           assert.isTrue(response.success)
@@ -152,9 +148,7 @@ describe "MerchantAccountGateway", ->
 
   describe "update", ->
     it "updates the Merchant Account info", (done) ->
-      params = new validMerchantAccountParams.constructor()
-      for key of validMerchantAccountParams
-        params[key] = validMerchantAccountParams[key]
+      params = validMerchantAccountParams()
       delete params["tos_accepted"]
       delete params["master_merchant_account_id"]
 
@@ -510,7 +504,7 @@ describe "MerchantAccountGateway", ->
 
   describe "find", ->
     it "can find a merchant account by id", (done) ->
-      specHelper.defaultGateway.merchantAccount.create validMerchantAccountParams, (err, response) ->
+      specHelper.defaultGateway.merchantAccount.create validMerchantAccountParams(), (err, response) ->
         assert.isTrue(response.success)
         merchantAccountId = response.merchantAccount.id
 
