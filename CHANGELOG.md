@@ -1,3 +1,6 @@
+## 1.26.0
+* Add support for Android Pay
+
 ## 1.25.0
 * Validate webhook challenge payload
 * Add missing criteria to CreditCardVerification search
