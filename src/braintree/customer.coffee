@@ -1,5 +1,6 @@
 {AttributeSetter} = require('./attribute_setter')
 {ApplePayCard} = require('./apple_pay_card')
+{AndroidPayCard} = require('./android_pay_card')
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
 {CoinbaseAccount} = require('./coinbase_account')
@@ -15,6 +16,10 @@ class Customer extends AttributeSetter
     if attributes.applePayCards
       @applePayCards = (new ApplePayCard(cardAttributes) for cardAttributes in attributes.applePayCards)
       for paymentMethod in @applePayCards
+        @paymentMethods.push paymentMethod
+    if attributes.androidPayCards
+      @androidPayCards = (new AndroidPayCard(cardAttributes) for cardAttributes in attributes.androidPayCards)
+      for paymentMethod in @androidPayCards
         @paymentMethods.push paymentMethod
     if attributes.paypalAccounts
       @paypalAccounts = (new PayPalAccount(paypalAccountAttributes) for paypalAccountAttributes in attributes.paypalAccounts)

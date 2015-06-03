@@ -114,6 +114,23 @@ describe "TransactionGateway", ->
 
             done()
 
+    context "with android pay", ->
+      it "returns AndroidPayCard for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.AndroidPay
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AndroidPayCard)
+            assert.isString(response.transaction.androidPayCard.googleTransactionId)
+            assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover)
+            assert.equal(response.transaction.androidPayCard.last4, "1117")
+
+            done()
+
     context "Coinbase", ->
       it "returns CoinbaseAccount for payment_instrument", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->

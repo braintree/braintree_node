@@ -1,5 +1,6 @@
 {Gateway} = require('./gateway')
 {ApplePayCard} = require('./apple_pay_card')
+{AndroidPayCard} = require('./android_pay_card')
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
 {CoinbaseAccount} = require('./coinbase_account')
@@ -15,6 +16,7 @@ class PaymentMethodGateway extends Gateway
       coinbaseAccount: CoinbaseAccount
       creditCard: CreditCard
       applePayCard: ApplePayCard
+      androidPayCard: AndroidPayCard
     @createResponseHandler(responseMapping, null, (err, response) ->
       if !err
         response.paymentMethod = PaymentMethodGateway.parsePaymentMethod(response)
@@ -47,6 +49,8 @@ class PaymentMethodGateway extends Gateway
       new PayPalAccount(response.paypalAccount)
     else if response.applePayCard
       new ApplePayCard(response.applePayCard)
+    else if response.androidPayCard
+      new AndroidPayCard(response.androidPayCard)
     else if response.coinbaseAccount
       new CoinbaseAccount(response.coinbaseAccount)
     else

@@ -1,5 +1,6 @@
 {AttributeSetter} = require('./attribute_setter')
 {ApplePayCard} = require('./apple_pay_card')
+{AndroidPayCard} = require('./android_pay_card')
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
 {CoinbaseAccount} = require('./coinbase_account')
@@ -65,6 +66,7 @@ class Transaction extends AttributeSetter
     @paypalAccount = new PayPalAccount(attributes.paypal)
     @coinbaseAccount = new CoinbaseAccount(attributes.coinbaseAccount)
     @applePayCard = new ApplePayCard(attributes.applePay)
+    @androidPayCard = new AndroidPayCard(attributes.androidPayCard)
     @disbursementDetails = new DisbursementDetails(attributes.disbursementDetails)
     @disputes = (new Dispute(disputeAttributes) for disputeAttributes in attributes.disputes) if attributes.disputes?
     @riskData = new RiskData(attributes.riskData) if attributes.riskData
