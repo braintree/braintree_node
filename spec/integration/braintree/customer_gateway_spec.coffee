@@ -114,6 +114,22 @@ describe "CustomerGateway", ->
 
           done()
 
+      it "creates a customer with an Android Pay payment method nonce", (done) ->
+        customerParams =
+          paymentMethodNonce: Nonces.AndroidPay
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.isNotNull(response.customer.androidPayCards[0])
+          androidPayCard = response.customer.androidPayCards[0]
+          assert.isNotNull(androidPayCard.token)
+          assert.isNotNull(androidPayCard.googleTransactionId)
+          assert.equal(androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover)
+          assert.equal(androidPayCard.last4, "1117")
+
+          done()
+
       it "creates a customer with a Coinbase account payment method nonce", (done) ->
         customerParams =
           paymentMethodNonce: Nonces.Coinbase

@@ -42,6 +42,31 @@ describe "PaymentMethodGateway", ->
 
             done()
 
+    context 'Android Pay', ->
+      it "vaults an Android Pay card from the nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
+          customerId = response.customer.id
+
+          paymentMethodParams =
+            customerId: customerId
+            paymentMethodNonce: Nonces.AndroidPay
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isNotNull(response.paymentMethod.token)
+            assert.isNotNull(response.paymentMethod.google_transaction_id)
+            assert.equal(response.paymentMethod.virtualCardType, specHelper.braintree.CreditCard.CardType.Discover)
+            assert.equal(response.paymentMethod.last4, "1117")
+            assert.isString(response.paymentMethod.expirationMonth)
+            assert.isString(response.paymentMethod.expirationYear)
+            assert.isTrue(response.paymentMethod.default)
+            assert.include(response.paymentMethod.imageUrl, "android_pay")
+            assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.Visa)
+            assert.equal(response.paymentMethod.sourceCardLast4, "1111")
+
+            done()
+
     context 'Coinbase', ->
       it "vaults a Coinbase account from the nonce", (done) ->
         specHelper.defaultGateway.customer.create {firstName: 'Paul', lastName: 'Gross'}, (err, response) ->
@@ -648,6 +673,30 @@ describe "PaymentMethodGateway", ->
             specHelper.defaultGateway.paymentMethod.find paymentMethodToken, (err, paypalAccount) ->
               assert.isNull(err)
               assert.isString(paypalAccount.email)
+
+              done()
+
+    context 'android pay card', ->
+      it "finds the android pay card", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          paymentMethodParams =
+            customerId: response.customer.id
+            paymentMethodNonce: Nonces.AndroidPay
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            paymentMethodToken = response.paymentMethod.token
+            specHelper.defaultGateway.paymentMethod.find paymentMethodToken, (err, androidPayCard) ->
+              assert.isNull(err)
+              assert.isString(androidPayCard.googleTransactionId)
+              assert.equal(androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover)
+              assert.equal(androidPayCard.virtualCardType, specHelper.braintree.CreditCard.CardType.Discover)
+              assert.equal(androidPayCard.last4, "1117")
+              assert.isString(androidPayCard.expirationMonth)
+              assert.isString(androidPayCard.expirationYear)
+              assert.isTrue(androidPayCard.default)
+              assert.include(androidPayCard.imageUrl, "android_pay")
+              assert.equal(androidPayCard.sourceCardType, specHelper.braintree.CreditCard.CardType.Visa)
+              assert.equal(androidPayCard.sourceCardLast4, "1111")
 
               done()
 
