@@ -40,6 +40,7 @@ class TransactionSearch extends AdvancedSearch
       "shippingPostalCode"
       "shippingRegion"
       "shippingStreetAddress"
+      "creditCardUniqueIdentifier"
     )
 
     @equalityFields "creditCardExpirationDate"
@@ -54,6 +55,7 @@ class TransactionSearch extends AdvancedSearch
       CreditCard.CustomerLocation.US
     ]}
     @multipleValueField "ids"
+    @multipleValueField "user"
     @multipleValueField "merchantAccountId"
     @multipleValueField "status", { "allows" : Transaction.Status.All() }
     @multipleValueField "source", { "allows" : [

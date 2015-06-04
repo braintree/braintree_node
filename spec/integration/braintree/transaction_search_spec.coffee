@@ -95,6 +95,7 @@ describe "TransactionSearch", ->
               shippingRegion: "IL"
               shippingStreetAddress: "123 Fake St"
               creditCardExpirationDate: "05/2012"
+              creditCardUniqueIdentifier: transaction.creditCard.uniqueNumberIdentifier
 
             partialCriteria =
               creditCardNumber:
@@ -109,6 +110,7 @@ describe "TransactionSearch", ->
               status: Transaction.Status.Settled
               source: Transaction.Source.Api
               type: Transaction.Type.Sale
+              user: "integration_user_public_id"
 
             keyValueCriteria =
               refund: false
