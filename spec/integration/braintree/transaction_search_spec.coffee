@@ -383,6 +383,57 @@ describe "TransactionSearch", ->
 
             done()
 
+    it "searches on payment instrument type credit_card", (done) ->
+      random = specHelper.randomId()
+      transactionParams =
+        amount: '10.00'
+        orderId: random
+        creditCard:
+          number: '4111111111111111'
+          expirationDate: '01/2015'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.search (
+          (search) -> 
+            search.paymentInstrumentType().is("CreditCardDetail")
+            search.id().is(response.transaction.id)
+        ), (err, response) ->
+
+          assert.equal(1, response.length())
+          done()
+
+    it "searches on payment instrument type paypal", (done) ->
+      random = specHelper.randomId()
+      transactionParams =
+        amount: Braintree.Test.TransactionAmounts.Authorize
+        paymentMethodNonce: Braintree.Test.Nonces.PayPalFuturePayment
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.search (
+          (search) -> 
+            search.id().is(response.transaction.id)
+            search.paymentInstrumentType().is("PayPalDetail")
+        ), (err, response) ->
+
+          assert.equal(1, response.length())
+          done()
+    
+    it "searches on payment instrument type apple pay", (done) ->
+      random = specHelper.randomId()
+      transactionParams =
+        amount: Braintree.Test.TransactionAmounts.Authorize
+        paymentMethodNonce: Braintree.Test.Nonces.ApplePayVisa
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.search (
+          (search) -> 
+            search.id().is(response.transaction.id)
+            search.paymentInstrumentType().is("ApplePayDetail")
+        ), (err, response) ->
+
+          assert.equal(1, response.length())
+          done()
+    
     it "filters on valid merchant account ids", (done) ->
       random = specHelper.randomId()
       transactionParams =

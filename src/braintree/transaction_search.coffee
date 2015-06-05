@@ -56,6 +56,7 @@ class TransactionSearch extends AdvancedSearch
     ]}
     @multipleValueField "ids"
     @multipleValueField "user"
+    @multipleValueField "paymentInstrumentType"
     @multipleValueField "merchantAccountId"
     @multipleValueField "status", { "allows" : Transaction.Status.All() }
     @multipleValueField "source", { "allows" : [

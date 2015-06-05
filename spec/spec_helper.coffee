@@ -5,6 +5,7 @@ catch err
 
 http = require('http')
 {TransactionAmounts} = require('../lib/braintree/test/transaction_amounts')
+{Nonces} = require('../lib/braintree/test/nonces')
 {Util} = require('../lib/braintree/util')
 {Config} = require('../lib/braintree/config')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
@@ -302,8 +303,6 @@ GLOBAL.specHelper =
   braintree: braintree
   create3DSVerification: create3DSVerification
   dateToMdy: dateToMdy
-  defaultConfig: defaultConfig
-  defaultGateway: defaultGateway
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
   doesNotInclude: doesNotInclude
