@@ -21,6 +21,7 @@ class CustomerSearch extends AdvancedSearch
     "paypalAccountEmail"
     "phone"
     "website"
+    "paymentMethodTokenWithDuplicates"
   )
 
   @equalityFields "creditCardExpirationDate"
