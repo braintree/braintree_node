@@ -241,6 +241,12 @@ createModificationForTests = (attributes, callback) ->
   specHelper.defaultGateway.http.post '/modifications/create_modification_for_tests', {modification: attributes}, (err, resp) ->
     callback()
 
+createGrant = (gateway, attributes, callback) ->
+  gateway.http.post '/oauth_testing/grants', attributes, (err, response) ->
+    return callback(err, null) if err
+    callback(null, response.grant.code)
+
+
 class ClientApiHttp
   timeout: 60000
 
@@ -329,3 +335,4 @@ GLOBAL.specHelper =
   generateNonceForNewPaymentMethod: generateNonceForNewPaymentMethod
   createPlanForTests: createPlanForTests
   createModificationForTests: createModificationForTests
+  createGrant: createGrant

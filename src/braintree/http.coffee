@@ -44,7 +44,7 @@ class Http
       host: @config.environment.server,
       port: @config.environment.port,
       method: method,
-      path: @config.baseMerchantPath + url,
+      path: url,
       headers: {
         'Authorization': 'Basic ' + (new Buffer(@config.publicKey + ':' + @config.privateKey)).toString('base64'),
         'X-ApiVersion': @config.apiVersion,
