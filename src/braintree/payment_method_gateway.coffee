@@ -9,6 +9,7 @@ exceptions = require('./exceptions')
 
 class PaymentMethodGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
 
   responseHandler: (callback) ->
     responseMapping =
@@ -24,13 +25,13 @@ class PaymentMethodGateway extends Gateway
     )
 
   create: (attributes, callback) ->
-    @gateway.http.post('/payment_methods', {paymentMethod: attributes}, @responseHandler(callback))
+    @gateway.http.post("#{@config.baseMerchantPath}/payment_methods", {paymentMethod: attributes}, @responseHandler(callback))
 
   find: (token, callback) ->
     if(token.trim() == '')
       callback(exceptions.NotFoundError("Not Found"), null)
     else
-      @gateway.http.get "/payment_methods/any/#{token}", (err, response) ->
+      @gateway.http.get "#{@config.baseMerchantPath}/payment_methods/any/#{token}", (err, response) ->
         if err
           callback(err, null)
         else
@@ -40,7 +41,7 @@ class PaymentMethodGateway extends Gateway
     if(token.trim() == '')
       callback(exceptions.NotFoundError("Not Found"), null)
     else
-      @gateway.http.put("/payment_methods/any/#{token}", {paymentMethod: attributes}, @responseHandler(callback))
+      @gateway.http.put("#{@config.baseMerchantPath}/payment_methods/any/#{token}", {paymentMethod: attributes}, @responseHandler(callback))
 
   @parsePaymentMethod: (response) ->
     if response.creditCard
@@ -57,6 +58,6 @@ class PaymentMethodGateway extends Gateway
       new UnknownPaymentMethod(response)
 
   delete: (token, callback) ->
-    @gateway.http.delete("/payment_methods/any/#{token}", callback)
+    @gateway.http.delete("#{@config.baseMerchantPath}/payment_methods/any/#{token}", callback)
 
 exports.PaymentMethodGateway = PaymentMethodGateway

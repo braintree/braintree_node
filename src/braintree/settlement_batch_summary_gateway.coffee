@@ -4,10 +4,11 @@
 
 class SettlementBatchSummaryGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
 
   generate: (criteria, callback) ->
     @gateway.http.post(
-      "/settlement_batch_summary",
+      "#{@config.baseMerchantPath}/settlement_batch_summary",
       {settlementBatchSummary: criteria},
       @responseHandler(criteria, callback)
     )

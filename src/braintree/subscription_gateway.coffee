@@ -6,18 +6,19 @@ exceptions = require('./exceptions')
 
 class SubscriptionGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
 
   create: (attributes, callback) ->
-    @gateway.http.post('/subscriptions', {subscription: attributes}, @responseHandler(callback))
+    @gateway.http.post("#{@config.baseMerchantPath}/subscriptions", {subscription: attributes}, @responseHandler(callback))
 
   cancel: (subscriptionId, callback) ->
-    @gateway.http.put("/subscriptions/#{subscriptionId}/cancel", null, @responseHandler(callback))
+    @gateway.http.put("#{@config.baseMerchantPath}/subscriptions/#{subscriptionId}/cancel", null, @responseHandler(callback))
 
   find: (subscriptionId, callback) ->
     if(subscriptionId.trim() == '')
       callback(exceptions.NotFoundError("Not Found"), null)
     else
-      @gateway.http.get "/subscriptions/#{subscriptionId}", (err, response) ->
+      @gateway.http.get "#{@config.baseMerchantPath}/subscriptions/#{subscriptionId}", (err, response) ->
         if err
           callback(err, null)
         else
@@ -35,10 +36,10 @@ class SubscriptionGateway extends Gateway
   search: (fn, callback) ->
     search = new SubscriptionSearch()
     fn(search)
-    @createSearchResponse("/subscriptions/advanced_search_ids", search, @pagingFunctionGenerator(search), callback)
+    @createSearchResponse("#{@config.baseMerchantPath}/subscriptions/advanced_search_ids", search, @pagingFunctionGenerator(search), callback)
 
   update: (subscriptionId, attributes, callback) ->
-    @gateway.http.put("/subscriptions/#{subscriptionId}", {subscription: attributes}, @responseHandler(callback))
+    @gateway.http.put("#{@config.baseMerchantPath}/subscriptions/#{subscriptionId}", {subscription: attributes}, @responseHandler(callback))
 
   pagingFunctionGenerator: (search) ->
     super search, 'subscriptions', Subscription, (response) -> response.subscriptions.subscription

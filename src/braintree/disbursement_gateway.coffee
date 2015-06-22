@@ -3,6 +3,7 @@
 
 class DisbursementGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
 
   transactions: (disbursement, callback) ->
     transactionIds = disbursement.transactionIds

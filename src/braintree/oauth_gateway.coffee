@@ -6,6 +6,7 @@ exceptions = require('./exceptions')
 
 class OAuthGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
 
   createTokenFromCode: (attributes, callback) ->
     attributes.grantType = 'authorization_code'
