@@ -12,6 +12,10 @@ class OAuthGateway extends Gateway
     attributes.grantType = 'authorization_code'
     @gateway.http.post('/oauth/access_tokens', attributes, @responseHandler(callback))
 
+  createTokenFromRefreshToken: (attributes, callback) ->
+    attributes.grantType = 'refresh_token'
+    @gateway.http.post('/oauth/access_tokens', attributes, @responseHandler(callback))
+
   responseHandler: (callback) ->
     @createResponseHandler("credentials", OAuthCredentials, callback)
 

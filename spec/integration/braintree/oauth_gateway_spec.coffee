@@ -44,3 +44,24 @@ describe "OAuthGateway", ->
         )
 
         done()
+
+  describe "createTokenFromRefreshToken", ->
+    it "creates an access token from a refresh token", (done) ->
+      gateway = braintree.connect {
+        clientId: 'client_id$development$integration_client_id'
+        clientSecret: 'client_secret$development$integration_client_secret'
+        environment: braintree.Environment.Development
+      }
+
+      specHelper.createGrant gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) ->
+        gateway.oauth.createTokenFromCode {code: code, scope: 'read_write'}, (err, refreshTokenResponse) ->
+          gateway.oauth.createTokenFromRefreshToken {refreshToken: refreshTokenResponse.credentials.refreshToken, scope: 'read_write'}, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            credentials = response.credentials
+            assert.isNotNull(credentials.accessToken)
+            assert.isNotNull(credentials.refreshToken)
+            assert.isNotNull(credentials.expiresAt)
+            assert.equal(credentials.tokenType, "bearer")
+
+            done()
