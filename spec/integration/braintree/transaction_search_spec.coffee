@@ -10,7 +10,6 @@ braintree = specHelper.braintree
 describe "TransactionSearch", ->
   describe "search", ->
     it "finds transactions", (done) ->
-      @timeout 10000
 
       firstName = "Tom_#{specHelper.randomId()}"
       cardToken = "card_#{specHelper.randomId()}"
@@ -165,7 +164,6 @@ describe "TransactionSearch", ->
                 done()
 
     it "finds paypal transactions", (done) ->
-      @timeout 10000
 
       transactionParams =
         amount: Braintree.Test.TransactionAmounts.Authorize
