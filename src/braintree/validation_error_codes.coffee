@@ -257,6 +257,13 @@ class ValidationErrorCodes
     MasterMerchantAccountMustBeActive : "82608"
     TosAcceptedIsRequired : "82610"
 
+  @OAuth = 
+    InvalidGrant : "93801"
+    InvalidCredentials : "93802"
+    InvalidScope : "93803"
+    InvalidRequest : "93804"
+    UnsupportedGrantType : "93805"
+
   @PaymentMethod =
     CannotForwardPaymentMethodType : "93106"
     CustomerIdIsInvalid : "93105"
