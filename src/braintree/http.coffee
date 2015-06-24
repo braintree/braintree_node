@@ -46,7 +46,7 @@ class Http
       method: method,
       path: url,
       headers: {
-        'Authorization': 'Basic ' + (new Buffer(@config.publicKey + ':' + @config.privateKey)).toString('base64'),
+        'Authorization': @authorizationHeader(),
         'X-ApiVersion': @config.apiVersion,
         'Accept': 'application/xml',
         'Content-Type': 'application/json',
@@ -91,5 +91,11 @@ class Http
 
     theRequest.write(requestBody) if body
     theRequest.end()
+
+  authorizationHeader: ->
+    if @config.clientId
+      'Basic ' + (new Buffer(@config.clientId + ':' + @config.clientSecret)).toString('base64')
+    else
+      'Basic ' + (new Buffer(@config.publicKey + ':' + @config.privateKey)).toString('base64')
 
 exports.Http = Http

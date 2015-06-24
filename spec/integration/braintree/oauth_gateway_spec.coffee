@@ -9,7 +9,6 @@ describe "OAuthGateway", ->
       gateway = braintree.connect {
         clientId: 'client_id$development$integration_client_id'
         clientSecret: 'client_secret$development$integration_client_secret'
-        environment: braintree.Environment.Development
       }
 
       specHelper.createGrant gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) ->
@@ -28,7 +27,6 @@ describe "OAuthGateway", ->
       gateway = braintree.connect {
         clientId: 'client_id$development$integration_client_id'
         clientSecret: 'client_secret$development$integration_client_secret'
-        environment: braintree.Environment.Development
       }
 
       gateway.oauth.createTokenFromCode {code: 'badCode', scope: 'read_write'}, (err, response) ->
@@ -50,7 +48,6 @@ describe "OAuthGateway", ->
       gateway = braintree.connect {
         clientId: 'client_id$development$integration_client_id'
         clientSecret: 'client_secret$development$integration_client_secret'
-        environment: braintree.Environment.Development
       }
 
       specHelper.createGrant gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) ->
