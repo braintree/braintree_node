@@ -15,6 +15,14 @@ class CredentialsParser
     else
       @environment = clientIdEnvironment
 
+  parseAccessToken: (@accessToken) ->
+    throw new Error('Missing access token') unless @accessToken
+
+    throw new Error('Value passed for accessToken is not a valid access token') if @accessToken.indexOf('access_token') != 0
+
+    @merchantId = @accessToken.split('$')[2]
+    @environment = @parseEnvironment(@accessToken)
+
   parseEnvironment: (credential) ->
     env = credential.split('$')[1]
     switch env

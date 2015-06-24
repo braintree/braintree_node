@@ -93,7 +93,9 @@ class Http
     theRequest.end()
 
   authorizationHeader: ->
-    if @config.clientId
+    if @config.accessToken
+      'Bearer ' + @config.accessToken
+    else if @config.clientId
       'Basic ' + (new Buffer(@config.clientId + ':' + @config.clientSecret)).toString('base64')
     else
       'Basic ' + (new Buffer(@config.publicKey + ':' + @config.privateKey)).toString('base64')

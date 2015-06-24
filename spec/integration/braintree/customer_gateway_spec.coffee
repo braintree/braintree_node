@@ -17,6 +17,26 @@ describe "CustomerGateway", ->
 
         done()
 
+    it "creates a customer using an access token", (done) ->
+      oauthGateway = braintree.connect {
+        clientId: 'client_id$development$integration_client_id'
+        clientSecret: 'client_secret$development$integration_client_secret'
+      }
+
+      specHelper.createToken oauthGateway, merchantPublicId: 'integration_merchant_id', scope: 'read_write', (err, response) ->
+
+        gateway = braintree.connect {
+          accessToken: response.credentials.accessToken
+        }
+
+        gateway.customer.create {firstName: 'John', lastName: 'Smith'}, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.customer.firstName, 'John')
+          assert.equal(response.customer.lastName, 'Smith')
+
+          done()
+
     it "handles uft8 characters", (done) ->
       specHelper.defaultGateway.customer.create {firstName: 'Jöhn', lastName: 'Smith'}, (err, response) ->
         assert.isNull(err)

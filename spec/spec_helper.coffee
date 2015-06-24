@@ -241,6 +241,10 @@ createModificationForTests = (attributes, callback) ->
   specHelper.defaultGateway.http.post "#{defaultGateway.config.baseMerchantPath}/modifications/create_modification_for_tests", {modification: attributes}, (err, resp) ->
     callback()
 
+createToken = (gateway, attributes, callback) ->
+  specHelper.createGrant gateway, attributes, (err, code) ->
+    gateway.oauth.createTokenFromCode {code: code}, callback
+
 createGrant = (gateway, attributes, callback) ->
   gateway.http.post '/oauth_testing/grants', attributes, (err, response) ->
     return callback(err, null) if err
@@ -336,3 +340,4 @@ GLOBAL.specHelper =
   createPlanForTests: createPlanForTests
   createModificationForTests: createModificationForTests
   createGrant: createGrant
+  createToken: createToken

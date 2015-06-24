@@ -9,12 +9,18 @@ class Config
       @clientId = parser.clientId
       @clientSecret = parser.clientSecret
       @environment = parser.environment
+    else if rawConfig.accessToken
+      parser.parseAccessToken(rawConfig.accessToken)
+      @accessToken = parser.accessToken
+      @environment = parser.environment
+      @merchantId = parser.merchantId
     else
       @publicKey = rawConfig.publicKey
       @privateKey = rawConfig.privateKey
       @merchantId = rawConfig.merchantId || rawConfig.partnerId
       @environment = rawConfig.environment
-      @baseMerchantPath = "/merchants/#{rawConfig.merchantId}"
+
+    @baseMerchantPath = "/merchants/#{@merchantId}"
 
   baseMerchantUrl: -> @environment.baseUrl() + @baseMerchantPath
 
