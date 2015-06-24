@@ -22,6 +22,8 @@ class Config
 
   baseMerchantPath: -> "/merchants/#{@merchantId}"
 
-  baseMerchantUrl: -> @environment.baseUrl() + @baseMerchantPath()
+  baseUrl: -> @environment.baseUrl()
+
+  baseMerchantUrl: -> @baseUrl() + @baseMerchantPath()
 
 exports.Config = Config
