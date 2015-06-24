@@ -53,42 +53,42 @@ addOns = {
 
 escrowTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath}/transactions/#{transactionId}/escrow",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/escrow",
     null,
     callback
   )
 
 makePastDue = (subscription, callback) ->
   defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath}/subscriptions/#{subscription.id}/make_past_due?days_past_due=1",
+    "#{defaultGateway.config.baseMerchantPath()}/subscriptions/#{subscription.id}/make_past_due?days_past_due=1",
     null,
     callback
   )
 
 settleTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath}/transactions/#{transactionId}/settle",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settle",
     null,
     callback
   )
 
 declineSettlingTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath}/transactions/#{transactionId}/settlement_decline",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_decline",
     null,
     callback
   )
 
 pendSettlingTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath}/transactions/#{transactionId}/settlement_pending",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_pending",
     null,
     callback
   )
 
 settlePayPalTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath}/transactions/#{transactionId}/settle",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settle",
     null,
     callback
   )
@@ -99,7 +99,7 @@ create3DSVerification = (merchantAccountId, params, callback) ->
     callback(threeDSecureToken)
 
   defaultGateway.http.post(
-    "#{defaultGateway.config.baseMerchantPath}/three_d_secure/create_verification/#{merchantAccountId}",
+    "#{defaultGateway.config.baseMerchantPath()}/three_d_secure/create_verification/#{merchantAccountId}",
     {three_d_secure_verification: params},
     responseCallback
   )
@@ -234,11 +234,11 @@ decodeClientToken = (encodedClientToken) ->
   unescapedClientToken
 
 createPlanForTests = (attributes, callback) ->
-  specHelper.defaultGateway.http.post "#{defaultGateway.config.baseMerchantPath}/plans/create_plan_for_tests", {plan: attributes}, (err, resp) ->
+  specHelper.defaultGateway.http.post "#{defaultGateway.config.baseMerchantPath()}/plans/create_plan_for_tests", {plan: attributes}, (err, resp) ->
     callback()
 
 createModificationForTests = (attributes, callback) ->
-  specHelper.defaultGateway.http.post "#{defaultGateway.config.baseMerchantPath}/modifications/create_modification_for_tests", {modification: attributes}, (err, resp) ->
+  specHelper.defaultGateway.http.post "#{defaultGateway.config.baseMerchantPath()}/modifications/create_modification_for_tests", {modification: attributes}, (err, resp) ->
     callback()
 
 createToken = (gateway, attributes, callback) ->

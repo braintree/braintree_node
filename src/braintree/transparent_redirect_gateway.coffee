@@ -70,6 +70,6 @@ class TransparentRedirectGateway
         confirmCallback = new CreditCardGateway(@gateway).responseHandler(callback)
       when KIND.CREATE_TRANSACTION
         confirmCallback = new TransactionGateway(@gateway).responseHandler(callback)
-    @gateway.http.post("#{@config.baseMerchantPath}/transparent_redirect_requests/" + params.id + '/confirm', null, confirmCallback)
+    @gateway.http.post("#{@config.baseMerchantPath()}/transparent_redirect_requests/" + params.id + '/confirm', null, confirmCallback)
 
 exports.TransparentRedirectGateway = TransparentRedirectGateway

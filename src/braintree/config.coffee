@@ -20,8 +20,8 @@ class Config
       @merchantId = rawConfig.merchantId || rawConfig.partnerId
       @environment = rawConfig.environment
 
-    @baseMerchantPath = "/merchants/#{@merchantId}"
+  baseMerchantPath: -> "/merchants/#{@merchantId}"
 
-  baseMerchantUrl: -> @environment.baseUrl() + @baseMerchantPath
+  baseMerchantUrl: -> @environment.baseUrl() + @baseMerchantPath()
 
 exports.Config = Config

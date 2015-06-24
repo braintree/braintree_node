@@ -6,6 +6,6 @@ class PlanGateway extends Gateway
     @config = @gateway.config
 
   all: (callback) ->
-    @gateway.http.get("#{@config.baseMerchantPath}/plans", @createResponseHandler("plan", Plan, callback))
+    @gateway.http.get("#{@config.baseMerchantPath()}/plans", @createResponseHandler("plan", Plan, callback))
 
 exports.PlanGateway = PlanGateway
