@@ -23,7 +23,7 @@ describe "CustomerGateway", ->
         clientSecret: 'client_secret$development$integration_client_secret'
       }
 
-      specHelper.createToken oauthGateway, merchantPublicId: 'integration_merchant_id', scope: 'read_write', (err, response) ->
+      specHelper.createToken oauthGateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, response) ->
 
         gateway = braintree.connect {
           accessToken: response.credentials.accessToken
