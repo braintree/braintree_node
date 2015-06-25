@@ -1,6 +1,5 @@
 {Gateway} = require('./gateway')
 {OAuthCredentials} = require('./oauth_credentials')
-util = require('util')
 {Util} = require('./util')
 {Digest} = require('./digest')
 
