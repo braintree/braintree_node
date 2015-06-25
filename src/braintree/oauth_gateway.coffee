@@ -21,26 +21,37 @@ class OAuthGateway extends Gateway
     @createResponseHandler("credentials", OAuthCredentials, callback)
 
   connectUrl: (params) ->
+    params.clientId = @config.clientId
     url = @config.baseUrl() + '/oauth/connect?' + @buildQuery(params)
     signature = Digest.Sha256hexdigest(@config.clientSecret, url)
     url + "&signature=#{signature}&algorithm=SHA256"
 
   buildQuery: (params) ->
-    query = Util.convertObjectKeysToUnderscores(params)
-    query.client_id = @config.clientId
-    @addSubQuery(query, 'user', query.user)
-    @addSubQuery(query, 'business', query.business)
-    delete query.user
-    delete query.business
+    params = Util.convertObjectKeysToUnderscores(params)
 
-    queryParts = []
-    for key, value of query
-      queryParts.push("#{encodeURIComponent(key)}=#{encodeURIComponent(value)}")
+    paramsArray = @buildSubQuery('user', params.user)
+    paramsArray.push(@buildSubQuery('business', params.business)...)
+    paramsArray.push(@buildSubArrayQuery('payment_methods', params.payment_methods)...)
+    delete params.user
+    delete params.business
+    delete params.payment_methods
 
-    queryParts.join('&')
+    paramsArray.push(([key, val] for key, val of params)...)
 
-  addSubQuery: (query, key, subParams) ->
+    queryStringParts = paramsArray.map ([key, value]) ->
+      "#{encodeURIComponent(key)}=#{encodeURIComponent(value)}"
+
+    queryStringParts.join('&')
+
+  buildSubQuery: (key, subParams) ->
+    arr = []
     for subKey, value of subParams
-      query["#{key}[#{subKey}]"] = value
+      arr.push(["#{key}[#{subKey}]", value])
+
+    arr
+
+  buildSubArrayQuery: (key, values) ->
+    (values || []).map (value) ->
+      ["#{key}[]", value]
 
 exports.OAuthGateway = OAuthGateway

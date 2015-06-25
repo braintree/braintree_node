@@ -165,3 +165,49 @@ describe "OAuthGateway", ->
 
       assert.equal(query('signature').length, 64)
       assert.equal(query('algorithm'), 'SHA256')
+
+    it "builds a connect url without optional parameters", ->
+      gateway = braintree.connect {
+        clientId: 'client_id$development$integration_client_id'
+        clientSecret: 'client_secret$development$integration_client_secret'
+      }
+
+      url = gateway.oauth.connectUrl({})
+
+      query = (searchKey) ->
+        parts = queryString.split('&')
+        foundValue = null
+        parts.forEach (part) ->
+          [key, value] = part.split('=')
+          if decodeURIComponent(key) == searchKey
+            foundValue = decodeURIComponent(value)
+
+        foundValue
+
+      [urlAndPath, queryString] = url.split('?')
+
+      assert.equal(query('redirect_url'), null)
+
+    it "builds a connect url with multiple payment methods", ->
+      gateway = braintree.connect {
+        clientId: 'client_id$development$integration_client_id'
+        clientSecret: 'client_secret$development$integration_client_secret'
+      }
+
+      url = gateway.oauth.connectUrl(
+        paymentMethods: ['credit_card', 'paypal']
+      )
+
+      query = (searchKey) ->
+        parts = queryString.split('&')
+        matches = []
+        parts.forEach (part) ->
+          [key, value] = part.split('=')
+          if decodeURIComponent(key) == searchKey
+            matches.push(decodeURIComponent(value))
+
+        matches
+
+      [urlAndPath, queryString] = url.split('?')
+
+      assert.deepEqual(query('payment_methods[]'), ['credit_card', 'paypal'])
