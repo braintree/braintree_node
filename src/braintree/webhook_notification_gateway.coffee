@@ -9,6 +9,7 @@ _ = require('underscore')
 
 class WebhookNotificationGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
     @parser = new xml2js.Parser
       explicitRoot: true
 

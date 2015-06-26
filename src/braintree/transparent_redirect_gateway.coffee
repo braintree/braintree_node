@@ -18,7 +18,8 @@ class TransparentRedirectGateway
     CREATE_TRANSACTION: 'create_transaction'
 
   constructor: (@gateway) ->
-    @url = "#{@gateway.config.baseMerchantUrl()}/transparent_redirect_requests"
+    @config = @gateway.config
+    @url = "#{@config.baseMerchantUrl()}/transparent_redirect_requests"
 
   generateTrData: (inputData) ->
     data = Util.convertObjectKeysToUnderscores(inputData)
@@ -69,6 +70,6 @@ class TransparentRedirectGateway
         confirmCallback = new CreditCardGateway(@gateway).responseHandler(callback)
       when KIND.CREATE_TRANSACTION
         confirmCallback = new TransactionGateway(@gateway).responseHandler(callback)
-    @gateway.http.post('/transparent_redirect_requests/' + params.id + '/confirm', null, confirmCallback)
+    @gateway.http.post("#{@config.baseMerchantPath()}/transparent_redirect_requests/" + params.id + '/confirm', null, confirmCallback)
 
 exports.TransparentRedirectGateway = TransparentRedirectGateway

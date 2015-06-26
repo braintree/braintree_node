@@ -12,7 +12,9 @@ class Gateway
         callback(null, new ErrorResponse(response.apiErrorResponse))
       else
         response.success = true
-        if typeof(attributeKlassMap) == 'string'
+        if attributeKlassMap == null
+          callback(null, response)
+        else if typeof(attributeKlassMap) == 'string'
           attributeName = attributeKlassMap
           if (response[attributeName])
             response[attributeName] = new klass(response[attributeName]) if klass?
@@ -62,7 +64,7 @@ class Gateway
   pagingFunctionGenerator: (search, url, subjectType, getSubject) ->
     (ids, callback) =>
       search.ids().in(ids)
-      @gateway.http.post("/" + url + "/advanced_search", { search : search.toHash() }, (err, response) ->
+      @gateway.http.post("#{@config.baseMerchantPath()}/" + url + "/advanced_search", { search : search.toHash() }, (err, response) ->
           if err
             callback(err, null)
           else

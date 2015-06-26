@@ -4,6 +4,7 @@ exceptions = require('./exceptions')
 
 class PaymentMethodNonceGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
 
   responseHandler: (callback) ->
     @createResponseHandler("payment_method_nonce", PaymentMethodNonce, (err, response) ->
@@ -13,10 +14,10 @@ class PaymentMethodNonceGateway extends Gateway
     )
 
   create: (payment_method_token, callback) ->
-    @gateway.http.post("/payment_methods/#{payment_method_token}/nonces", {}, @responseHandler(callback))
+    @gateway.http.post("#{@config.baseMerchantPath()}/payment_methods/#{payment_method_token}/nonces", {}, @responseHandler(callback))
 
   find: (payment_method_nonce, callback) ->
-    @gateway.http.get("/payment_method_nonces/#{payment_method_nonce}", (err, response) ->
+    @gateway.http.get("#{@config.baseMerchantPath()}/payment_method_nonces/#{payment_method_nonce}", (err, response) ->
       if err
         callback(err, null)
       else

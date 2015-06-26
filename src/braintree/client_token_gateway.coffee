@@ -6,6 +6,7 @@ DEFAULT_VERSION = 2
 
 class ClientTokenGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
 
   generate: (params={}, callback) ->
     params.version ||= DEFAULT_VERSION
@@ -15,7 +16,7 @@ class ClientTokenGateway extends Gateway
     params = {client_token: params}
 
     responseHandler = @responseHandler(callback)
-    @gateway.http.post("/client_token", params, responseHandler)
+    @gateway.http.post("#{@config.baseMerchantPath()}/client_token", params, responseHandler)
 
   validateParams: (params) ->
     return if params.customerId || !params.options

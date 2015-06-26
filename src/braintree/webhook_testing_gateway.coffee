@@ -6,6 +6,7 @@ dateFormat = require('dateformat')
 
 class WebhookTestingGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
 
   sampleNotification: (kind, id) ->
     payload = new Buffer(@sampleXml(kind, id)).toString("base64") + '\n'

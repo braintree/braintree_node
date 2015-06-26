@@ -31,6 +31,34 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "charges a card using an access token", (done) ->
+      oauthGateway = braintree.connect {
+        clientId: 'client_id$development$integration_client_id'
+        clientSecret: 'client_secret$development$integration_client_secret'
+      }
+
+      specHelper.createToken oauthGateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, response) ->
+
+        gateway = braintree.connect {
+          accessToken: response.credentials.accessToken
+        }
+
+        transactionParams =
+          amount: '5.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/12'
+
+        gateway.transaction.sale transactionParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.type, 'sale')
+          assert.equal(response.transaction.amount, '5.00')
+          assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100')
+          assert.isNull(response.transaction.voiceReferralNumber)
+
+          done()
+
     it "can use a customer from the vault", (done) ->
       customerParams =
         firstName: 'Adam'

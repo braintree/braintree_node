@@ -9,12 +9,13 @@ exceptions = require('./exceptions')
 
 class CreditCardVerificationGateway extends Gateway
   constructor: (@gateway) ->
+    @config = @gateway.config
 
   find: (creditCardVerificationId, callback) ->
     if(creditCardVerificationId.trim() == '')
       callback(exceptions.NotFoundError("Not Found"), null)
     else
-      @gateway.http.get "/verifications/#{creditCardVerificationId}", (err, response) ->
+      @gateway.http.get "#{@config.baseMerchantPath()}/verifications/#{creditCardVerificationId}", (err, response) ->
         if err
           callback(err, null)
         else
@@ -23,7 +24,7 @@ class CreditCardVerificationGateway extends Gateway
   search: (fn, callback) ->
     search = new CreditCardVerificationSearch()
     fn(search)
-    @createSearchResponse("/verifications/advanced_search_ids", search, @pagingFunctionGenerator(search), callback)
+    @createSearchResponse("#{@config.baseMerchantPath()}/verifications/advanced_search_ids", search, @pagingFunctionGenerator(search), callback)
 
   responseHandler: (callback) ->
     @createResponseHandler("creditCardVerification", CreditCardVerification, callback)
@@ -32,7 +33,7 @@ class CreditCardVerificationGateway extends Gateway
     (ids, callback) =>
       searchCriteria = search.toHash()
       searchCriteria["ids"] = ids
-      @gateway.http.post("/verifications/advanced_search",
+      @gateway.http.post("#{@config.baseMerchantPath()}/verifications/advanced_search",
         { search : searchCriteria },
         (err, response) ->
           if err
