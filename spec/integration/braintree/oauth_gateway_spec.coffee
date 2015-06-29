@@ -1,5 +1,6 @@
 require('../../spec_helper')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
+{Environment} = require('../../../lib/braintree/environment')
 
 braintree = specHelper.braintree
 
@@ -119,7 +120,8 @@ describe "OAuthGateway", ->
         foundValue
 
       [urlAndPath, queryString] = url.split('?')
-      assert.equal(urlAndPath, 'http://localhost:3000/oauth/connect')
+      port = process.env['GATEWAY_PORT'] || '3000'
+      assert.equal(urlAndPath, 'http://localhost:' + port + '/oauth/connect')
 
       assert.equal(query('merchant_id'), 'integration_merchant_id')
 
