@@ -61,6 +61,43 @@ describe "CustomerSearch", ->
 
             done()
 
+    it "can search on payment method token with duplicates", (done) ->
+      joe =
+        firstName: "Joe"
+        creditCard:
+          number: "5105105105105100"
+          expirationDate: "05/2012"
+        
+      specHelper.defaultGateway.customer.create joe, (err, response) ->
+        token = response.customer.creditCards[0].token
+        joeId = response.customer.id
+
+        jim =
+          firstName: "Jim"
+          creditCard:
+            number: "5105105105105100"
+            expirationDate: "05/2012"
+
+        specHelper.defaultGateway.customer.create jim, (err, response) ->
+          jimId = response.customer.id
+
+          search = (search) ->
+            search.paymentMethodTokenWithDuplicates().is(token)
+            search.ids().in([joeId, jimId])
+
+          specHelper.defaultGateway.customer.search search, (err, response) -> 
+            customers = []
+
+            response.each (err, customer) ->
+              customers.push customer
+
+              if customers.length == 2
+                assert.equal(customers.length, 2)
+                assert.equal(customers[0].firstName, "Jim")
+                assert.equal(customers[1].firstName, "Joe")
+
+                done()
+
     it "handles complex searches", (done) ->
       id = specHelper.randomId()
       email = "#{specHelper.randomId()}@example.com"

@@ -22,7 +22,6 @@ describe "Http", ->
         done()
 
     it "can hit the sandbox", (done) ->
-      @timeout 10000
 
       http = new Http(new Config(
         environment: braintree.Environment.Sandbox
@@ -37,7 +36,6 @@ describe "Http", ->
         done()
 
     it "can hit production", (done) ->
-      @timeout 10000
 
       http = new Http(new Config(
         environment: braintree.Environment.Production

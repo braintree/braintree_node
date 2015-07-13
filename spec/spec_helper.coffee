@@ -5,6 +5,7 @@ catch err
 
 http = require('http')
 {TransactionAmounts} = require('../lib/braintree/test/transaction_amounts')
+{Nonces} = require('../lib/braintree/test/nonces')
 {Util} = require('../lib/braintree/util')
 {Config} = require('../lib/braintree/config')
 querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
@@ -52,42 +53,42 @@ addOns = {
 
 escrowTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "/transactions/#{transactionId}/escrow",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/escrow",
     null,
     callback
   )
 
 makePastDue = (subscription, callback) ->
   defaultGateway.http.put(
-    "/subscriptions/#{subscription.id}/make_past_due?days_past_due=1",
+    "#{defaultGateway.config.baseMerchantPath()}/subscriptions/#{subscription.id}/make_past_due?days_past_due=1",
     null,
     callback
   )
 
 settleTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "/transactions/#{transactionId}/settle",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settle",
     null,
     callback
   )
 
 declineSettlingTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "/transactions/#{transactionId}/settlement_decline",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_decline",
     null,
     callback
   )
 
 pendSettlingTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "/transactions/#{transactionId}/settlement_pending",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_pending",
     null,
     callback
   )
 
 settlePayPalTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
-    "/transactions/#{transactionId}/settle",
+    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settle",
     null,
     callback
   )
@@ -98,7 +99,7 @@ create3DSVerification = (merchantAccountId, params, callback) ->
     callback(threeDSecureToken)
 
   defaultGateway.http.post(
-    "/three_d_secure/create_verification/#{merchantAccountId}",
+    "#{defaultGateway.config.baseMerchantPath()}/three_d_secure/create_verification/#{merchantAccountId}",
     {three_d_secure_verification: params},
     responseCallback
   )
@@ -233,12 +234,22 @@ decodeClientToken = (encodedClientToken) ->
   unescapedClientToken
 
 createPlanForTests = (attributes, callback) ->
-  specHelper.defaultGateway.http.post '/plans/create_plan_for_tests', {plan: attributes}, (err, resp) ->
+  specHelper.defaultGateway.http.post "#{defaultGateway.config.baseMerchantPath()}/plans/create_plan_for_tests", {plan: attributes}, (err, resp) ->
     callback()
 
 createModificationForTests = (attributes, callback) ->
-  specHelper.defaultGateway.http.post '/modifications/create_modification_for_tests', {modification: attributes}, (err, resp) ->
+  specHelper.defaultGateway.http.post "#{defaultGateway.config.baseMerchantPath()}/modifications/create_modification_for_tests", {modification: attributes}, (err, resp) ->
     callback()
+
+createToken = (gateway, attributes, callback) ->
+  specHelper.createGrant gateway, attributes, (err, code) ->
+    gateway.oauth.createTokenFromCode {code: code}, callback
+
+createGrant = (gateway, attributes, callback) ->
+  gateway.http.post '/oauth_testing/grants', attributes, (err, response) ->
+    return callback(err, null) if err
+    callback(null, response.grant.code)
+
 
 class ClientApiHttp
   timeout: 60000
@@ -304,8 +315,6 @@ GLOBAL.specHelper =
   dateToMdy: dateToMdy
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
-  defaultConfig: defaultConfig
-  defaultGateway: defaultGateway
   doesNotInclude: doesNotInclude
   escrowTransaction: escrowTransaction
   makePastDue: makePastDue
@@ -330,3 +339,5 @@ GLOBAL.specHelper =
   generateNonceForNewPaymentMethod: generateNonceForNewPaymentMethod
   createPlanForTests: createPlanForTests
   createModificationForTests: createModificationForTests
+  createGrant: createGrant
+  createToken: createToken

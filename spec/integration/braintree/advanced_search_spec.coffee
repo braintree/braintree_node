@@ -4,7 +4,6 @@ require("../../spec_helper")
 
 describe "AdvancedSearch", ->
   beforeEach ->
-    @timeout 5000
 
   describe "textFields", ->
     subscription1 = null
@@ -91,7 +90,6 @@ describe "AdvancedSearch", ->
 
   describe "keyValueFields", ->
     it "accepts the 'is' operator", (done) ->
-      @timeout 5000
 
       transactionParams =
         amount: "5.00"

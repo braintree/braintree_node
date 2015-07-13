@@ -168,6 +168,7 @@ class ValidationErrorCodes
     EmailFormatIsInvalid : "93602"
     EmailIsRequired : "83601"
     InconsistentCountry : "93612"
+    PaymentMethodsAreInvalid: "93613"
 
   @MerchantAccount =
     ApplicantDetails:
@@ -256,6 +257,13 @@ class ValidationErrorCodes
     MasterMerchantAccountIdIsRequired : "82606"
     MasterMerchantAccountMustBeActive : "82608"
     TosAcceptedIsRequired : "82610"
+
+  @OAuth = 
+    InvalidGrant : "93801"
+    InvalidCredentials : "93802"
+    InvalidScope : "93803"
+    InvalidRequest : "93804"
+    UnsupportedGrantType : "93805"
 
   @PaymentMethod =
     CannotForwardPaymentMethodType : "93106"
