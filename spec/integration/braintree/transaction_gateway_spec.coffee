@@ -454,6 +454,25 @@ describe "TransactionGateway", ->
 
               done()
 
+        it "successfully creates a transaction with a PayPal description", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              paypalAccount: {}
+              options:
+                paypal:
+                  description: 'product description'
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.paypalAccount.description, 'product description')
+
+              done()
+
         it "does not vault even when explicitly asked", (done) ->
           nonce = Nonces.PayPalOneTimePayment
 
