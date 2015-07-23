@@ -10,6 +10,7 @@ errorTypes = require("./braintree/error_types")
 {MerchantAccount} = require("./braintree/merchant_account")
 {PaymentInstrumentTypes} = require("./braintree/payment_instrument_types")
 {WebhookNotification} = require("./braintree/webhook_notification")
+{TestTransaction} = require("./braintree/test_transaction")
 
 {CreditCardDefaults} = require("./braintree/test/credit_card_defaults")
 {CreditCardNumbers} = require("./braintree/test/credit_card_numbers")
@@ -27,6 +28,7 @@ exports.Environment = Environment
 exports.errorTypes = errorTypes
 
 exports.Transaction = Transaction
+exports.TestTransaction = TestTransaction
 exports.CreditCard = CreditCard
 exports.CreditCardVerification = CreditCardVerification
 exports.Subscription = Subscription
