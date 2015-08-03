@@ -12,6 +12,7 @@ querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
 chai = require("chai")
 {Buffer} = require('buffer')
 xml2js = require('xml2js')
+{TestTransaction} = require('../lib/braintree/test_transaction')
 
 chai.Assertion.includeStack = true
 
@@ -61,27 +62,6 @@ escrowTransaction = (transactionId, callback) ->
 makePastDue = (subscription, callback) ->
   defaultGateway.http.put(
     "#{defaultGateway.config.baseMerchantPath()}/subscriptions/#{subscription.id}/make_past_due?days_past_due=1",
-    null,
-    callback
-  )
-
-settleTransaction = (transactionId, callback) ->
-  defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settle",
-    null,
-    callback
-  )
-
-declineSettlingTransaction = (transactionId, callback) ->
-  defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_decline",
-    null,
-    callback
-  )
-
-pendSettlingTransaction = (transactionId, callback) ->
-  defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_pending",
     null,
     callback
   )
@@ -188,7 +168,8 @@ createTransactionToRefund = (callback) ->
       submitForSettlement: true
 
   specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
-    specHelper.settleTransaction result.transaction.id, (err, settleResult) ->
+    testTransaction = new TestTransaction
+    testTransaction.settle specHelper.defaultGateway, result.transaction.id, (err, settleResult) ->
       specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
         callback(transaction)
 
@@ -322,9 +303,6 @@ GLOBAL.specHelper =
   nowInEastern: nowInEastern
   plans: plans
   randomId: randomId
-  settleTransaction: settleTransaction
-  declineSettlingTransaction: declineSettlingTransaction
-  pendSettlingTransaction: pendSettlingTransaction
   settlePayPalTransaction: settlePayPalTransaction
   simulateTrFormPost: simulateTrFormPost
   defaultMerchantAccountId: "sandbox_credit_card"

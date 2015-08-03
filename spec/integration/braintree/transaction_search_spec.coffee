@@ -6,6 +6,7 @@ CreditCard = Braintree.CreditCard
 {Util} = require('../../../lib/braintree/util')
 {Writable} = require('stream')
 braintree = specHelper.braintree
+TestTransaction = Braintree.TestTransaction
 
 describe "TransactionSearch", ->
   describe "search", ->
@@ -57,7 +58,8 @@ describe "TransactionSearch", ->
           submitForSettlement: true
 
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-        specHelper.settleTransaction response.transaction.id, (err, settleResult) ->
+        testTransaction = new TestTransaction()
+        testTransaction.settle specHelper.defaultGateway, response.transaction.id, (err, settleResult) ->
           specHelper.defaultGateway.transaction.find response.transaction.id, (err, transaction) ->
             textCriteria =
               billingCompany: "Braintree"
@@ -172,7 +174,8 @@ describe "TransactionSearch", ->
           submitForSettlement: true
 
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-        specHelper.settlePayPalTransaction response.transaction.id, (err, settleResult) ->
+        testTransaction = new TestTransaction
+        testTransaction.settle specHelper.defaultGateway, response.transaction.id, (err, settleResult) ->
           specHelper.defaultGateway.transaction.find response.transaction.id, (err, transaction) ->
 
             search = (search) ->
