@@ -1,7 +1,6 @@
 require('../../spec_helper')
 {TestTransaction} = require('../../../lib/braintree/test_transaction')
 
-{_} = require('underscore')
 braintree = specHelper.braintree
 
 describe "SettlementBatchSummaryGateway", ->
@@ -28,14 +27,14 @@ describe "SettlementBatchSummaryGateway", ->
           number: '4111111111111111'
           expirationDate: '05/12'
 
-      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
+      specHelper.defaultGateway.transaction.credit transactionParams, (err, transactionResponse) ->
         testTransaction = new TestTransaction()
-        testTransaction.settle specHelper.defaultGateway, response.transaction.id, (err, response) ->
+        testTransaction.settle specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
           formattedDate = specHelper.dateToMdy(specHelper.nowInEastern())
-          specHelper.defaultGateway.settlementBatchSummary.generate settlementDate: formattedDate, (err, response) ->
-            assert.isTrue(response.success)
+          specHelper.defaultGateway.settlementBatchSummary.generate settlementDate: formattedDate, (err, settleBatchResponse) ->
+            assert.isTrue(settleBatchResponse.success)
 
-            visaRecords = (record for record in response.settlementBatchSummary.records when record.cardType is "Visa")
+            visaRecords = (record for record in settleBatchResponse.settlementBatchSummary.records when record.cardType is "Visa")
             assert.ok(visaRecords[0]['count'] >= 1)
             assert.ok(parseFloat(visaRecords[0]['amountSettled']) >= parseFloat("5.00"))
 
@@ -50,17 +49,17 @@ describe "SettlementBatchSummaryGateway", ->
         customFields:
           store_me: 1
 
-      specHelper.defaultGateway.transaction.credit transactionParams, (err, response) ->
+      specHelper.defaultGateway.transaction.credit transactionParams, (err, transactionResponse) ->
         testTransaction = new TestTransaction()
-        testTransaction.settle specHelper.defaultGateway, response.transaction.id, (err, response) ->
+        testTransaction.settle specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
           formattedDate = specHelper.dateToMdy(specHelper.nowInEastern())
           settlementBatchParams =
             settlementDate: formattedDate
             groupByCustomField: "store_me"
 
-          specHelper.defaultGateway.settlementBatchSummary.generate settlementBatchParams, (err, response) ->
-            assert.isTrue(response.success)
-            records = response.settlementBatchSummary.records
+          specHelper.defaultGateway.settlementBatchSummary.generate settlementBatchParams, (err, settleBatchResponse) ->
+            assert.isTrue(settleBatchResponse.success)
+            records = settleBatchResponse.settlementBatchSummary.records
             assert.ok(records[0]['store_me'])
 
             done()
