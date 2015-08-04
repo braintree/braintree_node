@@ -114,7 +114,7 @@ describe "AdvancedSearch", ->
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             transaction2 = response.transaction
-            testTransaction.settle specHelper.defaultGateway, transaction2.id, (err, response) ->
+            testTransaction.settle specHelper.defaultGateway, transaction2.id, (err, settleResult) ->
               specHelper.defaultGateway.transaction.refund transaction1.id, (err, response) ->
                 specHelper.defaultGateway.transaction.search (search) ->
                   search.id().is(transaction1.id)

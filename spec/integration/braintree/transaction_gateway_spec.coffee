@@ -209,7 +209,7 @@ describe "TransactionGateway", ->
             transactionId = response.transaction.id
 
             testTransaction = new TestTransaction()
-            testTransaction.settlementDeclined specHelper.defaultGateway, transactionId, (err, transaction) ->
+            testTransaction.settlementDecline specHelper.defaultGateway, transactionId, (err, transaction) ->
               specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
                 assert.equal(transaction.processorSettlementResponseCode, "4001")
                 assert.equal(transaction.processorSettlementResponseText, "Settlement Declined")

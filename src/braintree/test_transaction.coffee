@@ -19,10 +19,10 @@ class TestTransaction
   settlementPending: (gateway, transactionId, callback) ->
     this.settlementOperationWithEnvironmentCheck(gateway, transactionId, "settlement_pending", callback)
 
-  settlementConfirmed: (gateway, transactionId, callback) ->
+  settlementConfirm: (gateway, transactionId, callback) ->
     this.settlementOperationWithEnvironmentCheck(gateway, transactionId, "settlement_confirm", callback)
 
-  settlementDeclined: (gateway, transactionId, callback) ->
+  settlementDecline: (gateway, transactionId, callback) ->
     this.settlementOperationWithEnvironmentCheck(gateway, transactionId, "settlement_decline", callback)
 
 exports.TestTransaction = TestTransaction

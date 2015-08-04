@@ -61,7 +61,7 @@ describe "TestTransaction", ->
         assert.isTrue(response.success)
         assert.equal(response.transaction.status, 'submitted_for_settlement')
         testTransaction = new TestTransaction()
-        testTransaction.settlementConfirmed specHelper.defaultGateway, response.transaction.id, (err, response) ->
+        testTransaction.settlementConfirm specHelper.defaultGateway, response.transaction.id, (err, response) ->
           assert.isNull(err)
           assert.equal(response.transaction.status, 'settlement_confirmed')
 
@@ -81,7 +81,7 @@ describe "TestTransaction", ->
         assert.isTrue(response.success)
         assert.equal(response.transaction.status, 'submitted_for_settlement')
         testTransaction = new TestTransaction()
-        testTransaction.settlementDeclined specHelper.defaultGateway, response.transaction.id, (err, response) ->
+        testTransaction.settlementDecline specHelper.defaultGateway, response.transaction.id, (err, response) ->
           assert.isNull(err)
           assert.equal(response.transaction.status, 'settlement_declined')
 
