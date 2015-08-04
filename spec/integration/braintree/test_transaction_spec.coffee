@@ -16,14 +16,14 @@ describe "TestTransaction", ->
         options:
           submitForSettlement: true
 
-      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, transactionResponse) ->
         assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.transaction.status, 'submitted_for_settlement')
+        assert.isTrue(transactionResponse.success)
+        assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement')
         testTransaction = new TestTransaction()
-        testTransaction.settle specHelper.defaultGateway, response.transaction.id, (err, response) ->
+        testTransaction.settle specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
           assert.isNull(err)
-          assert.equal(response.transaction.status, 'settled')
+          assert.equal(settleResponse.transaction.status, 'settled')
 
           done()
 
@@ -36,14 +36,14 @@ describe "TestTransaction", ->
         options:
           submitForSettlement: true
 
-      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, transactionResponse) ->
         assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.transaction.status, 'submitted_for_settlement')
+        assert.isTrue(transactionResponse.success)
+        assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement')
         testTransaction = new TestTransaction()
-        testTransaction.settlementPending specHelper.defaultGateway, response.transaction.id, (err, response) ->
+        testTransaction.settlementPending specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
           assert.isNull(err)
-          assert.equal(response.transaction.status, 'settlement_pending')
+          assert.equal(settleResponse.transaction.status, 'settlement_pending')
 
           done()
 
@@ -56,14 +56,14 @@ describe "TestTransaction", ->
         options:
           submitForSettlement: true
 
-      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, transactionResponse) ->
         assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.transaction.status, 'submitted_for_settlement')
+        assert.isTrue(transactionResponse.success)
+        assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement')
         testTransaction = new TestTransaction()
-        testTransaction.settlementConfirm specHelper.defaultGateway, response.transaction.id, (err, response) ->
+        testTransaction.settlementConfirm specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
           assert.isNull(err)
-          assert.equal(response.transaction.status, 'settlement_confirmed')
+          assert.equal(settleResponse.transaction.status, 'settlement_confirmed')
 
           done()
 
@@ -76,14 +76,14 @@ describe "TestTransaction", ->
         options:
           submitForSettlement: true
 
-      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, transactionResponse) ->
         assert.isNull(err)
-        assert.isTrue(response.success)
-        assert.equal(response.transaction.status, 'submitted_for_settlement')
+        assert.isTrue(transactionResponse.success)
+        assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement')
         testTransaction = new TestTransaction()
-        testTransaction.settlementDecline specHelper.defaultGateway, response.transaction.id, (err, response) ->
+        testTransaction.settlementDecline specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
           assert.isNull(err)
-          assert.equal(response.transaction.status, 'settlement_declined')
+          assert.equal(settleResponse.transaction.status, 'settlement_declined')
 
           done()
 
@@ -105,8 +105,8 @@ describe "TestTransaction", ->
 
       gateway = braintree.connect(gatewayConfig)
       testTransaction = new TestTransaction()
-      testTransaction.settle gateway, 'transaction_id', (err, response) ->
+      testTransaction.settle gateway, 'transaction_id', (err, transactionResponse) ->
         assert.equal(err.type, braintree.errorTypes.testOperationPerformedInProductionError)
 
         done()
-      
+
