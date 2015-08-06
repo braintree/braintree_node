@@ -11,7 +11,6 @@ braintree = specHelper.braintree
 {Transaction} = require('../../../lib/braintree/transaction')
 {Dispute} = require('../../../lib/braintree/dispute')
 {Config} = require('../../../lib/braintree/config')
-{TestTransaction} = require('../../../lib/braintree/test_transaction')
 
 describe "TransactionGateway", ->
   describe "sale", ->
@@ -208,8 +207,7 @@ describe "TransactionGateway", ->
             assert.isTrue(response.success)
             transactionId = response.transaction.id
 
-            testTransaction = new TestTransaction()
-            testTransaction.settlementDecline specHelper.defaultGateway, transactionId, (err, transaction) ->
+            specHelper.defaultGateway.testing.settlementDecline transactionId, (err, transaction) ->
               specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
                 assert.equal(transaction.processorSettlementResponseCode, "4001")
                 assert.equal(transaction.processorSettlementResponseText, "Settlement Declined")
@@ -228,8 +226,7 @@ describe "TransactionGateway", ->
             assert.isTrue(response.success)
             transactionId = response.transaction.id
 
-            testTransaction = new TestTransaction()
-            testTransaction.settlementPending specHelper.defaultGateway, transactionId, (err, response) ->
+            specHelper.defaultGateway.testing.settlementPending transactionId, (err, response) ->
               specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
                 assert.equal(transaction.processorSettlementResponseCode, "4002")
                 assert.equal(transaction.processorSettlementResponseText, "Settlement Pending")
@@ -968,8 +965,7 @@ describe "TransactionGateway", ->
           options:
             submitForSettlement: true
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          testTransaction = new TestTransaction()
-          testTransaction.settle specHelper.defaultGateway, response.transaction.id, (err, response) ->
+          specHelper.defaultGateway.testing.settle response.transaction.id, (err, response) ->
             specHelper.defaultGateway.transaction.holdInEscrow response.transaction.id, (err, response) ->
               assert.isFalse(response.success)
               assert.equal(

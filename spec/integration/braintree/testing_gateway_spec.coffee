@@ -2,12 +2,11 @@ require('../../spec_helper')
 
 braintree = specHelper.braintree
 {Transaction} = require('../../../lib/braintree/transaction')
-{TestTransaction} = require('../../../lib/braintree/test_transaction')
 {Environment} = require('../../../lib/braintree/environment')
 
-describe "TestTransaction", ->
+describe "TestingGateway", ->
   describe "test settlement methods", ->
-    it "settles a test transaction", (done) ->
+    it "settles a transaction", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:
@@ -20,14 +19,13 @@ describe "TestTransaction", ->
         assert.isNull(err)
         assert.isTrue(transactionResponse.success)
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement')
-        testTransaction = new TestTransaction()
-        testTransaction.settle specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
+        specHelper.defaultGateway.testing.settle transactionResponse.transaction.id, (err, settleResponse) ->
           assert.isNull(err)
           assert.equal(settleResponse.transaction.status, 'settled')
 
           done()
 
-    it "marks a test transaction settlement pending", (done) ->
+    it "marks a transaction settlement pending", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:
@@ -40,14 +38,13 @@ describe "TestTransaction", ->
         assert.isNull(err)
         assert.isTrue(transactionResponse.success)
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement')
-        testTransaction = new TestTransaction()
-        testTransaction.settlementPending specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
+        specHelper.defaultGateway.testing.settlementPending transactionResponse.transaction.id, (err, settleResponse) ->
           assert.isNull(err)
           assert.equal(settleResponse.transaction.status, 'settlement_pending')
 
           done()
 
-    it "marks a test transaction settlement confirmed", (done) ->
+    it "marks a transaction settlement confirmed", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:
@@ -60,14 +57,13 @@ describe "TestTransaction", ->
         assert.isNull(err)
         assert.isTrue(transactionResponse.success)
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement')
-        testTransaction = new TestTransaction()
-        testTransaction.settlementConfirm specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
+        specHelper.defaultGateway.testing.settlementConfirm transactionResponse.transaction.id, (err, settleResponse) ->
           assert.isNull(err)
           assert.equal(settleResponse.transaction.status, 'settlement_confirmed')
 
           done()
 
-    it "marks a test transaction settlement declined", (done) ->
+    it "marks a transaction settlement declined", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:
@@ -80,14 +76,13 @@ describe "TestTransaction", ->
         assert.isNull(err)
         assert.isTrue(transactionResponse.success)
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement')
-        testTransaction = new TestTransaction()
-        testTransaction.settlementDecline specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
+        specHelper.defaultGateway.testing.settlementDecline transactionResponse.transaction.id, (err, settleResponse) ->
           assert.isNull(err)
           assert.equal(settleResponse.transaction.status, 'settlement_declined')
 
           done()
 
-    it "throws an error if test transaction settlement methods are used in production", (done) ->
+    it "throws an error if testing gateway settlement methods are used in production", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:
@@ -104,8 +99,7 @@ describe "TestTransaction", ->
       }
 
       gateway = braintree.connect(gatewayConfig)
-      testTransaction = new TestTransaction()
-      testTransaction.settle gateway, 'transaction_id', (err, transactionResponse) ->
+      gateway.testing.settlementConfirm 'transaction_id', (err, transactionResponse) ->
         assert.equal(err.type, braintree.errorTypes.testOperationPerformedInProductionError)
 
         done()

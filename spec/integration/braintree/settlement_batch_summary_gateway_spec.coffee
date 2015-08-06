@@ -1,5 +1,4 @@
 require('../../spec_helper')
-{TestTransaction} = require('../../../lib/braintree/test_transaction')
 
 braintree = specHelper.braintree
 
@@ -28,8 +27,7 @@ describe "SettlementBatchSummaryGateway", ->
           expirationDate: '05/12'
 
       specHelper.defaultGateway.transaction.credit transactionParams, (err, transactionResponse) ->
-        testTransaction = new TestTransaction()
-        testTransaction.settle specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
+        specHelper.defaultGateway.testing.settle transactionResponse.transaction.id, (err, settleResponse) ->
           formattedDate = specHelper.dateToMdy(specHelper.nowInEastern())
           specHelper.defaultGateway.settlementBatchSummary.generate settlementDate: formattedDate, (err, settleBatchResponse) ->
             assert.isTrue(settleBatchResponse.success)
@@ -50,8 +48,7 @@ describe "SettlementBatchSummaryGateway", ->
           store_me: 1
 
       specHelper.defaultGateway.transaction.credit transactionParams, (err, transactionResponse) ->
-        testTransaction = new TestTransaction()
-        testTransaction.settle specHelper.defaultGateway, transactionResponse.transaction.id, (err, settleResponse) ->
+        specHelper.defaultGateway.testing.settle transactionResponse.transaction.id, (err, settleResponse) ->
           formattedDate = specHelper.dateToMdy(specHelper.nowInEastern())
           settlementBatchParams =
             settlementDate: formattedDate

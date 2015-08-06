@@ -1,7 +1,6 @@
 require("../../spec_helper")
 {SubscriptionSearch} = require('../../../lib/braintree/subscription_search')
 {TransactionSearch} = require('../../../lib/braintree/transaction_search')
-{TestTransaction} = require('../../../lib/braintree/test_transaction')
 
 describe "AdvancedSearch", ->
   beforeEach ->
@@ -102,8 +101,7 @@ describe "AdvancedSearch", ->
 
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         transaction1 = response.transaction
-        testTransaction = new TestTransaction()
-        testTransaction.settle specHelper.defaultGateway, transaction1.id, (err, response) ->
+        specHelper.defaultGateway.testing.settle transaction1.id, (err, response) ->
           transactionParams =
             amount: "10.00"
             creditCard:
@@ -114,7 +112,7 @@ describe "AdvancedSearch", ->
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             transaction2 = response.transaction
-            testTransaction.settle specHelper.defaultGateway, transaction2.id, (err, settleResult) ->
+            specHelper.defaultGateway.testing.settle transaction2.id, (err, settleResult) ->
               specHelper.defaultGateway.transaction.refund transaction1.id, (err, response) ->
                 specHelper.defaultGateway.transaction.search (search) ->
                   search.id().is(transaction1.id)

@@ -12,7 +12,6 @@ querystring = require('../vendor/querystring.node.js.511d6a2/querystring')
 chai = require("chai")
 {Buffer} = require('buffer')
 xml2js = require('xml2js')
-{TestTransaction} = require('../lib/braintree/test_transaction')
 
 chai.Assertion.includeStack = true
 
@@ -168,8 +167,7 @@ createTransactionToRefund = (callback) ->
       submitForSettlement: true
 
   specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
-    testTransaction = new TestTransaction
-    testTransaction.settle specHelper.defaultGateway, result.transaction.id, (err, settleResult) ->
+    specHelper.defaultGateway.testing.settle result.transaction.id, (err, settleResult) ->
       specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
         callback(transaction)
 
