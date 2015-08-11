@@ -83,14 +83,6 @@ describe "TestingGateway", ->
           done()
 
     it "throws an error if testing gateway settlement methods are used in production", (done) ->
-      transactionParams =
-        amount: '5.00'
-        creditCard:
-          number: '5105105105105100'
-          expirationDate: '05/12'
-        options:
-          submitForSettlement: true
-
       gatewayConfig = {
         environment: Environment.Production
         merchantId: 'integration_merchant_id'
