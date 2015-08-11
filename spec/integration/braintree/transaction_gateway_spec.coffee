@@ -207,7 +207,7 @@ describe "TransactionGateway", ->
             assert.isTrue(response.success)
             transactionId = response.transaction.id
 
-            specHelper.declineSettlingTransaction transactionId, (err, response) ->
+            specHelper.defaultGateway.testing.settlementDecline transactionId, (err, transaction) ->
               specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
                 assert.equal(transaction.processorSettlementResponseCode, "4001")
                 assert.equal(transaction.processorSettlementResponseText, "Settlement Declined")
@@ -226,7 +226,7 @@ describe "TransactionGateway", ->
             assert.isTrue(response.success)
             transactionId = response.transaction.id
 
-            specHelper.pendSettlingTransaction transactionId, (err, response) ->
+            specHelper.defaultGateway.testing.settlementPending transactionId, (err, response) ->
               specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
                 assert.equal(transaction.processorSettlementResponseCode, "4002")
                 assert.equal(transaction.processorSettlementResponseText, "Settlement Pending")
@@ -965,7 +965,7 @@ describe "TransactionGateway", ->
           options:
             submitForSettlement: true
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          specHelper.settleTransaction response.transaction.id, (err, response) ->
+          specHelper.defaultGateway.testing.settle response.transaction.id, (err, response) ->
             specHelper.defaultGateway.transaction.holdInEscrow response.transaction.id, (err, response) ->
               assert.isFalse(response.success)
               assert.equal(

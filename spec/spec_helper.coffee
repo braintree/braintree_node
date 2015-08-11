@@ -65,27 +65,6 @@ makePastDue = (subscription, callback) ->
     callback
   )
 
-settleTransaction = (transactionId, callback) ->
-  defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settle",
-    null,
-    callback
-  )
-
-declineSettlingTransaction = (transactionId, callback) ->
-  defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_decline",
-    null,
-    callback
-  )
-
-pendSettlingTransaction = (transactionId, callback) ->
-  defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_pending",
-    null,
-    callback
-  )
-
 settlePayPalTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
     "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settle",
@@ -188,7 +167,7 @@ createTransactionToRefund = (callback) ->
       submitForSettlement: true
 
   specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
-    specHelper.settleTransaction result.transaction.id, (err, settleResult) ->
+    specHelper.defaultGateway.testing.settle result.transaction.id, (err, settleResult) ->
       specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
         callback(transaction)
 
@@ -322,9 +301,6 @@ GLOBAL.specHelper =
   nowInEastern: nowInEastern
   plans: plans
   randomId: randomId
-  settleTransaction: settleTransaction
-  declineSettlingTransaction: declineSettlingTransaction
-  pendSettlingTransaction: pendSettlingTransaction
   settlePayPalTransaction: settlePayPalTransaction
   simulateTrFormPost: simulateTrFormPost
   defaultMerchantAccountId: "sandbox_credit_card"
