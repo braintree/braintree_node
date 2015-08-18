@@ -124,11 +124,6 @@ dateToMdy = (date) ->
   formattedDate = year + '-' + month + '-' + day
   return formattedDate
 
-nowInEastern = ->
-  now = new Date
-  eastern = now.getTime() - (5*60*60*1000)
-  return new Date(eastern)
-
 randomId = ->
   Math.floor(Math.random() * Math.pow(36,8)).toString(36)
 
@@ -298,7 +293,6 @@ GLOBAL.specHelper =
   escrowTransaction: escrowTransaction
   makePastDue: makePastDue
   multiplyString: multiplyString
-  nowInEastern: nowInEastern
   plans: plans
   randomId: randomId
   settlePayPalTransaction: settlePayPalTransaction
