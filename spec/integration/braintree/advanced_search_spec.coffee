@@ -101,7 +101,7 @@ describe "AdvancedSearch", ->
 
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         transaction1 = response.transaction
-        specHelper.settleTransaction transaction1.id, (err, settleResult) ->
+        specHelper.defaultGateway.testing.settle transaction1.id, (err, response) ->
           transactionParams =
             amount: "10.00"
             creditCard:
@@ -112,7 +112,7 @@ describe "AdvancedSearch", ->
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             transaction2 = response.transaction
-            specHelper.settleTransaction transaction2.id, (err, settleResult) ->
+            specHelper.defaultGateway.testing.settle transaction2.id, (err, settleResult) ->
               specHelper.defaultGateway.transaction.refund transaction1.id, (err, response) ->
                 specHelper.defaultGateway.transaction.search (search) ->
                   search.id().is(transaction1.id)

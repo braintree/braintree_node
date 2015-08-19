@@ -207,7 +207,7 @@ describe "TransactionGateway", ->
             assert.isTrue(response.success)
             transactionId = response.transaction.id
 
-            specHelper.declineSettlingTransaction transactionId, (err, response) ->
+            specHelper.defaultGateway.testing.settlementDecline transactionId, (err, transaction) ->
               specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
                 assert.equal(transaction.processorSettlementResponseCode, "4001")
                 assert.equal(transaction.processorSettlementResponseText, "Settlement Declined")
@@ -226,7 +226,7 @@ describe "TransactionGateway", ->
             assert.isTrue(response.success)
             transactionId = response.transaction.id
 
-            specHelper.pendSettlingTransaction transactionId, (err, response) ->
+            specHelper.defaultGateway.testing.settlementPending transactionId, (err, response) ->
               specHelper.defaultGateway.transaction.find transactionId, (err, transaction) ->
                 assert.equal(transaction.processorSettlementResponseCode, "4002")
                 assert.equal(transaction.processorSettlementResponseText, "Settlement Pending")
@@ -451,6 +451,25 @@ describe "TransactionGateway", ->
               assert.isString(response.transaction.paypalAccount.authorizationId)
               assert.isString(response.transaction.paypalAccount.debugId)
               assert.equal(response.transaction.paypalAccount.customField, 'custom field junk')
+
+              done()
+
+        it "successfully creates a transaction with a PayPal description", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              paypalAccount: {}
+              options:
+                paypal:
+                  description: 'product description'
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.paypalAccount.description, 'product description')
 
               done()
 
@@ -946,7 +965,7 @@ describe "TransactionGateway", ->
           options:
             submitForSettlement: true
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          specHelper.settleTransaction response.transaction.id, (err, response) ->
+          specHelper.defaultGateway.testing.settle response.transaction.id, (err, response) ->
             specHelper.defaultGateway.transaction.holdInEscrow response.transaction.id, (err, response) ->
               assert.isFalse(response.success)
               assert.equal(
@@ -1273,6 +1292,8 @@ describe "TransactionGateway", ->
         assert.isString(transaction.paypalAccount.sellerProtectionStatus)
         assert.isString(transaction.paypalAccount.captureId)
         assert.isString(transaction.paypalAccount.refundId)
+        assert.isString(transaction.paypalAccount.transactionFeeAmount)
+        assert.isString(transaction.paypalAccount.transactionFeeCurrencyIsoCode)
         done()
 
     context "threeDSecureInfo", ->

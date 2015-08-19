@@ -65,27 +65,6 @@ makePastDue = (subscription, callback) ->
     callback
   )
 
-settleTransaction = (transactionId, callback) ->
-  defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settle",
-    null,
-    callback
-  )
-
-declineSettlingTransaction = (transactionId, callback) ->
-  defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_decline",
-    null,
-    callback
-  )
-
-pendSettlingTransaction = (transactionId, callback) ->
-  defaultGateway.http.put(
-    "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settlement_pending",
-    null,
-    callback
-  )
-
 settlePayPalTransaction = (transactionId, callback) ->
   defaultGateway.http.put(
     "#{defaultGateway.config.baseMerchantPath()}/transactions/#{transactionId}/settle",
@@ -145,11 +124,6 @@ dateToMdy = (date) ->
   formattedDate = year + '-' + month + '-' + day
   return formattedDate
 
-nowInEastern = ->
-  now = new Date
-  eastern = now.getTime() - (5*60*60*1000)
-  return new Date(eastern)
-
 randomId = ->
   Math.floor(Math.random() * Math.pow(36,8)).toString(36)
 
@@ -188,7 +162,7 @@ createTransactionToRefund = (callback) ->
       submitForSettlement: true
 
   specHelper.defaultGateway.transaction.sale transactionParams, (err, result) ->
-    specHelper.settleTransaction result.transaction.id, (err, settleResult) ->
+    specHelper.defaultGateway.testing.settle result.transaction.id, (err, settleResult) ->
       specHelper.defaultGateway.transaction.find result.transaction.id, (err, transaction) ->
         callback(transaction)
 
@@ -319,12 +293,8 @@ GLOBAL.specHelper =
   escrowTransaction: escrowTransaction
   makePastDue: makePastDue
   multiplyString: multiplyString
-  nowInEastern: nowInEastern
   plans: plans
   randomId: randomId
-  settleTransaction: settleTransaction
-  declineSettlingTransaction: declineSettlingTransaction
-  pendSettlingTransaction: pendSettlingTransaction
   settlePayPalTransaction: settlePayPalTransaction
   simulateTrFormPost: simulateTrFormPost
   defaultMerchantAccountId: "sandbox_credit_card"
