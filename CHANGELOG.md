@@ -1,3 +1,8 @@
+## 1.28.0
+* Add new test payment method nonces
+* Allow passing description on PayPal transactions
+* Add methods to change transaction settlement status in sandbox
+
 ## 1.27.0
 * Add oauth support
 
