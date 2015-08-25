@@ -124,6 +124,15 @@ dateToMdy = (date) ->
   formattedDate = year + '-' + month + '-' + day
   return formattedDate
 
+settlementDate = (date) ->
+  now_in_utc = date
+  eastern_time = new Date(now_in_utc.getTime() - (4*60*60*1000))
+
+  if now_in_utc.getDate().toString() != eastern_time.getDate().toString()
+    return eastern_time
+  else
+    return now_in_utc
+
 randomId = ->
   Math.floor(Math.random() * Math.pow(36,8)).toString(36)
 
@@ -287,6 +296,7 @@ GLOBAL.specHelper =
   braintree: braintree
   create3DSVerification: create3DSVerification
   dateToMdy: dateToMdy
+  settlementDate: settlementDate
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
   doesNotInclude: doesNotInclude

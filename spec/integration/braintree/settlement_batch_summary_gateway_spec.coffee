@@ -28,7 +28,8 @@ describe "SettlementBatchSummaryGateway", ->
 
       specHelper.defaultGateway.transaction.credit transactionParams, (err, transactionResponse) ->
         specHelper.defaultGateway.testing.settle transactionResponse.transaction.id, (err, settleResponse) ->
-          formattedDate = specHelper.dateToMdy(new Date())
+          settlementDate = specHelper.settlementDate(new Date())
+          formattedDate = specHelper.dateToMdy(settlementDate)
           specHelper.defaultGateway.settlementBatchSummary.generate settlementDate: formattedDate, (err, settleBatchResponse) ->
             assert.isTrue(settleBatchResponse.success)
 
@@ -49,7 +50,8 @@ describe "SettlementBatchSummaryGateway", ->
 
       specHelper.defaultGateway.transaction.credit transactionParams, (err, transactionResponse) ->
         specHelper.defaultGateway.testing.settle transactionResponse.transaction.id, (err, settleResponse) ->
-          formattedDate = specHelper.dateToMdy(new Date())
+          settlementDate = specHelper.settlementDate(new Date())
+          formattedDate = specHelper.dateToMdy(settlementDate)
           settlementBatchParams =
             settlementDate: formattedDate
             groupByCustomField: "store_me"
