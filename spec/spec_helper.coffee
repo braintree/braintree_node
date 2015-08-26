@@ -125,13 +125,17 @@ dateToMdy = (date) ->
   return formattedDate
 
 settlementDate = (date) ->
-  now_in_utc = date
-  eastern_time = new Date(now_in_utc.getTime() - (4*60*60*1000))
-
-  if now_in_utc.getDate().toString() != eastern_time.getDate().toString()
-    return eastern_time
+  if daylightSavings()
+    return new Date(date.getTime() - (4*60*60*1000))
   else
-    return now_in_utc
+    return new Date(date.getTime() - (5*60*60*1000))
+
+daylightSavings = ->
+  today = new Date()
+  jan = new Date(today.getFullYear(), 0, 1)
+  jul = new Date(today.getFullYear(), 6, 1)
+  stdTimezoneOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset())
+  return today.getTimezoneOffset() < stdTimezoneOffset
 
 randomId = ->
   Math.floor(Math.random() * Math.pow(36,8)).toString(36)
