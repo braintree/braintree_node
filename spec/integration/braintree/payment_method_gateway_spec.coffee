@@ -37,19 +37,20 @@ describe "PaymentMethodGateway", ->
             assert.isNull(err)
             assert.isTrue(response.success)
             assert.isNotNull(response.paymentMethod.token)
-            assert.isNotNull(response.paymentMethod.card_type)
-            assert.isNotNull(response.paymentMethod.payment_instrument_name)
+            assert.isNotNull(response.paymentMethod.cardType)
+            assert.isNotNull(response.paymentMethod.paymentInstrumentName)
+            assert.isNotNull(response.paymentMethod.sourceDescription)
 
             done()
 
     context 'Android Pay', ->
-      it "vaults an Android Pay card from the nonce", (done) ->
+      it "vaults an Android Pay proxy card from the nonce", (done) ->
         specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
           customerId = response.customer.id
 
           paymentMethodParams =
             customerId: customerId
-            paymentMethodNonce: Nonces.AndroidPay
+            paymentMethodNonce: Nonces.AndroidPayDiscover
 
           specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
             assert.isNull(err)
@@ -64,6 +65,32 @@ describe "PaymentMethodGateway", ->
             assert.include(response.paymentMethod.imageUrl, "android_pay")
             assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.Visa)
             assert.equal(response.paymentMethod.sourceCardLast4, "1111")
+            assert.equal(response.paymentMethod.sourceDescription, "Visa 1111")
+
+            done()
+
+      it "vaults an Android Pay network token from the nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
+          customerId = response.customer.id
+
+          paymentMethodParams =
+            customerId: customerId
+            paymentMethodNonce: Nonces.AndroidPayMasterCard
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isNotNull(response.paymentMethod.token)
+            assert.isNotNull(response.paymentMethod.google_transaction_id)
+            assert.equal(response.paymentMethod.virtualCardType, specHelper.braintree.CreditCard.CardType.MasterCard)
+            assert.equal(response.paymentMethod.last4, "4444")
+            assert.isString(response.paymentMethod.expirationMonth)
+            assert.isString(response.paymentMethod.expirationYear)
+            assert.isTrue(response.paymentMethod.default)
+            assert.include(response.paymentMethod.imageUrl, "android_pay")
+            assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.MasterCard)
+            assert.equal(response.paymentMethod.sourceCardLast4, "4444")
+            assert.equal(response.paymentMethod.sourceDescription, "MasterCard 4444")
 
             done()
 

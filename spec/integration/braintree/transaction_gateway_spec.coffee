@@ -142,11 +142,11 @@ describe "TransactionGateway", ->
 
             done()
 
-    context "with android pay", ->
+    context "with android pay proxy card", ->
       it "returns AndroidPayCard for payment_instrument", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
           transactionParams =
-            paymentMethodNonce: Nonces.AndroidPay
+            paymentMethodNonce: Nonces.AndroidPayDiscover
             amount: '100.00'
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
@@ -156,6 +156,23 @@ describe "TransactionGateway", ->
             assert.isString(response.transaction.androidPayCard.googleTransactionId)
             assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover)
             assert.equal(response.transaction.androidPayCard.last4, "1117")
+
+            done()
+
+    context "with android pay network token", ->
+      it "returns AndroidPayCard for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.AndroidPayMasterCard
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AndroidPayCard)
+            assert.isString(response.transaction.androidPayCard.googleTransactionId)
+            assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.MasterCard)
+            assert.equal(response.transaction.androidPayCard.last4, "4444")
 
             done()
 

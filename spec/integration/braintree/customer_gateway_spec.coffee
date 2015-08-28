@@ -134,9 +134,9 @@ describe "CustomerGateway", ->
 
           done()
 
-      it "creates a customer with an Android Pay payment method nonce", (done) ->
+      it "creates a customer with an Android Pay proxy card nonce", (done) ->
         customerParams =
-          paymentMethodNonce: Nonces.AndroidPay
+          paymentMethodNonce: Nonces.AndroidPayDiscover
 
         specHelper.defaultGateway.customer.create customerParams, (err, response) ->
           assert.isNull(err)
@@ -147,6 +147,22 @@ describe "CustomerGateway", ->
           assert.isNotNull(androidPayCard.googleTransactionId)
           assert.equal(androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover)
           assert.equal(androidPayCard.last4, "1117")
+
+          done()
+
+      it "creates a customer with an Android Pay network token nonce", (done) ->
+        customerParams =
+          paymentMethodNonce: Nonces.AndroidPayMasterCard
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.isNotNull(response.customer.androidPayCards[0])
+          androidPayCard = response.customer.androidPayCards[0]
+          assert.isNotNull(androidPayCard.token)
+          assert.isNotNull(androidPayCard.googleTransactionId)
+          assert.equal(androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.MasterCard)
+          assert.equal(androidPayCard.last4, "4444")
 
           done()
 
