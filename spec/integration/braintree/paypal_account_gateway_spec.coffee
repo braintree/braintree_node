@@ -25,6 +25,19 @@ describe "PayPalGateway", ->
 
             done()
 
+    it "returns the billing agreement id", (done) ->
+      specHelper.defaultGateway.customer.create {}, (err, response) ->
+        paymentMethodParams =
+          customerId: response.customer.id
+          paymentMethodNonce: Nonces.PayPalBillingAgreement
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          paymentMethodToken = response.paymentMethod.token
+          specHelper.defaultGateway.paypalAccount.find paymentMethodToken, (err, paypalAccount) ->
+            assert.isNull(err)
+            assert.isString(paypalAccount.billingAgreementId)
+            done()
+
     it "handles not finding the paypal account", (done) ->
       specHelper.defaultGateway.paypalAccount.find 'NONEXISTENT_TOKEN', (err, creditCard) ->
         assert.equal(err.type, braintree.errorTypes.notFoundError)
