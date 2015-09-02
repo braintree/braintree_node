@@ -142,11 +142,11 @@ describe "TransactionGateway", ->
 
             done()
 
-    context "with android pay", ->
+    context "with android pay proxy card", ->
       it "returns AndroidPayCard for payment_instrument", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
           transactionParams =
-            paymentMethodNonce: Nonces.AndroidPay
+            paymentMethodNonce: Nonces.AndroidPayDiscover
             amount: '100.00'
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
@@ -156,6 +156,23 @@ describe "TransactionGateway", ->
             assert.isString(response.transaction.androidPayCard.googleTransactionId)
             assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover)
             assert.equal(response.transaction.androidPayCard.last4, "1117")
+
+            done()
+
+    context "with android pay network token", ->
+      it "returns AndroidPayCard for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.AndroidPayMasterCard
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AndroidPayCard)
+            assert.isString(response.transaction.androidPayCard.googleTransactionId)
+            assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.MasterCard)
+            assert.equal(response.transaction.androidPayCard.last4, "4444")
 
             done()
 
@@ -174,13 +191,7 @@ describe "TransactionGateway", ->
 
             done()
 
-
-
-
-
-
     context "with a paypal acount", ->
-
       it "returns PayPalAccount for payment_instrument", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
           transactionParams =
@@ -1077,6 +1088,48 @@ describe "TransactionGateway", ->
 
         done()
 
+    context "amex rewards", (done) ->
+      it "returns a successful response", (done) ->
+        transactionParams =
+          amount: "10.00"
+          creditCard:
+            number: "371449635392376"
+            expirationDate: "12/2020"
+          options:
+            submitForSettlement: true
+            amexRewards:
+              requestId: "ABC123"
+              points: "1000"
+              currencyAmount: "10.00"
+              currencyIsoCode: "USD"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement)
+          assert.equal(response.transaction.amexRewardsResponse, "success")
+
+          done()
+
+      it "returns an unsuccessful response", (done) ->
+        transactionParams =
+          amount: "10.00"
+          creditCard:
+            number: "371449635392376"
+            expirationDate: "12/2020"
+          options:
+            submitForSettlement: true
+            amexRewards:
+              requestId: "CARD_INELIGIBLE"
+              points: "1000"
+              currencyAmount: "10.00"
+              currencyIsoCode: "USD"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement)
+          assert.equal(response.transaction.amexRewardsResponse, "RDM2002 Card is not eligible for redemption")
+
+          done()
 
   describe "credit", ->
     it "creates a credit", (done) ->
@@ -1429,6 +1482,53 @@ describe "TransactionGateway", ->
           assert.equal(response.errors.for('transaction').on('base')[0].code, '91507')
 
           done()
+
+    context "amex rewards", (done) ->
+      it "returns a successful response", (done) ->
+        transactionParams =
+          amount: "10.00"
+          creditCard:
+            number: "371449635392376"
+            expirationDate: "12/2020"
+          options:
+            amexRewards:
+              requestId: "ABC123"
+              points: "1000"
+              currencyAmount: "10.00"
+              currencyIsoCode: "USD"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, Transaction.Status.Authorized)
+
+          specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.amexRewardsResponse, "success")
+
+            done()
+
+      it "returns an unsuccessful response", (done) ->
+        transactionParams =
+          amount: "10.00"
+          creditCard:
+            number: "371449635392376"
+            expirationDate: "12/2020"
+          options:
+            amexRewards:
+              requestId: "CARD_INELIGIBLE"
+              points: "1000"
+              currencyAmount: "10.00"
+              currencyIsoCode: "USD"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, Transaction.Status.Authorized)
+
+          specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.amexRewardsResponse, "RDM2002 Card is not eligible for redemption")
+
+            done()
 
   describe "void", ->
     it "voids a transaction", (done) ->

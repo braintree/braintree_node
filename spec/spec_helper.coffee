@@ -124,6 +124,19 @@ dateToMdy = (date) ->
   formattedDate = year + '-' + month + '-' + day
   return formattedDate
 
+settlementDate = (date) ->
+  if daylightSavings()
+    return new Date(date.getTime() - (4*60*60*1000))
+  else
+    return new Date(date.getTime() - (5*60*60*1000))
+
+daylightSavings = ->
+  today = new Date()
+  jan = new Date(today.getFullYear(), 0, 1)
+  jul = new Date(today.getFullYear(), 6, 1)
+  stdTimezoneOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset())
+  return today.getTimezoneOffset() < stdTimezoneOffset
+
 randomId = ->
   Math.floor(Math.random() * Math.pow(36,8)).toString(36)
 
@@ -287,6 +300,7 @@ GLOBAL.specHelper =
   braintree: braintree
   create3DSVerification: create3DSVerification
   dateToMdy: dateToMdy
+  settlementDate: settlementDate
   defaultConfig: defaultConfig
   defaultGateway: defaultGateway
   doesNotInclude: doesNotInclude
