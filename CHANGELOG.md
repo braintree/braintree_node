@@ -1,3 +1,8 @@
+## 1.29.0
+* Add sourceDescription to Android Pay and Apple Pay
+* Add billingAgreementId to PaypalAccount
+* Add support for Amex rewards transactions
+
 ## 1.28.0
 * Add new test payment method nonces
 * Allow passing description on PayPal transactions
