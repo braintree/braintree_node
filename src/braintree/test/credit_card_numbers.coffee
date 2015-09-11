@@ -1,4 +1,4 @@
-CreditCardNumbers =
+CreditCardNumbers = {
   CardTypeIndicators : {
     Prepaid           : "4111111111111210"
     Commercial        : "4111111111131010"
@@ -11,6 +11,13 @@ CreditCardNumbers =
     IssuingBank       : "4111111141010101"
     CountryOfIssuance : "4111111111121102"
     Fraud             : "4000111111111511"
+  },
+
+  AmexPayWithPoints : {
+    Success            : "371260714673002"
+    IneligibleCard     : "378267515471109"
+    InsufficientPoints : "371544868764018"
   }
+}
 
 exports.CreditCardNumbers = CreditCardNumbers

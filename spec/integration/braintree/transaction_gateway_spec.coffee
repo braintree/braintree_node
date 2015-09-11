@@ -1089,11 +1089,11 @@ describe "TransactionGateway", ->
         done()
 
     context "amex rewards", (done) ->
-      it "returns a successful response", (done) ->
+      it "succeeds", (done) ->
         transactionParams =
           amount: "10.00"
           creditCard:
-            number: "371449635392376"
+            number: CreditCardNumbers.AmexPayWithPoints.Success
             expirationDate: "12/2020"
           options:
             submitForSettlement: true
@@ -1106,20 +1106,19 @@ describe "TransactionGateway", ->
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
           assert.isTrue(response.success)
           assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement)
-          assert.equal(response.transaction.amexRewardsResponse, "success")
 
           done()
 
-      it "returns an unsuccessful response", (done) ->
+      it "succeeds even if the card is ineligible", (done) ->
         transactionParams =
           amount: "10.00"
           creditCard:
-            number: "371449635392376"
+            number: CreditCardNumbers.AmexPayWithPoints.IneligibleCard
             expirationDate: "12/2020"
           options:
             submitForSettlement: true
             amexRewards:
-              requestId: "CARD_INELIGIBLE"
+              requestId: "ABC123"
               points: "1000"
               currencyAmount: "10.00"
               currencyIsoCode: "USD"
@@ -1127,7 +1126,26 @@ describe "TransactionGateway", ->
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
           assert.isTrue(response.success)
           assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement)
-          assert.equal(response.transaction.amexRewardsResponse, "RDM2002 Card is not eligible for redemption")
+
+          done()
+
+      it "succeeds even if the card's balance is insufficient", (done) ->
+        transactionParams =
+          amount: "10.00"
+          creditCard:
+            number: CreditCardNumbers.AmexPayWithPoints.InsufficientPoints
+            expirationDate: "12/2020"
+          options:
+            submitForSettlement: true
+            amexRewards:
+              requestId: "ABC123"
+              points: "1000"
+              currencyAmount: "10.00"
+              currencyIsoCode: "USD"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement)
 
           done()
 
@@ -1484,11 +1502,11 @@ describe "TransactionGateway", ->
           done()
 
     context "amex rewards", (done) ->
-      it "returns a successful response", (done) ->
+      it "succeeds", (done) ->
         transactionParams =
           amount: "10.00"
           creditCard:
-            number: "371449635392376"
+            number: CreditCardNumbers.AmexPayWithPoints.Success
             expirationDate: "12/2020"
           options:
             amexRewards:
@@ -1503,19 +1521,18 @@ describe "TransactionGateway", ->
 
           specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
             assert.isTrue(response.success)
-            assert.equal(response.transaction.amexRewardsResponse, "success")
 
             done()
 
-      it "returns an unsuccessful response", (done) ->
+      it "succeeds even if the card is ineligible", (done) ->
         transactionParams =
           amount: "10.00"
           creditCard:
-            number: "371449635392376"
+            number: CreditCardNumbers.AmexPayWithPoints.IneligibleCard
             expirationDate: "12/2020"
           options:
             amexRewards:
-              requestId: "CARD_INELIGIBLE"
+              requestId: "ABC123"
               points: "1000"
               currencyAmount: "10.00"
               currencyIsoCode: "USD"
@@ -1526,7 +1543,28 @@ describe "TransactionGateway", ->
 
           specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
             assert.isTrue(response.success)
-            assert.equal(response.transaction.amexRewardsResponse, "RDM2002 Card is not eligible for redemption")
+
+            done()
+
+      it "succeeds even if the card's balance is insufficient", (done) ->
+        transactionParams =
+          amount: "10.00"
+          creditCard:
+            number: CreditCardNumbers.AmexPayWithPoints.InsufficientPoints
+            expirationDate: "12/2020"
+          options:
+            amexRewards:
+              requestId: "ABC123"
+              points: "1000"
+              currencyAmount: "10.00"
+              currencyIsoCode: "USD"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, Transaction.Status.Authorized)
+
+          specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, (err, response) ->
+            assert.isTrue(response.success)
 
             done()
 
