@@ -30,18 +30,21 @@ var gateway = braintree.connect({
 
 gateway.transaction.sale({
   amount: '5.00',
-  creditCard: {
-    number: '5105105105105100',
-    expirationDate: '05/12'
+  paymentMethodNonce: "nonce-from-the-client",
+  options: {
+    submitForSettlement: true
   }
-}, function (err, result) {
-  if (err) throw err;
-
-  if (result.success) {
-    util.log('Transaction ID: ' + result.transaction.id);
-  } else {
-    util.log(result.message);
-  }
+},
+  function(err, result) {
+    if (result) {
+      if (result.success) {
+        console.log("Transaction ID: " + result.transaction.id)
+      } else {
+        console.log(result.message)
+      }
+    } else {
+      console.log(err)
+    }
 });
 ```
 
