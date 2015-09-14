@@ -271,3 +271,19 @@ describe "WebhookNotificationGateway", ->
         assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123')
         assert.ok(webhookNotification.timestamp?)
         done()
+
+    it "builds a sample notification for a successfully charged subscription", (done) ->
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubscriptionChargedSuccessfully,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionChargedSuccessfully)
+        assert.equal(webhookNotification.subscription.id, 'my_id')
+        assert.equal(webhookNotification.subscription.transactions.length, 1)
+
+        transaction = webhookNotification.subscription.transactions.pop().transaction
+        assert.equal(transaction.status, "submitted_for_settlement")
+        assert.equal(transaction.amount, 49.99)
+        done()

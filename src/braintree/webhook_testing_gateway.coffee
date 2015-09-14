@@ -38,6 +38,7 @@ class WebhookTestingGateway extends Gateway
       when WebhookNotification.Kind.PartnerMerchantConnected then @subjectXmlForPartnerMerchantConnected()
       when WebhookNotification.Kind.PartnerMerchantDisconnected then @subjectXmlForPartnerMerchantDisconnected()
       when WebhookNotification.Kind.PartnerMerchantDeclined then @subjectXmlForPartnerMerchantDeclined()
+      when WebhookNotification.Kind.SubscriptionChargedSuccessfully then @subjectXmlForSubscriptionChargedSuccessfully(id)
       else @subjectXmlForSubscription(id)
 
   subjectXmlForTransactionDisbursed: (id) ->
@@ -196,6 +197,23 @@ class WebhookTestingGateway extends Gateway
     <subscription>
         <id>#{id}</id>
         <transactions type="array"></transactions>
+        <add_ons type="array"></add_ons>
+        <discounts type="array"></discounts>
+    </subscription>
+    """
+
+  subjectXmlForSubscriptionChargedSuccessfully: (id) ->
+    """
+    <subscription>
+        <id>#{id}</id>
+        <transactions type="array">
+          <transaction>
+            <transaction>
+              <status>submitted_for_settlement</status>
+              <amount>49.99</amount>
+            </transaction>
+          </transaction>
+        </transactions>
         <add_ons type="array"></add_ons>
         <discounts type="array"></discounts>
     </subscription>
