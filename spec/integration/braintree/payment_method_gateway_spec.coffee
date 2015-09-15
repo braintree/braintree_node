@@ -21,6 +21,7 @@ describe "PaymentMethodGateway", ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.isNotNull(response.paymentMethod.token)
+          assert.isNotNull(response.paymentMethod.customerId)
 
           done()
 
@@ -40,6 +41,7 @@ describe "PaymentMethodGateway", ->
             assert.isNotNull(response.paymentMethod.cardType)
             assert.isNotNull(response.paymentMethod.paymentInstrumentName)
             assert.isNotNull(response.paymentMethod.sourceDescription)
+            assert.isNotNull(response.paymentMethod.customerId)
 
             done()
 
@@ -66,6 +68,7 @@ describe "PaymentMethodGateway", ->
             assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.Visa)
             assert.equal(response.paymentMethod.sourceCardLast4, "1111")
             assert.equal(response.paymentMethod.sourceDescription, "Visa 1111")
+            assert.equal(response.paymentMethod.customerId, customerId)
 
             done()
 
@@ -91,6 +94,7 @@ describe "PaymentMethodGateway", ->
             assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.MasterCard)
             assert.equal(response.paymentMethod.sourceCardLast4, "4444")
             assert.equal(response.paymentMethod.sourceDescription, "MasterCard 4444")
+            assert.equal(response.paymentMethod.customerId, customerId)
 
             done()
 
@@ -107,6 +111,7 @@ describe "PaymentMethodGateway", ->
             assert.isNull(err)
             assert.isTrue(response.success)
             assert.isNotNull(response.paymentMethod.token)
+            assert.isNotNull(response.paymentMethod.customerId)
 
             done()
 
@@ -139,6 +144,7 @@ describe "PaymentMethodGateway", ->
                 assert.isNull(err)
                 assert.isTrue(response.success)
                 assert.equal(response.paymentMethod.maskedNumber, '411111******1111')
+                assert.equal(response.paymentMethod.customerId, customerId)
 
                 done()
 
@@ -432,6 +438,7 @@ describe "PaymentMethodGateway", ->
                 specHelper.defaultGateway.paymentMethod.find token, (err, paypalAccount) ->
                   assert.isNull(err)
                   assert.isTrue(paypalAccount != null)
+                  assert.equal(paypalAccount.customerId, customerId)
 
                   done()
 
@@ -530,6 +537,7 @@ describe "PaymentMethodGateway", ->
               assert.isTrue(response.success)
               assert.isString(response.paymentMethod.email)
               assert.isString(response.paymentMethod.imageUrl)
+              assert.isString(response.paymentMethod.customerId)
               done()
 
     it "can create a payment method and set the token and default", (done) ->
@@ -566,7 +574,8 @@ describe "PaymentMethodGateway", ->
                 assert.isNull(err)
                 assert.isTrue(response.success)
                 assert.isTrue(response.paymentMethod.default)
-                assert.equal(paymentMethodToken, response.paymentMethod.token)
+                assert.equal(response.paymentMethod.token, paymentMethodToken)
+                assert.equal(response.paymentMethod.customerId, customerId)
 
                 done()
 
