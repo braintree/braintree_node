@@ -6,6 +6,7 @@
 {CoinbaseAccount} = require('./coinbase_account')
 {DisbursementDetails} = require('./disbursement_details')
 {Dispute} = require('./dispute')
+{FacilitatorDetails} = require('./facilitator_details')
 {RiskData} = require('./risk_data')
 {ThreeDSecureInfo} = require('./three_d_secure_info')
 
@@ -71,6 +72,7 @@ class Transaction extends AttributeSetter
     @androidPayCard = new AndroidPayCard(attributes.androidPayCard)
     @disbursementDetails = new DisbursementDetails(attributes.disbursementDetails)
     @disputes = (new Dispute(disputeAttributes) for disputeAttributes in attributes.disputes) if attributes.disputes?
+    @facilitatorDetails = new FacilitatorDetails(attributes.facilitatorDetails) if attributes.facilitatorDetails
     @riskData = new RiskData(attributes.riskData) if attributes.riskData
     @threeDSecureInfo = new ThreeDSecureInfo(attributes.threeDSecureInfo) if attributes.threeDSecureInfo
 

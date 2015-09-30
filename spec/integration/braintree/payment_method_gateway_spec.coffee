@@ -1,8 +1,10 @@
 require('../../spec_helper')
 _ = require('underscore')._
 braintree = specHelper.braintree
+Braintree = require('../../../lib/braintree')
 util = require('util')
 {Config} = require('../../../lib/braintree/config')
+{Environment} = require('../../../lib/braintree/environment')
 {Nonces} = require('../../../lib/braintree/test/nonces')
 
 describe "PaymentMethodGateway", ->
@@ -1359,3 +1361,101 @@ describe "PaymentMethodGateway", ->
 
         done()
 
+  describe "grant", ->
+    creditCard = null
+    grantingGateway = null
+
+    before (done) ->
+      partnerMerchantGateway = braintree.connect {
+        merchantId: "integration_merchant_public_id",
+        publicKey: "oauth_app_partner_user_public_key",
+        privateKey: "oauth_app_partner_user_private_key",
+        environment: Environment.Development
+      }
+
+      customerParams =
+        firstName: "Joe",
+        lastName: "Brown",
+        company: "ExampleCo",
+        email: "joe@example.com",
+        phone: "312.555.1234",
+        fax: "614.555.5678",
+        website: "www.example.com"
+
+      partnerMerchantGateway.customer.create customerParams, (err, response) ->
+        customer = response.customer
+
+        creditCardParams =
+          customerId: customer.id,
+          cardholderName: "Adam Davis",
+          number: "4111111111111111",
+          expirationDate: "05/2009"
+
+        partnerMerchantGateway.creditCard.create creditCardParams, (err, response) ->
+          creditCard = response.creditCard
+
+          oauthGateway = braintree.connect {
+            clientId: "client_id$development$integration_client_id",
+            clientSecret: "client_secret$development$integration_client_secret",
+            environment: Environment.Development
+          }
+
+          accessTokenParams =
+            merchantPublicId: "integration_merchant_id",
+            scope: "grant_payment_method"
+
+          specHelper.createToken oauthGateway, accessTokenParams, (err, response) ->
+            grantingGateway = braintree.connect {
+              accessToken: response.credentials.accessToken,
+              environment: Environment.Development
+            }
+            done()
+
+    it "returns a nonce that is transactable by a partner merchant exactly once", (done) ->
+      grantingGateway.paymentMethod.grant(creditCard.token, false, (err, response) ->
+        grantResult = response
+
+        transactionParams =
+          paymentMethodNonce: grantResult.nonce,
+          amount: Braintree.Test.TransactionAmounts.Authorize
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isTrue response.success
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response2) ->
+            assert.isFalse response2.success
+            done()
+      )
+
+    it "returns a nonce that is not vaultable", (done) ->
+      grantingGateway.paymentMethod.grant(creditCard.token, false, (err, response) ->
+        grantResult = response
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          pmParams =
+            customerId: response.customer.id,
+            paymentMethodNonce: grantResult.nonce
+
+          specHelper.defaultGateway.creditCard.create pmParams, (err, response) ->
+            assert.isFalse response.success
+            done()
+      )
+
+    it "returns a nonce that is vaultable", (done) ->
+      grantingGateway.paymentMethod.grant(creditCard.token, true, (err, response) ->
+        grantResult = response
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          pmParams =
+            customerId: response.customer.id,
+            paymentMethodNonce: grantResult.nonce
+
+          specHelper.defaultGateway.creditCard.create pmParams, (err, response) ->
+            assert.isTrue response.success
+            done()
+      )
+
+    it "raises an error if the token isn't found", (done) ->
+      grantingGateway.paymentMethod.grant("not_a_real_token", false, (err, response) ->
+        assert.isObject(err)
+        assert.isNull(response)
+        done()
+      )
