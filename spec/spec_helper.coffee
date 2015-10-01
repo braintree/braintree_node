@@ -315,6 +315,7 @@ GLOBAL.specHelper =
   nonDefaultMerchantAccountId: "sandbox_credit_card_non_default"
   nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account"
   threeDSecureMerchantAccountId: "three_d_secure_merchant_account"
+  fakeAmexDirectMerchantAccountId: "fake_amex_direct_usd"
   clientApiHttp: ClientApiHttp
   decodeClientToken: decodeClientToken
   createTransactionToRefund: createTransactionToRefund

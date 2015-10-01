@@ -1091,6 +1091,7 @@ describe "TransactionGateway", ->
     context "amex rewards", (done) ->
       it "succeeds", (done) ->
         transactionParams =
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId
           amount: "10.00"
           creditCard:
             number: CreditCardNumbers.AmexPayWithPoints.Success
@@ -1111,6 +1112,7 @@ describe "TransactionGateway", ->
 
       it "succeeds even if the card is ineligible", (done) ->
         transactionParams =
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId
           amount: "10.00"
           creditCard:
             number: CreditCardNumbers.AmexPayWithPoints.IneligibleCard
@@ -1131,6 +1133,7 @@ describe "TransactionGateway", ->
 
       it "succeeds even if the card's balance is insufficient", (done) ->
         transactionParams =
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId
           amount: "10.00"
           creditCard:
             number: CreditCardNumbers.AmexPayWithPoints.InsufficientPoints
@@ -1504,6 +1507,7 @@ describe "TransactionGateway", ->
     context "amex rewards", (done) ->
       it "succeeds", (done) ->
         transactionParams =
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId
           amount: "10.00"
           creditCard:
             number: CreditCardNumbers.AmexPayWithPoints.Success
@@ -1526,6 +1530,7 @@ describe "TransactionGateway", ->
 
       it "succeeds even if the card is ineligible", (done) ->
         transactionParams =
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId
           amount: "10.00"
           creditCard:
             number: CreditCardNumbers.AmexPayWithPoints.IneligibleCard
@@ -1548,6 +1553,7 @@ describe "TransactionGateway", ->
 
       it "succeeds even if the card's balance is insufficient", (done) ->
         transactionParams =
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId
           amount: "10.00"
           creditCard:
             number: CreditCardNumbers.AmexPayWithPoints.InsufficientPoints
