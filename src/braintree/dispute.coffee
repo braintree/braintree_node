@@ -18,6 +18,10 @@ class Dispute extends AttributeSetter
     ProductUnsatisfactory         : 'product_unsatisfactory'
     Retrieval                     : 'retrieval'
     TransactionAmountDiffers      : 'transaction_amount_differs'
+  @Kind =
+    Chargeback     : 'chargeback'
+    PreArbitration : 'pre_arbitration'
+    Retrieval      : 'retrieval'
 
   constructor: (attributes) ->
     super attributes
