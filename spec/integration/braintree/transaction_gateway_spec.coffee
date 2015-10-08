@@ -1686,3 +1686,56 @@ describe "TransactionGateway", ->
           assert.equal(response.transaction.status, 'submitted_for_settlement')
           done()
 
+  describe "submitForPartialSettlement", ->
+    it "creates partial settlement transactions for an authorized transaction", (done) ->
+      transactionParams =
+        amount: '10.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        authorizedTransaction = response.transaction
+
+        specHelper.defaultGateway.transaction.submitForPartialSettlement authorizedTransaction.id, '6.00', (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'submitted_for_settlement')
+          assert.equal(response.transaction.amount, '6.00')
+
+          specHelper.defaultGateway.transaction.submitForPartialSettlement authorizedTransaction.id, '4.00', (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.status, 'submitted_for_settlement')
+            assert.equal(response.transaction.amount, '4.00')
+
+            specHelper.defaultGateway.transaction.find authorizedTransaction.id, (err, transaction) ->
+              assert.isTrue(response.success)
+              assert.equal(2, transaction.partialSettlementTransactionIds.length)
+              done()
+
+    it "cannot create a partial settlement transaction on a partial settlement transaction", (done) ->
+      transactionParams =
+        amount: '10.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        authorizedTransaction = response.transaction
+
+        specHelper.defaultGateway.transaction.submitForPartialSettlement authorizedTransaction.id, '6.00', (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'submitted_for_settlement')
+          assert.equal(response.transaction.amount, '6.00')
+
+          specHelper.defaultGateway.transaction.submitForPartialSettlement response.transaction.id, '4.00', (err, response) ->
+            assert.isFalse(response.success)
+            errorCode = response.errors.for('transaction').on('base')[0].code
+            assert.equal(errorCode, ValidationErrorCodes.Transaction.CannotSubmitForPartialSettlement)
+            done()
