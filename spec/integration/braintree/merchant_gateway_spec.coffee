@@ -27,7 +27,7 @@ describe "MerchantGateway", ->
         credentials = response.credentials
         assert.isNotNull(credentials.accessToken)
         assert.equal(credentials.accessToken.indexOf('access_token'), 0)
-        assert.isNull(credentials.refreshToken)
+        assert.isNotNull(credentials.refreshToken)
         assert.isNotNull(credentials.expiresAt)
         assert.equal(credentials.tokenType, 'bearer')
 
