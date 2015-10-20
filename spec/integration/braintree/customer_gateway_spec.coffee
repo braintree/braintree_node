@@ -537,27 +537,35 @@ describe "CustomerGateway", ->
           done()
 
       it "vaults a paypal account", (done) ->
-        paymentMethodToken = specHelper.randomId()
+        specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+          clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+          authorizationFingerprint = clientToken.authorizationFingerprint
 
-        specHelper.defaultGateway.customer.create {}, (err, response) ->
-          paypalCustomerId = response.customer.id
-
-          customerParams =
-            firstName: 'New First Name'
-            lastName: 'New Last Name'
+          params =
+            authorizationFingerprint: authorizationFingerprint
             paypalAccount:
               consentCode: 'PAYPAL_CONSENT_CODE'
-              token: paymentMethodToken
 
-          specHelper.defaultGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
-            assert.isNull(err)
-            assert.isTrue(response.success)
-            assert.equal(response.customer.firstName, 'New First Name')
-            assert.equal(response.customer.lastName, 'New Last Name')
-            assert.isString(response.customer.paypalAccounts[0].email)
-            assert.equal(response.customer.paypalAccounts[0].token, paymentMethodToken)
+          myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig))
+          myHttp.post "/client_api/v1/payment_methods/paypal_accounts.json", params, (statusCode, body) ->
+            nonce = JSON.parse(body).paypalAccounts[0].nonce
 
-            done()
+            specHelper.defaultGateway.customer.create {}, (err, response) ->
+              paypalCustomerId = response.customer.id
+
+              customerParams =
+                firstName: 'New First Name'
+                lastName: 'New Last Name'
+                paymentMethodNonce: nonce
+
+              specHelper.defaultGateway.customer.update paypalCustomerId, customerParams, (err, response) ->
+                assert.isNull(err)
+                assert.isTrue(response.success)
+                assert.isString(response.customer.paypalAccounts[0].email)
+                assert.equal(response.customer.firstName, 'New First Name')
+                assert.equal(response.customer.lastName, 'New Last Name')
+
+                done()
 
       it "does not vault a one-time use paypal account", (done) ->
         paymentMethodToken = specHelper.randomId()
