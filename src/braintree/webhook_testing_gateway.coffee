@@ -67,6 +67,7 @@ class WebhookTestingGateway extends Gateway
         <id>#{id}</id>
         <amount>250.00</amount>
       </transaction>
+      <date-opened type="date">2014-03-28</date-opened>
     </dispute>
     """
 
@@ -85,6 +86,7 @@ class WebhookTestingGateway extends Gateway
         <id>#{id}</id>
         <amount>250.00</amount>
       </transaction>
+      <date-opened type="date">2014-03-28</date-opened>
     </dispute>
     """
 
@@ -103,6 +105,8 @@ class WebhookTestingGateway extends Gateway
         <id>#{id}</id>
         <amount>250.00</amount>
       </transaction>
+      <date-opened type="date">2014-03-28</date-opened>
+      <date-won type="date">2014-09-01</date-won>
     </dispute>
    """
 
