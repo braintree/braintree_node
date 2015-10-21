@@ -47,6 +47,9 @@ gateway.transaction.sale({
     }
 });
 ```
+## Tests
+
+The unit specs can be run by anyone on any system, but the integration specs are meant to be run against a local development server of our gateway code. These integration specs are not meant for public consumption and will likely fail if run on your system. To run unit tests use rake (`rake test:unit`) or npm (`npm test`).
 
 ## Open Source Attribution
 
