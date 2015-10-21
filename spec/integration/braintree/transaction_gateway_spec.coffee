@@ -176,6 +176,23 @@ describe "TransactionGateway", ->
 
             done()
 
+    context "with amex express checkout card", ->
+      it "returns AmexExpressCheckoutCard for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.AmexExpressCheckout
+            merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AmexExpressCheckoutCard)
+            assert.equal(response.transaction.amexExpressCheckoutCard.cardType, specHelper.braintree.CreditCard.CardType.AmEx)
+            assert.match(response.transaction.amexExpressCheckoutCard.cardMemberNumber, /^\d{4}$/)
+
+            done()
+
     context "Coinbase", ->
       it "returns CoinbaseAccount for payment_instrument", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->

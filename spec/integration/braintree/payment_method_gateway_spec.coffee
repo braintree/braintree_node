@@ -98,6 +98,29 @@ describe "PaymentMethodGateway", ->
 
             done()
 
+    context 'Amex Express Checkout', ->
+      it "vaults an Amex Express Checkout Card from the nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
+          customerId = response.customer.id
+
+          paymentMethodParams =
+            customerId: customerId
+            paymentMethodNonce: Nonces.AmexExpressCheckout
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isNotNull(response.paymentMethod.token)
+            assert.isString(response.paymentMethod.expirationMonth)
+            assert.isString(response.paymentMethod.expirationYear)
+            assert.isTrue(response.paymentMethod.default)
+            assert.match(response.paymentMethod.imageUrl, /.png$/)
+            assert.match(response.paymentMethod.sourceDescription, /^AmEx \d{4}$/)
+            assert.match(response.paymentMethod.cardMemberNumber, /^\d{4}$/)
+            assert.equal(response.paymentMethod.customerId, customerId)
+
+            done()
+
     context 'Coinbase', ->
       it "vaults a Coinbase account from the nonce", (done) ->
         specHelper.defaultGateway.customer.create {firstName: 'Paul', lastName: 'Gross'}, (err, response) ->
