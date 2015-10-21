@@ -12,11 +12,3 @@ describe "ClientTokenGateway", ->
         assert.equal(err.message, "Invalid keys: makeDefault,verifyCard")
         done()
       )
-  describe "error responses", ->
-    it "responds with a ErrorResponse successfully", (done) ->
-      clientToken = specHelper.defaultGateway.clientToken.generate({
-        customerId: 3
-      }, (err, result) ->
-        assert.equal(result.message, "Customer specified by customer_id does not exist")
-        done()
-      )
