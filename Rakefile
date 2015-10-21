@@ -1,6 +1,6 @@
-task :default => %w[spec:unit spec:integration]
+task :default => %w[test:unit test:integration]
 
-namespace :spec do
+namespace :test do
   desc "Run units"
   task :unit => [:npm_install, :compile_coffee] do
     sh "#{local_mocha} spec_compiled/unit --recursive"
@@ -11,7 +11,7 @@ namespace :spec do
     sh "#{local_mocha} --slow 2000 spec_compiled/integration --recursive"
   end
 
-  desc "Run tests in a specific file, e.g. rake spec:focused[spec/integration/braintree/credit_card_gateway_spec]"
+  desc "Run tests in a specific file, e.g. rake test:focused[spec/integration/braintree/credit_card_gateway_spec]"
   task :focused, [:filename] => [:npm_install, :compile_coffee] do |t, args|
     compiled_filename = args[:filename].sub(/\Aspec/, "spec_compiled").sub(/\.coffee\z/, ".js")
 
