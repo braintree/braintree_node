@@ -61,9 +61,12 @@ class TransactionGateway extends Gateway
       @responseHandler(callback)
     )
 
-  submitForSettlement: (transactionId, amount..., callback) ->
+  submitForSettlement: (transactionId, attributes..., callback) ->
+    amount = attributes[0]
+    transactionParams = attributes[1] || {}
+    transactionParams.amount = amount if amount
     @gateway.http.put("#{@config.baseMerchantPath()}/transactions/#{transactionId}/submit_for_settlement",
-      {transaction: {amount: amount[0]}},
+      {transaction: transactionParams},
       @responseHandler(callback)
     )
 
