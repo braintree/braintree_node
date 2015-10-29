@@ -11,6 +11,7 @@ errorTypes = require("./braintree/error_types")
 {PaymentInstrumentTypes} = require("./braintree/payment_instrument_types")
 {WebhookNotification} = require("./braintree/webhook_notification")
 {TestingGateway} = require("./braintree/testing_gateway")
+{ValidationErrorCodes} = require("./braintree/validation_error_codes")
 
 {CreditCardDefaults} = require("./braintree/test/credit_card_defaults")
 {CreditCardNumbers} = require("./braintree/test/credit_card_numbers")
@@ -23,7 +24,7 @@ connect = (config) ->
   new BraintreeGateway(new Config(config))
 
 exports.connect = connect
-exports.version = '1.29.0'
+exports.version = '1.30.0'
 exports.Environment = Environment
 exports.errorTypes = errorTypes
 
@@ -34,6 +35,7 @@ exports.Subscription = Subscription
 exports.MerchantAccount = MerchantAccount
 exports.WebhookNotification = WebhookNotification
 exports.TestingGateway = TestingGateway
+exports.ValidationErrorCodes = ValidationErrorCodes
 
 exports.Test = {
   CreditCardDefaults: CreditCardDefaults,

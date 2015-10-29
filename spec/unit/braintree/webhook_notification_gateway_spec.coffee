@@ -162,6 +162,8 @@ describe "WebhookNotificationGateway", ->
       specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeOpened)
         assert.equal(Dispute.Status.Open, webhookNotification.dispute.status)
+        assert.equal(Dispute.Kind.Chargeback, webhookNotification.dispute.kind)
+        assert.equal('2014-03-28', webhookNotification.dispute.dateOpened)
         done()
 
     it "returns a parsable signature and payload for dispute lost", (done) ->
@@ -173,6 +175,8 @@ describe "WebhookNotificationGateway", ->
       specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeLost)
         assert.equal(Dispute.Status.Lost, webhookNotification.dispute.status)
+        assert.equal(Dispute.Kind.Chargeback, webhookNotification.dispute.kind)
+        assert.equal('2014-03-28', webhookNotification.dispute.dateOpened)
         done()
 
     it "returns a parsable signature and payload for dispute won", (done) ->
@@ -184,6 +188,9 @@ describe "WebhookNotificationGateway", ->
       specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeWon)
         assert.equal(Dispute.Status.Won, webhookNotification.dispute.status)
+        assert.equal(Dispute.Kind.Chargeback, webhookNotification.dispute.kind)
+        assert.equal('2014-03-28', webhookNotification.dispute.dateOpened)
+        assert.equal('2014-09-01', webhookNotification.dispute.dateWon)
         done()
 
     it "returns a parsable signature and payload for a disbursed webhook", (done) ->
@@ -270,4 +277,20 @@ describe "WebhookNotificationGateway", ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDeclined)
         assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123')
         assert.ok(webhookNotification.timestamp?)
+        done()
+
+    it "builds a sample notification for a successfully charged subscription", (done) ->
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubscriptionChargedSuccessfully,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionChargedSuccessfully)
+        assert.equal(webhookNotification.subscription.id, 'my_id')
+        assert.equal(webhookNotification.subscription.transactions.length, 1)
+
+        transaction = webhookNotification.subscription.transactions.pop().transaction
+        assert.equal(transaction.status, "submitted_for_settlement")
+        assert.equal(transaction.amount, 49.99)
         done()

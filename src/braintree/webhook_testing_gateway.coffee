@@ -38,6 +38,7 @@ class WebhookTestingGateway extends Gateway
       when WebhookNotification.Kind.PartnerMerchantConnected then @subjectXmlForPartnerMerchantConnected()
       when WebhookNotification.Kind.PartnerMerchantDisconnected then @subjectXmlForPartnerMerchantDisconnected()
       when WebhookNotification.Kind.PartnerMerchantDeclined then @subjectXmlForPartnerMerchantDeclined()
+      when WebhookNotification.Kind.SubscriptionChargedSuccessfully then @subjectXmlForSubscriptionChargedSuccessfully(id)
       else @subjectXmlForSubscription(id)
 
   subjectXmlForTransactionDisbursed: (id) ->
@@ -58,6 +59,7 @@ class WebhookTestingGateway extends Gateway
       <currency-iso-code>USD</currency-iso-code>
       <received-date type="date">2014-03-01</received-date>
       <reply-by-date type="date">2014-03-21</reply-by-date>
+      <kind>chargeback</kind>
       <status>open</status>
       <reason>fraud</reason>
       <id>#{id}</id>
@@ -65,6 +67,7 @@ class WebhookTestingGateway extends Gateway
         <id>#{id}</id>
         <amount>250.00</amount>
       </transaction>
+      <date-opened type="date">2014-03-28</date-opened>
     </dispute>
     """
 
@@ -75,6 +78,7 @@ class WebhookTestingGateway extends Gateway
       <currency-iso-code>USD</currency-iso-code>
       <received-date type="date">2014-03-01</received-date>
       <reply-by-date type="date">2014-03-21</reply-by-date>
+      <kind>chargeback</kind>
       <status>lost</status>
       <reason>fraud</reason>
       <id>#{id}</id>
@@ -82,6 +86,7 @@ class WebhookTestingGateway extends Gateway
         <id>#{id}</id>
         <amount>250.00</amount>
       </transaction>
+      <date-opened type="date">2014-03-28</date-opened>
     </dispute>
     """
 
@@ -92,6 +97,7 @@ class WebhookTestingGateway extends Gateway
       <currency-iso-code>USD</currency-iso-code>
       <received-date type="date">2014-03-01</received-date>
       <reply-by-date type="date">2014-03-21</reply-by-date>
+      <kind>chargeback</kind>
       <status>won</status>
       <reason>fraud</reason>
       <id>#{id}</id>
@@ -99,6 +105,8 @@ class WebhookTestingGateway extends Gateway
         <id>#{id}</id>
         <amount>250.00</amount>
       </transaction>
+      <date-opened type="date">2014-03-28</date-opened>
+      <date-won type="date">2014-09-01</date-won>
     </dispute>
    """
 
@@ -196,6 +204,23 @@ class WebhookTestingGateway extends Gateway
     <subscription>
         <id>#{id}</id>
         <transactions type="array"></transactions>
+        <add_ons type="array"></add_ons>
+        <discounts type="array"></discounts>
+    </subscription>
+    """
+
+  subjectXmlForSubscriptionChargedSuccessfully: (id) ->
+    """
+    <subscription>
+        <id>#{id}</id>
+        <transactions type="array">
+          <transaction>
+            <transaction>
+              <status>submitted_for_settlement</status>
+              <amount>49.99</amount>
+            </transaction>
+          </transaction>
+        </transactions>
         <add_ons type="array"></add_ons>
         <discounts type="array"></discounts>
     </subscription>

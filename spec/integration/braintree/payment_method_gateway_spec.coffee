@@ -21,6 +21,7 @@ describe "PaymentMethodGateway", ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.isNotNull(response.paymentMethod.token)
+          assert.isNotNull(response.paymentMethod.customerId)
 
           done()
 
@@ -40,6 +41,7 @@ describe "PaymentMethodGateway", ->
             assert.isNotNull(response.paymentMethod.cardType)
             assert.isNotNull(response.paymentMethod.paymentInstrumentName)
             assert.isNotNull(response.paymentMethod.sourceDescription)
+            assert.isNotNull(response.paymentMethod.customerId)
 
             done()
 
@@ -66,6 +68,7 @@ describe "PaymentMethodGateway", ->
             assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.Visa)
             assert.equal(response.paymentMethod.sourceCardLast4, "1111")
             assert.equal(response.paymentMethod.sourceDescription, "Visa 1111")
+            assert.equal(response.paymentMethod.customerId, customerId)
 
             done()
 
@@ -91,6 +94,30 @@ describe "PaymentMethodGateway", ->
             assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.MasterCard)
             assert.equal(response.paymentMethod.sourceCardLast4, "4444")
             assert.equal(response.paymentMethod.sourceDescription, "MasterCard 4444")
+            assert.equal(response.paymentMethod.customerId, customerId)
+
+            done()
+
+    context 'Amex Express Checkout', ->
+      it "vaults an Amex Express Checkout Card from the nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
+          customerId = response.customer.id
+
+          paymentMethodParams =
+            customerId: customerId
+            paymentMethodNonce: Nonces.AmexExpressCheckout
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isNotNull(response.paymentMethod.token)
+            assert.isString(response.paymentMethod.expirationMonth)
+            assert.isString(response.paymentMethod.expirationYear)
+            assert.isTrue(response.paymentMethod.default)
+            assert.match(response.paymentMethod.imageUrl, /.png$/)
+            assert.match(response.paymentMethod.sourceDescription, /^AmEx \d{4}$/)
+            assert.match(response.paymentMethod.cardMemberNumber, /^\d{4}$/)
+            assert.equal(response.paymentMethod.customerId, customerId)
 
             done()
 
@@ -107,6 +134,7 @@ describe "PaymentMethodGateway", ->
             assert.isNull(err)
             assert.isTrue(response.success)
             assert.isNotNull(response.paymentMethod.token)
+            assert.isNotNull(response.paymentMethod.customerId)
 
             done()
 
@@ -139,6 +167,7 @@ describe "PaymentMethodGateway", ->
                 assert.isNull(err)
                 assert.isTrue(response.success)
                 assert.equal(response.paymentMethod.maskedNumber, '411111******1111')
+                assert.equal(response.paymentMethod.customerId, customerId)
 
                 done()
 
@@ -432,6 +461,7 @@ describe "PaymentMethodGateway", ->
                 specHelper.defaultGateway.paymentMethod.find token, (err, paypalAccount) ->
                   assert.isNull(err)
                   assert.isTrue(paypalAccount != null)
+                  assert.equal(paypalAccount.customerId, customerId)
 
                   done()
 
@@ -530,6 +560,7 @@ describe "PaymentMethodGateway", ->
               assert.isTrue(response.success)
               assert.isString(response.paymentMethod.email)
               assert.isString(response.paymentMethod.imageUrl)
+              assert.isString(response.paymentMethod.customerId)
               done()
 
     it "can create a payment method and set the token and default", (done) ->
@@ -566,7 +597,8 @@ describe "PaymentMethodGateway", ->
                 assert.isNull(err)
                 assert.isTrue(response.success)
                 assert.isTrue(response.paymentMethod.default)
-                assert.equal(paymentMethodToken, response.paymentMethod.token)
+                assert.equal(response.paymentMethod.token, paymentMethodToken)
+                assert.equal(response.paymentMethod.customerId, customerId)
 
                 done()
 

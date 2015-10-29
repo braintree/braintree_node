@@ -186,3 +186,11 @@ describe "ClientTokenGateway", ->
       assert.equal(err.type, "authorizationError")
       done()
     )
+
+  it "returns an error when an non-existant customer_id is provided", (done) ->
+    clientToken = specHelper.defaultGateway.clientToken.generate({
+      customerId: 3
+    }, (err, result) ->
+      assert.equal(result.message, "Customer specified by customer_id does not exist")
+      done()
+    )

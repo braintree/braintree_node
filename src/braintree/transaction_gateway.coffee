@@ -67,6 +67,12 @@ class TransactionGateway extends Gateway
       @responseHandler(callback)
     )
 
+  submitForPartialSettlement: (transactionId, amount, callback) ->
+    @gateway.http.post("#{@config.baseMerchantPath()}/transactions/#{transactionId}/submit_for_partial_settlement",
+      {transaction: {amount: amount}},
+      @responseHandler(callback)
+    )
+
   void: (transactionId, callback) ->
     @gateway.http.put("#{@config.baseMerchantPath()}/transactions/#{transactionId}/void", null, @responseHandler(callback))
 

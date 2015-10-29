@@ -1,3 +1,12 @@
+## 1.30.0
+* Add transaction data to subscription charged successful webhook
+* Add new ProcessorDoesNotSupportAuths error
+* Export validation error codes
+* Add constants for dispute kind
+* Add support for partial settlement transactions
+* Add date-opened and date-won to dispute webhooks
+* Expose amex express checkout method
+
 ## 1.29.0
 * Add sourceDescription to Android Pay and Apple Pay
 * Add billingAgreementId to PaypalAccount
