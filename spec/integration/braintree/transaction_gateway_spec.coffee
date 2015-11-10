@@ -484,6 +484,27 @@ describe "TransactionGateway", ->
 
               done()
 
+        it "successfully creates a transaction with PayPal supplementary data", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              paypalAccount: {}
+              options:
+                paypal:
+                  supplementaryData:
+                    key1: 'value1'
+                    key2: 'value2'
+
+            # note - supplementary data is not returned in response
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
+
+              done()
+
         it "successfully creates a transaction with a PayPal description", (done) ->
           nonce = Nonces.PayPalOneTimePayment
 
