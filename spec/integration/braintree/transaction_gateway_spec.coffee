@@ -195,6 +195,23 @@ describe "TransactionGateway", ->
 
             done()
 
+    context "with venmo account", ->
+      it "returns VenmoAccount for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.VenmoAccount
+            merchantAccountId: specHelper.fakeVenmoAccountMerchantAccountId
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.VenmoAccount)
+            assert.equal(response.transaction.venmoAccount.username, "venmojoe")
+            assert.equal(response.transaction.venmoAccount.venmoUserId, "Venmo-Joe-1")
+
+            done()
+
     context "Coinbase", ->
       it "returns CoinbaseAccount for payment_instrument", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->

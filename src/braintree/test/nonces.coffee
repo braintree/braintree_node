@@ -42,7 +42,8 @@ Nonces = {
   LuhnInvalid: "fake-luhn-invalid-nonce",
   PayPalFuturePaymentRefreshToken: "fake-paypal-future-refresh-token-nonce",
   SEPA: "fake-sepa-bank-account-nonce",
-  GatewayRejectedFraud: "fake-gateway-rejected-fraud-nonce"
+  GatewayRejectedFraud: "fake-gateway-rejected-fraud-nonce",
+  VenmoAccount: "fake-venmo-account-nonce"
 }
 
 exports.Nonces = Nonces

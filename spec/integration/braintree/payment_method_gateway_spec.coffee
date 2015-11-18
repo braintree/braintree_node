@@ -123,6 +123,27 @@ describe "PaymentMethodGateway", ->
 
             done()
 
+    context 'Venmo Account', ->
+      it "vaults an Venmo Account from the nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
+          customerId = response.customer.id
+
+          paymentMethodParams =
+            customerId: customerId
+            paymentMethodNonce: Nonces.VenmoAccount
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isNotNull(response.paymentMethod.token)
+            assert.isTrue(response.paymentMethod.default)
+            assert.match(response.paymentMethod.imageUrl, /.png$/)
+            assert.equal(response.paymentMethod.customerId, customerId)
+            assert.equal(response.paymentMethod.username, "venmojoe")
+            assert.equal(response.paymentMethod.venmoUserId, "Venmo-Joe-1")
+
+            done()
+
     context 'Coinbase', ->
       it "vaults a Coinbase account from the nonce", (done) ->
         specHelper.defaultGateway.customer.create {firstName: 'Paul', lastName: 'Gross'}, (err, response) ->

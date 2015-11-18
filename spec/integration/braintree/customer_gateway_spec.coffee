@@ -182,6 +182,22 @@ describe "CustomerGateway", ->
 
           done()
 
+      it "creates a customer with an Venmo Account nonce", (done) ->
+        customerParams =
+          paymentMethodNonce: Nonces.VenmoAccount
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.isNotNull(response.customer.venmoAccounts[0])
+          venmoAccount = response.customer.venmoAccounts[0]
+          assert.isNotNull(venmoAccount.token)
+          assert.equal(venmoAccount.username, "venmojoe")
+          assert.equal(venmoAccount.venmoUserId, "Venmo-Joe-1")
+          assert.equal(response.customer.paymentMethods[0], venmoAccount)
+
+          done()
+
       it "creates a customer with a Coinbase account payment method nonce", (done) ->
         customerParams =
           paymentMethodNonce: Nonces.Coinbase

@@ -5,6 +5,7 @@
 {CreditCard} = require('./credit_card')
 {PayPalAccount} = require('./paypal_account')
 {CoinbaseAccount} = require('./coinbase_account')
+{VenmoAccount} = require('./venmo_account')
 
 class Customer extends AttributeSetter
   constructor: (attributes) ->
@@ -12,27 +13,28 @@ class Customer extends AttributeSetter
     @paymentMethods = []
     if attributes.creditCards
       @creditCards = (new CreditCard(cardAttributes) for cardAttributes in attributes.creditCards)
-      for paymentMethod in @creditCards
-        @paymentMethods.push paymentMethod
+      @_addPaymentMethods(@creditCards)
     if attributes.applePayCards
       @applePayCards = (new ApplePayCard(cardAttributes) for cardAttributes in attributes.applePayCards)
-      for paymentMethod in @applePayCards
-        @paymentMethods.push paymentMethod
+      @_addPaymentMethods(@applePayCards)
     if attributes.androidPayCards
       @androidPayCards = (new AndroidPayCard(cardAttributes) for cardAttributes in attributes.androidPayCards)
-      for paymentMethod in @androidPayCards
-        @paymentMethods.push paymentMethod
+      @_addPaymentMethods(@androidPayCards)
     if attributes.amexExpressCheckoutCards
       @amexExpressCheckoutCards = (new AmexExpressCheckoutCard(cardAttributes) for cardAttributes in attributes.amexExpressCheckoutCards)
-      for paymentMethod in @amexExpressCheckoutCards
-        @paymentMethods.push paymentMethod
+      @_addPaymentMethods(@amexExpressCheckoutCards)
     if attributes.paypalAccounts
       @paypalAccounts = (new PayPalAccount(paypalAccountAttributes) for paypalAccountAttributes in attributes.paypalAccounts)
-      for paymentMethod in @paypalAccounts
-        @paymentMethods.push paymentMethod
+      @_addPaymentMethods(@paypalAccounts)
     if attributes.coinbaseAccounts
       @coinbaseAccounts = (new CoinbaseAccount(coinbaseAccountAttributes) for coinbaseAccountAttributes in attributes.coinbaseAccounts)
-      for paymentMethod in @coinbaseAccounts
-        @paymentMethods.push paymentMethod
+      @_addPaymentMethods(@coinbaseAccounts)
+    if attributes.venmoAccounts
+      @venmoAccounts = (new VenmoAccount(venmoAccountAttributes) for venmoAccountAttributes in attributes.venmoAccounts)
+      @_addPaymentMethods(@venmoAccounts)
+
+  _addPaymentMethods: (paymentMethods) ->
+    for paymentMethod in paymentMethods
+      @paymentMethods.push paymentMethod
 
 exports.Customer = Customer
