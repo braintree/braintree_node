@@ -27,6 +27,7 @@ class WebhookTestingGateway extends Gateway
 
   subjectXmlFor: (kind, id) ->
     switch kind
+      when WebhookNotification.Kind.Check then @subjectXmlForCheck()
       when WebhookNotification.Kind.TransactionDisbursed then @subjectXmlForTransactionDisbursed(id)
       when WebhookNotification.Kind.DisbursementException then @subjectXmlForDisbursementException(id)
       when WebhookNotification.Kind.Disbursement then @subjectXmlForDisbursement(id)
@@ -40,6 +41,11 @@ class WebhookTestingGateway extends Gateway
       when WebhookNotification.Kind.PartnerMerchantDeclined then @subjectXmlForPartnerMerchantDeclined()
       when WebhookNotification.Kind.SubscriptionChargedSuccessfully then @subjectXmlForSubscriptionChargedSuccessfully(id)
       else @subjectXmlForSubscription(id)
+
+  subjectXmlForCheck: () ->
+    """
+    <check type="boolean">true</check>
+    """
 
   subjectXmlForTransactionDisbursed: (id) ->
     """

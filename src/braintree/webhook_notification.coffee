@@ -9,6 +9,7 @@
 
 class WebhookNotification extends AttributeSetter
   @Kind =
+    Check: "check"
     Disbursement: "disbursement"
     DisbursementException: "disbursement_exception"
     DisputeOpened: "dispute_opened"

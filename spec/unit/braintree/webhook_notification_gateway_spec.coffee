@@ -294,3 +294,13 @@ describe "WebhookNotificationGateway", ->
         assert.equal(transaction.status, "submitted_for_settlement")
         assert.equal(transaction.amount, 49.99)
         done()
+
+    it "builds a sample notification for a check notifications", (done) ->
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.Check,
+        ""
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.Check)
+        done()

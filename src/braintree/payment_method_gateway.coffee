@@ -5,6 +5,7 @@
 {PayPalAccount} = require('./paypal_account')
 {CoinbaseAccount} = require('./coinbase_account')
 {UnknownPaymentMethod} = require('./unknown_payment_method')
+{PaymentMethodNonce} = require('./payment_method_nonce')
 exceptions = require('./exceptions')
 
 class PaymentMethodGateway extends Gateway
@@ -42,6 +43,25 @@ class PaymentMethodGateway extends Gateway
       callback(exceptions.NotFoundError("Not Found"), null)
     else
       @gateway.http.put("#{@config.baseMerchantPath()}/payment_methods/any/#{token}", {paymentMethod: attributes}, @responseHandler(callback))
+
+  grant: (token, allow_vaulting, callback) ->
+    if(token.trim() == '')
+      callback(exceptions.NotFoundError("Not Found"), null)
+    else
+      @gateway.http.post(
+        "#{@config.baseMerchantPath()}/payment_methods/grant",
+        {
+          payment_method: {
+            shared_payment_method_token: token,
+            allow_vaulting: allow_vaulting
+          }
+        },
+        (err, response) ->
+          if err
+            callback(err, null)
+          else
+            callback(null, new PaymentMethodNonce(response.paymentMethodNonce))
+      )
 
   @parsePaymentMethod: (response) ->
     if response.creditCard

@@ -59,11 +59,7 @@ class TransactionSearch extends AdvancedSearch
     @multipleValueField "paymentInstrumentType"
     @multipleValueField "merchantAccountId"
     @multipleValueField "status", { "allows" : Transaction.Status.All() }
-    @multipleValueField "source", { "allows" : [
-      Transaction.Source.Api,
-      Transaction.Source.ControlPanel,
-      Transaction.Source.Recurring
-    ]}
+    @multipleValueField "source"
     @multipleValueField "type", { "allows" : Transaction.Type.All() }
     @keyValueFields "refund"
     @rangeFields(

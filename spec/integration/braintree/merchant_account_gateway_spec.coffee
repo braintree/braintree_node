@@ -520,6 +520,12 @@ describe "MerchantAccountGateway", ->
 
           done()
 
+    it "retrieves a master merchant accounts currency iso code", (done) ->
+      specHelper.defaultGateway.merchantAccount.find "sandbox_master_merchant_account", (err, merchantAccount) ->
+        assert.equal(merchantAccount.currencyIsoCode, "USD")
+
+        done()
+
     it "returns a not found error if given a bad id", (done) ->
       specHelper.defaultGateway.merchantAccount.find " ", (err, merchantAccount) ->
         assert.equal(err.type, braintree.errorTypes.notFoundError)

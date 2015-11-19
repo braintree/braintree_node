@@ -2,6 +2,7 @@ require('../../spec_helper')
 
 {_} = require('underscore')
 braintree = specHelper.braintree
+Braintree = require('../../../lib/braintree')
 {CreditCardNumbers} = require('../../../lib/braintree/test/credit_card_numbers')
 {Nonces} = require('../../../lib/braintree/test/nonces')
 {VenmoSdk} = require('../../../lib/braintree/test/venmo_sdk')
@@ -10,6 +11,7 @@ braintree = specHelper.braintree
 {PaymentInstrumentTypes} = require('../../../lib/braintree/payment_instrument_types')
 {Transaction} = require('../../../lib/braintree/transaction')
 {Dispute} = require('../../../lib/braintree/dispute')
+{Environment} = require('../../../lib/braintree/environment')
 {Config} = require('../../../lib/braintree/config')
 
 describe "TransactionGateway", ->
@@ -190,6 +192,23 @@ describe "TransactionGateway", ->
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AmexExpressCheckoutCard)
             assert.equal(response.transaction.amexExpressCheckoutCard.cardType, specHelper.braintree.CreditCard.CardType.AmEx)
             assert.match(response.transaction.amexExpressCheckoutCard.cardMemberNumber, /^\d{4}$/)
+
+            done()
+
+    context "with venmo account", ->
+      it "returns VenmoAccount for payment_instrument", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          transactionParams =
+            paymentMethodNonce: Nonces.VenmoAccount
+            merchantAccountId: specHelper.fakeVenmoAccountMerchantAccountId
+            amount: '100.00'
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.VenmoAccount)
+            assert.equal(response.transaction.venmoAccount.username, "venmojoe")
+            assert.equal(response.transaction.venmoAccount.venmoUserId, "Venmo-Joe-1")
 
             done()
 
@@ -479,6 +498,27 @@ describe "TransactionGateway", ->
               assert.isString(response.transaction.paypalAccount.authorizationId)
               assert.isString(response.transaction.paypalAccount.debugId)
               assert.equal(response.transaction.paypalAccount.customField, 'custom field junk')
+
+              done()
+
+        it "successfully creates a transaction with PayPal supplementary data", (done) ->
+          nonce = Nonces.PayPalOneTimePayment
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            transactionParams =
+              paymentMethodNonce: nonce
+              amount: '100.00'
+              paypalAccount: {}
+              options:
+                paypal:
+                  supplementaryData:
+                    key1: 'value1'
+                    key2: 'value2'
+
+            # note - supplementary data is not returned in response
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isNull(err)
+              assert.isTrue(response.success)
 
               done()
 
@@ -1756,3 +1796,90 @@ describe "TransactionGateway", ->
             errorCode = response.errors.for('transaction').on('base')[0].code
             assert.equal(errorCode, ValidationErrorCodes.Transaction.CannotSubmitForPartialSettlement)
             done()
+
+    context "shared payment methods", ->
+      address = null
+      creditCard = null
+      customer = null
+      grantingGateway = null
+
+      before (done) ->
+        partnerMerchantGateway = braintree.connect {
+          merchantId: "integration_merchant_public_id",
+          publicKey: "oauth_app_partner_user_public_key",
+          privateKey: "oauth_app_partner_user_private_key",
+          environment: Environment.Development
+        }
+
+        customerParams =
+          firstName: "Joe",
+          lastName: "Brown",
+          company: "ExampleCo",
+          email: "joe@example.com",
+          phone: "312.555.1234",
+          fax: "614.555.5678",
+          website: "www.example.com"
+
+        partnerMerchantGateway.customer.create customerParams, (err, response) ->
+          customer = response.customer
+
+          creditCardParams =
+            customerId: customer.id,
+            cardholderName: "Adam Davis",
+            number: "4111111111111111",
+            expirationDate: "05/2009"
+
+          addressParams =
+            customerId: customer.id,
+            firstName: "Firsty",
+            lastName: "Lasty",
+
+          partnerMerchantGateway.address.create addressParams, (err, response) ->
+            address = response.address
+
+            partnerMerchantGateway.creditCard.create creditCardParams, (err, response) ->
+              creditCard = response.creditCard
+
+              oauthGateway = braintree.connect {
+                clientId: "client_id$development$integration_client_id",
+                clientSecret: "client_secret$development$integration_client_secret",
+                environment: Environment.Development
+              }
+
+              accessTokenParams =
+                merchantPublicId: "integration_merchant_id",
+                scope: "grant_payment_method,shared_vault_transactions"
+
+              specHelper.createToken oauthGateway, accessTokenParams, (err, response) ->
+                grantingGateway = braintree.connect {
+                  accessToken: response.credentials.accessToken,
+                  environment: Environment.Development
+                }
+                done()
+
+      it "returns oauth app details on transactions created via nonce granting", (done) ->
+        grantingGateway.paymentMethod.grant creditCard.token, false, (err, response) ->
+
+          transactionParams =
+            paymentMethodNonce: response.nonce,
+            amount: Braintree.Test.TransactionAmounts.Authorize
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isTrue response.success
+            assert.equal response.transaction.facilitatorDetails.oauthApplicationClientId, "client_id$development$integration_client_id"
+            assert.equal response.transaction.facilitatorDetails.oauthApplicationName, "PseudoShop"
+            done()
+
+      it "allows transactions to be created with a shared payment method, customer, billing and shipping addresses", (done) ->
+        transactionParams =
+          shared_payment_method_token: creditCard.token,
+          shared_customer_id: customer.id,
+          shared_shipping_address_id: address.id,
+          shared_billing_address_id: address.id,
+          amount: Braintree.Test.TransactionAmounts.Authorize
+
+        grantingGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isTrue response.success
+          assert.equal response.transaction.shipping.firstName, address.firstName
+          assert.equal response.transaction.billing.firstName, address.firstName
+          done()
