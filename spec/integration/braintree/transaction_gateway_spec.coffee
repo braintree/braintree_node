@@ -1382,6 +1382,9 @@ describe "TransactionGateway", ->
         assert.equal(dispute.reason, Dispute.Reason.Fraud)
         assert.equal(dispute.transactionDetails.id, transactionId)
         assert.equal(dispute.transactionDetails.amount, '1000.00')
+        assert.equal(dispute.kind, Dispute.Kind.Chargeback)
+        assert.equal(dispute.dateOpened, '2014-03-01')
+        assert.equal(dispute.dateWon, '2014-03-07')
 
         done()
 
