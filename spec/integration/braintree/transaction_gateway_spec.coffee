@@ -1864,7 +1864,7 @@ describe "TransactionGateway", ->
         grantingGateway.paymentMethod.grant creditCard.token, false, (err, response) ->
 
           transactionParams =
-            paymentMethodNonce: response.nonce,
+            paymentMethodNonce: response.paymentMethodNonce.nonce,
             amount: Braintree.Test.TransactionAmounts.Authorize
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
