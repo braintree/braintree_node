@@ -1,5 +1,6 @@
 require('../../spec_helper')
 {Util} = require('../../../lib/braintree/util')
+capture = require('capture-stream')
 
 describe "Util", ->
   describe "convertObjectKeysToUnderscores", ->
@@ -312,3 +313,55 @@ describe "Util", ->
       result = Util.without([1,2,3], [4,5])
 
       assert.deepEqual(result, [1,2,3])
+
+  describe "flattenKeys", ->
+    it "flattens an objects keys into a flat array", ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      result = Util.flattenKeys(transactionParams)
+      assert.deepEqual(result, ["amount", "creditCard[number]", "creditCard[expirationDate]"])
+
+  describe "verifyKeys", ->
+    it "doesn't log deprecation warning if params are equal to the signature", ->
+      deprecate = require('depd')('test')
+      signature = ["amount", "creditCard[number]", "creditCard[expirationDate]"]
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      stderr = capture(process.stderr)
+      Util.verifyKeys(signature, transactionParams, deprecate)
+      assert.equal(stderr(true), "")
+
+    it "doesn't log deprecation warning if params are a subset of signature", ->
+      deprecate = require('depd')('test')
+      signature = ["validKey1", "validKey2", "amount", "creditCard[number]", "creditCard[expirationDate]"]
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      stderr = capture(process.stderr)
+      Util.verifyKeys(signature, transactionParams, deprecate)
+      assert.equal(stderr(true), "")
+
+    it "logs deprecation warning if params are a superset of signature", ->
+      deprecate = require('depd')('test')
+      signature = ["amount", "creditCard[number]"]
+      transactionParams =
+        amount: '5.00'
+        invalidKey: 'bar'
+        creditCard:
+          number: '5105105105105100'
+          nestedInvalidKey: '05/12'
+
+      stderr = capture(process.stderr)
+      Util.verifyKeys(signature, transactionParams, deprecate)
+      assert.include(stderr(true), "invalid keys: invalidKey, creditCard[nestedInvalidKey]")
