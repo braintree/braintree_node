@@ -137,7 +137,7 @@ describe "PaymentMethodGateway", ->
             assert.isTrue(response.success)
             assert.isNotNull(response.paymentMethod.token)
             assert.isTrue(response.paymentMethod.default)
-            assert.match(response.paymentMethod.imageUrl, /.png$/)
+            assert.include(response.paymentMethod.imageUrl, ".png")
             assert.equal(response.paymentMethod.customerId, customerId)
             assert.equal(response.paymentMethod.username, "venmojoe")
             assert.equal(response.paymentMethod.venmoUserId, "Venmo-Joe-1")
@@ -1382,7 +1382,7 @@ describe "PaymentMethodGateway", ->
 
         done()
 
-  describe "grant", ->
+  context "grant and revoke payment methods", ->
     creditCard = null
     grantingGateway = null
 
@@ -1432,51 +1432,78 @@ describe "PaymentMethodGateway", ->
             }
             done()
 
-    it "returns a nonce that is transactable by a partner merchant exactly once", (done) ->
-      grantingGateway.paymentMethod.grant(creditCard.token, false, (err, response) ->
-        grantResult = response
+    describe "grant", ->
+      it "returns a nonce that is transactable by a partner merchant exactly once", (done) ->
+        grantingGateway.paymentMethod.grant(creditCard.token, false, (err, response) ->
+          grantResult = response
 
-        transactionParams =
-          paymentMethodNonce: grantResult.nonce,
-          amount: Braintree.Test.TransactionAmounts.Authorize
+          assert.isTrue grantResult.success
 
-        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          assert.isTrue response.success
+          transactionParams =
+            paymentMethodNonce: grantResult.paymentMethodNonce.nonce,
+            amount: Braintree.Test.TransactionAmounts.Authorize
 
-          specHelper.defaultGateway.transaction.sale transactionParams, (err, response2) ->
-            assert.isFalse response2.success
-            done()
-      )
-
-    it "returns a nonce that is not vaultable", (done) ->
-      grantingGateway.paymentMethod.grant(creditCard.token, false, (err, response) ->
-        grantResult = response
-        specHelper.defaultGateway.customer.create {}, (err, response) ->
-          pmParams =
-            customerId: response.customer.id,
-            paymentMethodNonce: grantResult.nonce
-
-          specHelper.defaultGateway.creditCard.create pmParams, (err, response) ->
-            assert.isFalse response.success
-            done()
-      )
-
-    it "returns a nonce that is vaultable", (done) ->
-      grantingGateway.paymentMethod.grant(creditCard.token, true, (err, response) ->
-        grantResult = response
-        specHelper.defaultGateway.customer.create {}, (err, response) ->
-          pmParams =
-            customerId: response.customer.id,
-            paymentMethodNonce: grantResult.nonce
-
-          specHelper.defaultGateway.creditCard.create pmParams, (err, response) ->
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             assert.isTrue response.success
-            done()
-      )
 
-    it "raises an error if the token isn't found", (done) ->
-      grantingGateway.paymentMethod.grant("not_a_real_token", false, (err, response) ->
-        assert.isObject(err)
-        assert.isNull(response)
-        done()
-      )
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response2) ->
+              assert.isFalse response2.success
+              done()
+        )
+
+      it "returns a nonce that is not vaultable", (done) ->
+        grantingGateway.paymentMethod.grant(creditCard.token, false, (err, response) ->
+          grantResult = response
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            pmParams =
+              customerId: response.customer.id,
+              paymentMethodNonce: grantResult.paymentMethodNonce.nonce
+
+            specHelper.defaultGateway.creditCard.create pmParams, (err, response) ->
+              assert.isFalse response.success
+              done()
+        )
+
+      it "returns a nonce that is vaultable", (done) ->
+        grantingGateway.paymentMethod.grant(creditCard.token, true, (err, response) ->
+          grantResult = response
+
+          specHelper.defaultGateway.customer.create {}, (err, response) ->
+            pmParams =
+              customerId: response.customer.id,
+              paymentMethodNonce: grantResult.paymentMethodNonce.nonce
+
+            specHelper.defaultGateway.creditCard.create pmParams, (err, response) ->
+              assert.isTrue response.success
+              done()
+        )
+
+      it "raises an error if the token isn't found", (done) ->
+        grantingGateway.paymentMethod.grant("not_a_real_token", false, (err, response) ->
+          assert.isObject(err)
+          assert.isNull(response)
+          done()
+        )
+
+    describe "revoke", ->
+      it "renders a granted nonce unusable", (done) ->
+        grantingGateway.paymentMethod.grant creditCard.token, false, (err, response) ->
+          grantResult = response
+
+          grantingGateway.paymentMethod.revoke creditCard.token, (err, revokeResult) ->
+            assert.isTrue revokeResult.success
+
+            transactionParams =
+              paymentMethodNonce: grantResult.paymentMethodNonce.nonce,
+              amount: Braintree.Test.TransactionAmounts.Authorize
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isFalse response.success
+              done()
+
+      it "raises an error if the token isn't found", (done) ->
+        grantingGateway.paymentMethod.revoke "not_a_real_token", (err, response) ->
+          assert.isObject(err)
+          assert.isNull(response)
+          done()

@@ -1382,6 +1382,9 @@ describe "TransactionGateway", ->
         assert.equal(dispute.reason, Dispute.Reason.Fraud)
         assert.equal(dispute.transactionDetails.id, transactionId)
         assert.equal(dispute.transactionDetails.amount, '1000.00')
+        assert.equal(dispute.kind, Dispute.Kind.Chargeback)
+        assert.equal(dispute.dateOpened, '2014-03-01')
+        assert.equal(dispute.dateWon, '2014-03-07')
 
         done()
 
@@ -1861,7 +1864,7 @@ describe "TransactionGateway", ->
         grantingGateway.paymentMethod.grant creditCard.token, false, (err, response) ->
 
           transactionParams =
-            paymentMethodNonce: response.nonce,
+            paymentMethodNonce: response.paymentMethodNonce.nonce,
             amount: Braintree.Test.TransactionAmounts.Authorize
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->

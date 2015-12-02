@@ -1,3 +1,7 @@
+## 1.32.0
+* Add payment method revoke
+* Make payment method grant return a result object
+
 ## 1.31.0
 * Add VenmoAccount
 * Add support for Set Transaction Context supplementary data

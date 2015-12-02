@@ -6,6 +6,7 @@
 {CoinbaseAccount} = require('./coinbase_account')
 {UnknownPaymentMethod} = require('./unknown_payment_method')
 {PaymentMethodNonce} = require('./payment_method_nonce')
+{VenmoAccount} = require('./venmo_account')
 exceptions = require('./exceptions')
 
 class PaymentMethodGateway extends Gateway
@@ -19,9 +20,14 @@ class PaymentMethodGateway extends Gateway
       creditCard: CreditCard
       applePayCard: ApplePayCard
       androidPayCard: AndroidPayCard
+      paymentMethodNonce: PaymentMethodNonce
     @createResponseHandler(responseMapping, null, (err, response) ->
       if !err
-        response.paymentMethod = PaymentMethodGateway.parsePaymentMethod(response)
+        parsedResponse = PaymentMethodGateway.parsePaymentMethod(response)
+        if parsedResponse instanceof PaymentMethodNonce
+          response.paymentMethodNonce = parsedResponse
+        else
+          response.paymentMethod = parsedResponse
       callback(err, response)
     )
 
@@ -56,11 +62,21 @@ class PaymentMethodGateway extends Gateway
             allow_vaulting: allow_vaulting
           }
         },
-        (err, response) ->
-          if err
-            callback(err, null)
-          else
-            callback(null, new PaymentMethodNonce(response.paymentMethodNonce))
+        @responseHandler(callback)
+      )
+
+  revoke: (token, callback) ->
+    if(token.trim() == '')
+      callback(exceptions.NotFoundError("Not Found"), null)
+    else
+      @gateway.http.post(
+        "#{@config.baseMerchantPath()}/payment_methods/revoke",
+        {
+          payment_method: {
+            shared_payment_method_token: token
+          }
+        },
+        @responseHandler(callback)
       )
 
   @parsePaymentMethod: (response) ->
@@ -74,6 +90,10 @@ class PaymentMethodGateway extends Gateway
       new AndroidPayCard(response.androidPayCard)
     else if response.coinbaseAccount
       new CoinbaseAccount(response.coinbaseAccount)
+    else if response.paymentMethodNonce
+      new PaymentMethodNonce(response.paymentMethodNonce)
+    else if response.venmoAccount
+      new VenmoAccount(response.venmoAccount)
     else
       new UnknownPaymentMethod(response)
 

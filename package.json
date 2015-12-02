@@ -1,6 +1,6 @@
 {
   "name": "braintree",
-  "version": "1.31.0",
+  "version": "1.32.0",
   "description": "A library for integrating with Braintree.",
   "keywords": [
     "braintree",
@@ -34,6 +34,7 @@
   "optionalDependencies": {
     "source-map-support": "=0.2.9"
   },
+  "license": "MIT",
   "scripts": {
     "compile_coffee": "coffee --map -cbo ./lib ./src && coffee --map -cbo ./spec_compiled ./spec",
     "prepublish": "npm run compile_coffee",
