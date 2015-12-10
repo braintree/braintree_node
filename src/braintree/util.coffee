@@ -91,6 +91,23 @@ class Util
   @supportsStreams2: ->
     semver.satisfies(process.version, '>=0.10')
 
+  @flattenKeys: (obj, prefix=null) ->
+    keys = []
+    for key, value of obj
+      if typeof value is 'object'
+        keys.push(Util.flattenKeys value, key)
+      else
+        if prefix
+          keys.push(prefix + "[" + key + "]")
+        else
+          keys.push(key)
+
+    @flatten(keys)
+
+  @verifyKeys: (validKeys, obj, deprecate) ->
+    invalidKeys = @without(@flattenKeys(obj), validKeys)
+    deprecate("invalid keys: " + invalidKeys.join(", ") + ". In future releases we'll throw exceptions on keys we do not recognize. It is recommended to fix this now to avoid payment processing interruptions.") if invalidKeys.length > 0
+
   @_containsValue: (array, element) ->
     array.indexOf(element) isnt -1
 

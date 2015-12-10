@@ -450,6 +450,8 @@ class ValidationErrorCodes
     ProcessorDoesNotSupportAuths : "915104"
     ProcessorDoesNotSupportCredits : "91546"
     ProcessorDoesNotSupportPartialSettlement : "915102"
+    ProcessorDoesNotSupportUpdatingOrderId : "915107"
+    ProcessorDoesNotSupportUpdatingDescriptor : "915108"
     ProcessorDoesNotSupportVoiceAuthorizations : "91545"
     PurchaseOrderNumberIsInvalid : "91548"
     PurchaseOrderNumberIsTooLong : "91537"
