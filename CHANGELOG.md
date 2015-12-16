@@ -1,3 +1,10 @@
+## 1.34.0
+* Update version number
+
+## 1.33.0
+* Add deprecation warnings for unknown parameters in `submitForSettlement`
+* Add transaction validation errors ProcessorDoesNotSupportUpdatingOrderId and ProcessorDoesNotSupportUpdatingDescriptor
+
 ## 1.32.0
 * Add payment method revoke
 * Make payment method grant return a result object
