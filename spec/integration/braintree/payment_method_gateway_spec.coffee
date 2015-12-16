@@ -588,8 +588,9 @@ describe "PaymentMethodGateway", ->
 
     it "can create a payment method and set the token and default", (done) ->
       specHelper.defaultGateway.customer.create {}, (err, response) ->
+        customerId = response.customer.id
         creditCardParams =
-          customerId: response.customer.id
+          customerId: customerId
           number: '5105105105105100'
           expirationDate: '05/2012'
 

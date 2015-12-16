@@ -13,6 +13,7 @@ Braintree = require('../../../lib/braintree')
 {Dispute} = require('../../../lib/braintree/dispute')
 {Environment} = require('../../../lib/braintree/environment')
 {Config} = require('../../../lib/braintree/config')
+capture = require('capture-stream')
 
 describe "TransactionGateway", ->
   describe "sale", ->
@@ -1547,6 +1548,61 @@ describe "TransactionGateway", ->
 
           done()
 
+    it "allows submitting with an order id", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, '3.00', {orderId: "ABC123"}, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'submitted_for_settlement')
+          assert.equal(response.transaction.orderId, 'ABC123')
+
+          done()
+
+    it "allows submitting with an order id without specifying an amount", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, null, {orderId: "ABC123"}, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'submitted_for_settlement')
+          assert.equal(response.transaction.orderId, 'ABC123')
+          assert.equal(response.transaction.amount, '5.00')
+
+          done()
+
+    it "allows submitting with a descriptor", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      submitForSettlementParams =
+        descriptor:
+          name: 'abc*def'
+          phone: '1234567890'
+          url: 'ebay.com'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, null, submitForSettlementParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.descriptor.name, 'abc*def')
+          assert.equal(response.transaction.descriptor.phone, '1234567890')
+          assert.equal(response.transaction.descriptor.url, 'ebay.com')
+
+          done()
+
     it "handles validation errors", (done) ->
       transactionParams =
         amount: '5.00'
@@ -1561,6 +1617,42 @@ describe "TransactionGateway", ->
           assert.isNull(err)
           assert.isFalse(response.success)
           assert.equal(response.errors.for('transaction').on('base')[0].code, '91507')
+
+          done()
+
+    it "logs deprecation warning when options object contains invalid keys", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      stderr = capture(process.stderr)
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, '5.00', {"invalidKey": "1234"}, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'submitted_for_settlement')
+          assert.equal(response.transaction.amount, '5.00')
+          assert.include(stderr(true), 'deprecated')
+
+          done()
+
+    it "logs deprecation warning when called with too many arguments", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      stderr = capture(process.stderr)
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, '5.00', {"orderId": "1234"}, "invalidArg", (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'submitted_for_settlement')
+          assert.equal(response.transaction.amount, '5.00')
+          assert.include(stderr(true), 'deprecated')
 
           done()
 

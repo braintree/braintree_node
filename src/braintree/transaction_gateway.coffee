@@ -2,9 +2,12 @@
 {Transaction} = require('./transaction')
 {TransactionSearch} = require('./transaction_search')
 {ErrorResponse} = require('./error_response')
+{Util} = require('./util')
 exceptions = require('./exceptions')
+deprecate = require('depd')('braintree/gateway.transaction')
 
 class TransactionGateway extends Gateway
+  SUBMIT_FOR_SETTLEMENT_SIGNATURE: ["orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
   constructor: (@gateway) ->
     @config = @gateway.config
 
@@ -61,9 +64,14 @@ class TransactionGateway extends Gateway
       @responseHandler(callback)
     )
 
-  submitForSettlement: (transactionId, amount..., callback) ->
+  submitForSettlement: (transactionId, attributes..., callback) ->
+    amount = attributes[0]
+    options = attributes[1] || {}
+    deprecate("Received too many args for submitForSettlement (" + arguments.length + " for 4)") if arguments.length > 4
+    Util.verifyKeys(@SUBMIT_FOR_SETTLEMENT_SIGNATURE, options, deprecate)
+
     @gateway.http.put("#{@config.baseMerchantPath()}/transactions/#{transactionId}/submit_for_settlement",
-      {transaction: {amount: amount[0]}},
+      {transaction: {amount: amount, orderId: options["orderId"], descriptor: options["descriptor"]}},
       @responseHandler(callback)
     )
 
