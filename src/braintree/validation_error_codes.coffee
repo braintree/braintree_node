@@ -497,4 +497,13 @@ class ValidationErrorCodes
         CheckInDateIsInvalid : "93412"
         CheckOutDateIsInvalid : "93413"
 
+  @Verification =
+    Options:
+      AmountCannotBeNegative : "94201"
+      AmountFormatIsInvalid : "94202"
+      AmountNotSupportedByProcessor : "94203"
+      MerchantAccountIdIsInvalid : "94204"
+      MerchantAccountIsSuspended : "94205"
+      MerchantAccountIsForbidden : "94206"
+
 exports.ValidationErrorCodes = ValidationErrorCodes

@@ -26,6 +26,11 @@ class CreditCardVerificationGateway extends Gateway
     fn(search)
     @createSearchResponse("#{@config.baseMerchantPath()}/verifications/advanced_search_ids", search, @pagingFunctionGenerator(search), callback)
 
+  create: (params, callback) ->
+    @gateway.http.post "#{@config.baseMerchantPath()}/verifications",
+                       {"verification": params},
+                       @createResponseHandler("verification", CreditCardVerification, callback)
+
   responseHandler: (callback) ->
     @createResponseHandler("creditCardVerification", CreditCardVerification, callback)
 
@@ -44,6 +49,5 @@ class CreditCardVerificationGateway extends Gateway
                 callback(null, new CreditCardVerification(creditCardVerification))
             else
               callback(null, new CreditCardVerification(response.creditCardVerifications.verification)))
-
 
 exports.CreditCardVerificationGateway = CreditCardVerificationGateway
