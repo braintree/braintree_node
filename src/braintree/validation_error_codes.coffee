@@ -95,6 +95,7 @@ class ValidationErrorCodes
     InvalidVenmoSDKPaymentMethodCode : "91727"
     NumberHasInvalidLength : "81716"
     NumberIsInvalid : "81715"
+    NumberIsProhibited : "81750"
     NumberIsRequired : "81714"
     NumberLengthIsInvalid : "81716"
     NumberMustBeTestNumber : "81717"
