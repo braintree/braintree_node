@@ -1867,6 +1867,61 @@ describe "TransactionGateway", ->
               assert.isTrue(response.success)
               assert.equal(2, transaction.partialSettlementTransactionIds.length)
               done()
+              
+    it "allows submitting with an order id", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.submitForPartialSettlement response.transaction.id, '3.00', {orderId: "ABC123"}, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'submitted_for_settlement')
+          assert.equal(response.transaction.orderId, 'ABC123')
+
+          done()
+
+    it "allows submitting with a descriptor", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      submitForPartialSettlementParams =
+        descriptor:
+          name: 'abc*def'
+          phone: '1234567890'
+          url: 'ebay.com'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.submitForPartialSettlement response.transaction.id, '3.00', submitForPartialSettlementParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.descriptor.name, 'abc*def')
+          assert.equal(response.transaction.descriptor.phone, '1234567890')
+          assert.equal(response.transaction.descriptor.url, 'ebay.com')
+
+          done()
+
+    it "handles validation errors", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        options:
+          submitForSettlement: true
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.submitForPartialSettlement response.transaction.id, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(response.errors.for('transaction').on('base')[0].code, '91507')
+
+          done()
 
     it "cannot create a partial settlement transaction on a partial settlement transaction", (done) ->
       transactionParams =
