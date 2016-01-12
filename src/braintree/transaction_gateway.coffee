@@ -75,9 +75,13 @@ class TransactionGateway extends Gateway
       @responseHandler(callback)
     )
 
-  submitForPartialSettlement: (transactionId, amount, callback) ->
+  submitForPartialSettlement: (transactionId, attributes..., callback) ->
+    amount = attributes[0]
+    options = attributes[1] || {}
+    Util.verifyKeys(@SUBMIT_FOR_SETTLEMENT_SIGNATURE, options, deprecate)
+
     @gateway.http.post("#{@config.baseMerchantPath()}/transactions/#{transactionId}/submit_for_partial_settlement",
-      {transaction: {amount: amount}},
+      {transaction: {amount: amount, orderId: options["orderId"], descriptor: options["descriptor"]}},
       @responseHandler(callback)
     )
 
