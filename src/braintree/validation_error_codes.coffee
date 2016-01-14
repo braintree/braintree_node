@@ -95,6 +95,7 @@ class ValidationErrorCodes
     InvalidVenmoSDKPaymentMethodCode : "91727"
     NumberHasInvalidLength : "81716"
     NumberIsInvalid : "81715"
+    NumberIsProhibited : "81750"
     NumberIsRequired : "81714"
     NumberLengthIsInvalid : "81716"
     NumberMustBeTestNumber : "81717"
@@ -495,5 +496,14 @@ class ValidationErrorCodes
         DepartureDateIsInvalid : "93411"
         CheckInDateIsInvalid : "93412"
         CheckOutDateIsInvalid : "93413"
+
+  @Verification =
+    Options:
+      AmountCannotBeNegative : "94201"
+      AmountFormatIsInvalid : "94202"
+      AmountNotSupportedByProcessor : "94203"
+      MerchantAccountIdIsInvalid : "94204"
+      MerchantAccountIsSuspended : "94205"
+      MerchantAccountIsForbidden : "94206"
 
 exports.ValidationErrorCodes = ValidationErrorCodes

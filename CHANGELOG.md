@@ -1,3 +1,7 @@
+## 1.35.0
+* Add verification create API
+* Add options to `submit_for_settlement` transaction flows
+
 ## 1.34.0
 * Update version number
 
