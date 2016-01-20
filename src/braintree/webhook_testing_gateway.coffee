@@ -27,6 +27,7 @@ class WebhookTestingGateway extends Gateway
 
   subjectXmlFor: (kind, id) ->
     switch kind
+      when WebhookNotification.Kind.AccountUpdaterDailyReport then @subjectXmlForAccountUpdaterDailyReport()
       when WebhookNotification.Kind.Check then @subjectXmlForCheck()
       when WebhookNotification.Kind.TransactionDisbursed then @subjectXmlForTransactionDisbursed(id)
       when WebhookNotification.Kind.DisbursementException then @subjectXmlForDisbursementException(id)
@@ -41,6 +42,14 @@ class WebhookTestingGateway extends Gateway
       when WebhookNotification.Kind.PartnerMerchantDeclined then @subjectXmlForPartnerMerchantDeclined()
       when WebhookNotification.Kind.SubscriptionChargedSuccessfully then @subjectXmlForSubscriptionChargedSuccessfully(id)
       else @subjectXmlForSubscription(id)
+
+  subjectXmlForAccountUpdaterDailyReport: () ->
+    """
+    <account-updater-daily-report>
+      <report-date type="date">2016-01-14</report-date>
+      <report-url>link-to-csv-report</report-url>
+    </account-updater-daily-report>
+    """
 
   subjectXmlForCheck: () ->
     """

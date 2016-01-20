@@ -304,3 +304,16 @@ describe "WebhookNotificationGateway", ->
       specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.Check)
         done()
+
+
+    it "returns a parsable signature and payload for account updater daily report", (done) ->
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.AccountUpdaterDailyReport,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.AccountUpdaterDailyReport)
+        assert.equal('link-to-csv-report', webhookNotification.accountUpdaterDailyReport.reportUrl)
+        assert.equal('2016-01-14', webhookNotification.accountUpdaterDailyReport.reportDate)
+        done()
