@@ -290,7 +290,7 @@ describe "WebhookNotificationGateway", ->
         assert.equal(webhookNotification.subscription.id, 'my_id')
         assert.equal(webhookNotification.subscription.transactions.length, 1)
 
-        transaction = webhookNotification.subscription.transactions.pop().transaction
+        transaction = webhookNotification.subscription.transactions.pop()
         assert.equal(transaction.status, "submitted_for_settlement")
         assert.equal(transaction.amount, 49.99)
         done()

@@ -221,10 +221,8 @@ class WebhookTestingGateway extends Gateway
         <id>#{id}</id>
         <transactions type="array">
           <transaction>
-            <transaction>
-              <status>submitted_for_settlement</status>
-              <amount>49.99</amount>
-            </transaction>
+            <status>submitted_for_settlement</status>
+            <amount>49.99</amount>
           </transaction>
         </transactions>
         <add_ons type="array"></add_ons>
