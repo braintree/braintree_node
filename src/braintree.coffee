@@ -1,3 +1,4 @@
+{version} = require("../package.json")
 {Config} = require("./braintree/config")
 {Environment} = require("./braintree/environment")
 {BraintreeGateway} = require("./braintree/braintree_gateway")
@@ -24,7 +25,7 @@ connect = (config) ->
   new BraintreeGateway(new Config(config))
 
 exports.connect = connect
-exports.version = '1.35.1'
+exports.version = version
 exports.Environment = Environment
 exports.errorTypes = errorTypes
 
