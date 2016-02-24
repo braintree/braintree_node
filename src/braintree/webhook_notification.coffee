@@ -5,10 +5,12 @@
 {Dispute} = require('./dispute')
 {PartnerMerchant} = require('./partner_merchant')
 {Subscription} = require('./subscription')
+{AccountUpdaterDailyReport} = require('./account_updater_daily_report')
 {ValidationErrorsCollection} = require('./validation_errors_collection')
 
 class WebhookNotification extends AttributeSetter
   @Kind =
+    AccountUpdaterDailyReport: "account_updater_daily_report"
     Check: "check"
     Disbursement: "disbursement"
     DisbursementException: "disbursement_exception"
@@ -54,6 +56,9 @@ class WebhookNotification extends AttributeSetter
 
     if wrapper_node.dispute?
       @dispute= new Dispute(wrapper_node.dispute)
+
+    if wrapper_node.accountUpdaterDailyReport?
+      @accountUpdaterDailyReport = new AccountUpdaterDailyReport(wrapper_node.accountUpdaterDailyReport)
 
 
     if wrapper_node.errors?

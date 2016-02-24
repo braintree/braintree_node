@@ -1,3 +1,6 @@
+## 1.36.0
+* Add AccountUpdaterDailyReport webhook parsing
+
 ## 1.35.1
 * Fix bug in test transaction webhooks 
 
