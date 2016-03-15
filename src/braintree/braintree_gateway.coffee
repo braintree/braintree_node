@@ -1,4 +1,5 @@
 {Http} = require('./http')
+{AddOnGateway} = require("./add_on_gateway")
 {AddressGateway} = require("./address_gateway")
 {ClientTokenGateway} = require("./client_token_gateway")
 {CreditCardGateway} = require("./credit_card_gateway")
@@ -23,6 +24,7 @@
 class BraintreeGateway
   constructor: (@config) ->
     @http = new Http(@config)
+    @addOn = new AddOnGateway(this)
     @address = new AddressGateway(this)
     @clientToken = new ClientTokenGateway(this)
     @creditCard = new CreditCardGateway(this)
