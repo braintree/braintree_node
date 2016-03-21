@@ -35,3 +35,13 @@ describe "Config", ->
       )
 
       assert.equal(config.baseMerchantUrl(), "http://localhost/merchants/merchantId")
+
+  describe "timeout", ->
+    it "defaults to 60 seconds", ->
+      config = new Config(
+        merchantId: 'merchantId'
+        publicKey: 'publicKey'
+        privateKey: 'privateKey'
+      )
+
+      assert.equal(config.timeout, 60000)

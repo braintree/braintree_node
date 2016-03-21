@@ -1,3 +1,7 @@
+## 1.37.0
+* Add timeout attribute to config
+* Add AddOns.all method
+
 ## 1.36.0
 * Add AccountUpdaterDailyReport webhook parsing
 

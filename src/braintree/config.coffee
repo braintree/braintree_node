@@ -2,6 +2,7 @@
 
 class Config
   constructor: (rawConfig) ->
+    @timeout = 60000
     @apiVersion = '4'
     parser = new CredentialsParser()
     if rawConfig.clientId || rawConfig.clientSecret
