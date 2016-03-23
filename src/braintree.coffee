@@ -5,7 +5,15 @@
 errorTypes = require("./braintree/error_types")
 
 {Transaction} = require("./braintree/transaction")
+
 {CreditCard} = require("./braintree/credit_card")
+{PayPalAccount} = require("./braintree/paypal_account")
+{AndroidPayCard} = require("./braintree/android_pay_card")
+{ApplePayCard} = require("./braintree/apple_pay_card")
+{VenmoAccount} = require("./braintree/venmo_account")
+{CoinbaseAccount} = require("./braintree/coinbase_account")
+{AmexExpressCheckoutCard} = require("./braintree/amex_express_checkout_card")
+
 {CreditCardVerification} = require("./braintree/credit_card_verification")
 {Subscription} = require("./braintree/subscription")
 {MerchantAccount} = require("./braintree/merchant_account")
@@ -30,7 +38,15 @@ exports.Environment = Environment
 exports.errorTypes = errorTypes
 
 exports.Transaction = Transaction
+
 exports.CreditCard = CreditCard
+exports.PayPalAccount = PayPalAccount
+exports.AndroidPayCard = AndroidPayCard
+exports.ApplePayCard = ApplePayCard
+exports.VenmoAccount = VenmoAccount
+exports.CoinbaseAccount = CoinbaseAccount
+exports.AmexExpressCheckoutCard = AmexExpressCheckoutCard
+
 exports.CreditCardVerification = CreditCardVerification
 exports.Subscription = Subscription
 exports.MerchantAccount = MerchantAccount
