@@ -12,6 +12,7 @@ class ValidationErrorCodes
     FirstNameIsInvalid : "91819"
     FirstNameIsTooLong : "81805"
     InconsistentCountry : "91815"
+    IsInvalid : "91828"
     LastNameIsInvalid : "91820"
     LastNameIsTooLong : "81806"
     LocalityIsInvalid : "91824"

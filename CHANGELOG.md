@@ -1,3 +1,6 @@
+## 1.37.1
+* Fix issue when checking the instance of a customer's payment method
+
 ## 1.37.0
 * Add timeout attribute to config
 * Add AddOns.all method
