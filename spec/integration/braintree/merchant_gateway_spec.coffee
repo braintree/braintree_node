@@ -90,11 +90,13 @@ describe "MerchantGateway", ->
         merchantAccounts = merchant.merchantAccounts
         assert.equal(merchantAccounts.length, 2)
 
-        usdMerchantAccount = merchantAccounts[0]
+        usdMerchantAccount = (merchantAccounts.filter (x) -> x.id == 'USD')[0]
+        assert.isNotNull(usdMerchantAccount)
         assert.equal(usdMerchantAccount.default, true)
         assert.equal(usdMerchantAccount.currencyIsoCode, 'USD')
 
-        gbpMerchantAccount = merchantAccounts[1]
+        gbpMerchantAccount = (merchantAccounts.filter (x) -> x.id == 'GBP')[0]
+        assert.isNotNull(gbpMerchantAccount)
         assert.equal(gbpMerchantAccount.default, false)
         assert.equal(gbpMerchantAccount.currencyIsoCode, 'GBP')
 
