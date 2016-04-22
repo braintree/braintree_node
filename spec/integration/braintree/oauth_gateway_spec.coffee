@@ -77,6 +77,7 @@ describe "OAuthGateway", ->
         redirectUri: "http://bar.example.com"
         scope: "read_write"
         state: "baz_state"
+        landingPage: "login"
         user:
           country: "USA"
           email: "foo@example.com"
@@ -133,6 +134,7 @@ describe "OAuthGateway", ->
       assert.equal(query('redirect_uri'), 'http://bar.example.com')
       assert.equal(query('scope'), 'read_write')
       assert.equal(query('state'), 'baz_state')
+      assert.equal(query('landing_page'), 'login')
 
       assert.equal(query('user[country]'), 'USA')
       assert.equal(query('business[name]'), '14 Ladders')
