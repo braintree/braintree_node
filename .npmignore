@@ -5,3 +5,5 @@
 /spec_compiled
 /spec
 /src
+/lib/**/*.map
+/Rakefile
