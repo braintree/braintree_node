@@ -65,6 +65,30 @@ describe "OAuthGateway", ->
 
             done()
 
+  describe "revokeAccessToken", ->
+    it "revokes an access token", (done) ->
+      gateway = braintree.connect {
+        clientId: 'client_id$development$integration_client_id'
+        clientSecret: 'client_secret$development$integration_client_secret'
+      }
+
+      specHelper.createGrant gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) ->
+        gateway.oauth.createTokenFromCode {code: code, scope: 'read_write'}, (err, accessTokenResponse) ->
+          gateway.oauth.revokeAccessToken accessTokenResponse.credentials.accessToken, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isTrue(response.result.success)
+
+            gateway = braintree.connect {
+              accessToken: accessTokenResponse.credentials.accessToken
+            }
+
+            gateway.customer.create {}, (err, response) ->
+              assert.isNotNull(err)
+              assert.equal(err.name, 'authenticationError')
+
+              done()
+
   describe "connectUrl", ->
     it "builds a connect url", ->
       gateway = braintree.connect {
