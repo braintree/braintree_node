@@ -77,12 +77,23 @@ class Http
       )
     )
 
-    theRequest.setTimeout(@config.timeout, ->
+    timeoutHandler = () =>
+      theRequest.abort()
+      @_aborted = true
       error = exceptions.UnexpectedError("Request timed out")
       return callback(error, null)
+
+    theRequest.setTimeout(@config.timeout, timeoutHandler)
+
+    requestSocket = null
+    theRequest.on('socket', (socket) ->
+      requestSocket = socket
     )
 
-    theRequest.on('error', (err) ->
+    theRequest.on('error', (err) =>
+      return if @_aborted
+      if @config.timeout > 0
+        requestSocket.removeListener('timeout', timeoutHandler)
       error = exceptions.UnexpectedError('Unexpected request error: ' + err)
       return callback(error, null)
     )
