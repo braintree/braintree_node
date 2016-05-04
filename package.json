@@ -25,7 +25,7 @@
     "readable-stream": "2.1.2",
     "semver": "5.1.0",
     "underscore": "1.8.3",
-    "xml2js": "0.1.13"
+    "xml2js": "0.4.16"
   },
   "devDependencies": {
     "capture-stream": "0.1.2",
