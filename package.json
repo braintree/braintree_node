@@ -31,7 +31,8 @@
     "capture-stream": "0.1.2",
     "chai": "1.5.0",
     "coffee-script": "1.6.1",
-    "mocha": "1.6.0"
+    "mocha": "1.6.0",
+    "npm-check-updates": "^2.6.4"
   },
   "optionalDependencies": {
     "source-map-support": "0.2.9"
@@ -39,10 +40,12 @@
   "license": "MIT",
   "scripts": {
     "compile_coffee": "coffee --map -cbo ./lib ./src && coffee --map -cbo ./spec_compiled ./spec",
-    "prepublish": "npm run compile_coffee",
+    "prepublish": "npm run compile_coffee && npm run check_dependencies",
     "test_execute_unit": "mocha spec_compiled/unit --recursive",
     "test_execute_integration": "mocha --slow 2000 spec_compiled/integration --recursive",
     "test_integration": "npm run compile_coffee && npm run test_execute_integration",
-    "test": "npm run compile_coffee && npm run test_execute_unit"
+    "test": "npm run compile_coffee && npm run test_execute_unit",
+    "check_dependencies": "ncu -e 1",
+    "update_dependencies": "ncu -u"
   }
 }
