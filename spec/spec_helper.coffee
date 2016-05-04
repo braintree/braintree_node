@@ -244,6 +244,9 @@ class ClientApiHttp
   constructor: (@config) ->
     @parser = new xml2js.Parser
       explicitRoot: true
+      explicitArray: false
+      attrkey: '@'
+      charkey: '#'
 
   get: (url, params, callback) ->
     if params
