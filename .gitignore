@@ -2,4 +2,3 @@ lib
 node_modules
 spec_compiled
 tags
-npm-debug*
