@@ -12,9 +12,6 @@ class WebhookNotificationGateway extends Gateway
     @config = @gateway.config
     @parser = new xml2js.Parser
       explicitRoot: true
-      explicitArray: false
-      attrkey: '@'
-      charkey: '#'
 
   parse: (signature, payload, callback) ->
     if payload.match(/[^A-Za-z0-9+=\/\n]/)

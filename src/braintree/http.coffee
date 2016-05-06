@@ -11,9 +11,6 @@ class Http
   constructor: (@config) ->
     @parser = new xml2js.Parser
       explicitRoot: true
-      explicitArray: false
-      attrkey: '@'
-      charkey: '#'
 
   checkHttpStatus: (status) ->
     switch status.toString()
