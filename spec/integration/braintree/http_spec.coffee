@@ -14,13 +14,6 @@ describe "Http", ->
 
         done()
 
-    it "returns a down for maintenance error for 503s", (done) ->
-      http = new Http(new Config(specHelper.defaultConfig))
-      http.post '/test/maintenance', '', (err, response) ->
-        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError)
-
-        done()
-
     it "can hit the sandbox", (done) ->
 
       http = new Http(new Config(
