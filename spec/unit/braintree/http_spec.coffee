@@ -28,7 +28,11 @@ describe "Http", ->
       http = new Http(new Config(specHelper.defaultConfig))
       assert.equal(http.checkHttpStatus(426).type, braintree.errorTypes.upgradeRequired)
 
-    it "returns a server error for 500 =>", ->
+    it "returns an not found error for 429  => ", ->
+      http = new Http(new Config(specHelper.defaultConfig))
+      assert.equal(http.checkHttpStatus(429).type, braintree.errorTypes.tooManyRequestsError)
+
+    it "returns a down for maintenance error for 500 =>", ->
       http = new Http(new Config(specHelper.defaultConfig))
       assert.equal(http.checkHttpStatus(500).type, braintree.errorTypes.serverError)
 

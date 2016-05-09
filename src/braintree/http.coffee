@@ -19,6 +19,7 @@ class Http
       when '403' then exceptions.AuthorizationError("Authorization Error")
       when '404' then exceptions.NotFoundError("Not Found")
       when '426' then exceptions.UpgradeRequired("Upgrade Required")
+      when '429' then exceptions.TooManyRequestsError("Too Many Requests")
       when '500' then exceptions.ServerError("Server Error")
       when '503' then exceptions.DownForMaintenanceError("Down for Maintenance")
       else exceptions.UnexpectedError('Unexpected HTTP response: ' + status)
