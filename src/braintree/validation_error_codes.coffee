@@ -167,10 +167,12 @@ class ValidationErrorCodes
     CountryCodeNumericIsNotAccepted : "93608"
     CountryNameIsInvalid : "93611"
     CountryNameIsNotAccepted : "93610"
+    CurrenciesAreInvalid : "93614"
     EmailFormatIsInvalid : "93602"
     EmailIsRequired : "83601"
     InconsistentCountry : "93612"
     PaymentMethodsAreInvalid: "93613"
+    PaymentMethodsAreNotAllowed: "93615"
 
   @MerchantAccount =
     ApplicantDetails:
@@ -410,6 +412,7 @@ class ValidationErrorCodes
     CannotSimulateSettlement : "91575"
     CannotSubmitForPartialSettlement : "915103"
     CannotSubmitForSettlement : "91507"
+    CannotUpdateTransactionDetailsNotSubmittedForSettlement: "915129"
     ChannelIsTooLong : "91550"
     CreditCardIsRequired : "91508"
     CustomFieldIsInvalid : "91526"
@@ -454,6 +457,7 @@ class ValidationErrorCodes
     ProcessorDoesNotSupportPartialSettlement : "915102"
     ProcessorDoesNotSupportUpdatingOrderId : "915107"
     ProcessorDoesNotSupportUpdatingDescriptor : "915108"
+    ProcessorDoesNotSupportUpdatingTransactionDetails : "915130"
     ProcessorDoesNotSupportVoiceAuthorizations : "91545"
     PurchaseOrderNumberIsInvalid : "91548"
     PurchaseOrderNumberIsTooLong : "91537"

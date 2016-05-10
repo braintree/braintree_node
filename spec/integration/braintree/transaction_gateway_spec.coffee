@@ -1726,6 +1726,182 @@ describe "TransactionGateway", ->
 
             done()
 
+  describe "updateDetails", ->
+    it "updates the transaction details", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        options:
+          submitForSettlement: true
+
+      updateParams =
+        amount: '4.00'
+        orderId: '123'
+        descriptor:
+          name: 'abc*def'
+          phone: '1234567890'
+          url: 'ebay.com'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.updateDetails response.transaction.id, updateParams, (err, response) ->
+
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, 'submitted_for_settlement')
+          assert.equal(response.transaction.amount, '4.00')
+          assert.equal(response.transaction.orderId, '123')
+          assert.equal(response.transaction.descriptor.name, 'abc*def')
+          assert.equal(response.transaction.descriptor.phone, '1234567890')
+          assert.equal(response.transaction.descriptor.url, 'ebay.com')
+
+          done()
+
+    it "returns an authorizationError and logs when a key is invalid", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        options:
+          submitForSettlement: true
+
+      updateParams =
+        amount: '4.00'
+        invalidParam: "something invalid"
+
+      stderr = capture(process.stderr)
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.updateDetails response.transaction.id, updateParams, (err, response) ->
+
+          assert.equal(err.type, braintree.errorTypes.authorizationError)
+          assert.include(stderr(true), 'deprecated')
+          assert.include(stderr(true), 'invalid keys: invalidParam')
+
+          done()
+
+    it "validates amount", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        options:
+          submitForSettlement: true
+
+      updateParams =
+        amount: '555.00'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.updateDetails response.transaction.id, updateParams, (err, response) ->
+
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(response.errors.for('transaction').on('amount')[0].code, '91522')
+
+          done()
+
+    it "validates descriptor", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        options:
+          submitForSettlement: true
+
+      updateParams =
+        amount: '4.00'
+        orderId: '123'
+        descriptor:
+          name: 'invalid name'
+          phone: 'invalid phone'
+          url: 'invalid url that is invalid because it is too long'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.updateDetails response.transaction.id, updateParams, (err, response) ->
+
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(response.errors.for('transaction').for('descriptor').on('name')[0].code, '92201')
+          assert.equal(response.errors.for('transaction').for('descriptor').on('phone')[0].code, '92202')
+          assert.equal(response.errors.for('transaction').for('descriptor').on('url')[0].code, '92206')
+
+          done()
+
+    it "validates orderId", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        options:
+          submitForSettlement: true
+
+      updateParams =
+        orderId: new Array(257).join('X')
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.updateDetails response.transaction.id, updateParams, (err, response) ->
+
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(response.errors.for('transaction').on('orderId')[0].code, '91501')
+
+          done()
+
+    it "validates processor", (done) ->
+      transactionParams =
+        merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId
+        amount: "10.00"
+        creditCard:
+          number: CreditCardNumbers.AmexPayWithPoints.Success
+          expirationDate: "12/2020"
+        options:
+          submitForSettlement: true
+
+      updateParams =
+        amount: '4.00'
+        orderId: '123'
+        descriptor:
+          name: 'abc*def'
+          phone: '1234567890'
+          url: 'ebay.com'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.updateDetails response.transaction.id, updateParams, (err, response) ->
+
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(response.errors.for('transaction').on('base')[0].code, '915130')
+
+          done()
+
+    it "validates status", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      updateParams =
+        amount: '4.00'
+        orderId: '123'
+        descriptor:
+          name: 'abc*def'
+          phone: '1234567890'
+          url: 'ebay.com'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        specHelper.defaultGateway.transaction.updateDetails response.transaction.id, updateParams, (err, response) ->
+
+          assert.isNull(err)
+          assert.isFalse(response.success)
+          assert.equal(response.errors.for('transaction').on('base')[0].code, '915129')
+
+          done()
+
   describe "void", ->
     it "voids a transaction", (done) ->
       transactionParams =

@@ -19,6 +19,7 @@ class Http
       when '403' then exceptions.AuthorizationError("Authorization Error")
       when '404' then exceptions.NotFoundError("Not Found")
       when '426' then exceptions.UpgradeRequired("Upgrade Required")
+      when '429' then exceptions.TooManyRequestsError("Too Many Requests")
       when '500' then exceptions.ServerError("Server Error")
       when '503' then exceptions.DownForMaintenanceError("Down for Maintenance")
       else exceptions.UnexpectedError('Unexpected HTTP response: ' + status)
@@ -77,12 +78,23 @@ class Http
       )
     )
 
-    theRequest.setTimeout(@config.timeout, ->
+    timeoutHandler = () =>
+      theRequest.abort()
+      @_aborted = true
       error = exceptions.UnexpectedError("Request timed out")
       return callback(error, null)
+
+    theRequest.setTimeout(@config.timeout, timeoutHandler)
+
+    requestSocket = null
+    theRequest.on('socket', (socket) ->
+      requestSocket = socket
     )
 
-    theRequest.on('error', (err) ->
+    theRequest.on('error', (err) =>
+      return if @_aborted
+      if @config.timeout > 0
+        requestSocket.removeListener('timeout', timeoutHandler)
       error = exceptions.UnexpectedError('Unexpected request error: ' + err)
       return callback(error, null)
     )

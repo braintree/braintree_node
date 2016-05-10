@@ -15,5 +15,6 @@ exports.InvalidTransparentRedirectHashError = errorMaker(errorTypes.invalidTrans
 exports.NotFoundError = errorMaker(errorTypes.notFoundError)
 exports.ServerError = errorMaker(errorTypes.serverError)
 exports.TestOperationPerformedInProductionError = errorMaker(errorTypes.testOperationPerformedInProductionError)
+exports.TooManyRequestsError = errorMaker(errorTypes.tooManyRequestsError)
 exports.UnexpectedError = errorMaker(errorTypes.unexpectedError)
 exports.UpgradeRequired = errorMaker(errorTypes.upgradeRequired)

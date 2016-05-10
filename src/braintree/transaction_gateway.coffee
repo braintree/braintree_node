@@ -8,6 +8,7 @@ deprecate = require('depd')('braintree/gateway.transaction')
 
 class TransactionGateway extends Gateway
   SUBMIT_FOR_SETTLEMENT_SIGNATURE: ["orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
+  UPDATE_DETAILS_SIGNATURE: ["amount", "orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
   constructor: (@gateway) ->
     @config = @gateway.config
 
@@ -72,6 +73,14 @@ class TransactionGateway extends Gateway
 
     @gateway.http.put("#{@config.baseMerchantPath()}/transactions/#{transactionId}/submit_for_settlement",
       {transaction: {amount: amount, orderId: options["orderId"], descriptor: options["descriptor"]}},
+      @responseHandler(callback)
+    )
+
+  updateDetails: (transactionId, options, callback) ->
+    Util.verifyKeys(@UPDATE_DETAILS_SIGNATURE, options, deprecate)
+
+    @gateway.http.put("#{@config.baseMerchantPath()}/transactions/#{transactionId}/update_details",
+      {transaction: options},
       @responseHandler(callback)
     )
 

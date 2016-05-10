@@ -272,6 +272,23 @@ describe "CustomerGateway", ->
 
         done()
 
+    it "allows verifying cards with a verification_amount", (done) ->
+      customerParams =
+        firstName: 'John'
+        lastName: 'Smith'
+        creditCard:
+          number: '5555555555554444'
+          expirationDate: '05/2012'
+          options:
+            verifyCard: true
+            verificationAmount: '2.00'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+
+        done()
+
     it "handles unsuccessful verifications", (done) ->
       customerParams =
         firstName: 'John'
@@ -533,6 +550,23 @@ describe "CustomerGateway", ->
         assert.equal(response.customer.firstName, 'New First Name')
         assert.equal(response.customer.lastName, 'New Last Name')
         assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100')
+
+        done()
+
+    it "can add a new card to a customer with a verification_amount specified", (done) ->
+      customerParams =
+        firstName: 'New First Name'
+        lastName: 'New Last Name'
+        creditCard:
+          number: '5555555555554444'
+          expirationDate: '05/2014'
+          options:
+            verifyCard: true
+            verificationAmount: '2.00'
+
+      specHelper.defaultGateway.customer.update customerId, customerParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
 
         done()
 

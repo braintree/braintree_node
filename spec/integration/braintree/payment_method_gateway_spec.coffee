@@ -1142,6 +1142,43 @@ describe "PaymentMethodGateway", ->
 
                 done()
 
+    context 'coinbase', ->
+
+      it "updates a coinbase account's default flag", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          creditCardParams =
+            customerId: customerId
+            number: '4012888888881881'
+            expirationDate: '05/2009'
+
+          specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+            assert.isTrue(response.success)
+            assert.isTrue(response.creditCard.default)
+
+            paymentMethodParams =
+              customerId: customerId
+              paymentMethodNonce: Nonces.Coinbase
+
+            specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+              assert.isTrue(response.success)
+              assert.isFalse(response.paymentMethod.default)
+
+              coinbaseAccount = response.coinbaseAccount
+
+              updateParams =
+                options:
+                  makeDefault: 'true'
+
+              specHelper.defaultGateway.paymentMethod.update coinbaseAccount.token, updateParams, (err, response) ->
+                assert.isNull(err)
+                assert.isTrue(response.success)
+                assert.equal(response.paymentMethod.token, coinbaseAccount.token)
+                assert.isTrue(response.paymentMethod.default)
+
+                done()
+
     context 'paypal accounts', ->
 
       it "updates a paypal account's token", (done) ->
