@@ -1,3 +1,7 @@
+## 1.38.0
+* Add transaction `UpdateDetails`
+* Add multi-currency support for merchant `create`
+
 ## 1.37.1
 * Fix issue when checking the instance of a customer's payment method
 
@@ -9,7 +13,7 @@
 * Add AccountUpdaterDailyReport webhook parsing
 
 ## 1.35.1
-* Fix bug in test transaction webhooks 
+* Fix bug in test transaction webhooks
 
 ## 1.35.0
 * Add verification create API
