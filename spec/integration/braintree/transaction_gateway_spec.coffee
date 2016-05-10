@@ -1878,7 +1878,7 @@ describe "TransactionGateway", ->
 
           done()
 
-    it.only "validates status", (done) ->
+    it "validates status", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:
