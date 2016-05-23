@@ -1,3 +1,6 @@
+## 1.39.0
+* Add method of revoking OAuth access tokens
+
 ## 1.38.0
 * Add transaction `UpdateDetails`
 * Add multi-currency support for merchant `create`
