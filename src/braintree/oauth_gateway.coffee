@@ -1,5 +1,6 @@
 {Gateway} = require('./gateway')
 {OAuthCredentials} = require('./oauth_credentials')
+{AttributeSetter} = require('./attribute_setter')
 {Util} = require('./util')
 {Digest} = require('./digest')
 
@@ -16,6 +17,9 @@ class OAuthGateway extends Gateway
   createTokenFromRefreshToken: (attributes, callback) ->
     attributes.grantType = 'refresh_token'
     @gateway.http.post('/oauth/access_tokens', attributes, @responseHandler(callback))
+
+  revokeAccessToken: (accessToken, callback) ->
+    @gateway.http.post('/oauth/revoke_access_token', { token: accessToken }, @createResponseHandler("result", AttributeSetter, callback))
 
   responseHandler: (callback) ->
     @createResponseHandler("credentials", OAuthCredentials, callback)
