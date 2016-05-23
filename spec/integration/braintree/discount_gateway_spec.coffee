@@ -20,7 +20,6 @@ describe "DiscountGateway", ->
           assert.isTrue(response.success)
 
           discount = _.find(response.discounts, (discount) -> discount.id == attributes.id)
-          assert.equal(attributes.id, discount.id)
           assert.equal(attributes.name, discount.name)
           assert.equal(attributes.amount, discount.amount)
           assert.equal(attributes.description, discount.description)
