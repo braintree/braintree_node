@@ -124,6 +124,7 @@ class ValidationErrorCodes
       UpdateExistingTokenNotAllowed : "91729"
       VerificationAmountCannotBeNegative : "91739"
       VerificationAmountFormatIsInvalid : "91740"
+      VerificationAmountIsTooLarge : "91752"
       VerificationAmountNotSupportedByProcessor : "91741"
       VerificationMerchantAccountIdIsInvalid : "91728"
       VerificationMerchantAccountIsForbidden : "91743"
@@ -506,6 +507,7 @@ class ValidationErrorCodes
     Options:
       AmountCannotBeNegative : "94201"
       AmountFormatIsInvalid : "94202"
+      AmountIsTooLarge : "94207"
       AmountNotSupportedByProcessor : "94203"
       MerchantAccountIdIsInvalid : "94204"
       MerchantAccountIsSuspended : "94205"

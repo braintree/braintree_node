@@ -30,7 +30,7 @@ describe "SubscriptionGateway", ->
         assert.isTrue(response.success)
         assert.equal(response.subscription.planId, specHelper.plans.trialless.id)
         assert.equal(response.subscription.price, specHelper.plans.trialless.price)
-        assert.match(response.subscription.transactions[0].id, /^\w{6,7}$/)
+        assert.match(response.subscription.transactions[0].id, /^\w{6,}$/)
         assert.equal(response.subscription.transactions[0].creditCard.maskedNumber, '510510******5100')
         assert.equal(response.subscription.transactions[0].planId, specHelper.plans.trialless.id)
         assert.isNotNull(response.subscription.createdAt)
@@ -137,7 +137,7 @@ describe "SubscriptionGateway", ->
       specHelper.defaultGateway.subscription.create subscriptionParams, (err, response) ->
         assert.isNull(err)
         assert.isFalse(response.success)
-        assert.match(response.transaction.id, /^\w{6,7}$/)
+        assert.match(response.transaction.id, /^\w{6,}$/)
         assert.equal(response.transaction.status, 'processor_declined')
         assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100')
 

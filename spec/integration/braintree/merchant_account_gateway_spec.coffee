@@ -162,6 +162,7 @@ describe "MerchantAccountGateway", ->
       params["individual"]["last_name"] = "Doe"
       params["individual"]["email"] = "john.doe@example.com"
       params["individual"]["date_of_birth"] = "1970-01-01"
+      params["individual"]["ssn"] = "555123456"
       params["individual"]["phone"] = "3125551234"
       params["individual"]["address"]["street_address"] = "123 Fake St"
       params["individual"]["address"]["locality"] = "Chicago"
@@ -190,6 +191,7 @@ describe "MerchantAccountGateway", ->
         assert.equal(response.merchantAccount.individual.lastName, "Doe")
         assert.equal(response.merchantAccount.individual.email, "john.doe@example.com")
         assert.equal(response.merchantAccount.individual.dateOfBirth, "1970-01-01")
+        assert.equal(response.merchantAccount.individual.ssnLast4, "3456")
         assert.equal(response.merchantAccount.individual.phone, "3125551234")
         assert.equal(response.merchantAccount.individual.address.streetAddress, "123 Fake St")
         assert.equal(response.merchantAccount.individual.address.locality, "Chicago")

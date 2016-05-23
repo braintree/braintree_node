@@ -1,6 +1,10 @@
+## 1.39.0
+* Add method of revoking OAuth access tokens
+
 ## 1.38.0
 * Add transaction `UpdateDetails`
 * Add multi-currency support for merchant `create`
+* Add logic to stop duplicate callbacks in timeouts (closes issue #76)
 
 ## 1.37.1
 * Fix issue when checking the instance of a customer's payment method
