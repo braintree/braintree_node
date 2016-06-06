@@ -50,6 +50,7 @@ exports.AmexExpressCheckoutCard = AmexExpressCheckoutCard
 exports.CreditCardVerification = CreditCardVerification
 exports.Subscription = Subscription
 exports.MerchantAccount = MerchantAccount
+exports.PaymentInstrumentTypes = PaymentInstrumentTypes
 exports.WebhookNotification = WebhookNotification
 exports.TestingGateway = TestingGateway
 exports.ValidationErrorCodes = ValidationErrorCodes
