@@ -1339,6 +1339,112 @@ describe "TransactionGateway", ->
 
             done()
 
+      it "works for transaction with threeDSecurePassThru", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId
+          amount: '5.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2009'
+          threeDSecurePassThru:
+            eciFlag: "02"
+            cavv: "some_cavv"
+            xid: "some_xid"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.status, Transaction.Status.Authorized)
+
+          done()
+
+      it "returns an error for transaction with threeDSecurePassThru when the merchant account does not support that card type", (done) ->
+        transactionParams =
+          merchantAccountId: "adyen_ma"
+          amount: '5.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2009'
+          threeDSecurePassThru:
+            eciFlag: "02"
+            cavv: "some_cavv"
+            xid: "some_xid"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').on("merchantAccountId")[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureMerchantAccountDoesNotSupportCardType
+          )
+
+          done()
+
+      it "returns an error for transaction when the threeDSecurePassThru eciFlag is missing", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId
+          amount: '5.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2009'
+          threeDSecurePassThru:
+            eciFlag: ""
+            cavv: "some_cavv"
+            xid: "some_xid"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on("eciFlag")[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsRequired
+          )
+
+          done()
+
+      it "returns an error for transaction when the threeDSecurePassThru cavv or xid is missing", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId
+          amount: '5.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2009'
+          threeDSecurePassThru:
+            eciFlag: "06"
+            cavv: ""
+            xid: ""
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on("cavv")[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureCavvIsRequired
+          )
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on("xid")[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureXidIsRequired
+          )
+
+          done()
+
+      it "returns an error for transaction when the threeDSecurePassThru eciFlag is invalid", (done) ->
+        transactionParams =
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId
+          amount: '5.00'
+          creditCard:
+            number: '5105105105105100'
+            expirationDate: '05/2009'
+          threeDSecurePassThru:
+            eciFlag: "bad_eci_flag"
+            cavv: "some_cavv"
+            xid: "some_xid"
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on("eciFlag")[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsInvalid
+          )
+
+          done()
+
   describe "find", ->
     it "finds a transaction", (done) ->
       transactionParams =
