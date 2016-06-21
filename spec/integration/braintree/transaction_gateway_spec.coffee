@@ -1559,7 +1559,7 @@ describe "TransactionGateway", ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.equal(response.transaction.type, 'credit')
-          assert.match(response.transaction.refund_id, /^\w+$/)
+          assert.equal(response.transaction.refundedTransactionId, transaction.id)
 
           done()
 
@@ -1569,7 +1569,7 @@ describe "TransactionGateway", ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.equal(response.transaction.type, 'credit')
-          assert.match(response.transaction.refund_id, /^\w+$/)
+          assert.equal(response.transaction.refundedTransactionId, transaction.id)
 
           done()
 
@@ -1579,7 +1579,23 @@ describe "TransactionGateway", ->
           assert.isNull(err)
           assert.isTrue(response.success)
           assert.equal(response.transaction.type, 'credit')
-          assert.match(response.transaction.refund_id, /^\w+$/)
+          assert.equal(response.transaction.refundedTransactionId, transaction.id)
+          assert.equal(response.transaction.amount, '1.00')
+
+          done()
+
+    it "allows refunding with options param", (done) ->
+      specHelper.createTransactionToRefund (transaction) ->
+        options =
+          order_id: 'abcd'
+          amount: '1.00'
+
+        specHelper.defaultGateway.transaction.refund transaction.id, options, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+          assert.equal(response.transaction.type, 'credit')
+          assert.equal(response.transaction.refundedTransactionId, transaction.id)
+          assert.equal(response.transaction.orderId, 'abcd')
           assert.equal(response.transaction.amount, '1.00')
 
           done()
