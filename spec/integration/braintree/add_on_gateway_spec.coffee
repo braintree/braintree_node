@@ -20,7 +20,6 @@ describe "AddOnGateway", ->
           assert.isTrue(response.success)
 
           addOn = _.find(response.addOns, (addOn) -> addOn.id == attributes.id)
-          assert.equal(attributes.id, addOn.id)
           assert.equal(attributes.name, addOn.name)
           assert.equal(attributes.amount, addOn.amount)
           assert.equal(attributes.description, addOn.description)

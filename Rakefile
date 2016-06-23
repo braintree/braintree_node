@@ -1,4 +1,5 @@
 task :default => %w[test:unit test:integration]
+task :test => %w[test:unit test:integration]
 
 namespace :test do
   desc "Run units"

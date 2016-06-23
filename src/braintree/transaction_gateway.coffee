@@ -44,8 +44,12 @@ class TransactionGateway extends Gateway
       @responseHandler(callback)
     )
 
-  refund: (transactionId, amount..., callback) ->
-    @gateway.http.post("#{@config.baseMerchantPath()}/transactions/#{transactionId}/refund", {transaction: {amount: amount[0]}}, @responseHandler(callback))
+  refund: (transactionId, amount_or_options..., callback) ->
+    options = if typeof amount_or_options[0] == 'object'
+                amount_or_options[0]
+              else
+                amount: amount_or_options[0]
+    @gateway.http.post("#{@config.baseMerchantPath()}/transactions/#{transactionId}/refund", {transaction: options}, @responseHandler(callback))
 
   responseHandler: (callback) ->
     @createResponseHandler("transaction", Transaction, callback)
