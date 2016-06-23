@@ -1,3 +1,8 @@
+## 1.40.0
+* Add OrderId to refund
+* Add 3DS Pass thru support
+* Export missing Payment Instrument Types (Thanks, @kamilwaheed)
+
 ## 1.39.0
 * Add method of revoking OAuth access tokens
 
