@@ -37,6 +37,25 @@ describe "CustomerGateway", ->
 
           done()
 
+    it "creates a customer with risk data", (done) ->
+        customerParams =
+          credit_card:
+            number: "4111111111111111"
+            expiration_month: "11"
+            expiration_year: "2099"
+            options:
+              verifyCard: true
+          riskData:
+            customer_browser: 'IE6'
+            customer_ip: '127.0.0.0'
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+
+          done()
+
+
     it "handles uft8 characters", (done) ->
       specHelper.defaultGateway.customer.create {firstName: 'Jöhn', lastName: 'Smith'}, (err, response) ->
         assert.isNull(err)

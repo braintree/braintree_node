@@ -729,6 +729,22 @@ describe "TransactionGateway", ->
         assert.isTrue(response.success)
         done()
 
+    it "allows risk data params", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+        riskData:
+          customer_browser: 'Edge'
+          customer_ip: "127.0.0.0"
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        done()
+
+
     it "handles validation errors", (done) ->
       transactionParams =
         creditCard:
