@@ -555,6 +555,75 @@ describe "CustomerGateway", ->
 
         done()
 
+    it "updates default payment method in options", (done) ->
+      token1 = specHelper.randomId()
+      paymentMethodParams =
+        customerId: customerId
+        paymentMethodNonce: Nonces.TransactableVisa
+        token: token1
+
+      specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.paymentMethod.default)
+
+        token2 = specHelper.randomId()
+        paymentMethodParams =
+          customerId: customerId
+          paymentMethodNonce: Nonces.TransactableMasterCard
+          token: token2
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.paymentMethod.default)
+
+          customerParams =
+            creditCard:
+              options:
+                updateExistingToken: token2
+                makeDefault: true
+
+          specHelper.defaultGateway.customer.update customerId, customerParams, (err, response) ->
+            assert.isTrue(response.success)
+
+            specHelper.defaultGateway.paymentMethod.find token2, (err, creditCard) ->
+              assert.isTrue(creditCard.default)
+              assert.equal(creditCard.token, token2)
+
+              done()
+
+    it "updates default payment method", (done) ->
+      token1 = specHelper.randomId()
+      paymentMethodParams =
+        customerId: customerId
+        paymentMethodNonce: Nonces.TransactableVisa
+        token: token1
+
+      specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.paymentMethod.default)
+
+        token2 = specHelper.randomId()
+        paymentMethodParams =
+          customerId: customerId
+          paymentMethodNonce: Nonces.TransactableMasterCard
+          token: token2
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.paymentMethod.default)
+
+          customerParams =
+            defaultPaymentMethodToken: token2
+
+          specHelper.defaultGateway.customer.update customerId, customerParams, (err, response) ->
+            assert.isTrue(response.success)
+
+            specHelper.defaultGateway.paymentMethod.find token2, (err, creditCard) ->
+              assert.isTrue(creditCard.default)
+              assert.equal(creditCard.token, token2)
+
+              done()
+
     it "can add a new card to a customer", (done) ->
       customerParams =
         firstName: 'New First Name'
