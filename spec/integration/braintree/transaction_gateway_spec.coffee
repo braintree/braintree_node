@@ -73,7 +73,7 @@ describe "TransactionGateway", ->
 
       specHelper.defaultGateway.customer.create customerParams, (err, response) ->
         transactionParams =
-          customer_id: response.customer.id
+          customerId: response.customer.id
           amount: '100.00'
 
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
@@ -99,7 +99,7 @@ describe "TransactionGateway", ->
 
       specHelper.defaultGateway.customer.create customerParams, (err, response) ->
         transactionParams =
-          payment_method_token: response.customer.creditCards[0].token
+          paymentMethodToken: response.customer.creditCards[0].token
           amount: '100.00'
 
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
@@ -128,6 +128,19 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "logs deprecation warning when options object contains invalid keys", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          fakeData: "some non-matching param value"
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      stderr = capture(process.stderr)
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.include(stderr(true), 'deprecated')
+
+        done()
 
     context "with apple pay", ->
       it "returns ApplePayCard for payment_instrument", (done) ->
@@ -2211,7 +2224,7 @@ describe "TransactionGateway", ->
               assert.isTrue(response.success)
               assert.equal(2, transaction.partialSettlementTransactionIds.length)
               done()
-              
+
     it "allows submitting with an order id", (done) ->
       transactionParams =
         amount: '5.00'
