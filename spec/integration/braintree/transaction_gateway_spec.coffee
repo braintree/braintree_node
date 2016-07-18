@@ -627,6 +627,36 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "allows specifying transactions with transaction source as 'recurring'", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        transactionSource: 'recurring'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.recurring, true)
+
+        done()
+
+    it "allows specifying transactions with transaction source as 'moto'", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        transactionSource: 'moto'
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.equal(response.transaction.recurring, false)
+
+        done()
+
     it "sets card type indicators on the transaction", (done) ->
       transactionParams =
         amount: '5.00'
@@ -698,6 +728,22 @@ describe "TransactionGateway", ->
         assert.isNull(err)
         assert.isTrue(response.success)
         done()
+
+    it "allows risk data params", (done) ->
+      transactionParams =
+        amount: '10.0'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/16'
+        riskData:
+          customer_browser: 'Edge'
+          customer_ip: "127.0.0.0"
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        done()
+
 
     it "handles validation errors", (done) ->
       transactionParams =

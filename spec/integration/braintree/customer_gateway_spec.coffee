@@ -37,6 +37,25 @@ describe "CustomerGateway", ->
 
           done()
 
+    it "creates a customer with risk data", (done) ->
+        customerParams =
+          credit_card:
+            number: "4111111111111111"
+            expiration_month: "11"
+            expiration_year: "2099"
+            options:
+              verifyCard: true
+          riskData:
+            customer_browser: 'IE6'
+            customer_ip: '127.0.0.0'
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+
+          done()
+
+
     it "handles uft8 characters", (done) ->
       specHelper.defaultGateway.customer.create {firstName: 'Jöhn', lastName: 'Smith'}, (err, response) ->
         assert.isNull(err)
@@ -535,6 +554,75 @@ describe "CustomerGateway", ->
         assert.equal(response.customer.lastName, 'New Last Name')
 
         done()
+
+    it "updates default payment method in options", (done) ->
+      token1 = specHelper.randomId()
+      paymentMethodParams =
+        customerId: customerId
+        paymentMethodNonce: Nonces.TransactableVisa
+        token: token1
+
+      specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.paymentMethod.default)
+
+        token2 = specHelper.randomId()
+        paymentMethodParams =
+          customerId: customerId
+          paymentMethodNonce: Nonces.TransactableMasterCard
+          token: token2
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.paymentMethod.default)
+
+          customerParams =
+            creditCard:
+              options:
+                updateExistingToken: token2
+                makeDefault: true
+
+          specHelper.defaultGateway.customer.update customerId, customerParams, (err, response) ->
+            assert.isTrue(response.success)
+
+            specHelper.defaultGateway.paymentMethod.find token2, (err, creditCard) ->
+              assert.isTrue(creditCard.default)
+              assert.equal(creditCard.token, token2)
+
+              done()
+
+    it "updates default payment method", (done) ->
+      token1 = specHelper.randomId()
+      paymentMethodParams =
+        customerId: customerId
+        paymentMethodNonce: Nonces.TransactableVisa
+        token: token1
+
+      specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.paymentMethod.default)
+
+        token2 = specHelper.randomId()
+        paymentMethodParams =
+          customerId: customerId
+          paymentMethodNonce: Nonces.TransactableMasterCard
+          token: token2
+
+        specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+          assert.isNull(err)
+          assert.isFalse(response.paymentMethod.default)
+
+          customerParams =
+            defaultPaymentMethodToken: token2
+
+          specHelper.defaultGateway.customer.update customerId, customerParams, (err, response) ->
+            assert.isTrue(response.success)
+
+            specHelper.defaultGateway.paymentMethod.find token2, (err, creditCard) ->
+              assert.isTrue(creditCard.default)
+              assert.equal(creditCard.token, token2)
+
+              done()
 
     it "can add a new card to a customer", (done) ->
       customerParams =

@@ -1,3 +1,8 @@
+## 1.41.0
+* Add support for passing risk data
+* Allow updating default_payment_method on customer
+* Support passing `transaction_source` to set MOTO or recurring ECI flag
+
 ## 1.40.0
 * Add OrderId to refund
 * Add 3DS Pass thru support
