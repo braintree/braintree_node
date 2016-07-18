@@ -7,8 +7,6 @@ exceptions = require('./exceptions')
 deprecate = require('depd')('braintree/gateway.transaction')
 
 class TransactionGateway extends Gateway
-  SUBMIT_FOR_SETTLEMENT_SIGNATURE: ["orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
-  UPDATE_DETAILS_SIGNATURE: ["amount", "orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
   constructor: (@gateway) ->
     @config = @gateway.config
 
@@ -73,7 +71,7 @@ class TransactionGateway extends Gateway
     amount = attributes[0]
     options = attributes[1] || {}
     deprecate("Received too many args for submitForSettlement (" + arguments.length + " for 4)") if arguments.length > 4
-    Util.verifyKeys(@SUBMIT_FOR_SETTLEMENT_SIGNATURE, options, deprecate)
+    Util.verifyKeys(@_submitForSettlementSignature(), options, deprecate)
 
     @gateway.http.put("#{@config.baseMerchantPath()}/transactions/#{transactionId}/submit_for_settlement",
       {transaction: {amount: amount, orderId: options["orderId"], descriptor: options["descriptor"]}},
@@ -81,7 +79,7 @@ class TransactionGateway extends Gateway
     )
 
   updateDetails: (transactionId, options, callback) ->
-    Util.verifyKeys(@UPDATE_DETAILS_SIGNATURE, options, deprecate)
+    Util.verifyKeys(@_updateDetailsSignature(), options, deprecate)
 
     @gateway.http.put("#{@config.baseMerchantPath()}/transactions/#{transactionId}/update_details",
       {transaction: options},
@@ -91,7 +89,7 @@ class TransactionGateway extends Gateway
   submitForPartialSettlement: (transactionId, attributes..., callback) ->
     amount = attributes[0]
     options = attributes[1] || {}
-    Util.verifyKeys(@SUBMIT_FOR_SETTLEMENT_SIGNATURE, options, deprecate)
+    Util.verifyKeys(@_submitForSettlementSignature(), options, deprecate)
 
     @gateway.http.post("#{@config.baseMerchantPath()}/transactions/#{transactionId}/submit_for_partial_settlement",
       {transaction: {amount: amount, orderId: options["orderId"], descriptor: options["descriptor"]}},
@@ -103,5 +101,11 @@ class TransactionGateway extends Gateway
 
   pagingFunctionGenerator: (search) ->
     super search, 'transactions', Transaction, (response) -> response.creditCardTransactions.transaction
+
+  _submitForSettlementSignature: ->
+    ["orderid", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
+
+  _updateDetailsSignature: ->
+    ["amount", "orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
 
 exports.TransactionGateway = TransactionGateway
