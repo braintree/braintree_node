@@ -684,6 +684,9 @@ describe "TransactionGateway", ->
         assert.equal(response.transaction.creditCard.healthcare, CreditCard.Healthcare.Unknown)
         assert.equal(response.transaction.creditCard.debit, CreditCard.Debit.Unknown)
         assert.equal(response.transaction.creditCard.payroll, CreditCard.Payroll.Unknown)
+        assert.equal(response.transaction.creditCard.countryOfIssuance, CreditCard.CountryOfIssuance.Unknown)
+        assert.equal(response.transaction.creditCard.issuingBank, CreditCard.IssuingBank.Unknown)
+        assert.equal(response.transaction.creditCard.productId, CreditCard.ProductId.Unknown)
 
         done()
 

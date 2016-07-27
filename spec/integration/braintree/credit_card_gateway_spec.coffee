@@ -266,6 +266,7 @@ describe "CreditCardGateway", ->
 
         specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.payroll, CreditCard.Payroll.Yes)
+          assert.equal(response.creditCard.productId, 'MSA')
 
           done()
 
@@ -279,6 +280,7 @@ describe "CreditCardGateway", ->
 
         specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
           assert.equal(response.creditCard.healthcare, CreditCard.Healthcare.Yes)
+          assert.equal(response.creditCard.productId, 'J3')
 
           done()
 
@@ -353,7 +355,6 @@ describe "CreditCardGateway", ->
         assert.equal(createResponse.creditCard.prepaid, CreditCard.Prepaid.No)
 
       it 'sets the payroll field to No', ->
-        assert.equal(createResponse.creditCard.prepaid, CreditCard.Prepaid.No)
         assert.equal(createResponse.creditCard.payroll, CreditCard.Payroll.No)
 
       it 'sets the debit field to No', ->
@@ -367,6 +368,9 @@ describe "CreditCardGateway", ->
 
       it 'sets the heathcare field to No', ->
         assert.equal(createResponse.creditCard.healthcare, CreditCard.Healthcare.No)
+
+      it 'sets the product id field to MSB', ->
+        assert.equal(createResponse.creditCard.productId, 'MSB')
 
     context "unknown card type indicators", ->
       createResponse = null
@@ -406,6 +410,9 @@ describe "CreditCardGateway", ->
 
       it 'sets the issuing bank field to Unknown', ->
         assert.equal(createResponse.creditCard.issuingBank, CreditCard.IssuingBank.Unknown)
+
+      it 'sets the product id field to Unknown', ->
+        assert.equal(createResponse.creditCard.productId, CreditCard.ProductId.Unknown)
 
   describe "delete", (done) ->
     customerToken = null

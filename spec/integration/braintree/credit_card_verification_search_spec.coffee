@@ -181,5 +181,8 @@ describe "CreditCardVerification", ->
             assert.equal(verification.creditCard.healthcare, CreditCard.Healthcare.Unknown)
             assert.equal(verification.creditCard.debit, CreditCard.Debit.Unknown)
             assert.equal(verification.creditCard.payroll, CreditCard.Payroll.Unknown)
+            assert.equal(verification.creditCard.countryOfIssuance, CreditCard.CountryOfIssuance.Unknown)
+            assert.equal(verification.creditCard.issuingBank, CreditCard.IssuingBank.Unknown)
+            assert.equal(verification.creditCard.productId, CreditCard.ProductId.Unknown)
 
             done()
