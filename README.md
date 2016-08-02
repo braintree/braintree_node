@@ -9,7 +9,7 @@ This is a Node.js library for integrating with the [Braintree](http://www.braint
 
 ### Dependencies
 
-* node ~0.6.6
+* node >= 0.6.6
 
 ## Links
 
