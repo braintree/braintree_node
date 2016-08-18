@@ -1461,7 +1461,7 @@ describe "TransactionGateway", ->
 
           done()
 
-      it "works for transaction when the threeDSecurePassThru cavv or xid is missing", (done) ->
+      it "returns an error for transaction when the threeDSecurePassThru cavv or xid is missing", (done) ->
         transactionParams =
           merchantAccountId: specHelper.threeDSecureMerchantAccountId
           amount: '5.00'
@@ -1474,8 +1474,15 @@ describe "TransactionGateway", ->
             xid: ""
 
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          assert.isTrue(response.success)
-          assert.equal(response.transaction.status, Transaction.Status.Authorized)
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on("cavv")[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureCavvIsRequired
+          )
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on("xid")[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureXidIsRequired
+          )
 
           done()
 
