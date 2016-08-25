@@ -129,6 +129,7 @@ class ValidationErrorCodes
       VerificationMerchantAccountIdIsInvalid : "91728"
       VerificationMerchantAccountIsForbidden : "91743"
       VerificationMerchantAccountIsSuspended : "91742"
+      VerificationMerchantAccountCannotBeSubMerchantAccount : "91755"
 
   @Customer =
     CompanyIsTooLong : "81601"
@@ -517,5 +518,6 @@ class ValidationErrorCodes
       MerchantAccountIdIsInvalid : "94204"
       MerchantAccountIsSuspended : "94205"
       MerchantAccountIsForbidden : "94206"
+      MerchantAccountCannotBeSubMerchantAccount : "94208"
 
 exports.ValidationErrorCodes = ValidationErrorCodes
