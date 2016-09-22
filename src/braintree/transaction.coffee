@@ -75,6 +75,7 @@ class Transaction extends AttributeSetter
     @facilitatorDetails = new FacilitatorDetails(attributes.facilitatorDetails) if attributes.facilitatorDetails
     @riskData = new RiskData(attributes.riskData) if attributes.riskData
     @threeDSecureInfo = new ThreeDSecureInfo(attributes.threeDSecureInfo) if attributes.threeDSecureInfo
+    @usBankAccountDetails = new ThreeDSecureInfo(attributes.threeDSecureInfo) if attributes.threeDSecureInfo
 
   isDisbursed: ->
     @disbursementDetails.isValid()

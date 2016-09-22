@@ -1,3 +1,5 @@
+child_process = require('child_process')
+
 try
   require('source-map-support').install
     handleUncaughtExceptions: false
@@ -165,6 +167,19 @@ generateNonceForNewPaymentMethod = (paymentMethodParams, customerId, callback) -
       )
   )
 
+generateValidUsBankAccountNonce = ->
+  output = child_process.execSync("./spec/client.sh")
+  output.toString()
+
+
+generateInvalidUsBankAccountNonce = ->
+  nonceCharacters = "bcdfghjkmnpqrstvwxyz23456789".split('')
+  nonce = "tokenusbankacct"
+  for i in [0..3]
+    n = [0..5].map -> nonceCharacters[Math.floor(Math.random()*nonceCharacters.length)]
+    nonce += "_" + n.join("")
+  nonce += "_xxx"
+
 createTransactionToRefund = (callback) ->
   transactionParams =
     amount: '5.00'
@@ -323,6 +338,8 @@ GLOBAL.specHelper =
   createPayPalTransactionToRefund: createPayPalTransactionToRefund
   createEscrowedTransaction: createEscrowedTransaction
   generateNonceForNewPaymentMethod: generateNonceForNewPaymentMethod
+  generateValidUsBankAccountNonce: generateValidUsBankAccountNonce
+  generateInvalidUsBankAccountNonce: generateInvalidUsBankAccountNonce
   createPlanForTests: createPlanForTests
   createModificationForTests: createModificationForTests
   createGrant: createGrant
