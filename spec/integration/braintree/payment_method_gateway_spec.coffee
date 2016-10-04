@@ -1472,7 +1472,7 @@ describe "PaymentMethodGateway", ->
 
     describe "grant", ->
       it "returns a nonce that is transactable by a partner merchant exactly once", (done) ->
-        grantingGateway.paymentMethod.grant(creditCard.token, false, (err, response) ->
+        grantingGateway.paymentMethod.grant(creditCard.token, { allow_vaulting: false, include_billing_postal_code: true }, (err, response) ->
           grantResult = response
 
           assert.isTrue grantResult.success
@@ -1504,7 +1504,7 @@ describe "PaymentMethodGateway", ->
         )
 
       it "returns a nonce that is vaultable", (done) ->
-        grantingGateway.paymentMethod.grant(creditCard.token, true, (err, response) ->
+        grantingGateway.paymentMethod.grant(creditCard.token, { allow_vaulting: true, include_billing_postal_code: true }, (err, response) ->
           grantResult = response
 
           specHelper.defaultGateway.customer.create {}, (err, response) ->

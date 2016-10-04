@@ -7,6 +7,7 @@
 {UnknownPaymentMethod} = require('./unknown_payment_method')
 {PaymentMethodNonce} = require('./payment_method_nonce')
 {VenmoAccount} = require('./venmo_account')
+{Util} = require('./util')
 exceptions = require('./exceptions')
 
 class PaymentMethodGateway extends Gateway
@@ -50,17 +51,21 @@ class PaymentMethodGateway extends Gateway
     else
       @gateway.http.put("#{@config.baseMerchantPath()}/payment_methods/any/#{token}", {paymentMethod: attributes}, @responseHandler(callback))
 
-  grant: (token, allow_vaulting, callback) ->
+  grant: (token, attributes, callback) ->
     if(token.trim() == '')
       callback(exceptions.NotFoundError("Not Found"), null)
     else
+      grantOptions = {
+        shared_payment_method_token: token
+      }
+      if typeof attributes is 'boolean'
+        attributes = { allow_vaulting: attributes }
+      
+      grantOptions = Util.merge(grantOptions, attributes)
       @gateway.http.post(
         "#{@config.baseMerchantPath()}/payment_methods/grant",
         {
-          payment_method: {
-            shared_payment_method_token: token,
-            allow_vaulting: allow_vaulting
-          }
+          payment_method: grantOptions
         },
         @responseHandler(callback)
       )
