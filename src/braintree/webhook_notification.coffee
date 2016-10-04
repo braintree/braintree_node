@@ -30,6 +30,8 @@ class WebhookNotification extends AttributeSetter
     SubMerchantAccountApproved: "sub_merchant_account_approved"
     SubMerchantAccountDeclined: "sub_merchant_account_declined"
     TransactionDisbursed: "transaction_disbursed"
+    TransactionSettled: "transaction_settled"
+    TransactionSettlementDeclined: "transaction_settlement_declined"
 
   constructor: (attributes) ->
     super attributes

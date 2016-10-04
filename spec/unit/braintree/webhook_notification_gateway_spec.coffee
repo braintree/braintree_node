@@ -2,6 +2,7 @@ require('../../spec_helper')
 {ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 {WebhookNotification} = require('../../../lib/braintree')
 {Dispute} = require('../../../lib/braintree/dispute')
+{Transaction} = require('../../../lib/braintree/transaction')
 {errorTypes} = require('../../../lib/braintree')
 
 describe "WebhookNotificationGateway", ->
@@ -151,6 +152,42 @@ describe "WebhookNotificationGateway", ->
         assert.equal(webhookNotification.transaction.id, "my_id")
         assert.equal(webhookNotification.transaction.amount, '100')
         assert.ok(webhookNotification.transaction.disbursementDetails.disbursementDate?)
+        done()
+
+    it "returns a parsable signature and payload for settled transaction", (done) ->
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.TransactionSettled,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionSettled)
+        assert.equal(webhookNotification.transaction.id, "my_id")
+        assert.equal(webhookNotification.transaction.amount, '100')
+        assert.equal(webhookNotification.transaction.status, Transaction.Status.Settled)
+        assert.equal(webhookNotification.transaction.usBankAccount.last4, "1234")
+        assert.equal(webhookNotification.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
+        assert.equal(webhookNotification.transaction.usBankAccount.accountHolderName, "Dan Schulman")
+        assert.equal(webhookNotification.transaction.usBankAccount.routingNumber, "123456789")
+        assert.equal(webhookNotification.transaction.usBankAccount.accountType, "checking")
+        done()
+
+    it "returns a parsable signature and payload for settlement declined transaction", (done) ->
+      {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.TransactionSettlementDeclined,
+        "my_id"
+      )
+
+      specHelper.defaultGateway.webhookNotification.parse bt_signature, bt_payload, (err, webhookNotification) ->
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionSettlementDeclined)
+        assert.equal(webhookNotification.transaction.id, "my_id")
+        assert.equal(webhookNotification.transaction.amount, '100')
+        assert.equal(webhookNotification.transaction.status, Transaction.Status.SettlementDeclined)
+        assert.equal(webhookNotification.transaction.usBankAccount.last4, "1234")
+        assert.equal(webhookNotification.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
+        assert.equal(webhookNotification.transaction.usBankAccount.accountHolderName, "Dan Schulman")
+        assert.equal(webhookNotification.transaction.usBankAccount.routingNumber, "123456789")
+        assert.equal(webhookNotification.transaction.usBankAccount.accountType, "checking")
         done()
 
     it "returns a parsable signature and payload for dispute opened", (done) ->
