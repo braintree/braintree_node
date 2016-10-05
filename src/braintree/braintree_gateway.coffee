@@ -19,6 +19,7 @@
 {TestingGateway} = require("./testing_gateway")
 {TransactionGateway} = require("./transaction_gateway")
 {TransparentRedirectGateway} = require("./transparent_redirect_gateway")
+{UsBankAccountGateway} = require("./us_bank_account_gateway")
 {WebhookNotificationGateway} = require("./webhook_notification_gateway")
 {WebhookTestingGateway} = require("./webhook_testing_gateway")
 
@@ -45,6 +46,7 @@ class BraintreeGateway
     @testing = new TestingGateway(this)
     @transaction = new TransactionGateway(this)
     @transparentRedirect = new TransparentRedirectGateway(this)
+    @usBankAccount = new UsBankAccountGateway(this)
     @webhookNotification = new WebhookNotificationGateway(this)
     @webhookTesting = new WebhookTestingGateway(this)
 

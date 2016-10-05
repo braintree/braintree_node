@@ -6,6 +6,7 @@
 {CoinbaseAccount} = require('./coinbase_account')
 {UnknownPaymentMethod} = require('./unknown_payment_method')
 {PaymentMethodNonce} = require('./payment_method_nonce')
+{UsBankAccount} = require('./us_bank_account')
 {VenmoAccount} = require('./venmo_account')
 {Util} = require('./util')
 exceptions = require('./exceptions')
@@ -97,6 +98,8 @@ class PaymentMethodGateway extends Gateway
       new CoinbaseAccount(response.coinbaseAccount)
     else if response.paymentMethodNonce
       new PaymentMethodNonce(response.paymentMethodNonce)
+    else if response.usBankAccount
+      new UsBankAccount(response.usBankAccount)
     else if response.venmoAccount
       new VenmoAccount(response.venmoAccount)
     else
