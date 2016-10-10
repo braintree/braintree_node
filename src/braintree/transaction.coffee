@@ -9,6 +9,7 @@
 {FacilitatorDetails} = require('./facilitator_details')
 {RiskData} = require('./risk_data')
 {ThreeDSecureInfo} = require('./three_d_secure_info')
+{UsBankAccount} = require('./us_bank_account')
 
 class Transaction extends AttributeSetter
   @CreatedUsing =
@@ -75,7 +76,7 @@ class Transaction extends AttributeSetter
     @facilitatorDetails = new FacilitatorDetails(attributes.facilitatorDetails) if attributes.facilitatorDetails
     @riskData = new RiskData(attributes.riskData) if attributes.riskData
     @threeDSecureInfo = new ThreeDSecureInfo(attributes.threeDSecureInfo) if attributes.threeDSecureInfo
-    @usBankAccountDetails = new ThreeDSecureInfo(attributes.threeDSecureInfo) if attributes.threeDSecureInfo
+    @usBankAccount = new UsBankAccount(attributes.usBankAccount) if attributes.usBankAccount
 
   isDisbursed: ->
     @disbursementDetails.isValid()

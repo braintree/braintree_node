@@ -171,7 +171,6 @@ generateValidUsBankAccountNonce = ->
   output = child_process.execSync("./spec/client.sh")
   output.toString()
 
-
 generateInvalidUsBankAccountNonce = ->
   nonceCharacters = "bcdfghjkmnpqrstvwxyz23456789".split('')
   nonce = "tokenusbankacct"
