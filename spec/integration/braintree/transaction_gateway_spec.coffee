@@ -2337,7 +2337,10 @@ describe "TransactionGateway", ->
             customerId: customer.id,
             cardholderName: "Adam Davis",
             number: "4111111111111111",
-            expirationDate: "05/2009"
+            expirationDate: "05/2009",
+            billingAddress: {
+              postalCode: "95131"
+            }
 
           addressParams =
             customerId: customer.id,
@@ -2378,6 +2381,19 @@ describe "TransactionGateway", ->
             assert.isTrue response.success
             assert.equal response.transaction.facilitatorDetails.oauthApplicationClientId, "client_id$development$integration_client_id"
             assert.equal response.transaction.facilitatorDetails.oauthApplicationName, "PseudoShop"
+            assert.isNull response.transaction.billing.postalCode
+            done()
+
+      it "returns billing postal code in transactions created via nonce granting when requested during grant API", (done) ->
+        grantingGateway.paymentMethod.grant creditCard.token, { allow_vaulting: false, include_billing_postal_code: true }, (err, response) ->
+
+          transactionParams =
+            paymentMethodNonce: response.paymentMethodNonce.nonce,
+            amount: Braintree.Test.TransactionAmounts.Authorize
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isTrue response.success
+            assert.equal response.transaction.billing.postalCode, "95131"
             done()
 
       it "allows transactions to be created with a shared payment method, customer, billing and shipping addresses", (done) ->
