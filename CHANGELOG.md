@@ -1,3 +1,6 @@
+## 1.42.0
+* Add 'UsBankAccount' payment method
+
 ## 1.41.0
 * Add support for passing risk data
 * Allow updating default_payment_method on customer

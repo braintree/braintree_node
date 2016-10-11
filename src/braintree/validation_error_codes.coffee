@@ -129,6 +129,7 @@ class ValidationErrorCodes
       VerificationMerchantAccountIdIsInvalid : "91728"
       VerificationMerchantAccountIsForbidden : "91743"
       VerificationMerchantAccountIsSuspended : "91742"
+      VerificationMerchantAccountCannotBeSubMerchantAccount : "91755"
 
   @Customer =
     CompanyIsTooLong : "81601"
@@ -398,6 +399,7 @@ class ValidationErrorCodes
     CannotBeVoided : "91504"
     CannotCancelRelease : "91562"
     CannotCloneCredit : "91543"
+    CannotCloneMarketplaceTransaction : "915137"
     CannotCloneTransactionWithPayPalAccount : "91573"
     CannotCloneTransactionWithVaultCreditCard : "91540"
     CannotCloneUnsuccessfulTransaction : "91542"
@@ -517,5 +519,6 @@ class ValidationErrorCodes
       MerchantAccountIdIsInvalid : "94204"
       MerchantAccountIsSuspended : "94205"
       MerchantAccountIsForbidden : "94206"
+      MerchantAccountCannotBeSubMerchantAccount : "94208"
 
 exports.ValidationErrorCodes = ValidationErrorCodes

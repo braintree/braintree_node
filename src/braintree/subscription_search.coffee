@@ -8,6 +8,6 @@ class SubscriptionSearch extends AdvancedSearch
   @multipleValueOrTextField "planId"
   @multipleValueField "status", { "allows" : Subscription.Status.All() }
   @multipleValueField "merchantAccountId"
-  @rangeFields "price", "daysPastDue", "billingCyclesRemaining", "nextBillingDate"
+  @rangeFields "price", "daysPastDue", "billingCyclesRemaining", "nextBillingDate", "createdAt"
 
 exports.SubscriptionSearch = SubscriptionSearch

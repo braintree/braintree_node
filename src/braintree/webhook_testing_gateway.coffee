@@ -30,6 +30,8 @@ class WebhookTestingGateway extends Gateway
       when WebhookNotification.Kind.AccountUpdaterDailyReport then @subjectXmlForAccountUpdaterDailyReport()
       when WebhookNotification.Kind.Check then @subjectXmlForCheck()
       when WebhookNotification.Kind.TransactionDisbursed then @subjectXmlForTransactionDisbursed(id)
+      when WebhookNotification.Kind.TransactionSettled then @subjectXmlForTransactionSettled(id)
+      when WebhookNotification.Kind.TransactionSettlementDeclined then @subjectXmlForTransactionSettlementDeclined(id)
       when WebhookNotification.Kind.DisbursementException then @subjectXmlForDisbursementException(id)
       when WebhookNotification.Kind.Disbursement then @subjectXmlForDisbursement(id)
       when WebhookNotification.Kind.DisputeOpened then @subjectXmlForDisputeOpened(id)
@@ -64,6 +66,46 @@ class WebhookTestingGateway extends Gateway
       <disbursement-details>
         <disbursement-date type="datetime">2013-07-09T18:23:29Z</disbursement-date>
       </disbursement-details>
+    </transaction>
+    """
+
+  subjectXmlForTransactionSettled: (id) ->
+    """
+    <transaction>
+      <id>#{id}</id>
+      <status>settled</status>
+      <type>sale</type>
+      <currency-iso-code>USD</currency-iso-code>
+      <amount>100</amount>
+      <merchant-account-id>ogaotkivejpfayqfeaimuktty</merchant-account-id>
+      <payment-instrument-type>us_bank_account</payment-instrument-type>
+      <us-bank-account>
+        <routing-number>123456789</routing-number>
+        <last-4>1234</last-4>
+        <account-type>checking</account-type>
+        <account-description>PayPal Checking - 1234</account-description>
+        <account-holder-name>Dan Schulman</account-holder-name>
+      </us-bank-account>
+    </transaction>
+    """
+
+  subjectXmlForTransactionSettlementDeclined: (id) ->
+    """
+    <transaction>
+      <id>#{id}</id>
+      <status>settlement_declined</status>
+      <type>sale</type>
+      <currency-iso-code>USD</currency-iso-code>
+      <amount>100</amount>
+      <merchant-account-id>ogaotkivejpfayqfeaimuktty</merchant-account-id>
+      <payment-instrument-type>us_bank_account</payment-instrument-type>
+      <us-bank-account>
+        <routing-number>123456789</routing-number>
+        <last-4>1234</last-4>
+        <account-type>checking</account-type>
+        <account-description>PayPal Checking - 1234</account-description>
+        <account-holder-name>Dan Schulman</account-holder-name>
+      </us-bank-account>
     </transaction>
     """
 

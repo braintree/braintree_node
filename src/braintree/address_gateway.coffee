@@ -30,4 +30,17 @@ class AddressGateway extends Gateway
   responseHandler: (callback) ->
     @createResponseHandler("address", Address, callback)
 
+  sharedSignature: (prefix) ->
+    signatureKeys = [
+                      "company", "countryCodeAlpha2", "countryCodeAlpha3", "countryCodeNumeric",
+                      "countryName", "extendedAddress", "firstName",
+                      "lastName", "locality", "postalCode", "region", "streetAddress"
+                    ]
+
+    signature = []
+    for val in signatureKeys
+      signature.push prefix + "[" + val + "]"
+
+    signature
+
 exports.AddressGateway = AddressGateway

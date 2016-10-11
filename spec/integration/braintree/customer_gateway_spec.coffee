@@ -641,6 +641,27 @@ describe "CustomerGateway", ->
 
         done()
 
+    it "fails to add a new card to a customer with failOnDuplicatePaymentMethod", (done) ->
+      customerParams =
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/2014'
+
+      specHelper.defaultGateway.customer.create customerParams, (err, createResponse) ->
+        assert.isTrue(createResponse.success)
+
+        customerParams['creditCard']['options'] =
+            failOnDuplicatePaymentMethod: true
+
+        specHelper.defaultGateway.customer.update createResponse.customer.id, customerParams, (err, updateResponse) ->
+          assert.isFalse(updateResponse.success)
+          assert.equal(
+            updateResponse.errors.for('customer').for('creditCard').on('number')[0].code,
+            '81724'
+          )
+
+          done()
+
     it "can add a new card to a customer with a verification_amount specified", (done) ->
       customerParams =
         firstName: 'New First Name'

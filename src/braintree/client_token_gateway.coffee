@@ -1,6 +1,8 @@
 {Gateway} = require('./gateway')
 {ErrorResponse} = require('./error_response')
+{Util} = require('./util')
 exceptions = require('./exceptions')
+deprecate = require('depd')('braintree/gateway.transaction')
 
 DEFAULT_VERSION = 2
 
@@ -11,9 +13,12 @@ class ClientTokenGateway extends Gateway
   generate: (params={}, callback) ->
     params.version ||= DEFAULT_VERSION
 
+    Util.verifyKeys(@_generateSignature(), params, deprecate)
+
     err = @validateParams(params)
     return callback(err, null) if err
     params = {client_token: params}
+
 
     responseHandler = @responseHandler(callback)
     @gateway.http.post("#{@config.baseMerchantPath()}/client_token", params, responseHandler)
@@ -39,5 +44,12 @@ class ClientTokenGateway extends Gateway
         callback(null, response)
       else if (response.apiErrorResponse)
         callback(null, new ErrorResponse(response.apiErrorResponse))
+
+  _generateSignature: ->
+    [
+      "addressId", "customerId", "proxyMerchantId", "merchantAccountId",
+      "version", "sepaMandateAcceptanceLocation", "sepaMandateType",
+      "options","options[makeDefault]", "options[verifyCard]", "options[failOnDuplicatePaymentMethod]"
+    ]
 
 exports.ClientTokenGateway = ClientTokenGateway

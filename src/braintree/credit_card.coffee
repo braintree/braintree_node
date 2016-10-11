@@ -31,7 +31,7 @@ class CreditCard extends AttributeSetter
     Unknown : "Unknown"
 
   @Prepaid = @Commercial = @Payroll = @Healthcare = @DurbinRegulated =
-    @Debit = @CountryOfIssuance = @IssuingBank = @CardTypeIndicator
+    @Debit = @CountryOfIssuance = @IssuingBank = @ProductId = @CardTypeIndicator
 
   constructor: (attributes) ->
     super attributes

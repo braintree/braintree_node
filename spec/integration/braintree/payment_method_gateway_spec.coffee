@@ -6,6 +6,7 @@ util = require('util')
 {Config} = require('../../../lib/braintree/config')
 {Environment} = require('../../../lib/braintree/environment')
 {Nonces} = require('../../../lib/braintree/test/nonces')
+{ValidationErrorCodes} = require('../../../lib/braintree/validation_error_codes')
 
 describe "PaymentMethodGateway", ->
   describe "create", ->
@@ -141,6 +142,42 @@ describe "PaymentMethodGateway", ->
             assert.equal(response.paymentMethod.customerId, customerId)
             assert.equal(response.paymentMethod.username, "venmojoe")
             assert.equal(response.paymentMethod.venmoUserId, "Venmo-Joe-1")
+
+            done()
+
+    context 'US Bank Account', ->
+      it "vaults a US Bank Account from the nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
+          customerId = response.customer.id
+          specHelper.generateValidUsBankAccountNonce (nonce) ->
+            paymentMethodParams =
+              customerId: customerId
+              paymentMethodNonce: nonce
+            specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+              usBankAccount = response.paymentMethod
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.isNotNull(response.paymentMethod.token)
+              assert.equal(usBankAccount.last4, "1234")
+              assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
+              assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
+              assert.equal(usBankAccount.routingNumber, "123456789")
+              assert.equal(usBankAccount.accountType, "checking")
+
+              done()
+
+      it "does not vault a US Bank Account from an invalid nonce", (done) ->
+        specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
+          customerId = response.customer.id
+
+          paymentMethodParams =
+            customerId: customerId
+            paymentMethodNonce: specHelper.generateInvalidUsBankAccountNonce()
+
+          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+            assert.isFalse(response.success)
+            assert.equal(response.errors.for('paymentMethod').on('paymentMethodNonce')[0].code,
+              ValidationErrorCodes.PaymentMethod.PaymentMethodNonceUnknown)
 
             done()
 
@@ -1472,7 +1509,7 @@ describe "PaymentMethodGateway", ->
 
     describe "grant", ->
       it "returns a nonce that is transactable by a partner merchant exactly once", (done) ->
-        grantingGateway.paymentMethod.grant(creditCard.token, false, (err, response) ->
+        grantingGateway.paymentMethod.grant(creditCard.token, { allow_vaulting: false }, (err, response) ->
           grantResult = response
 
           assert.isTrue grantResult.success
@@ -1504,7 +1541,7 @@ describe "PaymentMethodGateway", ->
         )
 
       it "returns a nonce that is vaultable", (done) ->
-        grantingGateway.paymentMethod.grant(creditCard.token, true, (err, response) ->
+        grantingGateway.paymentMethod.grant(creditCard.token, { allow_vaulting: true }, (err, response) ->
           grantResult = response
 
           specHelper.defaultGateway.customer.create {}, (err, response) ->

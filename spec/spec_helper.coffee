@@ -1,3 +1,5 @@
+child_process = require('child_process')
+
 try
   require('source-map-support').install
     handleUncaughtExceptions: false
@@ -165,6 +167,20 @@ generateNonceForNewPaymentMethod = (paymentMethodParams, customerId, callback) -
       )
   )
 
+generateValidUsBankAccountNonce = (callback) ->
+  specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+    clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+    child_process.exec "./spec/client.sh #{clientToken.braintree_api.url}/tokens", (error, stdout, stderr) ->
+      callback(stdout.toString())
+
+generateInvalidUsBankAccountNonce = ->
+  nonceCharacters = "bcdfghjkmnpqrstvwxyz23456789".split('')
+  nonce = "tokenusbankacct"
+  for i in [0..3]
+    n = [0..5].map -> nonceCharacters[Math.floor(Math.random()*nonceCharacters.length)]
+    nonce += "_" + n.join("")
+  nonce += "_xxx"
+
 createTransactionToRefund = (callback) ->
   transactionParams =
     amount: '5.00'
@@ -197,7 +213,7 @@ createPayPalTransactionToRefund = (callback) ->
       specHelper.settlePayPalTransaction transactionId, (err, settleResult) ->
         defaultGateway.transaction.find transactionId, (err, transaction) ->
           callback(transaction)
-                                                                                     
+
 createEscrowedTransaction = (callback) ->
   transactionParams =
     merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
@@ -323,6 +339,8 @@ GLOBAL.specHelper =
   createPayPalTransactionToRefund: createPayPalTransactionToRefund
   createEscrowedTransaction: createEscrowedTransaction
   generateNonceForNewPaymentMethod: generateNonceForNewPaymentMethod
+  generateValidUsBankAccountNonce: generateValidUsBankAccountNonce
+  generateInvalidUsBankAccountNonce: generateInvalidUsBankAccountNonce
   createPlanForTests: createPlanForTests
   createModificationForTests: createModificationForTests
   createGrant: createGrant

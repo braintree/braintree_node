@@ -73,7 +73,7 @@ describe "TransactionGateway", ->
 
       specHelper.defaultGateway.customer.create customerParams, (err, response) ->
         transactionParams =
-          customer_id: response.customer.id
+          customerId: response.customer.id
           amount: '100.00'
 
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
@@ -99,7 +99,7 @@ describe "TransactionGateway", ->
 
       specHelper.defaultGateway.customer.create customerParams, (err, response) ->
         transactionParams =
-          payment_method_token: response.customer.creditCards[0].token
+          paymentMethodToken: response.customer.creditCards[0].token
           amount: '100.00'
 
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
@@ -128,6 +128,19 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "logs deprecation warning when options object contains invalid keys", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          fakeData: "some non-matching param value"
+          number: '5105105105105100'
+          expirationDate: '05/12'
+
+      stderr = capture(process.stderr)
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.include(stderr(true), 'deprecated')
+
+        done()
 
     context "with apple pay", ->
       it "returns ApplePayCard for payment_instrument", (done) ->
@@ -671,6 +684,9 @@ describe "TransactionGateway", ->
         assert.equal(response.transaction.creditCard.healthcare, CreditCard.Healthcare.Unknown)
         assert.equal(response.transaction.creditCard.debit, CreditCard.Debit.Unknown)
         assert.equal(response.transaction.creditCard.payroll, CreditCard.Payroll.Unknown)
+        assert.equal(response.transaction.creditCard.countryOfIssuance, CreditCard.CountryOfIssuance.Unknown)
+        assert.equal(response.transaction.creditCard.issuingBank, CreditCard.IssuingBank.Unknown)
+        assert.equal(response.transaction.creditCard.productId, CreditCard.ProductId.Unknown)
 
         done()
 
@@ -1255,6 +1271,86 @@ describe "TransactionGateway", ->
           assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement)
 
           done()
+
+    context "us bank account nonce", (done) ->
+      it "succeeds and vaults a us bank account nonce", (done) ->
+        specHelper.generateValidUsBankAccountNonce (nonce) ->
+          transactionParams =
+            merchantAccountId: "us_bank_merchant_account"
+            amount: "10.00"
+            payment_method_nonce: nonce
+            options:
+              submitForSettlement: true
+              store_in_vault: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.status, Transaction.Status.SettlementPending)
+            assert.equal(response.transaction.usBankAccount.last4, "1234")
+            assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
+            assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
+            assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
+            assert.equal(response.transaction.usBankAccount.accountType, "checking")
+
+            done()
+
+      it "succeeds and vaults a us bank account nonce and can transact on vaulted token", (done) ->
+        specHelper.generateValidUsBankAccountNonce (nonce) ->
+          transactionParams =
+            merchantAccountId: "us_bank_merchant_account"
+            amount: "10.00"
+            payment_method_nonce: nonce
+            options:
+              submitForSettlement: true
+              store_in_vault: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.status, Transaction.Status.SettlementPending)
+            assert.equal(response.transaction.usBankAccount.last4, "1234")
+            assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
+            assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
+            assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
+            assert.equal(response.transaction.usBankAccount.accountType, "checking")
+            token = response.transaction.usBankAccount.token
+
+            transactionParams =
+              merchantAccountId: "us_bank_merchant_account"
+              amount: "10.00"
+              payment_method_token: token
+              options:
+                submitForSettlement: true
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.status, Transaction.Status.SettlementPending)
+              assert.equal(response.transaction.usBankAccount.last4, "1234")
+              assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
+              assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
+              assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
+              assert.equal(response.transaction.usBankAccount.accountType, "checking")
+
+              done()
+
+      it "fails when us bank account nonce is not found", (done) ->
+        transactionParams =
+          merchantAccountId: "us_bank_merchant_account"
+          amount: "10.00"
+          payment_method_nonce: specHelper.generateInvalidUsBankAccountNonce()
+          options:
+            submitForSettlement: true
+            store_in_vault: true
+
+        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+          assert.isFalse(response.success)
+          assert.equal(
+            response.errors.for('transaction').on('paymentMethodNonce')[0].code,
+            ValidationErrorCodes.Transaction.PaymentMethodNonceUnknown
+          )
+
+          done()
+
+
 
   describe "credit", ->
     it "creates a credit", (done) ->
@@ -2211,7 +2307,7 @@ describe "TransactionGateway", ->
               assert.isTrue(response.success)
               assert.equal(2, transaction.partialSettlementTransactionIds.length)
               done()
-              
+
     it "allows submitting with an order id", (done) ->
       transactionParams =
         amount: '5.00'
@@ -2321,7 +2417,10 @@ describe "TransactionGateway", ->
             customerId: customer.id,
             cardholderName: "Adam Davis",
             number: "4111111111111111",
-            expirationDate: "05/2009"
+            expirationDate: "05/2009",
+            billingAddress: {
+              postalCode: "95131"
+            }
 
           addressParams =
             customerId: customer.id,
@@ -2362,6 +2461,19 @@ describe "TransactionGateway", ->
             assert.isTrue response.success
             assert.equal response.transaction.facilitatorDetails.oauthApplicationClientId, "client_id$development$integration_client_id"
             assert.equal response.transaction.facilitatorDetails.oauthApplicationName, "PseudoShop"
+            assert.isNull response.transaction.billing.postalCode
+            done()
+
+      it "returns billing postal code in transactions created via nonce granting when requested during grant API", (done) ->
+        grantingGateway.paymentMethod.grant creditCard.token, { allow_vaulting: false, include_billing_postal_code: true }, (err, response) ->
+
+          transactionParams =
+            paymentMethodNonce: response.paymentMethodNonce.nonce,
+            amount: Braintree.Test.TransactionAmounts.Authorize
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isTrue response.success
+            assert.equal response.transaction.billing.postalCode, "95131"
             done()
 
       it "allows transactions to be created with a shared payment method, customer, billing and shipping addresses", (done) ->

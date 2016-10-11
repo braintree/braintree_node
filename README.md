@@ -2,6 +2,9 @@
 
 This is a Node.js library for integrating with the [Braintree](http://www.braintreepayments.com) gateway.
 
+## Please Note
+> **The Payment Card Industry (PCI) Council has [mandated](http://blog.pcisecuritystandards.org/migrating-from-ssl-and-early-tls) that early versions of TLS be retired from service.  All organizations that handle credit card information are required to comply with this standard. As part of this obligation, Braintree is updating its services to require TLS 1.2 for all HTTPS connections. Braintree will also require HTTP/1.1 for all connections. Please see our [technical documentation](https://github.com/paypal/tls-update) for more information.**
+
 ## Installation
 
 * `npm install braintree`
@@ -9,7 +12,7 @@ This is a Node.js library for integrating with the [Braintree](http://www.braint
 
 ### Dependencies
 
-* node ~0.6.6
+* node >= 0.6.6
 
 ## Links
 
