@@ -167,9 +167,9 @@ generateNonceForNewPaymentMethod = (paymentMethodParams, customerId, callback) -
       )
   )
 
-generateValidUsBankAccountNonce = ->
-  output = child_process.execSync("./spec/client.sh")
-  output.toString()
+generateValidUsBankAccountNonce = (callback) ->
+  output = child_process.exec "./spec/client.sh", (error, stdout, stderr) ->
+    callback(stdout.toString())
 
 generateInvalidUsBankAccountNonce = ->
   nonceCharacters = "bcdfghjkmnpqrstvwxyz23456789".split('')

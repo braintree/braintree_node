@@ -1274,50 +1274,14 @@ describe "TransactionGateway", ->
 
     context "us bank account nonce", (done) ->
       it "succeeds and vaults a us bank account nonce", (done) ->
-        transactionParams =
-          merchantAccountId: "us_bank_merchant_account"
-          amount: "10.00"
-          payment_method_nonce: specHelper.generateValidUsBankAccountNonce()
-          options:
-            submitForSettlement: true
-            store_in_vault: true
-
-        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          assert.isTrue(response.success)
-          assert.equal(response.transaction.status, Transaction.Status.SettlementPending)
-          assert.equal(response.transaction.usBankAccount.last4, "1234")
-          assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
-          assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
-          assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
-          assert.equal(response.transaction.usBankAccount.accountType, "checking")
-
-          done()
-
-      it "succeeds and vaults a us bank account nonce and can transact on vaulted token", (done) ->
-        transactionParams =
-          merchantAccountId: "us_bank_merchant_account"
-          amount: "10.00"
-          payment_method_nonce: specHelper.generateValidUsBankAccountNonce()
-          options:
-            submitForSettlement: true
-            store_in_vault: true
-
-        specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-          assert.isTrue(response.success)
-          assert.equal(response.transaction.status, Transaction.Status.SettlementPending)
-          assert.equal(response.transaction.usBankAccount.last4, "1234")
-          assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
-          assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
-          assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
-          assert.equal(response.transaction.usBankAccount.accountType, "checking")
-          token = response.transaction.usBankAccount.token
-
+        specHelper.generateValidUsBankAccountNonce (nonce) ->
           transactionParams =
             merchantAccountId: "us_bank_merchant_account"
             amount: "10.00"
-            payment_method_token: token
+            payment_method_nonce: nonce
             options:
               submitForSettlement: true
+              store_in_vault: true
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             assert.isTrue(response.success)
@@ -1329,6 +1293,44 @@ describe "TransactionGateway", ->
             assert.equal(response.transaction.usBankAccount.accountType, "checking")
 
             done()
+
+      it "succeeds and vaults a us bank account nonce and can transact on vaulted token", (done) ->
+        specHelper.generateValidUsBankAccountNonce (nonce) ->
+          transactionParams =
+            merchantAccountId: "us_bank_merchant_account"
+            amount: "10.00"
+            payment_method_nonce: nonce
+            options:
+              submitForSettlement: true
+              store_in_vault: true
+
+          specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+            assert.isTrue(response.success)
+            assert.equal(response.transaction.status, Transaction.Status.SettlementPending)
+            assert.equal(response.transaction.usBankAccount.last4, "1234")
+            assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
+            assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
+            assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
+            assert.equal(response.transaction.usBankAccount.accountType, "checking")
+            token = response.transaction.usBankAccount.token
+
+            transactionParams =
+              merchantAccountId: "us_bank_merchant_account"
+              amount: "10.00"
+              payment_method_token: token
+              options:
+                submitForSettlement: true
+
+            specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+              assert.isTrue(response.success)
+              assert.equal(response.transaction.status, Transaction.Status.SettlementPending)
+              assert.equal(response.transaction.usBankAccount.last4, "1234")
+              assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
+              assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
+              assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
+              assert.equal(response.transaction.usBankAccount.accountType, "checking")
+
+              done()
 
       it "fails when us bank account nonce is not found", (done) ->
         transactionParams =
