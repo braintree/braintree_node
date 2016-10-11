@@ -168,8 +168,10 @@ generateNonceForNewPaymentMethod = (paymentMethodParams, customerId, callback) -
   )
 
 generateValidUsBankAccountNonce = (callback) ->
-  child_process.exec "./spec/client.sh", (error, stdout, stderr) ->
-    callback(stdout.toString())
+  specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
+    clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
+    child_process.exec "./spec/client.sh #{clientToken.braintree_api.url}/tokens", (error, stdout, stderr) ->
+      callback(stdout.toString())
 
 generateInvalidUsBankAccountNonce = ->
   nonceCharacters = "bcdfghjkmnpqrstvwxyz23456789".split('')
