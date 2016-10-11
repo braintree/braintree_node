@@ -149,23 +149,22 @@ describe "PaymentMethodGateway", ->
       it "vaults a US Bank Account from the nonce", (done) ->
         specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->
           customerId = response.customer.id
+          specHelper.generateValidUsBankAccountNonce (nonce) ->
+            paymentMethodParams =
+              customerId: customerId
+              paymentMethodNonce: nonce
+            specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
+              usBankAccount = response.paymentMethod
+              assert.isNull(err)
+              assert.isTrue(response.success)
+              assert.isNotNull(response.paymentMethod.token)
+              assert.equal(usBankAccount.last4, "1234")
+              assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
+              assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
+              assert.equal(usBankAccount.routingNumber, "123456789")
+              assert.equal(usBankAccount.accountType, "checking")
 
-          paymentMethodParams =
-            customerId: customerId
-            paymentMethodNonce: specHelper.generateValidUsBankAccountNonce()
-
-          specHelper.defaultGateway.paymentMethod.create paymentMethodParams, (err, response) ->
-            usBankAccount = response.paymentMethod
-            assert.isNull(err)
-            assert.isTrue(response.success)
-            assert.isNotNull(response.paymentMethod.token)
-            assert.equal(usBankAccount.last4, "1234")
-            assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
-            assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
-            assert.equal(usBankAccount.routingNumber, "123456789")
-            assert.equal(usBankAccount.accountType, "checking")
-
-            done()
+              done()
 
       it "does not vault a US Bank Account from an invalid nonce", (done) ->
         specHelper.defaultGateway.customer.create {firstName: 'John', lastName: 'Appleseed'}, (err, response) ->

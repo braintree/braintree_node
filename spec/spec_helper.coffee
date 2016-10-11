@@ -168,7 +168,7 @@ generateNonceForNewPaymentMethod = (paymentMethodParams, customerId, callback) -
   )
 
 generateValidUsBankAccountNonce = (callback) ->
-  output = child_process.exec "./spec/client.sh", (error, stdout, stderr) ->
+  child_process.exec "./spec/client.sh", (error, stdout, stderr) ->
     callback(stdout.toString())
 
 generateInvalidUsBankAccountNonce = ->
@@ -211,7 +211,7 @@ createPayPalTransactionToRefund = (callback) ->
       specHelper.settlePayPalTransaction transactionId, (err, settleResult) ->
         defaultGateway.transaction.find transactionId, (err, transaction) ->
           callback(transaction)
-                                                                                     
+
 createEscrowedTransaction = (callback) ->
   transactionParams =
     merchantAccountId: specHelper.nonDefaultSubMerchantAccountId
