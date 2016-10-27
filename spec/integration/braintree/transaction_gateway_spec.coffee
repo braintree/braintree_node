@@ -530,9 +530,11 @@ describe "TransactionGateway", ->
                     key2: 'value2'
 
             # note - supplementary data is not returned in response
+            stderr = capture(process.stderr)
             specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
+              assert.isFalse(stderr(true).includes('deprecated'))
 
               done()
 
@@ -618,10 +620,12 @@ describe "TransactionGateway", ->
         customFields:
           storeMe: 'custom value'
 
+      stderr = capture(process.stderr)
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         assert.isNull(err)
         assert.isTrue(response.success)
         assert.equal(response.transaction.customFields.storeMe, 'custom value')
+        assert.isFalse(stderr(true).includes('deprecated'))
 
         done()
 

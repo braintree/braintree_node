@@ -105,13 +105,17 @@ class TransactionGateway extends Gateway
     super search, 'transactions', Transaction, (response) -> response.creditCardTransactions.transaction
 
   _submitForSettlementSignature: ->
-    ["orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
+    {
+      valid: ["orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
+    }
 
   _updateDetailsSignature: ->
-    ["amount", "orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
+    {
+      valid: ["amount", "orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
+    }
 
   _createSignature: ->
-    [
+    validKeys = [
       "amount", "customerId", "merchantAccountId", "orderId", "channel", "paymentMethodToken", "purchaseOrderNumber", "recurring", "transactionSource", "shippingAddressId", "type", "taxAmount", "taxExempt",
       "venmoSdkPaymentMethodCode", "deviceSessionId", "serviceFeeAmount", "deviceData", "fraudMerchantId", "billingAddressId", "paymentMethodNonce", "paymentMethodToken", "threeDSecureToken",
       "sharedPaymentMethodToken", "sharedBillingAddressId", "sharedCustomerId", "sharedShippingAddressId",
@@ -122,9 +126,8 @@ class TransactionGateway extends Gateway
       "options", "options[holdInEscrow]", "options[storeInVault]", "options[storeInVaultOnSuccess]", "options[submitForSettlement]",
       "options[addBillingAddressToPaymentMethod]", "options[storeShippingAddressInVault]", "options[venmoSdkSession]", "options[payeeEmail]",
       "options[skipAvs]", "options[skipCvv]", "options[paypal]", "options[paypal][customField]", "options[paypal][payeeEmail]",
-      "options[paypal][description]", "options[paypal][supplementaryData]", "options[threeDSecure]", "options[threeDSecure][required]",
+      "options[paypal][description]", "options[threeDSecure]", "options[threeDSecure][required]",
       "options[amexRewards]", "options[amexRewards][requestId]", "options[amexRewards][points]", "options[amexRewards][currencyAmount]", "options[amexRewards][currencyIsoCode]",
-      "customFields",
       "descriptor", "descriptor[name]", "descriptor[phone]", "descriptor[url]",
       "paypalAccount", "paypalAccount[email]", "paypalAccount[token]", "paypalAccount[paypalData]", "paypalAccount[payeeEmail]",
       "industry", "industry[industryType]", "industry[data]", "industry[data][folioNumber]",
@@ -135,5 +138,10 @@ class TransactionGateway extends Gateway
       "androidPayCard[cryptogram]", "androidPayCard[googleTransactionId]", "androidPayCard[expirationMonth]", "androidPayCard[expirationYear]", "androidPayCard[sourceCardType]", "androidPayCard[sourceCardLastFour]", "androidPayCard[eciIndicator]",
       "subscriptionId"
     ] + new AddressGateway(this).sharedSignature("shipping") + new AddressGateway(this).sharedSignature("billing")
+
+    {
+      valid: validKeys
+      ignore: ["customFields", "options[paypal][supplementaryData]"]
+    }
 
 exports.TransactionGateway = TransactionGateway

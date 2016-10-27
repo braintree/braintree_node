@@ -321,14 +321,20 @@ describe "Util", ->
         creditCard:
           number: '5105105105105100'
           expirationDate: '05/12'
+        options:
+          threeDSecure:
+            required: true
 
       result = Util.flattenKeys(transactionParams)
-      assert.deepEqual(result, ["amount", "creditCard[number]", "creditCard[expirationDate]"])
+      assert.deepEqual(result, ["amount", "creditCard[number]", "creditCard[expirationDate]", "options[threeDSecure][required]"])
 
   describe "verifyKeys", ->
     it "doesn't log deprecation warning if params are equal to the signature", ->
       deprecate = require('depd')('test')
-      signature = ["amount", "creditCard[number]", "creditCard[expirationDate]"]
+      signature = {
+        valid: ["amount", "creditCard[number]", "creditCard[expirationDate]"]
+      }
+
       transactionParams =
         amount: '5.00'
         creditCard:
@@ -341,7 +347,10 @@ describe "Util", ->
 
     it "doesn't log deprecation warning if params are a subset of signature", ->
       deprecate = require('depd')('test')
-      signature = ["validKey1", "validKey2", "amount", "creditCard[number]", "creditCard[expirationDate]"]
+      signature = {
+        valid: ["validKey1", "validKey2", "amount", "creditCard[number]", "creditCard[expirationDate]"]
+      }
+
       transactionParams =
         amount: '5.00'
         creditCard:
@@ -352,9 +361,37 @@ describe "Util", ->
       Util.verifyKeys(signature, transactionParams, deprecate)
       assert.equal(stderr(true), "")
 
+    it "ignores specified keys without deleting them", =>
+      deprecate = require('depd')('test')
+      signature = {
+        valid: ["amount", "creditCard[number]", "creditCard[expirationDate]"]
+        ignore: ["topLevelKey", "options[nested][key]"]
+      }
+
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        topLevelKey:
+          ignore: 'foo'
+        options:
+          nested:
+            key:
+              ignore: 'bar'
+
+      stderr = capture(process.stderr)
+      Util.verifyKeys(signature, transactionParams, deprecate)
+      assert.equal(transactionParams.topLevelKey.ignore, "foo")
+      assert.equal(transactionParams.options.nested.key.ignore, "bar")
+      assert.equal(stderr(true), "")
+
     it "logs deprecation warning if params are a superset of signature", ->
       deprecate = require('depd')('test')
-      signature = ["amount", "creditCard[number]"]
+      signature = {
+        valid: ["amount", "creditCard[number]"]
+      }
+
       transactionParams =
         amount: '5.00'
         invalidKey: 'bar'
