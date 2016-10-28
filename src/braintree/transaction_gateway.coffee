@@ -105,7 +105,7 @@ class TransactionGateway extends Gateway
     super search, 'transactions', Transaction, (response) -> response.creditCardTransactions.transaction
 
   _submitForSettlementSignature: ->
-    ["orderid", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
+    ["orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
 
   _updateDetailsSignature: ->
     ["amount", "orderId", "descriptor[name]", "descriptor[phone]", "descriptor[url]"]
@@ -121,13 +121,13 @@ class TransactionGateway extends Gateway
       "threeDSecurePassThru", "threeDSecurePassThru[eciFlag]", "threeDSecurePassThru[cavv]", "threeDSecurePassThru[xid]",
       "options", "options[holdInEscrow]", "options[storeInVault]", "options[storeInVaultOnSuccess]", "options[submitForSettlement]",
       "options[addBillingAddressToPaymentMethod]", "options[storeShippingAddressInVault]", "options[venmoSdkSession]", "options[payeeEmail]",
-      "options[skipAvs]", "options[skipCvv]", "options[paypal]", "options[paypal][customField", "options[paypal][payeeEmail]",
-      "options[paypal][description", "options[paypal][supplementaryData]", "options[threeDSecure]", "options[threeDSecure][required]",
+      "options[skipAvs]", "options[skipCvv]", "options[paypal]", "options[paypal][customField]", "options[paypal][payeeEmail]",
+      "options[paypal][description]", "options[paypal][supplementaryData]", "options[threeDSecure]", "options[threeDSecure][required]",
       "options[amexRewards]", "options[amexRewards][requestId]", "options[amexRewards][points]", "options[amexRewards][currencyAmount]", "options[amexRewards][currencyIsoCode]",
       "customFields",
       "descriptor", "descriptor[name]", "descriptor[phone]", "descriptor[url]",
       "paypalAccount", "paypalAccount[email]", "paypalAccount[token]", "paypalAccount[paypalData]", "paypalAccount[payeeEmail]",
-      "industry", "industry[industryType]", "industry[data]", "industry[data][folioNumber]", "industry[data][folioNumber]",
+      "industry", "industry[industryType]", "industry[data]", "industry[data][folioNumber]",
       "industry[data][checkInDate]", "industry[data][checkOutDate]", "industry[data][travelPackage]", "industry[data][lodgingCheckInDate]",
       "industry[data][lodgingCheckOutDate]", "industry[data][departureDate]", "industry[data][lodgingName]", "industry[data][roomRate]",
       "applePayCard", "applePayCard[number]", "applePayCard[cardholderName]", "applePayCard[cryptogram]", "applePayCard[expirationMonth]", "applePayCard[expirationYear]",
