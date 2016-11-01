@@ -113,26 +113,27 @@ class TransactionGateway extends Gateway
   _createSignature: ->
     [
       "amount", "customerId", "merchantAccountId", "orderId", "channel", "paymentMethodToken", "purchaseOrderNumber", "recurring", "transactionSource", "shippingAddressId", "type", "taxAmount", "taxExempt",
-      "venmoSdkPaymentMethodCode", "deviceSessionId", "serviceFeeAmount", "deviceData", "fraudMerchantId", "billingAddressId", "paymentMethodNonce", "threeDSecureToken",
-      "sharedPaymentMethodToken", "sharedBillingAddressId", "sharedCustomerId", "sharedShippingAddressId", "riskData", "riskData[customerBrowser]", "riskData[customerIp]",
+      "venmoSdkPaymentMethodCode", "deviceSessionId", "serviceFeeAmount", "deviceData", "fraudMerchantId", "billingAddressId", "paymentMethodNonce", "paymentMethodToken", "threeDSecureToken",
+      "sharedPaymentMethodToken", "sharedBillingAddressId", "sharedCustomerId", "sharedShippingAddressId",
+      "riskData", "riskData[customerBrowser]", "riskData[customerIp]", "riskData[customerBrowser]",
       "creditCard", "creditCard[token]", "creditCard[cardholderName]", "creditCard[cvv]", "creditCard[expirationDate]", "creditCard[expirationMonth]", "creditCard[expirationYear]", "creditCard[number]",
       "customer", "customer[id]", "customer[company]", "customer[email]", "customer[fax]", "customer[firstName]", "customer[lastName]", "customer[phone]", "customer[website]",
       "threeDSecurePassThru", "threeDSecurePassThru[eciFlag]", "threeDSecurePassThru[cavv]", "threeDSecurePassThru[xid]",
       "options", "options[holdInEscrow]", "options[storeInVault]", "options[storeInVaultOnSuccess]", "options[submitForSettlement]",
       "options[addBillingAddressToPaymentMethod]", "options[storeShippingAddressInVault]", "options[venmoSdkSession]", "options[payeeEmail]",
-      "options[skipAvs]", "options[skipCvv]", "options[paypal]", "options[paypal][customField", "options[paypal][payeeEmail",
+      "options[skipAvs]", "options[skipCvv]", "options[paypal]", "options[paypal][customField", "options[paypal][payeeEmail]",
       "options[paypal][description", "options[paypal][supplementaryData]", "options[threeDSecure]", "options[threeDSecure][required]",
       "options[amexRewards]", "options[amexRewards][requestId]", "options[amexRewards][points]", "options[amexRewards][currencyAmount]", "options[amexRewards][currencyIsoCode]",
       "customFields",
       "descriptor", "descriptor[name]", "descriptor[phone]", "descriptor[url]",
       "paypalAccount", "paypalAccount[email]", "paypalAccount[token]", "paypalAccount[paypalData]", "paypalAccount[payeeEmail]",
-      "industry", "industry[industryType]", "industry[industryType][data]", "industry[industryType][data][folioNumber]", "industry[industryType][data][folioNumber]",
-      "industry[industryType][data][checkInDate]", "industry[industryType][data][checkOutDate]", "industry[industryType][data][travelPackage]", "industry[industryType][data][lodgingCheckInDate]",
-      "industry[industryType][data][lodgingCheckOutDate]", "industry[industryType][data][departureDate]", "industry[industryType][data][lodgingName]",
-      "industry[industryType][data][roomRate]",
+      "industry", "industry[industryType]", "industry[data]", "industry[data][folioNumber]", "industry[data][folioNumber]",
+      "industry[data][checkInDate]", "industry[data][checkOutDate]", "industry[data][travelPackage]", "industry[data][lodgingCheckInDate]",
+      "industry[data][lodgingCheckOutDate]", "industry[data][departureDate]", "industry[data][lodgingName]", "industry[data][roomRate]",
       "applePayCard", "applePayCard[number]", "applePayCard[cardholderName]", "applePayCard[cryptogram]", "applePayCard[expirationMonth]", "applePayCard[expirationYear]",
       "androidPayCard", "androidPayCard[number]",
-      "androidPayCard[cryptogram]", "androidPayCard[googleTransactionId]", "androidPayCard[expirationMonth]", "androidPayCard[expirationYear]", "androidPayCard[sourceCardType]", "androidPayCard[sourceCardLastFour]", "androidPayCard[eciIndicator]"
+      "androidPayCard[cryptogram]", "androidPayCard[googleTransactionId]", "androidPayCard[expirationMonth]", "androidPayCard[expirationYear]", "androidPayCard[sourceCardType]", "androidPayCard[sourceCardLastFour]", "androidPayCard[eciIndicator]",
+      "subscriptionId"
     ] + new AddressGateway(this).sharedSignature("shipping") + new AddressGateway(this).sharedSignature("billing")
 
 exports.TransactionGateway = TransactionGateway
