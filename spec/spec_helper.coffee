@@ -173,6 +173,7 @@ generateValidUsBankAccountNonce = (callback) ->
   specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
     clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
     url = uri.parse(clientToken["braintree_api"]["url"])
+    token = clientToken["braintree_api"]["access_token"]
     options = {
       host: url.hostname,
       port: url.port,
@@ -181,7 +182,7 @@ generateValidUsBankAccountNonce = (callback) ->
       headers: {
         'Content-Type': 'application/json',
         'Braintree-Version': '2015-11-01',
-        'Authorization': 'Bearer integratexxxxxx_xxxxxx_xxxxxx_xxxxxx_xx1'
+        'Authorization': "Bearer #{token}"
       }
     }
 
