@@ -6,6 +6,8 @@ try
 catch err
 
 http = require('http')
+https = require('https')
+uri = require('url')
 {TransactionAmounts} = require('../lib/braintree/test/transaction_amounts')
 {Nonces} = require('../lib/braintree/test/nonces')
 {Util} = require('../lib/braintree/util')
@@ -170,8 +172,55 @@ generateNonceForNewPaymentMethod = (paymentMethodParams, customerId, callback) -
 generateValidUsBankAccountNonce = (callback) ->
   specHelper.defaultGateway.clientToken.generate {}, (err, result) ->
     clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken))
-    child_process.exec "./spec/client.sh #{clientToken.braintree_api.url}/tokens", (error, stdout, stderr) ->
-      callback(stdout.toString())
+    url = uri.parse(clientToken["braintree_api"]["url"])
+    options = {
+      host: url.hostname,
+      port: url.port,
+      method: "POST",
+      path: "/tokens"
+      headers: {
+        'Content-Type': 'application/json',
+        'Braintree-Version': '2015-11-01',
+        'Authorization': 'Bearer integratexxxxxx_xxxxxx_xxxxxx_xxxxxx_xx1'
+      }
+    }
+
+    payload = {
+      "type": "us_bank_account",
+      "billing_address": {
+        "street_address": "123 Ave",
+        "region": "CA",
+        "locality": "San Francisco",
+        "postal_code": "94112"
+      },
+      "account_type": "checking",
+      "routing_number": "123456789",
+      "account_number": "567891234",
+      "account_holder_name": "Dan Schulman",
+      "account_description": "PayPal Checking - 1234",
+      "ach_mandate": {
+        "text": ""
+      }
+    }
+
+    requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload))
+    options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString()
+
+    req = https.request(options)
+    req.on('response', (response) =>
+      body = ''
+      response.on('data', (responseBody) -> body += responseBody )
+      response.on('end', =>
+        json = JSON.parse(body)
+        callback(json["data"]["id"])
+      )
+      response.on('error', (err) -> console.log("Unexpected response error: #{err}"))
+    )
+
+    req.on('error', (err) -> console.log("Unexpected request error: #{err}"))
+
+    req.write(requestBody)
+    req.end()
 
 generateInvalidUsBankAccountNonce = ->
   nonceCharacters = "bcdfghjkmnpqrstvwxyz23456789".split('')
