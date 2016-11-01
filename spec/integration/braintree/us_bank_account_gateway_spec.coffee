@@ -20,6 +20,7 @@ describe "UsBankAccountGateway", ->
               assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(usBankAccount.routingNumber, "123456789")
               assert.equal(usBankAccount.accountType, "checking")
+              assert.equal(usBankAccount.bankName, "UNKNOWN")
 
               done()
 
@@ -53,5 +54,6 @@ describe "UsBankAccountGateway", ->
               assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
               assert.equal(response.transaction.usBankAccount.accountType, "checking")
+              assert.equal(response.transaction.usBankAccount.bankName, "UNKNOWN")
 
               done()
