@@ -534,7 +534,7 @@ describe "TransactionGateway", ->
             specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
-              assert.isFalse(stderr(true).includes('deprecated'))
+              assert.equal(stderr(true).indexOf('deprecated'), -1)
 
               done()
 
@@ -625,7 +625,7 @@ describe "TransactionGateway", ->
         assert.isNull(err)
         assert.isTrue(response.success)
         assert.equal(response.transaction.customFields.storeMe, 'custom value')
-        assert.isFalse(stderr(true).includes('deprecated'))
+        assert.equal(stderr(true).indexOf('deprecated'), -1)
 
         done()
 
