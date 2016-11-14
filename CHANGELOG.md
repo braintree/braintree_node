@@ -1,3 +1,8 @@
+## 1.43.0
+* Spec updates for deprecated keys
+* Added error handling for missing configuration credentials
+* Fix `UsBankAccount` support for `Customer`s
+
 ## 1.42.0
 * Add 'UsBankAccount' payment method
 

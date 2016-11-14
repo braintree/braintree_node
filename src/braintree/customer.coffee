@@ -6,6 +6,7 @@
 {PayPalAccount} = require('./paypal_account')
 {CoinbaseAccount} = require('./coinbase_account')
 {VenmoAccount} = require('./venmo_account')
+{UsBankAccount} = require('./us_bank_account')
 
 class Customer extends AttributeSetter
   constructor: (attributes) ->
@@ -32,6 +33,9 @@ class Customer extends AttributeSetter
     if attributes.venmoAccounts
       @venmoAccounts = (new VenmoAccount(venmoAccountAttributes) for venmoAccountAttributes in attributes.venmoAccounts)
       @_addPaymentMethods(@venmoAccounts)
+    if attributes.usBankAccounts
+      @usBankAccounts = (new UsBankAccount(usBankAccountAttributes) for usBankAccountAttributes in attributes.usBankAccounts)
+      @_addPaymentMethods(@usBankAccounts)
 
   _addPaymentMethods: (paymentMethods) ->
     for paymentMethod in paymentMethods

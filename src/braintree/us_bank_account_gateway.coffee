@@ -18,9 +18,9 @@ class UsBankAccountGateway extends Gateway
           callback(null, new UsBankAccount(response.usBankAccount))
 
   sale:(token, transactionRequest, callback) ->
-    transactionRequest.payment_method_token = token
+    transactionRequest.paymentMethodToken = token
     transactionRequest.options = {} unless transactionRequest.options
-    transactionRequest.options.submit_for_settlement = true
+    transactionRequest.options.submitForSettlement = true
     new TransactionGateway(@gateway).sale(transactionRequest, callback)
 
 exports.UsBankAccountGateway = UsBankAccountGateway

@@ -20,6 +20,10 @@ class Config
       @privateKey = rawConfig.privateKey
       @merchantId = rawConfig.merchantId || rawConfig.partnerId
       @environment = rawConfig.environment
+      throw new Error('Missing publicKey') unless @publicKey
+      throw new Error('Missing privateKey') unless @privateKey
+      throw new Error('Missing merchantId') unless @merchantId
+      throw new Error('Missing environment') unless @environment
 
   baseMerchantPath: -> "/merchants/#{@merchantId}"
 

@@ -530,9 +530,11 @@ describe "TransactionGateway", ->
                     key2: 'value2'
 
             # note - supplementary data is not returned in response
+            stderr = capture(process.stderr)
             specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
+              assert.equal(stderr(true).indexOf('deprecated'), -1)
 
               done()
 
@@ -618,10 +620,12 @@ describe "TransactionGateway", ->
         customFields:
           storeMe: 'custom value'
 
+      stderr = capture(process.stderr)
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         assert.isNull(err)
         assert.isTrue(response.success)
         assert.equal(response.transaction.customFields.storeMe, 'custom value')
+        assert.equal(stderr(true).indexOf('deprecated'), -1)
 
         done()
 
@@ -752,8 +756,8 @@ describe "TransactionGateway", ->
           number: '5105105105105100'
           expirationDate: '05/16'
         riskData:
-          customer_browser: 'Edge'
-          customer_ip: "127.0.0.0"
+          customerBrowser: 'Edge'
+          customerIp: "127.0.0.0"
 
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         assert.isNull(err)
@@ -1278,10 +1282,10 @@ describe "TransactionGateway", ->
           transactionParams =
             merchantAccountId: "us_bank_merchant_account"
             amount: "10.00"
-            payment_method_nonce: nonce
+            paymentMethodNonce: nonce
             options:
               submitForSettlement: true
-              store_in_vault: true
+              storeInVault: true
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             assert.isTrue(response.success)
@@ -1291,6 +1295,7 @@ describe "TransactionGateway", ->
             assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
             assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
             assert.equal(response.transaction.usBankAccount.accountType, "checking")
+            assert.equal(response.transaction.usBankAccount.bankName, "UNKNOWN")
 
             done()
 
@@ -1299,10 +1304,10 @@ describe "TransactionGateway", ->
           transactionParams =
             merchantAccountId: "us_bank_merchant_account"
             amount: "10.00"
-            payment_method_nonce: nonce
+            paymentMethodNonce: nonce
             options:
               submitForSettlement: true
-              store_in_vault: true
+              storeInVault: true
 
           specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
             assert.isTrue(response.success)
@@ -1317,7 +1322,7 @@ describe "TransactionGateway", ->
             transactionParams =
               merchantAccountId: "us_bank_merchant_account"
               amount: "10.00"
-              payment_method_token: token
+              paymentMethodToken: token
               options:
                 submitForSettlement: true
 
@@ -1336,10 +1341,10 @@ describe "TransactionGateway", ->
         transactionParams =
           merchantAccountId: "us_bank_merchant_account"
           amount: "10.00"
-          payment_method_nonce: specHelper.generateInvalidUsBankAccountNonce()
+          paymentMethodNonce: specHelper.generateInvalidUsBankAccountNonce()
           options:
             submitForSettlement: true
-            store_in_vault: true
+            storeInVault: true
 
         specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
           assert.isFalse(response.success)
@@ -2478,10 +2483,10 @@ describe "TransactionGateway", ->
 
       it "allows transactions to be created with a shared payment method, customer, billing and shipping addresses", (done) ->
         transactionParams =
-          shared_payment_method_token: creditCard.token,
-          shared_customer_id: customer.id,
-          shared_shipping_address_id: address.id,
-          shared_billing_address_id: address.id,
+          sharedPaymentMethodToken: creditCard.token,
+          sharedCustomerId: customer.id,
+          sharedShippingAddressId: address.id,
+          sharedBillingAddressId: address.id,
           amount: Braintree.Test.TransactionAmounts.Authorize
 
         grantingGateway.transaction.sale transactionParams, (err, response) ->

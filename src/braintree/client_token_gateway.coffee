@@ -46,10 +46,12 @@ class ClientTokenGateway extends Gateway
         callback(null, new ErrorResponse(response.apiErrorResponse))
 
   _generateSignature: ->
-    [
-      "addressId", "customerId", "proxyMerchantId", "merchantAccountId",
-      "version", "sepaMandateAcceptanceLocation", "sepaMandateType",
-      "options","options[makeDefault]", "options[verifyCard]", "options[failOnDuplicatePaymentMethod]"
-    ]
+    {
+      valid: [
+        "addressId", "customerId", "proxyMerchantId", "merchantAccountId",
+        "version", "sepaMandateAcceptanceLocation", "sepaMandateType",
+        "options","options[makeDefault]", "options[verifyCard]", "options[failOnDuplicatePaymentMethod]"
+      ]
+    }
 
 exports.ClientTokenGateway = ClientTokenGateway

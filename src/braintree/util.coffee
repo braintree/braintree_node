@@ -95,7 +95,8 @@ class Util
     keys = []
     for key, value of obj
       if typeof value is 'object'
-        keys.push(Util.flattenKeys value, key)
+        keyToPush = if prefix then prefix + "[" + key + "]" else key
+        keys.push(Util.flattenKeys value, keyToPush)
       else
         if prefix
           keys.push(prefix + "[" + key + "]")
@@ -104,8 +105,16 @@ class Util
 
     @flatten(keys)
 
-  @verifyKeys: (validKeys, obj, deprecate) ->
-    invalidKeys = @without(@flattenKeys(obj), validKeys)
+  @verifyKeys: (keys, obj, deprecate) ->
+    unrecognizedKeys = @without(@flattenKeys(obj), keys.valid)
+    if keys.ignore
+      invalidKeys = (unrecognizedKeys.filter (key) ->
+        for ignoredKey in keys.ignore
+          return false if key.indexOf(ignoredKey) == 0
+        true
+      )
+    else invalidKeys = unrecognizedKeys
+
     deprecate("invalid keys: " + invalidKeys.join(", ") + ". In future releases we'll throw exceptions on keys we do not recognize. It is recommended to fix this now to avoid payment processing interruptions.") if invalidKeys.length > 0
 
   @_containsValue: (array, element) ->

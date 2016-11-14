@@ -163,6 +163,7 @@ describe "PaymentMethodGateway", ->
               assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(usBankAccount.routingNumber, "123456789")
               assert.equal(usBankAccount.accountType, "checking")
+              assert.equal(usBankAccount.bankName, "UNKNOWN")
 
               done()
 

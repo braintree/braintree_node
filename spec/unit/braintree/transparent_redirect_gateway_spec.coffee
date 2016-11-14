@@ -9,6 +9,8 @@ describe "TransparentRedirectGateway", ->
       config = {
         environment: braintree.Environment.Sandbox
         merchantId: 'integration_merchant_id'
+        publicKey: 'integration_public_key'
+        privateKey: 'integration_private_key'
       }
       gateway = new TransparentRedirectGateway(braintree.connect(config))
 
@@ -18,6 +20,8 @@ describe "TransparentRedirectGateway", ->
       config = {
         environment: braintree.Environment.Production
         merchantId: 'integration_merchant_id'
+        publicKey: 'integration_public_key'
+        privateKey: 'integration_private_key'
       }
       gateway = new TransparentRedirectGateway(braintree.connect(config))
 
@@ -27,6 +31,8 @@ describe "TransparentRedirectGateway", ->
       config = {
         environment: braintree.Environment.Development
         merchantId: 'integration_merchant_id'
+        publicKey: 'integration_public_key'
+        privateKey: 'integration_private_key'
       }
       gateway = new TransparentRedirectGateway(braintree.connect(config))
 

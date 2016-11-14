@@ -57,7 +57,7 @@ class PaymentMethodGateway extends Gateway
       callback(exceptions.NotFoundError("Not Found"), null)
     else
       grantOptions = {
-        shared_payment_method_token: token
+        sharedPaymentMethodToken: token
       }
       if typeof attributes is 'boolean'
         attributes = { allow_vaulting: attributes }
@@ -79,7 +79,7 @@ class PaymentMethodGateway extends Gateway
         "#{@config.baseMerchantPath()}/payment_methods/revoke",
         {
           payment_method: {
-            shared_payment_method_token: token
+            sharedPaymentMethodToken: token
           }
         },
         @responseHandler(callback)

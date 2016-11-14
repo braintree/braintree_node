@@ -217,6 +217,28 @@ describe "CustomerGateway", ->
 
           done()
 
+      it "creates a customer with a Us Bank Account nonce", (done) ->
+        specHelper.generateValidUsBankAccountNonce( (token) ->
+          customerParams =
+            paymentMethodNonce: token
+
+          specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+            assert.isNull(err)
+            assert.isTrue(response.success)
+            assert.isNotNull(response.customer.usBankAccounts[0])
+            usBankAccount = response.customer.usBankAccounts[0]
+            assert.isNotNull(usBankAccount.token)
+            assert.equal(usBankAccount.routingNumber, "123456789")
+            assert.equal(usBankAccount.last4, "1234")
+            assert.equal(usBankAccount.accountType, "checking")
+            assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
+            assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
+            assert.equal(usBankAccount.bankName, "UNKNOWN")
+            assert.equal(response.customer.paymentMethods[0], usBankAccount)
+
+            done()
+        )
+
       it "creates a customer with a Coinbase account payment method nonce", (done) ->
         customerParams =
           paymentMethodNonce: Nonces.Coinbase
@@ -517,6 +539,32 @@ describe "CustomerGateway", ->
             assert.equal(customer.paypalAccounts.length, 1)
 
             done()
+
+    it "returns us bank account for a given customer", (done) ->
+      specHelper.generateValidUsBankAccountNonce( (token) ->
+        customerParams =
+          paymentMethodNonce: token
+
+        specHelper.defaultGateway.customer.create customerParams, (err, response) ->
+          assert.isNull(err)
+          assert.isTrue(response.success)
+
+          specHelper.defaultGateway.customer.find response.customer.id, (err, customer) ->
+            assert.isNull(err)
+            assert.isNotNull(customer)
+            assert.isNotNull(customer.usBankAccounts[0])
+            usBankAccount = customer.usBankAccounts[0]
+            assert.isNotNull(usBankAccount.token)
+            assert.equal(usBankAccount.routingNumber, "123456789")
+            assert.equal(usBankAccount.last4, "1234")
+            assert.equal(usBankAccount.accountType, "checking")
+            assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
+            assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
+            assert.equal(usBankAccount.bankName, "UNKNOWN")
+            assert.equal(customer.paymentMethods[0], usBankAccount)
+
+            done()
+      )
 
     it "returns an error if unable to find the customer", (done) ->
       specHelper.defaultGateway.customer.find 'nonexistent_customer', (err, customer) ->
