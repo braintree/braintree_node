@@ -1677,7 +1677,6 @@ describe "TransactionGateway", ->
         assert.isString(transaction.paypalAccount.payerId)
         assert.isString(transaction.paypalAccount.payerFirstName)
         assert.isString(transaction.paypalAccount.payerLastName)
-        assert.isString(transaction.paypalAccount.payerStatus)
         assert.isString(transaction.paypalAccount.sellerProtectionStatus)
         assert.isString(transaction.paypalAccount.captureId)
         assert.isString(transaction.paypalAccount.refundId)
