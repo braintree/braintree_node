@@ -175,6 +175,11 @@ class ValidationErrorCodes
     InconsistentCountry : "93612"
     PaymentMethodsAreInvalid: "93613"
     PaymentMethodsAreNotAllowed: "93615"
+    MerchantAccountExistsForCurrency: "93616"
+    CurrencyIsRequired: "93617"
+    CurrencyIsInvalid: "93618"
+    NoMerchantAccounts: "93619"
+    MerchantAccountExistsForId: "93620"
 
   @MerchantAccount =
     ApplicantDetails:
