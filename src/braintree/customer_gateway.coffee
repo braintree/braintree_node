@@ -37,6 +37,6 @@ class CustomerGateway extends Gateway
     @createResponseHandler("customer", Customer, callback)
 
   pagingFunctionGenerator: (search) ->
-    super search, 'customers', Customer, (response) -> response.customers.customer
+    super search, 'customers', Customer, "customers", (response) -> response.customers.customer
 
 exports.CustomerGateway = CustomerGateway

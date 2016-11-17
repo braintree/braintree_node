@@ -42,6 +42,6 @@ class SubscriptionGateway extends Gateway
     @gateway.http.put("#{@config.baseMerchantPath()}/subscriptions/#{subscriptionId}", {subscription: attributes}, @responseHandler(callback))
 
   pagingFunctionGenerator: (search) ->
-    super search, 'subscriptions', Subscription, (response) -> response.subscriptions.subscription
+    super search, 'subscriptions', Subscription, "subscriptions", (response) -> response.subscriptions.subscription
 
 exports.SubscriptionGateway = SubscriptionGateway

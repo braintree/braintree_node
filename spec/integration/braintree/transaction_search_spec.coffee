@@ -154,12 +154,14 @@ describe "TransactionSearch", ->
                   search[criteria]()[operator](value)
 
             specHelper.defaultGateway.transaction.search search, (err, response) ->
+              assert.isNull(err)
+              assert.isObject(response)
               assert.isTrue(response.success)
               assert.equal(response.length(), 1)
 
               response.first (err, transaction) ->
-                assert.isObject(transaction)
                 assert.isNull(err)
+                assert.isObject(transaction)
 
                 done()
 

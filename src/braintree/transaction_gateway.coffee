@@ -102,7 +102,7 @@ class TransactionGateway extends Gateway
     @gateway.http.put("#{@config.baseMerchantPath()}/transactions/#{transactionId}/void", null, @responseHandler(callback))
 
   pagingFunctionGenerator: (search) ->
-    super search, 'transactions', Transaction, (response) -> response.creditCardTransactions.transaction
+    super search, 'transactions', Transaction, "creditCardTransactions", (response) -> response.creditCardTransactions.transaction
 
   _submitForSettlementSignature: ->
     {
