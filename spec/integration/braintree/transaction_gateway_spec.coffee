@@ -1293,9 +1293,9 @@ describe "TransactionGateway", ->
             assert.equal(response.transaction.usBankAccount.last4, "1234")
             assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
             assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
-            assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
+            assert.equal(response.transaction.usBankAccount.routingNumber, "021000021")
             assert.equal(response.transaction.usBankAccount.accountType, "checking")
-            assert.equal(response.transaction.usBankAccount.bankName, "UNKNOWN")
+            assert.match(response.transaction.usBankAccount.bankName, /CHASE/)
 
             done()
 
@@ -1315,7 +1315,7 @@ describe "TransactionGateway", ->
             assert.equal(response.transaction.usBankAccount.last4, "1234")
             assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
             assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
-            assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
+            assert.equal(response.transaction.usBankAccount.routingNumber, "021000021")
             assert.equal(response.transaction.usBankAccount.accountType, "checking")
             token = response.transaction.usBankAccount.token
 
@@ -1332,7 +1332,7 @@ describe "TransactionGateway", ->
               assert.equal(response.transaction.usBankAccount.last4, "1234")
               assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
               assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
-              assert.equal(response.transaction.usBankAccount.routingNumber, "123456789")
+              assert.equal(response.transaction.usBankAccount.routingNumber, "021000021")
               assert.equal(response.transaction.usBankAccount.accountType, "checking")
 
               done()

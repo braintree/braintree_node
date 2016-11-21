@@ -161,9 +161,9 @@ describe "PaymentMethodGateway", ->
               assert.equal(usBankAccount.last4, "1234")
               assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
               assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
-              assert.equal(usBankAccount.routingNumber, "123456789")
+              assert.equal(usBankAccount.routingNumber, "021000021")
               assert.equal(usBankAccount.accountType, "checking")
-              assert.equal(usBankAccount.bankName, "UNKNOWN")
+              assert.match(usBankAccount.bankName, /CHASE/)
 
               done()
 
