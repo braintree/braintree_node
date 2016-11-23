@@ -1311,6 +1311,8 @@ describe "TransactionGateway", ->
             assert.equal(response.transaction.usBankAccount.routingNumber, "021000021")
             assert.equal(response.transaction.usBankAccount.accountType, "checking")
             assert.match(response.transaction.usBankAccount.bankName, /CHASE/)
+            assert.equal(response.transaction.usBankAccount.achMandate.text, "cl mandate text")
+            assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date)
 
             done()
 
@@ -1332,6 +1334,9 @@ describe "TransactionGateway", ->
             assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
             assert.equal(response.transaction.usBankAccount.routingNumber, "021000021")
             assert.equal(response.transaction.usBankAccount.accountType, "checking")
+            assert.match(response.transaction.usBankAccount.bankName, /CHASE/)
+            assert.equal(response.transaction.usBankAccount.achMandate.text, "cl mandate text")
+            assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date)
             token = response.transaction.usBankAccount.token
 
             transactionParams =
@@ -1349,6 +1354,9 @@ describe "TransactionGateway", ->
               assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(response.transaction.usBankAccount.routingNumber, "021000021")
               assert.equal(response.transaction.usBankAccount.accountType, "checking")
+              assert.match(response.transaction.usBankAccount.bankName, /CHASE/)
+              assert.equal(response.transaction.usBankAccount.achMandate.text, "cl mandate text")
+              assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date)
 
               done()
 

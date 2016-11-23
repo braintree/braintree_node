@@ -21,6 +21,9 @@ describe "UsBankAccountGateway", ->
               assert.equal(usBankAccount.routingNumber, "021000021")
               assert.equal(usBankAccount.accountType, "checking")
               assert.match(usBankAccount.bankName, /CHASE/)
+              assert.equal(usBankAccount.achMandate.text, "cl mandate text")
+              assert.isTrue(usBankAccount.achMandate.acceptedAt instanceof Date)
+              assert.isTrue(usBankAccount.default)
 
               done()
 
@@ -55,5 +58,7 @@ describe "UsBankAccountGateway", ->
               assert.equal(response.transaction.usBankAccount.routingNumber, "021000021")
               assert.equal(response.transaction.usBankAccount.accountType, "checking")
               assert.match(response.transaction.usBankAccount.bankName, /CHASE/)
+              assert.equal(response.transaction.usBankAccount.achMandate.text, "cl mandate text")
+              assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date)
 
               done()
