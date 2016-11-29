@@ -180,6 +180,7 @@ class ValidationErrorCodes
     CurrencyIsInvalid: "93618"
     NoMerchantAccounts: "93619"
     MerchantAccountExistsForId: "93620"
+    MerchantAccountNotAuthOnboarded: "93621"
 
   @MerchantAccount =
     ApplicantDetails:
