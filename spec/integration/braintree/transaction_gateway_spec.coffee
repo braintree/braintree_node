@@ -142,6 +142,21 @@ describe "TransactionGateway", ->
 
         done()
 
+    it "skips advanced fraud checking if transaction[options][skip_advanced_fraud_checking] is set to true", (done) ->
+      transactionParams =
+        amount: '5.00'
+        creditCard:
+          number: '5105105105105100'
+          expirationDate: '05/12'
+        options:
+          skipAdvancedFraudChecking: true
+
+      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
+        assert.isNull(err)
+        assert.isTrue(response.success)
+        assert.isNull(response.transaction.riskData.id)
+        done()
+
     context "with apple pay", ->
       it "returns ApplePayCard for payment_instrument", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
