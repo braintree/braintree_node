@@ -25,15 +25,4 @@ class MerchantAccountGateway extends Gateway
   responseHandler: (callback) ->
     @createResponseHandler("merchantAccount", MerchantAccount, callback)
 
-  createForCurrency: (attributes, callback) ->
-    @gateway.http.post("#{@config.baseMerchantPath()}/merchant_accounts/create_for_currency", {merchantAccount: attributes}, @createForCurrencyResponseHandler(callback))
-
-  createForCurrencyResponseHandler: (callback) ->
-    @createResponseHandler(null, null, (err, response) ->
-      if !err && response.success
-        response.merchantAccount = new MerchantAccount(response.response.merchantAccount)
-        delete response.response
-      callback(err, response)
-    )
-
 exports.MerchantAccountGateway = MerchantAccountGateway
