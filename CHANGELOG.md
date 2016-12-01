@@ -1,3 +1,8 @@
+## 1.44.0
+* Update UsBank tests to use legal routing numbers
+* Add option `skip_advanced_fraud_check` for transaction flows
+* Raise an exception when advanced search times out
+
 ## 1.43.0
 * Spec updates for deprecated keys
 * Added error handling for missing configuration credentials
