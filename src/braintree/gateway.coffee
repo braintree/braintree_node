@@ -61,17 +61,19 @@ class Gateway
       else
         callback(exceptions.DownForMaintenanceError("Down for Maintenance"), null)
 
-  pagingFunctionGenerator: (search, url, subjectType, getSubject) ->
+  pagingFunctionGenerator: (search, url, subjectType, pagedResultsKey, getSubject) ->
     (ids, callback) =>
       search.ids().in(ids)
       @gateway.http.post("#{@config.baseMerchantPath()}/" + url + "/advanced_search", { search : search.toHash() }, (err, response) ->
           if err
             callback(err, null)
-          else
+          else if (pagedResultsKey of response)
             if _.isArray(getSubject(response))
               for subject in getSubject(response)
                 callback(null, new subjectType(subject))
             else
-              callback(null, new subjectType(getSubject(response))))
+              callback(null, new subjectType(getSubject(response)))
+          else
+            callback(exceptions.DownForMaintenanceError("Down for Maintenance"), null))
 
 exports.Gateway = Gateway

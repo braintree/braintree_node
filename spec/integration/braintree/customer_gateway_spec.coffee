@@ -228,12 +228,12 @@ describe "CustomerGateway", ->
             assert.isNotNull(response.customer.usBankAccounts[0])
             usBankAccount = response.customer.usBankAccounts[0]
             assert.isNotNull(usBankAccount.token)
-            assert.equal(usBankAccount.routingNumber, "123456789")
+            assert.equal(usBankAccount.routingNumber, "021000021")
             assert.equal(usBankAccount.last4, "1234")
             assert.equal(usBankAccount.accountType, "checking")
             assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
             assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
-            assert.equal(usBankAccount.bankName, "UNKNOWN")
+            assert.match(usBankAccount.bankName, /CHASE/)
             assert.equal(response.customer.paymentMethods[0], usBankAccount)
 
             done()
@@ -555,12 +555,12 @@ describe "CustomerGateway", ->
             assert.isNotNull(customer.usBankAccounts[0])
             usBankAccount = customer.usBankAccounts[0]
             assert.isNotNull(usBankAccount.token)
-            assert.equal(usBankAccount.routingNumber, "123456789")
+            assert.equal(usBankAccount.routingNumber, "021000021")
             assert.equal(usBankAccount.last4, "1234")
             assert.equal(usBankAccount.accountType, "checking")
             assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
             assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
-            assert.equal(usBankAccount.bankName, "UNKNOWN")
+            assert.match(usBankAccount.bankName, /CHASE/)
             assert.equal(customer.paymentMethods[0], usBankAccount)
 
             done()
