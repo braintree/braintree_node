@@ -87,6 +87,17 @@ create3DSVerification = (merchantAccountId, params, callback) ->
     responseCallback
   )
 
+generate3DSNonce = (params, callback) ->
+  responseCallback = (err, response) ->
+    threeDSecureNonce = response.paymentMethodNonce.nonce
+    callback(threeDSecureNonce)
+
+  defaultGateway.http.post(
+    "#{defaultGateway.config.baseMerchantPath()}/three_d_secure/create_nonce/#{specHelper.threeDSecureMerchantAccountId}",
+    params,
+    responseCallback
+  )
+
 simulateTrFormPost = (url, trData, inputFormData, callback) ->
   headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -365,6 +376,7 @@ GLOBAL.specHelper =
   addOns: addOns
   braintree: braintree
   create3DSVerification: create3DSVerification
+  generate3DSNonce: generate3DSNonce
   dateToMdy: dateToMdy
   settlementDate: settlementDate
   defaultConfig: defaultConfig

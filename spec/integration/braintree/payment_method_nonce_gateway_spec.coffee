@@ -44,16 +44,25 @@ describe "PaymentMethodNonceGateway", ->
 
   describe "find", ->
     it 'find the nonce', (done) ->
-      specHelper.defaultGateway.paymentMethodNonce.find "threedsecurednonce", (err, paymentMethodNonce) ->
-        assert.isNull(err)
-        info = paymentMethodNonce.threeDSecureInfo
-        assert.equal(paymentMethodNonce.nonce, "threedsecurednonce")
-        assert.isTrue(info.liabilityShifted)
-        assert.isTrue(info.liabilityShiftPossible)
-        assert.equal(info.enrolled, "Y")
-        assert.equal(info.status, "authenticate_successful")
+      nonceParams =
+        creditCard:
+          number: '4111111111111111'
+          expirationMonth: '05'
+          expirationYear: '2020'
 
-        done()
+      specHelper.generate3DSNonce nonceParams, (nonce) ->
+        assert.isNotNull(nonce)
+
+        specHelper.defaultGateway.paymentMethodNonce.find nonce, (err, paymentMethodNonce) ->
+          assert.isNull(err)
+          info = paymentMethodNonce.threeDSecureInfo
+          assert.equal(paymentMethodNonce.nonce, nonce)
+          assert.isTrue(info.liabilityShifted)
+          assert.isTrue(info.liabilityShiftPossible)
+          assert.equal(info.enrolled, "Y")
+          assert.equal(info.status, "authenticate_successful")
+
+          done()
 
     it "returns undefined threeDSecureInfo if there's none present", (done) ->
       specHelper.defaultGateway.customer.create {}, (err, response) ->
