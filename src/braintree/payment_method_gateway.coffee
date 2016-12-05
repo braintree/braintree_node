@@ -10,6 +10,8 @@
 {VenmoAccount} = require('./venmo_account')
 {Util} = require('./util')
 exceptions = require('./exceptions')
+deprecate = require('depd')('braintree/gateway.transaction')
+querystring = require('../../vendor/querystring.node.js.511d6a2/querystring')
 
 class PaymentMethodGateway extends Gateway
   constructor: (@gateway) ->
@@ -105,7 +107,17 @@ class PaymentMethodGateway extends Gateway
     else
       new UnknownPaymentMethod(response)
 
-  delete: (token, callback) ->
-    @gateway.http.delete("#{@config.baseMerchantPath()}/payment_methods/any/#{token}", callback)
+  delete: (token, options, callback) ->
+    if !callback
+      callback = options
+      options = null
+    Util.verifyKeys(@_deleteSignature(), options, deprecate)
+    queryParam = if options? then "?" + querystring.stringify(Util.convertObjectKeysToUnderscores(options)) else ""
+    @gateway.http.delete("#{@config.baseMerchantPath()}/payment_methods/any/#{token}#{queryParam}", callback)
+
+  _deleteSignature: ->
+    {
+      valid: ["revokeAllGrants"]
+    }
 
 exports.PaymentMethodGateway = PaymentMethodGateway
