@@ -1,3 +1,6 @@
+## 1.45.0
+* Add multi-currency updates to merchants onboarded through Braintree Auth
+
 ## 1.44.0
 * Update UsBank tests to use legal routing numbers
 * Add option `skip_advanced_fraud_check` for transaction flows
