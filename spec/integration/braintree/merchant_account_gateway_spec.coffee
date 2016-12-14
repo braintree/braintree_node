@@ -534,6 +534,147 @@ describe "MerchantAccountGateway", ->
 
         done()
 
+  describe "all", ->
+    context "using a callback", ->
+      it "returns all merchant accounts", (done) ->
+        gateway = braintree.connect {
+          clientId: "client_id$development$integration_client_id"
+          clientSecret: "client_secret$development$integration_client_secret"
+        }
+
+        specHelper.createToken gateway, {merchantPublicId: "integration_merchant_id", scope: "read_write"}, (err, response) ->
+          gateway = braintree.connect {
+            accessToken: response.credentials.accessToken
+          }
+
+          gateway.merchantAccount.all (err, merchantAccounts) ->
+            assert.equal(true, merchantAccounts.length > 20)
+            done()
+
+      it "handles a response containing a single merchant account", (done) ->
+        gateway = braintree.connect {
+          clientId: "client_id$development$integration_client_id"
+          clientSecret: "client_secret$development$integration_client_secret"
+        }
+
+        gateway.merchant.create {email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['credit_card', 'paypal']}, (err, response) ->
+          gateway = braintree.connect {
+            accessToken: response.credentials.accessToken
+          }
+          merchantAccounts = []
+          gateway.merchantAccount.all (err, merchantAccounts) ->
+            assert.equal(merchantAccounts.length, 1)
+
+            merchantAccount = merchantAccounts[0]
+            assert.equal(merchantAccount.currencyIsoCode, "USD")
+            done()
+
+      it "returns a merchant account with correct attributes", (done) ->
+        gateway = braintree.connect {
+          clientId: "client_id$development$integration_client_id"
+          clientSecret: "client_secret$development$integration_client_secret"
+        }
+
+        gateway.merchant.create {email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['credit_card', 'paypal']}, (err, response) ->
+          gateway = braintree.connect {
+            accessToken: response.credentials.accessToken
+          }
+          merchantAccounts = []
+          gateway.merchantAccount.all (err, merchantAccounts) ->
+            assert.equal(merchantAccounts.length, 1)
+
+            merchantAccount = merchantAccounts[0]
+            assert.equal(merchantAccount.currencyIsoCode, "USD")
+            assert.equal(merchantAccount.status, "active")
+            assert.equal(merchantAccount.default, true)
+            done()
+
+      it "gracefully handles errors", (done) ->
+        gateway = braintree.connect {
+          clientId: "client_id$development$integration_client_id"
+          clientSecret: "client_secret$development$integration_client_secret"
+        }
+
+        specHelper.createToken gateway, {merchantPublicId: "integration_merchant_id", scope: "read_write"}, (err, response) ->
+          gateway = braintree.connect {
+            accessToken: response.credentials.accessToken
+          }
+
+          gateway.config.merchantId = "nonexistantmerchant"
+
+          gateway.merchantAccount.all (err) ->
+            assert(err)
+            assert.equal(err.type, braintree.errorTypes.authenticationError)
+            done()
+
+    context "using a stream", ->
+      it "returns a stream if no callback is provided", (done) ->
+        gateway = braintree.connect {
+          clientId: "client_id$development$integration_client_id"
+          clientSecret: "client_secret$development$integration_client_secret"
+        }
+
+        specHelper.createToken gateway, {merchantPublicId: "integration_merchant_id", scope: "read_write"}, (err, response) ->
+          gateway = braintree.connect {
+            accessToken: response.credentials.accessToken
+          }
+
+          merchantAccounts = []
+          merchantAccountStream = gateway.merchantAccount.all()
+          merchantAccountStream.on "data", (data) ->
+            merchantAccounts.push(data)
+
+          merchantAccountStream.on "end", ->
+            assert.equal(true, merchantAccounts.length > 20)
+            done()
+
+      it "returns a merchant account with correct attributes", (done) ->
+        gateway = braintree.connect {
+          clientId: "client_id$development$integration_client_id"
+          clientSecret: "client_secret$development$integration_client_secret"
+        }
+
+        gateway.merchant.create {email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['credit_card', 'paypal']}, (err, response) ->
+          gateway = braintree.connect {
+            accessToken: response.credentials.accessToken
+          }
+          merchantAccounts = []
+          merchantAccountStream = gateway.merchantAccount.all()
+          merchantAccountStream.on "data", (data) ->
+            merchantAccounts.push(data)
+
+          merchantAccountStream.on "end", ->
+            assert.equal(merchantAccounts.length, 1)
+            merchantAccount = merchantAccounts[0]
+            assert.equal(merchantAccount.currencyIsoCode, "USD")
+            assert.equal(merchantAccount.status, "active")
+            assert.equal(merchantAccount.default, true)
+            done()
+
+      it "gracefully handles errors", (done) ->
+        gateway = braintree.connect {
+          clientId: "client_id$development$integration_client_id"
+          clientSecret: "client_secret$development$integration_client_secret"
+        }
+
+        specHelper.createToken gateway, {merchantPublicId: "integration_merchant_id", scope: "read_write"}, (err, response) ->
+          gateway = braintree.connect {
+            accessToken: response.credentials.accessToken
+          }
+
+          gateway.config.merchantId = "nonexistantmerchant"
+
+          merchantAccountStream = gateway.merchantAccount.all()
+          merchantAccountStream.on "error", (error) ->
+            assert.equal(error.type, braintree.errorTypes.authenticationError)
+            done()
+
+          merchantAccountStream.on "data", ->
+            throw new Error("Should not have data")
+
+          merchantAccountStream.on "end", ->
+            throw new Error("Should not have ended")
+
   describe "createForCurrency", ->
     it "creates a new merchant account for currency", (done) ->
       gateway = braintree.connect {
