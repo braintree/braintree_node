@@ -1,5 +1,7 @@
+_ = require('underscore')
 {Gateway} = require('./gateway')
 {MerchantAccount} = require('./merchant_account')
+{PaginatedResponse} = require('./paginated_response')
 exceptions = require('./exceptions')
 
 class MerchantAccountGateway extends Gateway
@@ -24,6 +26,27 @@ class MerchantAccountGateway extends Gateway
 
   responseHandler: (callback) ->
     @createResponseHandler("merchantAccount", MerchantAccount, callback)
+
+  all: (callback) ->
+    response = new PaginatedResponse(@fetchMerchantAccounts)
+
+    if callback?
+      response.all(callback)
+    else
+      response.ready()
+      response.stream
+
+  fetchMerchantAccounts: (pageNumber, callback) =>
+    @gateway.http.get "#{@config.baseMerchantPath()}/merchant_accounts?page=#{pageNumber}", (err, response) ->
+      if err
+        callback(err)
+      else
+        body = response.merchantAccounts
+        {totalItems, pageSize} = response.merchantAccounts
+        merchantAccounts = body.merchantAccount
+        unless _.isArray(merchantAccounts)
+          merchantAccounts = [merchantAccounts]
+        callback(null, totalItems, pageSize, merchantAccounts)
 
   createForCurrency: (attributes, callback) ->
     @gateway.http.post("#{@config.baseMerchantPath()}/merchant_accounts/create_for_currency", {merchantAccount: attributes}, @createForCurrencyResponseHandler(callback))

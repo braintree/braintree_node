@@ -1,3 +1,6 @@
+## 1.46.0
+* Add functionality to list all merchant accounts for a merchant with `merchantAccount.all`
+
 ## 1.45.0
 * Add multi-currency updates to merchants onboarded through Braintree Auth
 

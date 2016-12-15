@@ -1,6 +1,6 @@
 {
   "name": "braintree",
-  "version": "1.45.0",
+  "version": "1.46.0",
   "description": "A library for integrating with Braintree.",
   "keywords": [
     "braintree",
@@ -31,7 +31,7 @@
     "capture-stream": "0.1.2",
     "chai": "1.5.0",
     "coffee-script": "1.6.1",
-    "mocha": "1.6.0"
+    "mocha": "1.21.5"
   },
   "optionalDependencies": {
     "source-map-support": "0.2.9"
@@ -41,7 +41,7 @@
     "compile_coffee": "coffee --map -cbo ./lib ./src && coffee --map -cbo ./spec_compiled ./spec",
     "prepublish": "npm run compile_coffee",
     "test_execute_unit": "mocha spec_compiled/unit --recursive",
-    "test_execute_integration": "mocha --slow 2000 spec_compiled/integration --recursive",
+    "test_execute_integration": "mocha --timeout 15000 --slow 2000 spec_compiled/integration --recursive",
     "test_integration": "npm run compile_coffee && npm run test_execute_integration",
     "test": "npm run compile_coffee && npm run test_execute_unit"
   }
