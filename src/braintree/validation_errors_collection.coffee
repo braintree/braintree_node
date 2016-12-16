@@ -18,11 +18,16 @@ class ValidationErrorsCollection
       @validationErrors[key] or= []
       @validationErrors[key].push(new ValidationError(item))
 
-  deepErrors: ->
+  errors: ->
     errors = []
 
     for key, val of @validationErrors
       errors = errors.concat(val)
+
+    errors
+
+  deepErrors: ->
+    errors = @errors()
 
     for key, val of @errorCollections
       errors = errors.concat(val.deepErrors())
