@@ -3,6 +3,7 @@
 {Environment} = require("./braintree/environment")
 {BraintreeGateway} = require("./braintree/braintree_gateway")
 errorTypes = require("./braintree/error_types")
+{ValidationErrorCodes} = require("./braintree/validation_error_codes");
 
 {Transaction} = require("./braintree/transaction")
 
@@ -36,6 +37,7 @@ exports.connect = connect
 exports.version = version
 exports.Environment = Environment
 exports.errorTypes = errorTypes
+exports.ValidationErrorCodes = ValidationErrorCodes;
 
 exports.Transaction = Transaction
 
