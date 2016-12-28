@@ -991,6 +991,35 @@ describe "PaymentMethodGateway", ->
 
               done()
 
+      it "can pass a custom verification amount", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          creditCardParams =
+            cardholderName: 'Card Holder'
+            customerId: customerId
+            cvv: '123'
+            number: '4012888888881881'
+            expirationDate: '05/2020'
+
+          specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+            assert.isTrue(response.success)
+
+            creditCard = response.creditCard
+
+            updateParams =
+              paymentMethodNonce: Nonces.ProcessorDeclinedMasterCard
+              options:
+                verifyCard: 'true'
+                verificationAmount: '2.34'
+
+            specHelper.defaultGateway.paymentMethod.update creditCard.token, updateParams, (err, response) ->
+              assert.isFalse(response.success)
+              assert.equal(response.verification.status, 'processor_declined')
+              assert.isNull(response.verification.gatewayRejectionReason)
+
+              done()
+
       it "returns an error if invalid", (done) ->
         specHelper.defaultGateway.customer.create {}, (err, response) ->
           customerId = response.customer.id
