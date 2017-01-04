@@ -67,7 +67,10 @@ class Http
         return callback(error, null) if error
         if body isnt ' '
           @parser.parseString body, (err, result) ->
-            callback(null, Util.convertNodeToObject(result))
+            if err?
+              callback(err, null)
+            else
+              callback(null, Util.convertNodeToObject(result))
         else
           callback(null, null)
       )
