@@ -9,8 +9,6 @@ exceptions = require('./exceptions')
 
 class Http
   constructor: (@config) ->
-    @parser = new xml2js.Parser
-      explicitRoot: true
 
   checkHttpStatus: (status) ->
     switch status.toString()
@@ -66,7 +64,10 @@ class Http
         error = @checkHttpStatus(response.statusCode)
         return callback(error, null) if error
         if body isnt ' '
-          @parser.parseString body, (err, result) ->
+          parser = new xml2js.Parser
+            explicitRoot: true
+
+          parser.parseString body, (err, result) ->
             if err?
               callback(err, null)
             else
