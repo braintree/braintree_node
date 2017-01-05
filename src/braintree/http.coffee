@@ -68,7 +68,7 @@ class Http
             explicitRoot: true
 
           parser.parseString body, (err, result) ->
-            if err?
+            if err
               callback(err, null)
             else
               callback(null, Util.convertNodeToObject(result))
