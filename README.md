@@ -21,8 +21,7 @@ This is a Node.js library for integrating with the [Braintree](https://www.brain
 
 ## Quick Start
 ```javascript
-var util = require('util'),
-    braintree = require('braintree');
+var braintree = require('braintree');
 
 var gateway = braintree.connect({
   environment: braintree.Environment.Sandbox,
@@ -33,21 +32,21 @@ var gateway = braintree.connect({
 
 gateway.transaction.sale({
   amount: '5.00',
-  paymentMethodNonce: "nonce-from-the-client",
+  paymentMethodNonce: 'nonce-from-the-client',
   options: {
     submitForSettlement: true
   }
-},
-  function(err, result) {
-    if (result) {
-      if (result.success) {
-        console.log("Transaction ID: " + result.transaction.id)
-      } else {
-        console.log(result.message)
-      }
-    } else {
-      console.log(err)
-    }
+}, function (err, result) {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  if (result.success) {
+    console.log('Transaction ID: ' + result.transaction.id);
+  } else {
+    console.error(result.message);
+  }
 });
 ```
 ## Tests
