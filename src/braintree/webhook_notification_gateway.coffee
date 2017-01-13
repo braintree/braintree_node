@@ -10,8 +10,6 @@ _ = require('underscore')
 class WebhookNotificationGateway extends Gateway
   constructor: (@gateway) ->
     @config = @gateway.config
-    @parser = new xml2js.Parser
-      explicitRoot: true
 
   parse: (signature, payload, callback) ->
     if payload.match(/[^A-Za-z0-9+=\/\n]/)
@@ -21,7 +19,11 @@ class WebhookNotificationGateway extends Gateway
     return callback(err, null) if err
 
     xmlPayload = new Buffer(payload, "base64").toString("utf8")
-    @parser.parseString xmlPayload, (err, result) =>
+    parser = new xml2js.Parser
+      explicitRoot: true
+    parser.parseString xmlPayload, (err, result) =>
+      return callback(err, null) if err
+
       attributes = Util.convertNodeToObject(result)
       handler = @createResponseHandler "notification", WebhookNotification, (err, result) ->
         callback(null, result.notification)

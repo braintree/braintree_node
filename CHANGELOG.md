@@ -1,3 +1,7 @@
+## 1.47.0
+* Fix a bug where xml parsing errors were not being caught
+* Stop sending account_description field from us bank accounts
+
 ## 1.46.0
 * Add functionality to list all merchant accounts for a merchant with `merchantAccount.all`
 

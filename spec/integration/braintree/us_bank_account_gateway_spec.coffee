@@ -16,11 +16,13 @@ describe "UsBankAccountGateway", ->
             specHelper.defaultGateway.usBankAccount.find usBankAccountToken, (err, usBankAccount) ->
               assert.isNull(err)
               assert.equal(usBankAccount.last4, "1234")
-              assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
               assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(usBankAccount.routingNumber, "021000021")
               assert.equal(usBankAccount.accountType, "checking")
               assert.match(usBankAccount.bankName, /CHASE/)
+              assert.equal(usBankAccount.achMandate.text, "cl mandate text")
+              assert.isTrue(usBankAccount.achMandate.acceptedAt instanceof Date)
+              assert.isTrue(usBankAccount.default)
 
               done()
 
@@ -50,10 +52,11 @@ describe "UsBankAccountGateway", ->
               assert.isTrue(response.success)
               assert.equal(response.transaction.status, Transaction.Status.SettlementPending)
               assert.equal(response.transaction.usBankAccount.last4, "1234")
-              assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
               assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(response.transaction.usBankAccount.routingNumber, "021000021")
               assert.equal(response.transaction.usBankAccount.accountType, "checking")
               assert.match(response.transaction.usBankAccount.bankName, /CHASE/)
+              assert.equal(response.transaction.usBankAccount.achMandate.text, "cl mandate text")
+              assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date)
 
               done()

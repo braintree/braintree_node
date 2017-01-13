@@ -159,7 +159,6 @@ describe "PaymentMethodGateway", ->
               assert.isTrue(response.success)
               assert.isNotNull(response.paymentMethod.token)
               assert.equal(usBankAccount.last4, "1234")
-              assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
               assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(usBankAccount.routingNumber, "021000021")
               assert.equal(usBankAccount.accountType, "checking")
@@ -983,6 +982,35 @@ describe "PaymentMethodGateway", ->
               expirationDate: '06/2013'
               options:
                 verifyCard: 'true'
+
+            specHelper.defaultGateway.paymentMethod.update creditCard.token, updateParams, (err, response) ->
+              assert.isFalse(response.success)
+              assert.equal(response.verification.status, 'processor_declined')
+              assert.isNull(response.verification.gatewayRejectionReason)
+
+              done()
+
+      it "can pass a custom verification amount", (done) ->
+        specHelper.defaultGateway.customer.create {}, (err, response) ->
+          customerId = response.customer.id
+
+          creditCardParams =
+            cardholderName: 'Card Holder'
+            customerId: customerId
+            cvv: '123'
+            number: '4012888888881881'
+            expirationDate: '05/2020'
+
+          specHelper.defaultGateway.creditCard.create creditCardParams, (err, response) ->
+            assert.isTrue(response.success)
+
+            creditCard = response.creditCard
+
+            updateParams =
+              paymentMethodNonce: Nonces.ProcessorDeclinedMasterCard
+              options:
+                verifyCard: 'true'
+                verificationAmount: '2.34'
 
             specHelper.defaultGateway.paymentMethod.update creditCard.token, updateParams, (err, response) ->
               assert.isFalse(response.success)
