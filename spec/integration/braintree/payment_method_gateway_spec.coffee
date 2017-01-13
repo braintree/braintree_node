@@ -159,7 +159,6 @@ describe "PaymentMethodGateway", ->
               assert.isTrue(response.success)
               assert.isNotNull(response.paymentMethod.token)
               assert.equal(usBankAccount.last4, "1234")
-              assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
               assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(usBankAccount.routingNumber, "021000021")
               assert.equal(usBankAccount.accountType, "checking")

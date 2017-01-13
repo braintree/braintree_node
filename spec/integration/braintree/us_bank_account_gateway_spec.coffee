@@ -16,7 +16,6 @@ describe "UsBankAccountGateway", ->
             specHelper.defaultGateway.usBankAccount.find usBankAccountToken, (err, usBankAccount) ->
               assert.isNull(err)
               assert.equal(usBankAccount.last4, "1234")
-              assert.equal(usBankAccount.accountDescription, "PayPal Checking - 1234")
               assert.equal(usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(usBankAccount.routingNumber, "021000021")
               assert.equal(usBankAccount.accountType, "checking")
@@ -53,7 +52,6 @@ describe "UsBankAccountGateway", ->
               assert.isTrue(response.success)
               assert.equal(response.transaction.status, Transaction.Status.SettlementPending)
               assert.equal(response.transaction.usBankAccount.last4, "1234")
-              assert.equal(response.transaction.usBankAccount.accountDescription, "PayPal Checking - 1234")
               assert.equal(response.transaction.usBankAccount.accountHolderName, "Dan Schulman")
               assert.equal(response.transaction.usBankAccount.routingNumber, "021000021")
               assert.equal(response.transaction.usBankAccount.accountType, "checking")
