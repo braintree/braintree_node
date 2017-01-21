@@ -38,7 +38,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "compile_coffee": "coffee --map -cbo ./lib ./src && coffee --map -cbo ./spec_compiled ./spec",
+    "compile_coffee": "./node_modules/coffee-script/bin/coffee  --map -cbo ./lib ./src && ./node_modules/coffee-script/bin/coffee --map -cbo ./spec_compiled ./spec",
     "prepublish": "npm run compile_coffee",
     "test_execute_unit": "mocha spec_compiled/unit --recursive",
     "test_execute_integration": "mocha --timeout 15000 --slow 2000 spec_compiled/integration --recursive",
