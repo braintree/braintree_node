@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
  * querystring-stringify.js
  *   - node.js module providing 'stringify' method for converting objects to query strings.
@@ -33,15 +34,15 @@ function querystring_stringify (obj, sep, eq, name, escape) {
   sep = sep || "&";
   eq = eq || "=";
   escape = escape || encodeURIComponent;
-  
+
   if (util.isNull(obj) || util.isUndefined(obj) || typeof(obj) === 'function') {
     return name ? escape(name) + eq : '';
   }
-  
+
   if (util.isBoolean(obj)) obj = +obj;
   if (util.isNumber(obj) || util.isString(obj)) {
     return escape(name) + eq + escape(obj);
-  }  
+  }
   if (util.isArray(obj)) {
     var s = [];
     name = name+'[]';
@@ -50,14 +51,14 @@ function querystring_stringify (obj, sep, eq, name, escape) {
     }
     return s.join(sep);
   }
-  
+
   // Check for cyclical references in nested objects
   for (var i = stack.length - 1; i >= 0; --i) if (stack[i] === obj) {
     throw new Error("querystring_stringify. Cyclical reference");
   }
-  
+
   stack.push(obj);
-  
+
   var s = [];
   var begin = name ? name + '[' : '';
   var end = name ? ']' : '';
@@ -65,9 +66,9 @@ function querystring_stringify (obj, sep, eq, name, escape) {
     var n = begin + i + end;
     s.push(querystring_stringify(obj[i], sep, eq, n, escape));
   }
-  
+
   stack.pop();
-  
+
   s = s.join(sep);
   if (!s && name) return name + "=";
   return s;

@@ -1,5 +1,5 @@
 #!/bin/bash
-nvm_version="0.6.19"
+nvm_version="4"
 nvm_location="/var/lib/jenkins/.nvm/v$nvm_version/bin"
 
 source ~/.nvm/nvm.sh

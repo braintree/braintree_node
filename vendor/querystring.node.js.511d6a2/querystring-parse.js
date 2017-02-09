@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
  * querystring-parse.js
  *  - node.js module providing "parse" method to turn query strings into js objects
@@ -23,7 +24,7 @@ exports.parse = querystring_parse;
  *
  * <p>The <code>querystring</code> module is a rollup of <code>querystring-parse</code> and
  * <code>querystring-stringify</code>.</p>
- * 
+ *
  * <p>As their names suggest, <code>querystring-parse</code> adds support for parsing
  * Query String data (querystring.parse) and <code>querystring-stringify</code> for serializing
  * JavaScript data into Query Strings (querystring.stringify).  You may choose to
@@ -104,7 +105,7 @@ function pieceParser (eq, unesc) {
 // the reducer function that merges each query piece together into one set of params
 function mergeParams (params, addition) {
 	var ret;
-			
+
 	if (!params){
 		// if it's uncontested, then just return the addition.
 		ret = addition;
@@ -112,7 +113,7 @@ function mergeParams (params, addition) {
 		// if the existing value is an array, then concat it.
 		ret = params.concat(addition);
 	} else if (!braintree_util.isObject(params) || !braintree_util.isObject(addition)) {
-		// if the existing value is not an array, and either are not objects, arrayify it.		
+		// if the existing value is not an array, and either are not objects, arrayify it.
 		ret = [params].concat(addition);
 	} else {
 		// else merge them as objects, which is a little more complex

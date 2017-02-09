@@ -1,15 +1,5 @@
 require("../../spec_helper")
-{AdvancedSearch} = require('../../../lib/braintree/advanced_search')
-
-class TestSearch extends AdvancedSearch
-  @equalityFields "equality"
-  @partialMatchFields "partialMatch"
-  @textFields "text"
-  @keyValueFields "key"
-  @multipleValueField "multiple"
-  @multipleValueField "multipleWithAllows", { "allows" : ["Hello", "World"] }
-  @multipleValueOrTextField "multipleValueOrText"
-  @rangeFields "range"
+TestSearch = require('../../../spec/test-search')
 
 newSearch = -> new TestSearch()
 value = "mail@example.com"

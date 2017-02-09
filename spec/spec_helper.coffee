@@ -19,13 +19,13 @@ xml2js = require('xml2js')
 
 chai.Assertion.includeStack = true
 
-GLOBAL.assert = chai.assert
+global.assert = chai.assert
 
-GLOBAL.assert.isEmptyArray = (array) ->
+global.assert.isEmptyArray = (array) ->
   assert.isArray(array)
   assert.equal(array.length, 0)
 
-GLOBAL.inspect = (object) ->
+global.inspect = (object) ->
   console.dir(object)
 
 braintree = require('./../lib/braintree.js')
@@ -371,7 +371,7 @@ class ClientApiHttp
     theRequest.write(requestBody) if body
     theRequest.end()
 
-GLOBAL.specHelper =
+global.specHelper =
   addOns: addOns
   braintree: braintree
   create3DSVerification: create3DSVerification

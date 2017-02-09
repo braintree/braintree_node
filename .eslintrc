@@ -1,0 +1,8 @@
+---
+  extends: braintree/server
+  parserOptions:
+    ecmaVersion: 6
+  rules:
+    new-cap:
+      - 2
+      - {"capIsNewExceptions": ["Sha1hexdigest", "Sha256hexdigest"]}

@@ -117,7 +117,7 @@ describe "PaymentMethodGateway", ->
             assert.isString(response.paymentMethod.expirationMonth)
             assert.isString(response.paymentMethod.expirationYear)
             assert.isTrue(response.paymentMethod.default)
-            assert.match(response.paymentMethod.imageUrl, /.png$/)
+            assert.include(response.paymentMethod.imageUrl, ".png")
             assert.match(response.paymentMethod.sourceDescription, /^AmEx \d{4}$/)
             assert.match(response.paymentMethod.cardMemberNumber, /^\d{4}$/)
             assert.equal(response.paymentMethod.customerId, customerId)

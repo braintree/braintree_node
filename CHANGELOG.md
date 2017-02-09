@@ -1,3 +1,8 @@
+## 2.0.0
+* Drop support for Node versions < 4
+* `transaction.submitForSettlement` can no longer take an arbitrary number of arguments
+* Call callback with an error when invalid keys are used instead of logging a deprecation warning
+
 ## 1.47.0
 * Fix a bug where xml parsing errors were not being caught
 * Stop sending account_description field from us bank accounts

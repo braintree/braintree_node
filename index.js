@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require("./lib/braintree");
+module.exports = require('./lib/braintree');

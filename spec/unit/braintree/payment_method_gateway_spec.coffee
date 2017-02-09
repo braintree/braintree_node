@@ -1,6 +1,6 @@
 require('../../spec_helper')
 {PaymentMethodGateway} = require('../../../lib/braintree/payment_method_gateway')
-capture = require('capture-stream')
+{errorTypes} = require('../../../lib/braintree/error_types')
 
 describe "PaymentMethodGateway", ->
   describe "find", ->
@@ -56,12 +56,13 @@ describe "PaymentMethodGateway", ->
       paymentMethodGateway.delete("some_token", assertRequestUrl)
       done()
 
-    it 'returns a deprecated warning for an invalid option', (done) ->
-      stderr = capture(process.stderr)
+    it 'calls callback with error if keys are invalid', (done) ->
       paymentMethodGateway = new PaymentMethodGateway(fakeGateway)
       deleteOptions = { 'invalid_key':'true' }
-      assertDeprecated = (url) ->
-        assert.include(stderr(true), 'deprecated')
 
-      paymentMethodGateway.delete("some_token", deleteOptions, assertDeprecated)
-      done()
+      paymentMethodGateway.delete("some_token", deleteOptions, (err) ->
+        assert.instanceOf(err, Error)
+        assert.equal(err.type, errorTypes.invalidKeysError)
+        assert.equal(err.message, 'These keys are invalid: invalid_key')
+        done()
+      )

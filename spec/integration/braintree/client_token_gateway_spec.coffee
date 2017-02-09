@@ -1,7 +1,6 @@
 require('../../spec_helper')
 braintree = specHelper.braintree
 {Config} = require('../../../lib/braintree/config')
-capture = require('capture-stream')
 
 describe "ClientTokenGateway", ->
   it "generates an authorization fingerprint that is accepted by the gateway", (done) ->
@@ -180,13 +179,12 @@ describe "ClientTokenGateway", ->
       done()
     )
 
-  it "returns an error and a deprecate warning when an invalid parameter is supplied", (done) ->
-    stderr = capture(process.stderr)
+  it "calls callback with an error when an invalid parameter is supplied", (done) ->
     specHelper.defaultGateway.clientToken.generate({
       customrId: "1234"
     }, (err, result) ->
-      assert.equal(err.type, "authorizationError")
-      assert.include(stderr(true), 'deprecated')
+      assert.equal(err.type, "invalidKeysError")
+      assert.equal(err.message, "These keys are invalid: customrId")
       done()
     )
 

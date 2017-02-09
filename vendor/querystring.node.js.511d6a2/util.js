@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
  * util.js
  *  - utility helper functions for querystring module
