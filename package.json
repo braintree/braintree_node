@@ -17,7 +17,7 @@
     "url": "https://github.com/braintree/braintree_node.git"
   },
   "engines": {
-    "node": ">=0.6.6"
+    "node": ">=4"
   },
   "dependencies": {
     "dateformat": "1.0.1-1.2.3",
@@ -28,9 +28,10 @@
     "xml2js": "0.1.13"
   },
   "devDependencies": {
-    "capture-stream": "0.1.2",
     "chai": "1.5.0",
     "coffee-script": "1.6.1",
+    "eslint": "^2.7.0",
+    "eslint-config-braintree": "^1.0.2",
     "mocha": "1.21.5"
   },
   "optionalDependencies": {
@@ -38,11 +39,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "compile_coffee": "coffee --map -cbo ./lib ./src && coffee --map -cbo ./spec_compiled ./spec",
-    "prepublish": "npm run compile_coffee",
-    "test_execute_unit": "mocha spec_compiled/unit --recursive",
-    "test_execute_integration": "mocha --timeout 15000 --slow 2000 spec_compiled/integration --recursive",
-    "test_integration": "npm run compile_coffee && npm run test_execute_integration",
-    "test": "npm run compile_coffee && npm run test_execute_unit"
+    "lint": "eslint lib/",
+    "test:unit": "mocha spec/unit --recursive --compilers coffee:coffee-script",
+    "test:integration": "mocha --timeout 60000 --slow 2000 spec/integration --recursive --compilers coffee:coffee-script",
+    "test": "npm run lint && npm run test:unit"
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable */
 // test using assert
 
 var qs = require("./querystring"),

@@ -9,6 +9,6 @@ describe "ClientTokenGateway", ->
         options: {makeDefault: true, verifyCard: true}
       }, (err, result) ->
         assert.equal(err.type, braintree.errorTypes.unexpectedError)
-        assert.equal(err.message, "Invalid keys: makeDefault,verifyCard")
+        assert.equal(err.message, "A customer id is required for the following options: makeDefault, verifyCard")
         done()
       )

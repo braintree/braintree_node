@@ -1,6 +1,6 @@
 require('../../spec_helper')
 {Util} = require('../../../lib/braintree/util')
-capture = require('capture-stream')
+{errorTypes} = require('../../../lib/braintree/error_types')
 
 describe "Util", ->
   describe "convertObjectKeysToUnderscores", ->
@@ -329,8 +329,7 @@ describe "Util", ->
       assert.deepEqual(result, ["amount", "creditCard[number]", "creditCard[expirationDate]", "options[threeDSecure][required]"])
 
   describe "verifyKeys", ->
-    it "doesn't log deprecation warning if params are equal to the signature", ->
-      deprecate = require('depd')('test')
+    it "doesn't return an error if params are equal to the signature", ->
       signature = {
         valid: ["amount", "creditCard[number]", "creditCard[expirationDate]"]
       }
@@ -341,12 +340,10 @@ describe "Util", ->
           number: '5105105105105100'
           expirationDate: '05/12'
 
-      stderr = capture(process.stderr)
-      Util.verifyKeys(signature, transactionParams, deprecate)
-      assert.equal(stderr(true), "")
+      error = Util.verifyKeys(signature, transactionParams)
+      assert.isUndefined(error)
 
-    it "doesn't log deprecation warning if params are a subset of signature", ->
-      deprecate = require('depd')('test')
+    it "doesn't return an error if params are a subset of signature", ->
       signature = {
         valid: ["validKey1", "validKey2", "amount", "creditCard[number]", "creditCard[expirationDate]"]
       }
@@ -357,12 +354,10 @@ describe "Util", ->
           number: '5105105105105100'
           expirationDate: '05/12'
 
-      stderr = capture(process.stderr)
-      Util.verifyKeys(signature, transactionParams, deprecate)
-      assert.equal(stderr(true), "")
+      error = Util.verifyKeys(signature, transactionParams)
+      assert.isUndefined(error)
 
     it "ignores specified keys without deleting them", =>
-      deprecate = require('depd')('test')
       signature = {
         valid: ["amount", "creditCard[number]", "creditCard[expirationDate]"]
         ignore: ["topLevelKey", "options[nested][key]"]
@@ -380,14 +375,11 @@ describe "Util", ->
             key:
               ignore: 'bar'
 
-      stderr = capture(process.stderr)
-      Util.verifyKeys(signature, transactionParams, deprecate)
+      Util.verifyKeys(signature, transactionParams)
       assert.equal(transactionParams.topLevelKey.ignore, "foo")
       assert.equal(transactionParams.options.nested.key.ignore, "bar")
-      assert.equal(stderr(true), "")
 
-    it "logs deprecation warning if params are a superset of signature", ->
-      deprecate = require('depd')('test')
+    it "returns an error if params are a superset of signature", ->
       signature = {
         valid: ["amount", "creditCard[number]"]
       }
@@ -399,6 +391,7 @@ describe "Util", ->
           number: '5105105105105100'
           nestedInvalidKey: '05/12'
 
-      stderr = capture(process.stderr)
-      Util.verifyKeys(signature, transactionParams, deprecate)
-      assert.include(stderr(true), "invalid keys: invalidKey, creditCard[nestedInvalidKey]")
+      error = Util.verifyKeys(signature, transactionParams)
+      assert.instanceOf(error, Error)
+      assert.equal(error.type, errorTypes.invalidKeysError)
+      assert.equal(error.message, 'These keys are invalid: invalidKey, creditCard[nestedInvalidKey]')

@@ -1,7 +1,8 @@
+/* eslint-disable */
 /*
  * querystring.js
- *  - node.js module providing "parse" and "stringify" methods 
- *    to turn query strings into objects and to turn objects 
+ *  - node.js module providing "parse" and "stringify" methods
+ *    to turn query strings into objects and to turn objects
  *    into query string, respectively
  *
  *  This module is basically a stub loader. It will load both

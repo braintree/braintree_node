@@ -13,7 +13,6 @@ Braintree = require('../../../lib/braintree')
 {Dispute} = require('../../../lib/braintree/dispute')
 {Environment} = require('../../../lib/braintree/environment')
 {Config} = require('../../../lib/braintree/config')
-capture = require('capture-stream')
 
 describe "TransactionGateway", ->
   describe "sale", ->
@@ -128,7 +127,7 @@ describe "TransactionGateway", ->
 
         done()
 
-    it "logs deprecation warning when options object contains invalid keys", (done) ->
+    it "calls callback with an error when options object contains invalid keys", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:
@@ -136,10 +135,9 @@ describe "TransactionGateway", ->
           number: '5105105105105100'
           expirationDate: '05/12'
 
-      stderr = capture(process.stderr)
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-        assert.include(stderr(true), 'deprecated')
-
+        assert.equal(err.type, "invalidKeysError")
+        assert.equal(err.message, "These keys are invalid: creditCard[fakeData]")
         done()
 
     it "skips advanced fraud checking if transaction[options][skip_advanced_fraud_checking] is set to true", (done) ->
@@ -545,11 +543,9 @@ describe "TransactionGateway", ->
                     key2: 'value2'
 
             # note - supplementary data is not returned in response
-            stderr = capture(process.stderr)
             specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
               assert.isNull(err)
               assert.isTrue(response.success)
-              assert.equal(stderr(true).indexOf('deprecated'), -1)
 
               done()
 
@@ -635,12 +631,10 @@ describe "TransactionGateway", ->
         customFields:
           storeMe: 'custom value'
 
-      stderr = capture(process.stderr)
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         assert.isNull(err)
         assert.isTrue(response.success)
         assert.equal(response.transaction.customFields.storeMe, 'custom value')
-        assert.equal(stderr(true).indexOf('deprecated'), -1)
 
         done()
 
@@ -1910,39 +1904,17 @@ describe "TransactionGateway", ->
 
           done()
 
-    it "logs deprecation warning when options object contains invalid keys", (done) ->
+    it "calls callback with an error when options object contains invalid keys", (done) ->
       transactionParams =
         amount: '5.00'
         creditCard:
           number: '5105105105105100'
           expirationDate: '05/12'
 
-      stderr = capture(process.stderr)
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, '5.00', {"invalidKey": "1234"}, (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-          assert.equal(response.transaction.status, 'submitted_for_settlement')
-          assert.equal(response.transaction.amount, '5.00')
-          assert.include(stderr(true), 'deprecated')
-
-          done()
-
-    it "logs deprecation warning when called with too many arguments", (done) ->
-      transactionParams =
-        amount: '5.00'
-        creditCard:
-          number: '5105105105105100'
-          expirationDate: '05/12'
-
-      stderr = capture(process.stderr)
-      specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
-        specHelper.defaultGateway.transaction.submitForSettlement response.transaction.id, '5.00', {"orderId": "1234"}, "invalidArg", (err, response) ->
-          assert.isNull(err)
-          assert.isTrue(response.success)
-          assert.equal(response.transaction.status, 'submitted_for_settlement')
-          assert.equal(response.transaction.amount, '5.00')
-          assert.include(stderr(true), 'deprecated')
+          assert.equal(err.type, "invalidKeysError")
+          assert.equal(err.message, "These keys are invalid: invalidKey")
 
           done()
 
@@ -2061,13 +2033,10 @@ describe "TransactionGateway", ->
         amount: '4.00'
         invalidParam: "something invalid"
 
-      stderr = capture(process.stderr)
       specHelper.defaultGateway.transaction.sale transactionParams, (err, response) ->
         specHelper.defaultGateway.transaction.updateDetails response.transaction.id, updateParams, (err, response) ->
-
-          assert.equal(err.type, braintree.errorTypes.authorizationError)
-          assert.include(stderr(true), 'deprecated')
-          assert.include(stderr(true), 'invalid keys: invalidParam')
+          assert.equal(err.type, "invalidKeysError")
+          assert.equal(err.message, "These keys are invalid: invalidParam")
 
           done()
 
