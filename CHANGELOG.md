@@ -1,3 +1,6 @@
+## 2.0.1
+* Fix bug where SDK version number was not being sent in requests
+
 ## 2.0.0
 * Drop support for Node versions < 4
 * `transaction.submitForSettlement` can no longer take an arbitrary number of arguments
