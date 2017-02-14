@@ -217,6 +217,26 @@ describe "OAuthGateway", ->
 
       assert.equal(query('redirect_url'), null)
 
+    it "encodes connect url query parameters containing special characters not encoded by encodeURIComponent", ->
+      gateway = braintree.connect {
+        clientId: 'client_id$development$integration_client_id'
+        clientSecret: 'client_secret$development$integration_client_secret'
+      }
+
+      url = gateway.oauth.connectUrl(
+        merchantId: "integration_merchant_id"
+        redirectUri: "http://bar.example.com"
+        business:
+          name: "wacky symbols !'()*"
+      )
+
+      [_, queryString] = url.split('?')
+      [key, value] = queryString.split('&')
+        .find((item) -> item.indexOf('wacky') > -1).split("=")
+
+      assert.equal(key, "business%5Bname%5D")
+      assert.equal(value, "wacky%20symbols%20%21%27%28%29%2A")
+
     it "builds a connect url with multiple payment methods", ->
       gateway = braintree.connect {
         clientId: 'client_id$development$integration_client_id'
