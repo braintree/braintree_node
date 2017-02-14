@@ -83,7 +83,6 @@ class WebhookTestingGateway extends Gateway
         <routing-number>123456789</routing-number>
         <last-4>1234</last-4>
         <account-type>checking</account-type>
-        <account-description>PayPal Checking - 1234</account-description>
         <account-holder-name>Dan Schulman</account-holder-name>
       </us-bank-account>
     </transaction>
@@ -103,7 +102,6 @@ class WebhookTestingGateway extends Gateway
         <routing-number>123456789</routing-number>
         <last-4>1234</last-4>
         <account-type>checking</account-type>
-        <account-description>PayPal Checking - 1234</account-description>
         <account-holder-name>Dan Schulman</account-holder-name>
       </us-bank-account>
     </transaction>

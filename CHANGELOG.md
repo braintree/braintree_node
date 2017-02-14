@@ -1,3 +1,7 @@
+## 1.47.1
+* Fix a bug where merchantAccounts.all would attempt to fetch too many pages of merchant accounts
+* Fix a bug where OAuth connect urls did not properly escape special characters
+
 ## 1.47.0
 * Fix a bug where xml parsing errors were not being caught
 * Stop sending account_description field from us bank accounts

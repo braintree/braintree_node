@@ -12,7 +12,7 @@ class PaginatedResponseStream extends Readable
     @items = []
 
   nextItem: ->
-    if @currentPage == 0 || @index % @pageSize == 0
+    if @currentPage == 0 || (@index % @pageSize == 0 && @index < @totalItems)
       @currentPage++
       @paginatedResponse.pagingFunction @currentPage, (err, totalItems, pageSize, items) =>
         if err?

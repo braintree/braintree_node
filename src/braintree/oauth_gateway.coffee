@@ -42,8 +42,8 @@ class OAuthGateway extends Gateway
 
     paramsArray.push(([key, val] for key, val of params)...)
 
-    queryStringParts = paramsArray.map ([key, value]) ->
-      "#{encodeURIComponent(key)}=#{encodeURIComponent(value)}"
+    queryStringParts = paramsArray.map ([key, value]) =>
+      "#{@_encodeValue(key)}=#{@_encodeValue(value)}"
 
     queryStringParts.join('&')
 
@@ -57,5 +57,10 @@ class OAuthGateway extends Gateway
   buildSubArrayQuery: (key, values) ->
     (values || []).map (value) ->
       ["#{key}[]", value]
+
+  _encodeValue: (value) ->
+    encodeURIComponent(value)
+      .replace(/[!'()]/g, escape)
+      .replace(/\*/g, '%2A')
 
 exports.OAuthGateway = OAuthGateway
