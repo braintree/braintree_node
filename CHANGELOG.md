@@ -1,3 +1,7 @@
+## 2.0.2
+* Fix a bug where merchantAccounts.all would attempt to fetch too many pages of merchant accounts
+* Fix a bug where OAuth connect urls did not properly escape special characters
+
 ## 2.0.1
 * Fix bug where SDK version number was not being sent in requests
 
