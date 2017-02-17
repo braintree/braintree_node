@@ -1,7 +1,7 @@
 'use strict';
 
 require('../../spec_helper');
-let { SearchResponse } = require('../../../lib/braintree/search_response');
+let SearchResponse = require('../../../lib/braintree/search_response').SearchResponse;
 
 describe("SearchResponse", function() {
   describe("first", function() {

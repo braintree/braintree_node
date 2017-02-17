@@ -2,9 +2,9 @@
 
 require('../../spec_helper');
 
-let { braintree } = specHelper;
-let { Config } = require('../../../lib/braintree/config');
-let { Http } = require('../../../lib/braintree/http');
+let braintree = specHelper.braintree;
+let Config = require('../../../lib/braintree/config').Config;
+let Http = require('../../../lib/braintree/http').Http;
 
 describe("Http", () =>
   describe("checkHttpStatus", function() {

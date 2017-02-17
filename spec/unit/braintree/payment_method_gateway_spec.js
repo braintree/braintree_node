@@ -1,8 +1,8 @@
 'use strict';
 
 require('../../spec_helper');
-let { PaymentMethodGateway } = require('../../../lib/braintree/payment_method_gateway');
-let { errorTypes } = require('../../../lib/braintree/error_types');
+let PaymentMethodGateway = require('../../../lib/braintree/payment_method_gateway').PaymentMethodGateway;
+let errorTypes = require('../../../lib/braintree/error_types').errorTypes;
 
 describe("PaymentMethodGateway", function() {
   describe("find", () =>

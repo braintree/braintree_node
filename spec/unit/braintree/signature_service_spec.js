@@ -1,7 +1,7 @@
 'use strict';
 
 require('../../spec_helper');
-let { SignatureService } = require('../../../lib/braintree/signature_service');
+let SignatureService = require('../../../lib/braintree/signature_service').SignatureService;
 
 describe("SignatureService", () =>
   it("signs the data with the given key and hash", function() {

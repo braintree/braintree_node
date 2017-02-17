@@ -1,9 +1,9 @@
 'use strict';
 
 require('../../spec_helper');
-let { _ } = require('underscore');
-let { braintree } = specHelper;
-let { CreditCard } = require('../../../lib/braintree/credit_card');
+let _ = require('underscore')._;
+let braintree = specHelper.braintree;
+let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
 
 describe("CreditCard", () =>
   describe("constructor", () =>

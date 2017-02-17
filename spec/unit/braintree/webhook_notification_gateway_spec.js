@@ -1,11 +1,11 @@
 'use strict';
 
 require('../../spec_helper');
-let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
-let { WebhookNotification } = require('../../../lib/braintree');
-let { Dispute } = require('../../../lib/braintree/dispute');
-let { Transaction } = require('../../../lib/braintree/transaction');
-let { errorTypes } = require('../../../lib/braintree');
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
+let WebhookNotification = require('../../../lib/braintree').WebhookNotification;
+let Dispute = require('../../../lib/braintree/dispute').Dispute;
+let Transaction = require('../../../lib/braintree/transaction').Transaction;
+let errorTypes = require('../../../lib/braintree').errorTypes;
 
 describe("WebhookNotificationGateway", function() {
   describe("verify", function() {
@@ -16,7 +16,7 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("throws an error when challenge contains non-hex chars", function(done) {
-      let { webhookNotification } = specHelper.defaultGateway;
+      let webhookNotification = specHelper.defaultGateway.webhookNotification;
 
       assert.throws((() => webhookNotification.verify("bad challenge")));
       return done();
@@ -33,10 +33,12 @@ describe("WebhookNotificationGateway", function() {
 
   return describe("sampleNotification", function() {
     it("returns a parsable signature and payload", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionWentPastDue);
@@ -47,10 +49,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("retries a payload with a newline", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload.replace(/\n$/,''), function(err, webhookNotification) {
         assert.equal(err, null);
@@ -62,10 +66,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns an errback with InvalidSignatureError when signature is invalid", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse("bad_signature", bt_payload, function(err, webhookNotification) {
         assert.equal(err.type, errorTypes.invalidSignatureError);
@@ -74,10 +80,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns an errback with InvalidSignatureError when the public key does not match", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(`bad${bt_signature}`, bt_payload, function(err, webhookNotification) {
         assert.equal(err.type, errorTypes.invalidSignatureError);
@@ -87,10 +95,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns an errback with InvalidSignatureError when the signature is modified", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(`${bt_signature}bad`, bt_payload, function(err, webhookNotification) {
         assert.equal(err.type, errorTypes.invalidSignatureError);
@@ -99,10 +109,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns an errback with InvalidSignatureError when the payload is modified", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, `bad${bt_payload}`, function(err, webhookNotification) {
         assert.equal(err.type, errorTypes.invalidSignatureError);
@@ -112,10 +124,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns an errback with InvalidSignatureError when the payload contains invalid characters", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       bt_payload = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+=/\n";
 
@@ -127,10 +141,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("allows all valid characters", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, "^& bad ,* chars @!", function(err, webhookNotification) {
         assert.equal(err.type, errorTypes.invalidSignatureError);
@@ -139,10 +155,12 @@ describe("WebhookNotificationGateway", function() {
       });
     });
     it("returns a parsable signature and payload for merchant account approvals", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubMerchantAccountApproved,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubMerchantAccountApproved);
@@ -153,10 +171,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns a parsable signature and payload for merchant account declines", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubMerchantAccountDeclined,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubMerchantAccountDeclined);
@@ -169,10 +189,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns a parsable signature and payload for disbursed transaction", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.TransactionDisbursed,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionDisbursed);
@@ -184,10 +206,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns a parsable signature and payload for settled transaction", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.TransactionSettled,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionSettled);
@@ -203,10 +227,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns a parsable signature and payload for settlement declined transaction", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.TransactionSettlementDeclined,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionSettlementDeclined);
@@ -222,10 +248,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns a parsable signature and payload for dispute opened", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.DisputeOpened,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeOpened);
@@ -237,10 +265,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns a parsable signature and payload for dispute lost", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.DisputeLost,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeLost);
@@ -252,10 +282,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns a parsable signature and payload for dispute won", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.DisputeWon,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeWon);
@@ -268,10 +300,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns a parsable signature and payload for a disbursed webhook", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.Disbursement,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.Disbursement);
@@ -292,10 +326,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("returns a parsable signature and payload for disbursement exception webhook", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.DisbursementException,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisbursementException);
@@ -318,10 +354,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("builds a sample notification for a partner merchant connected webhook", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.PartnerMerchantConnected,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantConnected);
@@ -336,10 +374,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("builds a sample notification for a partner merchant disconnected webhook", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.PartnerMerchantDisconnected,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDisconnected);
@@ -350,10 +390,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("builds a sample notification for a partner merchant declined webhook", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.PartnerMerchantDeclined,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDeclined);
@@ -364,10 +406,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("builds a sample notification for a successfully charged subscription", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionChargedSuccessfully,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionChargedSuccessfully);
@@ -382,10 +426,12 @@ describe("WebhookNotificationGateway", function() {
     });
 
     it("builds a sample notification for a check notifications", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.Check,
         ""
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.Check);
@@ -395,10 +441,12 @@ describe("WebhookNotificationGateway", function() {
 
 
     return it("returns a parsable signature and payload for account updater daily report", function(done) {
-      let {bt_signature, bt_payload} = specHelper.defaultGateway.webhookTesting.sampleNotification(
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.AccountUpdaterDailyReport,
         "my_id"
       );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
 
       return specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function(err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.AccountUpdaterDailyReport);

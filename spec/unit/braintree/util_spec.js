@@ -1,8 +1,8 @@
 'use strict';
 
 require('../../spec_helper');
-let { Util } = require('../../../lib/braintree/util');
-let { errorTypes } = require('../../../lib/braintree/error_types');
+let Util = require('../../../lib/braintree/util').Util;
+let errorTypes = require('../../../lib/braintree/error_types').errorTypes;
 
 describe("Util", function() {
   describe("convertObjectKeysToUnderscores", function() {

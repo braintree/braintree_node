@@ -1,7 +1,7 @@
 'use strict';
 
 require('../../spec_helper');
-let { Digest } = require('../../../lib/braintree/digest');
+let Digest = require('../../../lib/braintree/digest').Digest;
 
 describe("Util", function() {
   describe("Sha1hexdigest", function() {

@@ -2,8 +2,8 @@
 
 require('../../spec_helper');
 
-let { braintree } = specHelper;
-let { PaginatedResponse } = require('../../../lib/braintree/paginated_response');
+let braintree = specHelper.braintree;
+let PaginatedResponse = require('../../../lib/braintree/paginated_response').PaginatedResponse;
 
 describe("PaginatedResponse", () =>
   describe("nextItem", function() {

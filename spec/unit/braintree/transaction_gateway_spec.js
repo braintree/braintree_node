@@ -1,7 +1,7 @@
 'use strict';
 
 require('../../spec_helper');
-let { TransactionGateway } = require('../../../lib/braintree/transaction_gateway');
+let TransactionGateway = require('../../../lib/braintree/transaction_gateway').TransactionGateway;
 
 describe("TransactionGateway", () =>
   describe("sale", function() {

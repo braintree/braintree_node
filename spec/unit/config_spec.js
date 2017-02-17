@@ -1,8 +1,8 @@
 'use strict';
 
 require("../spec_helper");
-let { Config } = require('../../lib/braintree/config');
-let { Environment } = require('../../lib/braintree/environment');
+let Config = require('../../lib/braintree/config').Config;
+let Environment = require('../../lib/braintree/environment').Environment;
 
 describe("Config", function() {
   it("can be configured with merchant credentials", function() {

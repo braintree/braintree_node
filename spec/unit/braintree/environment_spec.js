@@ -1,7 +1,7 @@
 'use strict';
 
 require('../../spec_helper');
-let { Environment } = require('../../../lib/braintree/environment');
+let Environment = require('../../../lib/braintree/environment').Environment;
 
 describe("Environment", () =>
   describe("baseUrl", function() {

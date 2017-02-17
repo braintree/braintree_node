@@ -3,7 +3,7 @@
 require('../../spec_helper');
 let braintree = require('../../../lib/braintree');
 
-let { TransparentRedirectGateway } = require('../../../lib/braintree/transparent_redirect_gateway');
+let TransparentRedirectGateway = require('../../../lib/braintree/transparent_redirect_gateway').TransparentRedirectGateway;
 
 describe("TransparentRedirectGateway", () =>
   describe("url", function() {

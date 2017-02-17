@@ -1,7 +1,7 @@
 'use strict';
 
 require('../../spec_helper');
-let { CreditCardGateway } = require('../../../lib/braintree/credit_card_gateway');
+let CreditCardGateway = require('../../../lib/braintree/credit_card_gateway').CreditCardGateway;
 
 describe("CreditCardGateway", () =>
   describe("dateFormat", () =>

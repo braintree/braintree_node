@@ -10,13 +10,13 @@ try {
 let http = require('http');
 let https = require('https');
 let uri = require('url');
-let { TransactionAmounts } = require('../lib/braintree/test/transaction_amounts');
-let { Nonces } = require('../lib/braintree/test/nonces');
-let { Util } = require('../lib/braintree/util');
-let { Config } = require('../lib/braintree/config');
+let TransactionAmounts = require('../lib/braintree/test/transaction_amounts').TransactionAmounts;
+let Nonces = require('../lib/braintree/test/nonces').Nonces;
+let Util = require('../lib/braintree/util').Util;
+let Config = require('../lib/braintree/config').Config;
 let querystring = require('../vendor/querystring.node.js.511d6a2/querystring');
 let chai = require("chai");
-let { Buffer } = require('buffer');
+let Buffer = require('buffer').Buffer;
 let xml2js = require('xml2js');
 
 chai.Assertion.includeStack = true;
@@ -82,7 +82,7 @@ let settlePayPalTransaction = (transactionId, callback) =>
 
 let create3DSVerification = function(merchantAccountId, params, callback) {
   let responseCallback = function(err, response) {
-    let { threeDSecureToken } = response.threeDSecureVerification;
+    let threeDSecureToken = response.threeDSecureVerification.threeDSecureToken;
     return callback(threeDSecureToken);
   };
 
@@ -182,13 +182,13 @@ let generateNonceForNewPaymentMethod = function(paymentMethodParams, customerId,
     if (paymentMethodParams["paypalAccount"] != null) {
       params["paypalAccount"] = paymentMethodParams["paypalAccount"];
       return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-        let { nonce } = JSON.parse(body).paypalAccounts[0];
+        let nonce = JSON.parse(body).paypalAccounts[0].nonce;
         return callback(nonce);
       });
     } else {
       params["creditCard"] = paymentMethodParams["creditCard"];
       return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-        let { nonce } = JSON.parse(body).creditCards[0];
+        let nonce = JSON.parse(body).creditCards[0].nonce;
         return callback(nonce);
       });
     }
