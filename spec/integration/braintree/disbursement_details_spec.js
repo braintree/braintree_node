@@ -2,8 +2,8 @@
 
 require('../../spec_helper');
 
-let { braintree } = specHelper;
-let { DisbursementDetails } = require('../../../lib/braintree/disbursement_details');
+let braintree = specHelper.braintree;
+let DisbursementDetails = require('../../../lib/braintree/disbursement_details').DisbursementDetails;
 
 describe("DisbursementDetails", () =>
   describe("isValid", function() {

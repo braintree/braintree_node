@@ -1,12 +1,12 @@
 'use strict';
 
 require('../../spec_helper');
-let { _ } = require('underscore');
-let { braintree } = specHelper;
+let _ = require('underscore')._;
+let braintree = specHelper.braintree;
 let util = require('util');
-let { PayPalAccount } = require('../../../lib/braintree/paypal_account');
-let { Config } = require('../../../lib/braintree/config');
-let { Nonces } = require('../../../lib/braintree/test/nonces');
+let PayPalAccount = require('../../../lib/braintree/paypal_account').PayPalAccount;
+let Config = require('../../../lib/braintree/config').Config;
+let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
 
 describe("PayPalGateway", function() {
   describe("find", function() {
@@ -74,7 +74,7 @@ describe("PayPalGateway", function() {
         };
 
         return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function(err, response) {
-          let { token } = response.paymentMethod;
+          let token = response.paymentMethod.token;
 
           let subscriptionParams = {
             paymentMethodToken: token,
@@ -123,7 +123,7 @@ describe("PayPalGateway", function() {
         let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
         return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let { authorizationFingerprint } = clientToken;
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
 
           let params = {
             authorizationFingerprint,
@@ -134,7 +134,7 @@ describe("PayPalGateway", function() {
           };
 
           return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-            let { nonce } = JSON.parse(body).paypalAccounts[0];
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
             let paypalAccountParams = {
               customerId,
               paymentMethodNonce: nonce
@@ -235,7 +235,7 @@ describe("PayPalGateway", function() {
         let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
         return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let { authorizationFingerprint } = clientToken;
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
 
           let params = {
             authorizationFingerprint,
@@ -245,7 +245,7 @@ describe("PayPalGateway", function() {
           };
 
           return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-            let { nonce } = JSON.parse(body).paypalAccounts[0];
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
             let paypalAccountParams = {
               customerId,
               paymentMethodNonce: nonce

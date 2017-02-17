@@ -2,9 +2,9 @@
 
 require('../../spec_helper');
 
-let { CredentialsParser } = require('../../../lib/braintree/credentials_parser');
+let CredentialsParser = require('../../../lib/braintree/credentials_parser').CredentialsParser;
 
-let { braintree } = specHelper;
+let braintree = specHelper.braintree;
 
 describe("CredentialsParser", function() {
   describe("parseClientCredentials", function() {

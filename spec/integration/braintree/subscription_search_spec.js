@@ -2,7 +2,7 @@
 
 let Braintree = require("../../../lib/braintree");
 require('../../spec_helper');
-let { Subscription } = Braintree;
+let Subscription = Braintree.Subscription;
 
 describe("SubscriptionSearch", () =>
   describe("search", function() {

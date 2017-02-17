@@ -1,9 +1,9 @@
 'use strict';
 
 require('../../spec_helper');
-let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
-let { braintree } = specHelper;
+let braintree = specHelper.braintree;
 
 describe("MerchantGateway", function() {
   describe("create", () =>
@@ -17,7 +17,7 @@ describe("MerchantGateway", function() {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        let { merchant } = response;
+        let merchant = response.merchant;
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -26,7 +26,7 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryCodeNumeric, '840');
         assert.equal(merchant.countryName, 'United States of America');
 
-        let { credentials } = response;
+        let credentials = response.credentials;
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
@@ -74,7 +74,7 @@ describe("MerchantGateway", function() {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        let { merchant } = response;
+        let merchant = response.merchant;
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -83,14 +83,14 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryCodeNumeric, '840');
         assert.equal(merchant.countryName, 'United States of America');
 
-        let { credentials } = response;
+        let credentials = response.credentials;
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
         assert.isNotNull(credentials.expiresAt);
         assert.equal(credentials.tokenType, 'bearer');
 
-        let { merchantAccounts } = merchant;
+        let merchantAccounts = merchant.merchantAccounts;
         assert.equal(merchantAccounts.length, 2);
 
         let usdMerchantAccount = (merchantAccounts.filter(x => x.id === 'USD'))[0];
@@ -126,7 +126,7 @@ describe("MerchantGateway", function() {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        let { merchant } = response;
+        let merchant = response.merchant;
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -135,14 +135,14 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryCodeNumeric, '840');
         assert.equal(merchant.countryName, 'United States of America');
 
-        let { credentials } = response;
+        let credentials = response.credentials;
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
         assert.isNotNull(credentials.expiresAt);
         assert.equal(credentials.tokenType, 'bearer');
 
-        let { merchantAccounts } = merchant;
+        let merchantAccounts = merchant.merchantAccounts;
         assert.equal(merchantAccounts.length, 2);
 
         let usdMerchantAccount = (merchantAccounts.filter(x => x.id === 'USD'))[0];
@@ -177,7 +177,7 @@ describe("MerchantGateway", function() {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        let { merchant } = response;
+        let merchant = response.merchant;
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -186,14 +186,14 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryCodeNumeric, '392');
         assert.equal(merchant.countryName, 'Japan');
 
-        let { credentials } = response;
+        let credentials = response.credentials;
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
         assert.isNotNull(credentials.expiresAt);
         assert.equal(credentials.tokenType, 'bearer');
 
-        let { merchantAccounts } = merchant;
+        let merchantAccounts = merchant.merchantAccounts;
         assert.equal(merchantAccounts.length, 1);
 
         let merchantAccount = merchantAccounts[0];
@@ -222,7 +222,7 @@ describe("MerchantGateway", function() {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        let { merchant } = response;
+        let merchant = response.merchant;
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -231,14 +231,14 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryCodeNumeric, '887');
         assert.equal(merchant.countryName, 'Yemen');
 
-        let { credentials } = response;
+        let credentials = response.credentials;
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
         assert.isNotNull(credentials.expiresAt);
         assert.equal(credentials.tokenType, 'bearer');
 
-        let { merchantAccounts } = merchant;
+        let merchantAccounts = merchant.merchantAccounts;
         assert.equal(merchantAccounts.length, 1);
 
         let merchantAccount = merchantAccounts[0];

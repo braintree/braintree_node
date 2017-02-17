@@ -2,7 +2,7 @@
 
 require('../../spec_helper');
 
-let { braintree } = specHelper;
+let braintree = specHelper.braintree;
 
 describe("Braintree", () =>
   describe("AuthenticationError", () =>

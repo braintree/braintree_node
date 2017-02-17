@@ -1,7 +1,7 @@
 'use strict';
 
 require('../../spec_helper');
-let { Config } = require('../../../lib/braintree/config');
+let Config = require('../../../lib/braintree/config').Config;
 
 describe("CustomerSearch", () =>
   describe("search", function() {
@@ -84,7 +84,7 @@ describe("CustomerSearch", () =>
       };
 
       return specHelper.defaultGateway.customer.create(joe, function(err, response) {
-        let { token } = response.customer.creditCards[0];
+        let token = response.customer.creditCards[0].token;
         let joeId = response.customer.id;
 
         let jim = {
@@ -275,7 +275,7 @@ describe("CustomerSearch", () =>
         let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
         return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let { authorizationFingerprint } = clientToken;
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
 
           let params = {
             authorizationFingerprint,
@@ -286,7 +286,7 @@ describe("CustomerSearch", () =>
           };
 
           return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-            let { nonce } = JSON.parse(body).paypalAccounts[0];
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
             let paypalAccountParams = {
               customerId,
               paymentMethodNonce: nonce

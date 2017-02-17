@@ -2,19 +2,19 @@
 
 require('../../spec_helper');
 
-let { _ } = require('underscore');
-let { braintree } = specHelper;
+let _ = require('underscore')._;
+let braintree = specHelper.braintree;
 let Braintree = require('../../../lib/braintree');
-let { CreditCardNumbers } = require('../../../lib/braintree/test/credit_card_numbers');
-let { Nonces } = require('../../../lib/braintree/test/nonces');
-let { VenmoSdk } = require('../../../lib/braintree/test/venmo_sdk');
-let { CreditCard } = require('../../../lib/braintree/credit_card');
-let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
-let { PaymentInstrumentTypes } = require('../../../lib/braintree/payment_instrument_types');
-let { Transaction } = require('../../../lib/braintree/transaction');
-let { Dispute } = require('../../../lib/braintree/dispute');
-let { Environment } = require('../../../lib/braintree/environment');
-let { Config } = require('../../../lib/braintree/config');
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
+let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
+let PaymentInstrumentTypes = require('../../../lib/braintree/payment_instrument_types').PaymentInstrumentTypes;
+let Transaction = require('../../../lib/braintree/transaction').Transaction;
+let Dispute = require('../../../lib/braintree/dispute').Dispute;
+let Environment = require('../../../lib/braintree/environment').Environment;
+let Config = require('../../../lib/braintree/config').Config;
 
 describe("TransactionGateway", function() {
   describe("sale", function() {
@@ -438,7 +438,7 @@ describe("TransactionGateway", function() {
           let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
             let params = {
               authorizationFingerprint,
               paypalAccount: {
@@ -448,7 +448,7 @@ describe("TransactionGateway", function() {
             };
 
             return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).paypalAccounts[0];
+              let nonce = JSON.parse(body).paypalAccounts[0].nonce;
 
               return specHelper.defaultGateway.customer.create({}, function(err, response) {
                 let transactionParams = {
@@ -482,7 +482,7 @@ describe("TransactionGateway", function() {
           let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
             let params = {
               authorizationFingerprint,
               paypalAccount: {
@@ -492,7 +492,7 @@ describe("TransactionGateway", function() {
             };
 
             return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).paypalAccounts[0];
+              let nonce = JSON.parse(body).paypalAccounts[0].nonce;
 
               return specHelper.defaultGateway.customer.create({}, function(err, response) {
                 let transactionParams = {
@@ -1682,7 +1682,7 @@ describe("TransactionGateway", function() {
             assert.match(response.transaction.usBankAccount.bankName, /CHASE/);
             assert.equal(response.transaction.usBankAccount.achMandate.text, "cl mandate text");
             assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date);
-            let { token } = response.transaction.usBankAccount;
+            let token = response.transaction.usBankAccount.token;
 
             transactionParams = {
               merchantAccountId: "us_bank_merchant_account",
@@ -2055,7 +2055,7 @@ describe("TransactionGateway", function() {
       return specHelper.defaultGateway.transaction.find(transactionId, function(err, transaction) {
         assert.equal(transaction.isDisbursed(), true);
 
-        let { disbursementDetails } = transaction;
+        let disbursementDetails = transaction.disbursementDetails;
         assert.equal(disbursementDetails.settlementAmount, '100.00');
         assert.equal(disbursementDetails.settlementCurrencyIsoCode, 'USD');
         assert.equal(disbursementDetails.settlementCurrencyExchangeRate, '1');
@@ -2838,7 +2838,7 @@ describe("TransactionGateway", function() {
 
         return specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, cloneParams, function(err, response) {
           assert.isTrue(response.success);
-          let { transaction } = response;
+          let transaction = response.transaction;
           assert.equal(transaction.amount, '123.45');
           assert.equal(transaction.channel, 'MyShoppingCartProvider');
           assert.equal(transaction.creditCard.maskedNumber, '510510******5100');
@@ -3063,7 +3063,7 @@ describe("TransactionGateway", function() {
         };
 
         return partnerMerchantGateway.customer.create(customerParams, function(err, response) {
-          ({ customer } = response);
+          customer = response.customer;
 
           let creditCardParams = {
             customerId: customer.id,
@@ -3082,10 +3082,10 @@ describe("TransactionGateway", function() {
           };
 
           return partnerMerchantGateway.address.create(addressParams, function(err, response) {
-            ({ address } = response);
+            address = response.address;
 
             return partnerMerchantGateway.creditCard.create(creditCardParams, function(err, response) {
-              ({ creditCard } = response);
+              creditCard = response.creditCard;
 
               let oauthGateway = braintree.connect({
                 clientId: "client_id$development$integration_client_id",

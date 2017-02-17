@@ -2,11 +2,11 @@
 
 require('../../spec_helper');
 
-let { _ } = require('underscore');
-let { braintree } = specHelper;
+let _ = require('underscore')._;
+let braintree = specHelper.braintree;
 
 describe("TransparentRedirectGateway", function() {
-  let { url } = specHelper.defaultGateway.transparentRedirect;
+  let url = specHelper.defaultGateway.transparentRedirect.url;
 
   describe("createCustomerData", function() {
     it("generates tr data for the customer", function(done) {

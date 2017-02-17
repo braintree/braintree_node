@@ -2,11 +2,11 @@
 
 require('../../spec_helper');
 
-let { _ } = require('underscore');
-let { VenmoSdk } = require('../../../lib/braintree/test/venmo_sdk');
-let { Nonces } = require('../../../lib/braintree/test/nonces');
-let { Config } = require('../../../lib/braintree/config');
-let { braintree } = specHelper;
+let _ = require('underscore')._;
+let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
+let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let Config = require('../../../lib/braintree/config').Config;
+let braintree = specHelper.braintree;
 
 describe("CustomerGateway", function() {
   describe("create", function() {
@@ -135,7 +135,7 @@ describe("CustomerGateway", function() {
         let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
         return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let { authorizationFingerprint } = clientToken;
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
           let params = {
             authorizationFingerprint,
             sharedCustomerIdentifierType: "testing",
@@ -149,7 +149,7 @@ describe("CustomerGateway", function() {
           };
 
           return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-            let { nonce } = JSON.parse(body).creditCards[0];
+            let nonce = JSON.parse(body).creditCards[0].nonce;
             let customerParams = {
               creditCard: {
                 paymentMethodNonce: nonce
@@ -466,7 +466,7 @@ describe("CustomerGateway", function() {
         assert.equal(response.customer.creditCards[0].expirationYear, '2012');
         assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100');
         assert.equal(response.customer.creditCards.length, 1);
-        let { billingAddress } = response.customer.creditCards[0];
+        let billingAddress = response.customer.creditCards[0].billingAddress;
         assert.equal(billingAddress.streetAddress, '123 Fake St');
         assert.equal(billingAddress.extendedAddress, 'Suite 403');
         assert.equal(billingAddress.locality, 'Chicago');
@@ -596,7 +596,7 @@ describe("CustomerGateway", function() {
           assert.isNull(err);
           assert.equal(customer.firstName, 'John');
           assert.equal(customer.lastName, 'Smith');
-          let { billingAddress } = customer.creditCards[0];
+          let billingAddress = customer.creditCards[0].billingAddress;
           assert.equal(billingAddress.streetAddress, '123 E Fake St');
           assert.equal(billingAddress.company, '');
 
@@ -902,7 +902,7 @@ describe("CustomerGateway", function() {
           assert.equal(response.customer.firstName, 'New First Name');
           assert.equal(response.customer.lastName, 'New Last Name');
           assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100');
-          let { billingAddress } = response.customer.creditCards[0];
+          let billingAddress = response.customer.creditCards[0].billingAddress;
           assert.equal(billingAddress.streetAddress, '123 E Fake St');
           assert.equal(billingAddress.locality, 'Chicago');
           assert.equal(billingAddress.region, 'IL');
@@ -919,7 +919,7 @@ describe("CustomerGateway", function() {
       it("vaults a paypal account", done =>
         specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let { authorizationFingerprint } = clientToken;
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
 
           let params = {
             authorizationFingerprint,
@@ -930,7 +930,7 @@ describe("CustomerGateway", function() {
 
           let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
           return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-            let { nonce } = JSON.parse(body).paypalAccounts[0];
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
 
             return specHelper.defaultGateway.customer.create({}, function(err, response) {
               let paypalCustomerId = response.customer.id;
@@ -1093,7 +1093,7 @@ describe("CustomerGateway", function() {
           assert.equal(response.customer.creditCards[0].cardholderName, 'New Cardholder Name');
           assert.equal(response.customer.creditCards[0].expirationDate, '05/2014');
           assert.equal(response.customer.addresses.length, 1);
-          let { billingAddress } = response.customer.creditCards[0];
+          let billingAddress = response.customer.creditCards[0].billingAddress;
           assert.equal(billingAddress.streetAddress, '123 New St');
           assert.equal(billingAddress.locality, 'New City');
 
@@ -1116,7 +1116,7 @@ describe("CustomerGateway", function() {
         return specHelper.defaultGateway.customer.create(customerParams, function(err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
-          let { billingAddress } = response.customer.creditCards[0];
+          let billingAddress = response.customer.creditCards[0].billingAddress;
           assert.equal(billingAddress.streetAddress, null);
 
           return done();

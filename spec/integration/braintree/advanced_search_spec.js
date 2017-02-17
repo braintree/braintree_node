@@ -1,8 +1,8 @@
 'use strict';
 
 require('../../spec_helper');
-let { SubscriptionSearch } = require('../../../lib/braintree/subscription_search');
-let { TransactionSearch } = require('../../../lib/braintree/transaction_search');
+let SubscriptionSearch = require('../../../lib/braintree/subscription_search').SubscriptionSearch;
+let TransactionSearch = require('../../../lib/braintree/transaction_search').TransactionSearch;
 
 describe("AdvancedSearch", function() {
   beforeEach(function() {});

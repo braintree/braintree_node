@@ -1,10 +1,10 @@
 'use strict';
 
 require('../../spec_helper');
-let { CreditCardVerification } = require('../../../lib/braintree/credit_card_verification');
-let { CreditCardNumbers } = require('../../../lib/braintree/test/credit_card_numbers');
-let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
-let { braintree } = specHelper;
+let CreditCardVerification = require('../../../lib/braintree/credit_card_verification').CreditCardVerification;
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
+let braintree = specHelper.braintree;
 
 describe("CreditCardVerificationGateway", function() {
   describe("find", function() {

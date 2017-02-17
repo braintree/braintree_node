@@ -1,8 +1,8 @@
 'use strict';
 
 require('../../spec_helper');
-let { braintree } = specHelper;
-let { Config } = require('../../../lib/braintree/config');
+let braintree = specHelper.braintree;
+let Config = require('../../../lib/braintree/config').Config;
 
 describe("ClientTokenGateway", function() {
   it("generates an authorization fingerprint that is accepted by the gateway", function(done) {
@@ -63,7 +63,7 @@ describe("ClientTokenGateway", function() {
       }, function(err, result) {
         assert.isTrue(result.success);
         let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-        let { authorizationFingerprint } = clientToken;
+        let authorizationFingerprint = clientToken.authorizationFingerprint;
 
         let params = {
           authorizationFingerprint,
@@ -103,7 +103,7 @@ describe("ClientTokenGateway", function() {
         }, function(err,result) {
           assert.isTrue(result.success);
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let { authorizationFingerprint } = clientToken;
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
           let params = {
             authorizationFingerprint,
             sharedCustomerIdentifierType: "testing",
@@ -137,12 +137,12 @@ describe("ClientTokenGateway", function() {
     specHelper.defaultGateway.customer.create({}, function(err, result) {
       let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
 
-      let { customer } = result;
+      let customer = result.customer;
       return specHelper.defaultGateway.clientToken.generate({
         customerId: customer.id
       }, function(err, result) {
         let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-        let { authorizationFingerprint } = clientToken;
+        let authorizationFingerprint = clientToken.authorizationFingerprint;
 
         let params = {
           authorizationFingerprint,
@@ -164,7 +164,7 @@ describe("ClientTokenGateway", function() {
             }
           }, function(err, result) {
             clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            ({ authorizationFingerprint } = clientToken);
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
             params.authorizationFingerprint = authorizationFingerprint;
 
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode) {

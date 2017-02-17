@@ -1,8 +1,8 @@
 'use strict';
 
 require('../../spec_helper');
-let { UsBankAccount } = require('../../../lib/braintree/us_bank_account');
-let { Transaction } = require('../../../lib/braintree/transaction');
+let UsBankAccount = require('../../../lib/braintree/us_bank_account').UsBankAccount;
+let Transaction = require('../../../lib/braintree/transaction').Transaction;
 
 describe("UsBankAccountGateway", function() {
   describe("find", function() {

@@ -2,10 +2,10 @@
 
 require('../../spec_helper');
 
-let { braintree } = specHelper;
-let { Config } = require('../../../lib/braintree/config');
-let { Http } = require('../../../lib/braintree/http');
-let { Environment } = require('../../../lib/braintree/environment');
+let braintree = specHelper.braintree;
+let Config = require('../../../lib/braintree/config').Config;
+let Http = require('../../../lib/braintree/http').Http;
+let Environment = require('../../../lib/braintree/environment').Environment;
 
 describe("Http", () =>
   describe("request", function() {

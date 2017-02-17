@@ -1,14 +1,14 @@
 'use strict';
 
 require('../../spec_helper');
-let { _ } = require('underscore');
-let { braintree } = specHelper;
+let _ = require('underscore')._;
+let braintree = specHelper.braintree;
 let Braintree = require('../../../lib/braintree');
 let util = require('util');
-let { Config } = require('../../../lib/braintree/config');
-let { Environment } = require('../../../lib/braintree/environment');
-let { Nonces } = require('../../../lib/braintree/test/nonces');
-let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
+let Config = require('../../../lib/braintree/config').Config;
+let Environment = require('../../../lib/braintree/environment').Environment;
+let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
 describe("PaymentMethodGateway", function() {
   describe("create", function() {
@@ -252,7 +252,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -264,7 +264,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
 
               let creditCardParams = {
                 customerId,
@@ -290,7 +290,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -303,7 +303,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
 
               let creditCardParams = {
                 paymentMethodNonce: nonce,
@@ -332,7 +332,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -345,7 +345,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
 
               let creditCardParams = {
                 paymentMethodNonce: nonce,
@@ -389,7 +389,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -401,7 +401,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
 
               creditCardParams = {
                 customerId,
@@ -429,7 +429,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -445,7 +445,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
 
               let creditCardParams = {
                 paymentMethodNonce: nonce,
@@ -460,7 +460,7 @@ describe("PaymentMethodGateway", function() {
                 assert.isTrue(response.success);
 
                 assert.isTrue(response.paymentMethod.constructor.name === "CreditCard");
-                let { token } = response.paymentMethod;
+                let token = response.paymentMethod.token;
                 return specHelper.defaultGateway.paymentMethod.find(token, function(err, creditCard) {
                   assert.isNull(err);
                   assert.isTrue(creditCard !== null);
@@ -480,7 +480,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -499,7 +499,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
 
               let creditCardParams = {
                 paymentMethodNonce: nonce,
@@ -514,7 +514,7 @@ describe("PaymentMethodGateway", function() {
                 assert.isTrue(response.success);
 
                 assert.isTrue(response.paymentMethod.constructor.name === "CreditCard");
-                let { token } = response.paymentMethod;
+                let token = response.paymentMethod.token;
                 return specHelper.defaultGateway.paymentMethod.find(token, function(err, creditCard) {
                   assert.isNull(err);
                   assert.isTrue(creditCard !== null);
@@ -534,7 +534,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({customerId}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -551,7 +551,7 @@ describe("PaymentMethodGateway", function() {
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
               assert.equal(statusCode, "201");
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
 
               let creditCardParams = {
                 paymentMethodNonce: nonce,
@@ -566,7 +566,7 @@ describe("PaymentMethodGateway", function() {
                 assert.isTrue(response.success);
 
                 assert.isTrue(response.paymentMethod.constructor.name === "CreditCard");
-                let { token } = response.paymentMethod;
+                let token = response.paymentMethod.token;
                 return specHelper.defaultGateway.paymentMethod.find(token, function(err, creditCard) {
                   assert.isNull(err);
                   assert.isTrue(creditCard !== null);
@@ -586,7 +586,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -602,7 +602,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
 
               let addressParams = {
                 customerId,
@@ -625,7 +625,7 @@ describe("PaymentMethodGateway", function() {
                   assert.isTrue(response.success);
 
                   assert.isTrue(response.paymentMethod.constructor.name === "CreditCard");
-                  let { token } = response.paymentMethod;
+                  let token = response.paymentMethod.token;
                   return specHelper.defaultGateway.paymentMethod.find(token, function(err, creditCard) {
                     assert.isNull(err);
                     assert.isTrue(creditCard !== null);
@@ -656,7 +656,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -667,7 +667,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).paypalAccounts[0];
+              let nonce = JSON.parse(body).paypalAccounts[0].nonce;
 
               let paypalAccountParams = {
                 paymentMethodNonce: nonce,
@@ -685,7 +685,7 @@ describe("PaymentMethodGateway", function() {
 
                 assert.equal(response.paymentMethod.constructor.name, "PayPalAccount");
                 assert.isTrue(response.paymentMethod.imageUrl !== null);
-                let { token } = response.paymentMethod;
+                let token = response.paymentMethod.token;
                 return specHelper.defaultGateway.paymentMethod.find(token, function(err, paypalAccount) {
                   assert.isNull(err);
                   assert.isTrue(paypalAccount !== null);
@@ -705,7 +705,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -716,7 +716,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).paypalAccounts[0];
+              let nonce = JSON.parse(body).paypalAccounts[0].nonce;
 
               let paypalAccountParams = {
                 paymentMethodNonce: nonce,
@@ -732,7 +732,7 @@ describe("PaymentMethodGateway", function() {
 
                 assert.equal(response.paymentMethod.constructor.name, "PayPalAccount");
                 assert.isTrue(response.paymentMethod.imageUrl !== null);
-                let { token } = response.paymentMethod;
+                let token = response.paymentMethod.token;
                 return specHelper.defaultGateway.paymentMethod.find(token, function(err, paypalAccount) {
                   assert.isNull(err);
                   assert.isTrue(paypalAccount !== null);
@@ -751,7 +751,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -762,7 +762,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).paypalAccounts[0];
+              let nonce = JSON.parse(body).paypalAccounts[0].nonce;
 
               let paypalAccountParams = {
                 paymentMethodNonce: nonce,
@@ -776,7 +776,7 @@ describe("PaymentMethodGateway", function() {
 
                 assert.equal(response.paymentMethod.constructor.name, "PayPalAccount");
                 assert.isTrue(response.paymentMethod.imageUrl !== null);
-                let { token } = response.paymentMethod;
+                let token = response.paymentMethod.token;
                 return specHelper.defaultGateway.paymentMethod.find(token, function(err, paypalAccount) {
                   assert.isNull(err);
                   assert.isTrue(paypalAccount !== null);
@@ -795,7 +795,7 @@ describe("PaymentMethodGateway", function() {
         customerId = response.customer.id;
         return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let { authorizationFingerprint } = clientToken;
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
 
           let params = {
             authorizationFingerprint,
@@ -806,7 +806,7 @@ describe("PaymentMethodGateway", function() {
 
           let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
           return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-            let { nonce } = JSON.parse(body).paypalAccounts[0];
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
             let paypalAccountParams = {
               customerId,
               paymentMethodNonce: nonce
@@ -837,7 +837,7 @@ describe("PaymentMethodGateway", function() {
         return specHelper.defaultGateway.creditCard.create(creditCardParams, (err, response) =>
           specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -849,7 +849,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
 
               let paymentMethodToken = specHelper.randomId();
               creditCardParams = {
@@ -882,7 +882,7 @@ describe("PaymentMethodGateway", function() {
 
         return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let { authorizationFingerprint } = clientToken;
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
 
           let params = {
             authorizationFingerprint,
@@ -893,7 +893,7 @@ describe("PaymentMethodGateway", function() {
 
           let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
           return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-            let { nonce } = JSON.parse(body).paypalAccounts[0];
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
             let paypalAccountParams = {
               customerId,
               paymentMethodNonce: nonce
@@ -920,7 +920,7 @@ describe("PaymentMethodGateway", function() {
 
         return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let { authorizationFingerprint } = clientToken;
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
 
           let params = {
             authorizationFingerprint,
@@ -929,7 +929,7 @@ describe("PaymentMethodGateway", function() {
 
           let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
           return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-            let { nonce } = JSON.parse(body).paypalAccounts[0];
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
             let paypalAccountParams = {
               customerId,
               paymentMethodNonce: nonce
@@ -967,7 +967,7 @@ describe("PaymentMethodGateway", function() {
             assert.isNull(err);
             assert.isTrue(response.success);
 
-            let { token } = response.paymentMethod;
+            let token = response.paymentMethod.token;
             return specHelper.defaultGateway.paymentMethod.find(token, function(err, applePayCard) {
               assert.isNull(err);
               assert.isTrue(applePayCard !== null);
@@ -991,7 +991,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
             let params = {
               authorizationFingerprint,
               creditCard: {
@@ -1003,7 +1003,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
               let paymentMethodParams = {
                 customerId,
                 paymentMethodNonce: nonce
@@ -1131,7 +1131,7 @@ describe("PaymentMethodGateway", function() {
           return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
             assert.isTrue(response.success);
 
-            let { creditCard } = response;
+            let creditCard = response.creditCard;
 
             let updateParams = {
               cardholderName: 'New Holder',
@@ -1187,7 +1187,7 @@ describe("PaymentMethodGateway", function() {
           return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
             assert.isTrue(response.success);
 
-            let { creditCard } = response;
+            let creditCard = response.creditCard;
 
             let updateParams = {
               expirationMonth: '07',
@@ -1223,7 +1223,7 @@ describe("PaymentMethodGateway", function() {
           return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
             assert.isTrue(response.success);
 
-            let { creditCard } = response;
+            let creditCard = response.creditCard;
 
             let updateParams = {
               cardholderName: 'New Holder',
@@ -1261,7 +1261,7 @@ describe("PaymentMethodGateway", function() {
           return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
             assert.isTrue(response.success);
 
-            let { creditCard } = response;
+            let creditCard = response.creditCard;
 
             let updateParams = {
               paymentMethodNonce: Nonces.ProcessorDeclinedMasterCard,
@@ -1296,7 +1296,7 @@ describe("PaymentMethodGateway", function() {
           return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
             assert.isTrue(response.success);
 
-            let { creditCard } = response;
+            let creditCard = response.creditCard;
 
             let updateParams = {
               cardholderName: 'New Holder',
@@ -1380,7 +1380,7 @@ describe("PaymentMethodGateway", function() {
             return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
               assert.isTrue(response.success);
 
-              let { creditCard } = response;
+              let creditCard = response.creditCard;
 
               let updateParams = {
                 billingAddress: {
@@ -1419,7 +1419,7 @@ describe("PaymentMethodGateway", function() {
             return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
               assert.isTrue(response.success);
 
-              let { creditCard } = response;
+              let creditCard = response.creditCard;
 
               let updateParams = {
                 billingAddress: {
@@ -1461,7 +1461,7 @@ describe("PaymentMethodGateway", function() {
             return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
               assert.isTrue(response.success);
 
-              let { creditCard } = response;
+              let creditCard = response.creditCard;
 
               let updateParams = {
                 billingAddress: {
@@ -1516,7 +1516,7 @@ describe("PaymentMethodGateway", function() {
             return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
               assert.isTrue(response.success);
 
-              let { creditCard } = response;
+              let creditCard = response.creditCard;
 
               let updateParams = {
                 options: {
@@ -1582,7 +1582,7 @@ describe("PaymentMethodGateway", function() {
               assert.isTrue(response.success);
               assert.isFalse(response.paymentMethod.default);
 
-              let { coinbaseAccount } = response;
+              let coinbaseAccount = response.coinbaseAccount;
 
               let updateParams = {
                 options: {
@@ -1613,7 +1613,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -1625,7 +1625,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).paypalAccounts[0];
+              let nonce = JSON.parse(body).paypalAccounts[0].nonce;
               let paypalAccountParams = {
                 paymentMethodNonce: nonce,
                 customerId
@@ -1682,11 +1682,11 @@ describe("PaymentMethodGateway", function() {
           return specHelper.defaultGateway.creditCard.create(creditCardParams, function(err, response) {
             assert.isTrue(response.success);
 
-            let { creditCard } = response;
+            let creditCard = response.creditCard;
 
             return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
               let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-              let { authorizationFingerprint } = clientToken;
+              let authorizationFingerprint = clientToken.authorizationFingerprint;
 
               let params = {
                 authorizationFingerprint,
@@ -1697,7 +1697,7 @@ describe("PaymentMethodGateway", function() {
 
               let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
               return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-                let { nonce } = JSON.parse(body).paypalAccounts[0];
+                let nonce = JSON.parse(body).paypalAccounts[0].nonce;
                 let paypalAccountParams = {
                   paymentMethodNonce: nonce,
                   customerId
@@ -1746,7 +1746,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -1823,7 +1823,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
             let params = {
               authorizationFingerprint,
               creditCard: {
@@ -1834,7 +1834,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/credit_cards.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).creditCards[0];
+              let nonce = JSON.parse(body).creditCards[0].nonce;
               let paymentMethodParams = {
                 customerId,
                 paymentMethodNonce: nonce
@@ -1867,7 +1867,7 @@ describe("PaymentMethodGateway", function() {
 
           return specHelper.defaultGateway.clientToken.generate({}, function(err, result) {
             let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let { authorizationFingerprint } = clientToken;
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
             let params = {
               authorizationFingerprint,
@@ -1878,7 +1878,7 @@ describe("PaymentMethodGateway", function() {
 
             let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
             return myHttp.post("/client_api/v1/payment_methods/paypal_accounts.json", params, function(statusCode, body) {
-              let { nonce } = JSON.parse(body).paypalAccounts[0];
+              let nonce = JSON.parse(body).paypalAccounts[0].nonce;
               let paypalAccountParams = {
                 customerId,
                 paymentMethodNonce: nonce
@@ -1938,7 +1938,7 @@ describe("PaymentMethodGateway", function() {
       };
 
       return partnerMerchantGateway.customer.create(customerParams, function(err, response) {
-        let { customer } = response;
+        let customer = response.customer;
 
         let creditCardParams = {
           customerId: customer.id,
@@ -1948,7 +1948,7 @@ describe("PaymentMethodGateway", function() {
         };
 
         return partnerMerchantGateway.creditCard.create(creditCardParams, function(err, response) {
-          ({ creditCard } = response);
+          creditCard = response.creditCard;
 
           let oauthGateway = braintree.connect({
             clientId: "client_id$development$integration_client_id",

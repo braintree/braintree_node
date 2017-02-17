@@ -2,9 +2,9 @@
 
 require('../../spec_helper');
 
-let { braintree } = specHelper;
-let { MerchantAccount } = require('../../../lib/braintree/merchant_account');
-let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
+let braintree = specHelper.braintree;
+let MerchantAccount = require('../../../lib/braintree/merchant_account').MerchantAccount;
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
 let legacyMerchantAccountParams = {
   applicantDetails: {

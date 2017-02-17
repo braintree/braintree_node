@@ -2,9 +2,9 @@
 
 require('../../spec_helper');
 let dateFormat = require('dateformat');
-let { _ } = require('underscore');
-let { braintree } = specHelper;
-let { Nonces } = require('../../../lib/braintree/test/nonces');
+let _ = require('underscore')._;
+let braintree = specHelper.braintree;
+let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
 
 describe("SubscriptionGateway", function() {
   let customerId = null;
@@ -307,7 +307,7 @@ describe("SubscriptionGateway", function() {
       };
 
       return specHelper.defaultGateway.subscription.create(subscriptionParams, function(err, response) {
-        ({ subscription } = response);
+        subscription = response.subscription;
         return done();
       });
     });
@@ -375,7 +375,7 @@ describe("SubscriptionGateway", function() {
       };
 
       return specHelper.defaultGateway.subscription.create(subscriptionParams, function(err, response) {
-        ({ subscription } = response);
+        subscription = response.subscription;
         return specHelper.makePastDue(response.subscription, (err, response) => done());
       });
     });

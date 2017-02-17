@@ -1,7 +1,7 @@
 'use strict';
 
 require('../../spec_helper');
-let { braintree } = specHelper;
+let braintree = specHelper.braintree;
 
 describe("AddressGateway", function() {
   describe("create", function() {
@@ -47,7 +47,9 @@ describe("AddressGateway", function() {
 
           let errorCodes = ((() => {
             let result = [];
-            for (let {code} of Array.from(response.errors.deepErrors())) {               result.push(code);
+            for (let error of Array.from(response.errors.deepErrors())) {
+              let code = error.code;
+              result.push(code);
             }
             return result;
           })());
@@ -67,7 +69,9 @@ describe("AddressGateway", function() {
           customerId: response.customer.id,
           countryName: 'United States of America'
         };
-        return specHelper.defaultGateway.address.create(addressParams, (err, {address}) =>
+        return specHelper.defaultGateway.address.create(addressParams, (err, response) => {
+          let address = response.address;
+
           specHelper.defaultGateway.address.delete(address.customerId, address.id, err =>
             specHelper.defaultGateway.address.find(address.customerId, address.id, function(err, address) {
               assert.isNull(address);
@@ -75,7 +79,7 @@ describe("AddressGateway", function() {
               return done();
             })
           )
-        );
+        });
       })
     )
   );
@@ -91,7 +95,9 @@ describe("AddressGateway", function() {
           region: 'IL',
           postalCode: '60607',
           countryName: 'United States of America'
-        }, (err, {address}) =>
+        }, (err, response) => {
+          let address = response.address;
+
           specHelper.defaultGateway.address.find(address.customerId, address.id, function(err, address) {
             assert.isNull(err);
             assert.equal(address.streetAddress, '123 Fake St');
@@ -102,7 +108,7 @@ describe("AddressGateway", function() {
             assert.equal(address.countryName, 'United States of America');
             return done();
           })
-        )
+        })
       )
     );
 
@@ -142,7 +148,9 @@ describe("AddressGateway", function() {
           region: 'Old State',
           postalCode: '60607',
           countryName: 'France'
-        }, (err, {address}) =>
+        }, (err, response) => {
+          let address = response.address;
+
           specHelper.defaultGateway.address.update(address.customerId, address.id, {
             streetAddress: '1 New Street',
             extendedAddress: 'New Extended',
@@ -161,7 +169,7 @@ describe("AddressGateway", function() {
             assert.equal(response.address.countryName, 'United States of America');
             return done();
           })
-        )
+        })
       )
     );
 
@@ -175,7 +183,9 @@ describe("AddressGateway", function() {
           region: 'Old State',
           postalCode: '60607',
           countryName: 'France'
-        }, (err, {address}) =>
+        }, (err, response) => {
+          let address = response.address;
+
           specHelper.defaultGateway.address.update(address.customerId, address.id, {
             countryName: 'invalid country'
           }, function(err, response) {
@@ -186,7 +196,9 @@ describe("AddressGateway", function() {
             assert.equal(response.errors.for('address').on('countryName')[0].attribute, 'country_name');
             let errorCodes = ((() => {
               let result = [];
-              for (let {code} of Array.from(response.errors.deepErrors())) {                 result.push(code);
+              for (let error of Array.from(response.errors.deepErrors())) {
+                let code = error.code;
+                result.push(code);
               }
               return result;
             })());
@@ -194,7 +206,7 @@ describe("AddressGateway", function() {
             assert.include(errorCodes, '91803');
             return done();
           })
-        )
+        })
       )
     );
   });

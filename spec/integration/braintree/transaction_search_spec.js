@@ -3,11 +3,11 @@
 let Braintree = require("../../../lib/braintree");
 require('../../spec_helper');
 let _ = require("underscore");
-let { Transaction } = Braintree;
-let { CreditCard } = Braintree;
-let { Util } = require('../../../lib/braintree/util');
-let { Writable } = require('stream');
-let { braintree } = specHelper;
+let Transaction = Braintree.Transaction;
+let CreditCard = Braintree.CreditCard;
+let Util = require('../../../lib/braintree/util').Util;
+let Writable = require('stream').Writable;
+let braintree = specHelper.braintree;
 
 describe("TransactionSearch", () =>
   describe("search", function() {

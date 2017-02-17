@@ -1,11 +1,11 @@
 'use strict';
 
 require('../../spec_helper');
-let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
-let { Environment } = require('../../../lib/braintree/environment');
-let { Digest } = require('../../../lib/braintree/digest');
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
+let Environment = require('../../../lib/braintree/environment').Environment;
+let Digest = require('../../../lib/braintree/digest').Digest;
 
-let { braintree } = specHelper;
+let braintree = specHelper.braintree;
 
 describe("OAuthGateway", function() {
   describe("createTokenFromCode", function() {
@@ -19,7 +19,7 @@ describe("OAuthGateway", function() {
         gateway.oauth.createTokenFromCode({code, scope: 'read_write'}, function(err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
-          let { credentials } = response;
+          let credentials = response.credentials;
           assert.isNotNull(credentials.accessToken);
           assert.isNotNull(credentials.refreshToken);
           assert.isNotNull(credentials.expiresAt);
@@ -65,7 +65,7 @@ describe("OAuthGateway", function() {
           gateway.oauth.createTokenFromRefreshToken({refreshToken: refreshTokenResponse.credentials.refreshToken, scope: 'read_write'}, function(err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
-            let { credentials } = response;
+            let credentials = response.credentials;
             assert.isNotNull(credentials.accessToken);
             assert.isNotNull(credentials.refreshToken);
             assert.isNotNull(credentials.expiresAt);
@@ -160,7 +160,9 @@ describe("OAuthGateway", function() {
         let parts = queryString.split('&');
         let foundValue = null;
         parts.forEach(function(part) {
-          let [key, value] = Array.from(part.split('='));
+          let parts = Array.from(part.split('='));
+          let key = parts[0];
+          let value = parts[1];
           if (decodeURIComponent(key) === searchKey) {
             return foundValue = decodeURIComponent(value);
           }
@@ -169,7 +171,9 @@ describe("OAuthGateway", function() {
         return foundValue;
       };
 
-      var [urlAndPath, queryString] = Array.from(url.split('?'));
+      let parts = Array.from(url.split('?'));
+      let urlAndPath = parts[0];
+      let queryString = parts[1];
       let port = process.env['GATEWAY_PORT'] || '3000';
       assert.equal(urlAndPath, `http://localhost:${port}/oauth/connect`);
 
@@ -232,7 +236,9 @@ describe("OAuthGateway", function() {
         let parts = queryString.split('&');
         let foundValue = null;
         parts.forEach(function(part) {
-          let [key, value] = Array.from(part.split('='));
+          let parts = Array.from(part.split('='));
+          let key = parts[0];
+          let value = parts[1];
           if (decodeURIComponent(key) === searchKey) {
             return foundValue = decodeURIComponent(value);
           }
@@ -241,7 +247,9 @@ describe("OAuthGateway", function() {
         return foundValue;
       };
 
-      var [urlAndPath, queryString] = Array.from(url.split('?'));
+      let parts = Array.from(url.split('?'));
+      let urlAndPath = parts[0];
+      let queryString = parts[1];
 
       return assert.equal(query('redirect_url'), null);
     });
@@ -260,9 +268,10 @@ describe("OAuthGateway", function() {
         }
       });
 
-      let [_, queryString] = Array.from(url.split('?'));
-      let [key, value] = Array.from(queryString.split('&')
-        .find(item => item.indexOf('wacky') > -1).split("="));
+      let queryString = Array.from(url.split('?'))[1];
+      let parts = Array.from(queryString.split('&').find(item => item.indexOf('wacky') > -1).split("="));
+      let key = parts[0];
+      let value = parts[1];
 
       assert.equal(key, "business%5Bname%5D");
       return assert.equal(value, "wacky%20symbols%20%21%27%28%29%2A");
@@ -282,7 +291,9 @@ describe("OAuthGateway", function() {
         let parts = queryString.split('&');
         let matches = [];
         parts.forEach(function(part) {
-          let [key, value] = Array.from(part.split('='));
+          let parts = Array.from(part.split('='));
+          let key = parts[0];
+          let value = parts[1];
           if (decodeURIComponent(key) === searchKey) {
             return matches.push(decodeURIComponent(value));
           }
@@ -291,7 +302,9 @@ describe("OAuthGateway", function() {
         return matches;
       };
 
-      var [urlAndPath, queryString] = Array.from(url.split('?'));
+      let parts = Array.from(url.split('?'));
+      let urlAndPath = parts[0];
+      let queryString = parts[1];
 
       return assert.deepEqual(query('payment_methods[]'), ['credit_card', 'paypal']);
     });

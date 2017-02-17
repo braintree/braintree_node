@@ -2,7 +2,7 @@
 
 require('../../spec_helper');
 
-let { braintree } = specHelper;
+let braintree = specHelper.braintree;
 
 describe("SettlementBatchSummaryGateway", () =>
   describe("generate", function() {
@@ -74,7 +74,7 @@ describe("SettlementBatchSummaryGateway", () =>
 
           return specHelper.defaultGateway.settlementBatchSummary.generate(settlementBatchParams, function(err, settleBatchResponse) {
             assert.isTrue(settleBatchResponse.success);
-            let { records } = settleBatchResponse.settlementBatchSummary;
+            let records = settleBatchResponse.settlementBatchSummary.records;
             assert.ok(records[0]['store_me']);
 
             return done();

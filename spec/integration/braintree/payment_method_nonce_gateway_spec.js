@@ -1,11 +1,11 @@
 'use strict';
 
 require('../../spec_helper');
-let { _ } = require('underscore');
-let { braintree } = specHelper;
+let _ = require('underscore')._;
+let braintree = specHelper.braintree;
 let util = require('util');
-let { Config } = require('../../../lib/braintree/config');
-let { Nonces } = require('../../../lib/braintree/test/nonces');
+let Config = require('../../../lib/braintree/config').Config;
+let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
 
 describe("PaymentMethodNonceGateway", function() {
   let paymentMethodToken = null;
@@ -37,7 +37,7 @@ describe("PaymentMethodNonceGateway", function() {
   describe("create", function() {
     it('creates the nonce', done =>
       specHelper.defaultGateway.paymentMethodNonce.create(paymentMethodToken, function(err, response) {
-        let { paymentMethodNonce } = response;
+        let paymentMethodNonce = response.paymentMethodNonce;
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.isNotNull(paymentMethodNonce.nonce);

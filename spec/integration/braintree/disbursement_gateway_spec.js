@@ -2,8 +2,8 @@
 
 require('../../spec_helper');
 
-let { braintree } = specHelper;
-let { Disbursement } = require('../../../lib/braintree/disbursement');
+let braintree = specHelper.braintree;
+let Disbursement = require('../../../lib/braintree/disbursement').Disbursement;
 
 describe("DisbursementGateway", () =>
   describe("#transactions", () =>

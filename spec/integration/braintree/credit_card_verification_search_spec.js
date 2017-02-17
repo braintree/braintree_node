@@ -2,9 +2,9 @@
 
 let Braintree = require("../../../lib/braintree");
 require('../../spec_helper');
-let { CreditCardNumbers } = require('../../../lib/braintree/test/credit_card_numbers');
-let { CreditCard } = Braintree;
-let { CreditCardVerification } = Braintree;
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let CreditCard = Braintree.CreditCard;
+let CreditCardVerification = Braintree.CreditCardVerification;
 
 describe("CreditCardVerification", () =>
   describe("search", function() {
@@ -67,7 +67,7 @@ describe("CreditCardVerification", () =>
         , function(err, response) {
           assert.equal(response.length(), 1);
           return response.first(function(err, verification) {
-            let { createdAt } = verification;
+            let createdAt = verification.createdAt;
             let verificationId = verification.id;
 
             assert.equal(verification.billing.postalCode, postalCode);
