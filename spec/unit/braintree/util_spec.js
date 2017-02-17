@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { Util } = require('../../../lib/braintree/util');
 let { errorTypes } = require('../../../lib/braintree/error_types');

@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { Digest } = require('../../../lib/braintree/digest');
 

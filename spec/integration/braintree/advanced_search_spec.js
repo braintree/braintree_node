@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { SubscriptionSearch } = require('../../../lib/braintree/subscription_search');
 let { TransactionSearch } = require('../../../lib/braintree/transaction_search');

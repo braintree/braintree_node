@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { UsBankAccount } = require('../../../lib/braintree/us_bank_account');
 let { Transaction } = require('../../../lib/braintree/transaction');

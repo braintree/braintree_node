@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { SignatureService } = require('../../../lib/braintree/signature_service');
 

@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { ValidationErrorsCollection } = require('../../../lib/braintree/validation_errors_collection');
 

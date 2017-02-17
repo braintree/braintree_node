@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { UnknownPaymentMethod } = require('../../../lib/braintree/unknown_payment_method');
 

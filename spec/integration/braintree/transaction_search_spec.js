@@ -1,3 +1,5 @@
+'use strict';
+
 let Braintree = require("../../../lib/braintree");
 require('../../spec_helper');
 let _ = require("underscore");

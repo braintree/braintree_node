@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let TestSearch = require('../../../spec/test-search');
 

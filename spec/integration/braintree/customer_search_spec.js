@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { Config } = require('../../../lib/braintree/config');
 

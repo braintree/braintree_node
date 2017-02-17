@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
 let { Environment } = require('../../../lib/braintree/environment');

@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 
 let { CredentialsParser } = require('../../../lib/braintree/credentials_parser');

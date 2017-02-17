@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { CreditCardVerification } = require('../../../lib/braintree/credit_card_verification');
 let { CreditCardNumbers } = require('../../../lib/braintree/test/credit_card_numbers');

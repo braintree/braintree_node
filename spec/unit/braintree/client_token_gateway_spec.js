@@ -1,3 +1,5 @@
+'use strict';
+
 require('../../spec_helper');
 let { ClientTokenGateway } = require('../../../lib/braintree/client_token_gateway');
 let { braintree } = specHelper;
