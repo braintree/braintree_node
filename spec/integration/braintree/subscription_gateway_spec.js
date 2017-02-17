@@ -1,8 +1,8 @@
-import '../../spec_helper';
-import dateFormat from 'dateformat';
-import { _ } from 'underscore';
+require('../../spec_helper');
+let dateFormat = require('dateformat');
+let { _ } = require('underscore');
 let { braintree } = specHelper;
-import { Nonces } from '../../../lib/braintree/test/nonces';
+let { Nonces } = require('../../../lib/braintree/test/nonces');
 
 describe("SubscriptionGateway", function() {
   let customerId = null;

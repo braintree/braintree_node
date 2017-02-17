@@ -1,18 +1,18 @@
-import '../../spec_helper';
+require('../../spec_helper');
 
-import { _ } from 'underscore';
+let { _ } = require('underscore');
 let { braintree } = specHelper;
-import Braintree from '../../../lib/braintree';
-import { CreditCardNumbers } from '../../../lib/braintree/test/credit_card_numbers';
-import { Nonces } from '../../../lib/braintree/test/nonces';
-import { VenmoSdk } from '../../../lib/braintree/test/venmo_sdk';
-import { CreditCard } from '../../../lib/braintree/credit_card';
-import { ValidationErrorCodes } from '../../../lib/braintree/validation_error_codes';
-import { PaymentInstrumentTypes } from '../../../lib/braintree/payment_instrument_types';
-import { Transaction } from '../../../lib/braintree/transaction';
-import { Dispute } from '../../../lib/braintree/dispute';
-import { Environment } from '../../../lib/braintree/environment';
-import { Config } from '../../../lib/braintree/config';
+let Braintree = require('../../../lib/braintree');
+let { CreditCardNumbers } = require('../../../lib/braintree/test/credit_card_numbers');
+let { Nonces } = require('../../../lib/braintree/test/nonces');
+let { VenmoSdk } = require('../../../lib/braintree/test/venmo_sdk');
+let { CreditCard } = require('../../../lib/braintree/credit_card');
+let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
+let { PaymentInstrumentTypes } = require('../../../lib/braintree/payment_instrument_types');
+let { Transaction } = require('../../../lib/braintree/transaction');
+let { Dispute } = require('../../../lib/braintree/dispute');
+let { Environment } = require('../../../lib/braintree/environment');
+let { Config } = require('../../../lib/braintree/config');
 
 describe("TransactionGateway", function() {
   describe("sale", function() {

@@ -1,6 +1,6 @@
-import "../spec_helper";
-import { Config } from '../../lib/braintree/config';
-import { Environment } from '../../lib/braintree/environment';
+require("../spec_helper");
+let { Config } = require('../../lib/braintree/config');
+let { Environment } = require('../../lib/braintree/environment');
 
 describe("Config", function() {
   it("can be configured with merchant credentials", function() {

@@ -1,12 +1,12 @@
-import '../../spec_helper';
-import { _ } from 'underscore';
+require('../../spec_helper');
+let { _ } = require('underscore');
 let { braintree } = specHelper;
-import Braintree from '../../../lib/braintree';
-import util from 'util';
-import { Config } from '../../../lib/braintree/config';
-import { Environment } from '../../../lib/braintree/environment';
-import { Nonces } from '../../../lib/braintree/test/nonces';
-import { ValidationErrorCodes } from '../../../lib/braintree/validation_error_codes';
+let Braintree = require('../../../lib/braintree');
+let util = require('util');
+let { Config } = require('../../../lib/braintree/config');
+let { Environment } = require('../../../lib/braintree/environment');
+let { Nonces } = require('../../../lib/braintree/test/nonces');
+let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
 
 describe("PaymentMethodGateway", function() {
   describe("create", function() {

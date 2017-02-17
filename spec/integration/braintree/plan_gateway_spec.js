@@ -1,5 +1,5 @@
-import '../../spec_helper';
-import { _ } from 'underscore';
+require('../../spec_helper');
+let { _ } = require('underscore');
 
 describe("PlanGateway", () =>
   describe("self.all", () =>

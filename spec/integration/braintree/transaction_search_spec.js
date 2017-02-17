@@ -1,10 +1,10 @@
-import Braintree from "../../../lib/braintree";
-import "../../spec_helper";
-import _ from "underscore";
+let Braintree = require("../../../lib/braintree");
+require('../../spec_helper');
+let _ = require("underscore");
 let { Transaction } = Braintree;
 let { CreditCard } = Braintree;
-import { Util } from '../../../lib/braintree/util';
-import { Writable } from 'stream';
+let { Util } = require('../../../lib/braintree/util');
+let { Writable } = require('stream');
 let { braintree } = specHelper;
 
 describe("TransactionSearch", () =>
@@ -495,7 +495,7 @@ describe("TransactionSearch", () =>
 
       return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search((
-          function(search) { 
+          function(search) {
             search.paymentInstrumentType().is("CreditCardDetail");
             return search.id().is(response.transaction.id);
         }), function(err, response) {
@@ -515,7 +515,7 @@ describe("TransactionSearch", () =>
 
       return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search((
-          function(search) { 
+          function(search) {
             search.id().is(response.transaction.id);
             return search.paymentInstrumentType().is("PayPalDetail");
         }), function(err, response) {
@@ -525,7 +525,7 @@ describe("TransactionSearch", () =>
         })
       );
     });
-    
+
     it("searches on payment instrument type apple pay", function(done) {
       let random = specHelper.randomId();
       let transactionParams = {
@@ -535,7 +535,7 @@ describe("TransactionSearch", () =>
 
       return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search((
-          function(search) { 
+          function(search) {
             search.id().is(response.transaction.id);
             return search.paymentInstrumentType().is("ApplePayDetail");
         }), function(err, response) {
@@ -545,7 +545,7 @@ describe("TransactionSearch", () =>
         })
       );
     });
-    
+
     it("filters on valid merchant account ids", function(done) {
       let random = specHelper.randomId();
       let transactionParams = {
@@ -559,7 +559,7 @@ describe("TransactionSearch", () =>
 
       return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search((
-          function(search) { 
+          function(search) {
             search.merchantAccountId().is(response.transaction.merchantAccountId);
             return search.id().is(response.transaction.id);
         }), function(err, response) {
@@ -583,7 +583,7 @@ describe("TransactionSearch", () =>
 
       return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search((
-          function(search) { 
+          function(search) {
             search.merchantAccountId().in(response.transaction.merchantAccountId, "invalid_merchant_acct_id");
             return search.id().is(response.transaction.id);
         }), function(err, response) {
@@ -607,7 +607,7 @@ describe("TransactionSearch", () =>
 
       return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search((
-          function(search) { 
+          function(search) {
             search.merchantAccountId().is("invalid_merchant_acct_id");
             return search.id().is(response.transaction.id);
         }), function(err, response) {

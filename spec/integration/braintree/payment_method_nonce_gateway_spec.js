@@ -1,9 +1,9 @@
-import '../../spec_helper';
-import { _ } from 'underscore';
+require('../../spec_helper');
+let { _ } = require('underscore');
 let { braintree } = specHelper;
-import util from 'util';
-import { Config } from '../../../lib/braintree/config';
-import { Nonces } from '../../../lib/braintree/test/nonces';
+let util = require('util');
+let { Config } = require('../../../lib/braintree/config');
+let { Nonces } = require('../../../lib/braintree/test/nonces');
 
 describe("PaymentMethodNonceGateway", function() {
   let paymentMethodToken = null;

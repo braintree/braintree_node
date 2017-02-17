@@ -1,7 +1,7 @@
-import '../../spec_helper';
+require('../../spec_helper');
 
 let { braintree } = specHelper;
-import { DisbursementDetails } from '../../../lib/braintree/disbursement_details';
+let { DisbursementDetails } = require('../../../lib/braintree/disbursement_details');
 
 describe("DisbursementDetails", () =>
   describe("isValid", function() {

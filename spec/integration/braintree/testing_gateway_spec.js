@@ -1,8 +1,8 @@
-import '../../spec_helper';
+require('../../spec_helper');
 
 let { braintree } = specHelper;
-import { Transaction } from '../../../lib/braintree/transaction';
-import { Environment } from '../../../lib/braintree/environment';
+let { Transaction } = require('../../../lib/braintree/transaction');
+let { Environment } = require('../../../lib/braintree/environment');
 
 describe("TestingGateway", () =>
   describe("test settlement methods", function() {

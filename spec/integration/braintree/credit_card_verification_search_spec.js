@@ -1,6 +1,6 @@
-import Braintree from "../../../lib/braintree";
-import "../../spec_helper";
-import { CreditCardNumbers } from '../../../lib/braintree/test/credit_card_numbers';
+let Braintree = require("../../../lib/braintree");
+require('../../spec_helper');
+let { CreditCardNumbers } = require('../../../lib/braintree/test/credit_card_numbers');
 let { CreditCard } = Braintree;
 let { CreditCardVerification } = Braintree;
 

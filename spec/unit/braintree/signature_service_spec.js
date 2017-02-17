@@ -1,5 +1,5 @@
-import '../../spec_helper';
-import { SignatureService } from '../../../lib/braintree/signature_service';
+require('../../spec_helper');
+let { SignatureService } = require('../../../lib/braintree/signature_service');
 
 describe("SignatureService", () =>
   it("signs the data with the given key and hash", function() {

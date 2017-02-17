@@ -1,9 +1,9 @@
-import '../../spec_helper';
-import { ValidationErrorCodes } from '../../../lib/braintree/validation_error_codes';
-import { WebhookNotification } from '../../../lib/braintree';
-import { Dispute } from '../../../lib/braintree/dispute';
-import { Transaction } from '../../../lib/braintree/transaction';
-import { errorTypes } from '../../../lib/braintree';
+require('../../spec_helper');
+let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
+let { WebhookNotification } = require('../../../lib/braintree');
+let { Dispute } = require('../../../lib/braintree/dispute');
+let { Transaction } = require('../../../lib/braintree/transaction');
+let { errorTypes } = require('../../../lib/braintree');
 
 describe("WebhookNotificationGateway", function() {
   describe("verify", function() {

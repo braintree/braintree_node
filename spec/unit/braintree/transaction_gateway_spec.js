@@ -1,5 +1,5 @@
-import '../../spec_helper';
-import { TransactionGateway } from '../../../lib/braintree/transaction_gateway';
+require('../../spec_helper');
+let { TransactionGateway } = require('../../../lib/braintree/transaction_gateway');
 
 describe("TransactionGateway", () =>
   describe("sale", function() {

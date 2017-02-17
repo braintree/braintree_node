@@ -1,9 +1,9 @@
-import '../../spec_helper';
+require('../../spec_helper');
 
-import { _ } from 'underscore';
-import { VenmoSdk } from '../../../lib/braintree/test/venmo_sdk';
-import { Nonces } from '../../../lib/braintree/test/nonces';
-import { Config } from '../../../lib/braintree/config';
+let { _ } = require('underscore');
+let { VenmoSdk } = require('../../../lib/braintree/test/venmo_sdk');
+let { Nonces } = require('../../../lib/braintree/test/nonces');
+let { Config } = require('../../../lib/braintree/config');
 let { braintree } = specHelper;
 
 describe("CustomerGateway", function() {

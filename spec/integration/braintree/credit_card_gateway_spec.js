@@ -1,12 +1,12 @@
-import '../../spec_helper';
-import { _ } from 'underscore';
+require('../../spec_helper');
+let { _ } = require('underscore');
 let { braintree } = specHelper;
-import util from 'util';
-import { CreditCard } from '../../../lib/braintree/credit_card';
-import { CreditCardNumbers } from '../../../lib/braintree/test/credit_card_numbers';
-import { CreditCardDefaults } from '../../../lib/braintree/test/credit_card_defaults';
-import { VenmoSdk } from '../../../lib/braintree/test/venmo_sdk';
-import { Config } from '../../../lib/braintree/config';
+let util = require('util');
+let { CreditCard } = require('../../../lib/braintree/credit_card');
+let { CreditCardNumbers } = require('../../../lib/braintree/test/credit_card_numbers');
+let { CreditCardDefaults } = require('../../../lib/braintree/test/credit_card_defaults');
+let { VenmoSdk } = require('../../../lib/braintree/test/venmo_sdk');
+let { Config } = require('../../../lib/braintree/config');
 
 describe("CreditCardGateway", function() {
   describe("create", function() {
@@ -681,7 +681,7 @@ describe("CreditCardGateway", function() {
         });
       });
     });
-    
+
     return it("returns an error if the supplied nonce is consumed", function(done) {
       let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig));
       return specHelper.defaultGateway.clientToken.generate({customerId}, function(err, result) {
@@ -766,7 +766,7 @@ describe("CreditCardGateway", function() {
           streetAddress: '123 New St',
           locality: 'New City',
           region: 'New Region',
-          options: { 
+          options: {
             updateExisting: true
           }
         }

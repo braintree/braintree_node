@@ -1,7 +1,7 @@
-import '../../spec_helper';
-import { ValidationErrorCodes } from '../../../lib/braintree/validation_error_codes';
-import { Environment } from '../../../lib/braintree/environment';
-import { Digest } from '../../../lib/braintree/digest';
+require('../../spec_helper');
+let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
+let { Environment } = require('../../../lib/braintree/environment');
+let { Digest } = require('../../../lib/braintree/digest');
 
 let { braintree } = specHelper;
 
@@ -297,7 +297,7 @@ describe("OAuthGateway", function() {
     return it("generates the correct signature", function() {
       let url = 'http://localhost:3000/oauth/connect?business%5Bname%5D=We+Like+Spaces&client_id=client_id%24development%24integration_client_id';
       let signature = Digest.Sha256hexdigest('client_secret$development$integration_client_secret', url);
-      
+
       return assert.equal(signature, 'a36bcf10dd982e2e47e0d6a2cb930aea47ade73f954b7d59c58dae6167894d41');
     });
   });

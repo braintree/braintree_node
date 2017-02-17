@@ -1,21 +1,21 @@
-import child_process from 'child_process';
+let child_process = require('child_process');
 
 try {
   require('source-map-support').install({
     handleUncaughtExceptions: false});
 } catch (err) {}
 
-import http from 'http';
-import https from 'https';
-import uri from 'url';
-import { TransactionAmounts } from '../lib/braintree/test/transaction_amounts';
-import { Nonces } from '../lib/braintree/test/nonces';
-import { Util } from '../lib/braintree/util';
-import { Config } from '../lib/braintree/config';
-import querystring from '../vendor/querystring.node.js.511d6a2/querystring';
-import chai from "chai";
-import { Buffer } from 'buffer';
-import xml2js from 'xml2js';
+let http = require('http');
+let https = require('https');
+let uri = require('url');
+let { TransactionAmounts } = require('../lib/braintree/test/transaction_amounts');
+let { Nonces } = require('../lib/braintree/test/nonces');
+let { Util } = require('../lib/braintree/util');
+let { Config } = require('../lib/braintree/config');
+let querystring = require('../vendor/querystring.node.js.511d6a2/querystring');
+let chai = require("chai");
+let { Buffer } = require('buffer');
+let xml2js = require('xml2js');
 
 chai.Assertion.includeStack = true;
 
@@ -28,7 +28,7 @@ global.assert.isEmptyArray = function(array) {
 
 global.inspect = object => console.dir(object);
 
-import braintree from './../lib/braintree.js';
+let braintree = require('./../lib/braintree.js');
 
 let defaultConfig = {
   environment: braintree.Environment.Development,

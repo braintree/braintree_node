@@ -1,10 +1,10 @@
-import '../../spec_helper';
-import { _ } from 'underscore';
+require('../../spec_helper');
+let { _ } = require('underscore');
 let { braintree } = specHelper;
-import util from 'util';
-import { PayPalAccount } from '../../../lib/braintree/paypal_account';
-import { Config } from '../../../lib/braintree/config';
-import { Nonces } from '../../../lib/braintree/test/nonces';
+let util = require('util');
+let { PayPalAccount } = require('../../../lib/braintree/paypal_account');
+let { Config } = require('../../../lib/braintree/config');
+let { Nonces } = require('../../../lib/braintree/test/nonces');
 
 describe("PayPalGateway", function() {
   describe("find", function() {

@@ -1,5 +1,5 @@
-import "../../spec_helper";
-import TestSearch from '../../../spec/test-search';
+require('../../spec_helper');
+let TestSearch = require('../../../spec/test-search');
 
 let newSearch = () => new TestSearch();
 let value = "mail@example.com";

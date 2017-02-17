@@ -1,7 +1,7 @@
-import '../../spec_helper';
+require('../../spec_helper');
 
 let { braintree } = specHelper;
-import { PaginatedResponse } from '../../../lib/braintree/paginated_response';
+let { PaginatedResponse } = require('../../../lib/braintree/paginated_response');
 
 describe("PaginatedResponse", () =>
   describe("nextItem", function() {

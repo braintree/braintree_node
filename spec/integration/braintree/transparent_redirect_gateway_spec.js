@@ -1,6 +1,6 @@
-import '../../spec_helper';
+require('../../spec_helper');
 
-import { _ } from 'underscore';
+let { _ } = require('underscore');
 let { braintree } = specHelper;
 
 describe("TransparentRedirectGateway", function() {

@@ -1,5 +1,5 @@
-import '../../spec_helper';
-import { CreditCardGateway } from '../../../lib/braintree/credit_card_gateway';
+require('../../spec_helper');
+let { CreditCardGateway } = require('../../../lib/braintree/credit_card_gateway');
 
 describe("CreditCardGateway", () =>
   describe("dateFormat", () =>

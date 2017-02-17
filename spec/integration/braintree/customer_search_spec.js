@@ -1,5 +1,5 @@
-import "../../spec_helper";
-import { Config } from '../../../lib/braintree/config';
+require('../../spec_helper');
+let { Config } = require('../../../lib/braintree/config');
 
 describe("CustomerSearch", () =>
   describe("search", function() {
@@ -80,7 +80,7 @@ describe("CustomerSearch", () =>
           expirationDate: "05/2012"
         }
       };
-        
+
       return specHelper.defaultGateway.customer.create(joe, function(err, response) {
         let { token } = response.customer.creditCards[0];
         let joeId = response.customer.id;
@@ -101,7 +101,7 @@ describe("CustomerSearch", () =>
             return search.ids().in([joeId, jimId]);
           };
 
-          return specHelper.defaultGateway.customer.search(search, function(err, response) { 
+          return specHelper.defaultGateway.customer.search(search, function(err, response) {
             let customers = [];
 
             return response.each(function(err, customer) {

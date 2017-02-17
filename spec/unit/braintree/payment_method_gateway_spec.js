@@ -1,6 +1,6 @@
-import '../../spec_helper';
-import { PaymentMethodGateway } from '../../../lib/braintree/payment_method_gateway';
-import { errorTypes } from '../../../lib/braintree/error_types';
+require('../../spec_helper');
+let { PaymentMethodGateway } = require('../../../lib/braintree/payment_method_gateway');
+let { errorTypes } = require('../../../lib/braintree/error_types');
 
 describe("PaymentMethodGateway", function() {
   describe("find", () =>

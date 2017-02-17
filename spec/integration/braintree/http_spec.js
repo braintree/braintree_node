@@ -1,9 +1,9 @@
-import '../../spec_helper';
+require('../../spec_helper');
 
 let { braintree } = specHelper;
-import { Config } from '../../../lib/braintree/config';
-import { Http } from '../../../lib/braintree/http';
-import { Environment } from '../../../lib/braintree/environment';
+let { Config } = require('../../../lib/braintree/config');
+let { Http } = require('../../../lib/braintree/http');
+let { Environment } = require('../../../lib/braintree/environment');
 
 describe("Http", () =>
   describe("request", function() {

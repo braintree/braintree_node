@@ -1,7 +1,7 @@
-import '../../spec_helper';
-import { CreditCardVerification } from '../../../lib/braintree/credit_card_verification';
-import { CreditCardNumbers } from '../../../lib/braintree/test/credit_card_numbers';
-import { ValidationErrorCodes } from '../../../lib/braintree/validation_error_codes';
+require('../../spec_helper');
+let { CreditCardVerification } = require('../../../lib/braintree/credit_card_verification');
+let { CreditCardNumbers } = require('../../../lib/braintree/test/credit_card_numbers');
+let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
 let { braintree } = specHelper;
 
 describe("CreditCardVerificationGateway", function() {

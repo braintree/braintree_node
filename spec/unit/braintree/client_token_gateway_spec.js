@@ -1,5 +1,5 @@
-import '../../spec_helper';
-import { ClientTokenGateway } from '../../../lib/braintree/client_token_gateway';
+require('../../spec_helper');
+let { ClientTokenGateway } = require('../../../lib/braintree/client_token_gateway');
 let { braintree } = specHelper;
 
 describe("ClientTokenGateway", () =>

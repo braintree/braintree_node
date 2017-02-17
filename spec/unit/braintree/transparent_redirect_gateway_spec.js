@@ -1,7 +1,7 @@
-import '../../spec_helper';
-import braintree from '../../../lib/braintree';
+require('../../spec_helper');
+let braintree = require('../../../lib/braintree');
 
-import { TransparentRedirectGateway } from '../../../lib/braintree/transparent_redirect_gateway';
+let { TransparentRedirectGateway } = require('../../../lib/braintree/transparent_redirect_gateway');
 
 describe("TransparentRedirectGateway", () =>
   describe("url", function() {

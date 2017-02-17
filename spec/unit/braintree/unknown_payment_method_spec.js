@@ -1,5 +1,5 @@
-import '../../spec_helper';
-import { UnknownPaymentMethod } from '../../../lib/braintree/unknown_payment_method';
+require('../../spec_helper');
+let { UnknownPaymentMethod } = require('../../../lib/braintree/unknown_payment_method');
 
 describe("UnknownPaymentMethod", () =>
   describe("imageUrl", () =>

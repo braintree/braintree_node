@@ -1,6 +1,6 @@
-import "../../spec_helper";
-import { SubscriptionSearch } from '../../../lib/braintree/subscription_search';
-import { TransactionSearch } from '../../../lib/braintree/transaction_search';
+require('../../spec_helper');
+let { SubscriptionSearch } = require('../../../lib/braintree/subscription_search');
+let { TransactionSearch } = require('../../../lib/braintree/transaction_search');
 
 describe("AdvancedSearch", function() {
   beforeEach(function() {});
@@ -223,7 +223,7 @@ describe("AdvancedSearch", function() {
         assert.equal(response.ids.length, 1);
         assert.include(response.ids, subscription1.id);
         specHelper.doesNotInclude(response.ids, subscription2.id);
-        
+
         return done();
       })
     );

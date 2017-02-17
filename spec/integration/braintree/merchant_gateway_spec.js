@@ -1,5 +1,5 @@
-import '../../spec_helper';
-import { ValidationErrorCodes } from '../../../lib/braintree/validation_error_codes';
+require('../../spec_helper');
+let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
 
 let { braintree } = specHelper;
 

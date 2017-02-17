@@ -1,5 +1,5 @@
-import "../../spec_helper";
-import { SearchResponse } from '../../../lib/braintree/search_response';
+require('../../spec_helper');
+let { SearchResponse } = require('../../../lib/braintree/search_response');
 
 describe("SearchResponse", function() {
   describe("first", function() {

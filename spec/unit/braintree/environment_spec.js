@@ -1,5 +1,5 @@
-import "../../spec_helper";
-import { Environment } from '../../../lib/braintree/environment';
+require('../../spec_helper');
+let { Environment } = require('../../../lib/braintree/environment');
 
 describe("Environment", () =>
   describe("baseUrl", function() {

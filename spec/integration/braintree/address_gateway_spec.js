@@ -1,4 +1,4 @@
-import "../../spec_helper";
+require('../../spec_helper');
 let { braintree } = specHelper;
 
 describe("AddressGateway", function() {

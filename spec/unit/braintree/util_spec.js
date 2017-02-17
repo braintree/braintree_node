@@ -1,6 +1,6 @@
-import '../../spec_helper';
-import { Util } from '../../../lib/braintree/util';
-import { errorTypes } from '../../../lib/braintree/error_types';
+require('../../spec_helper');
+let { Util } = require('../../../lib/braintree/util');
+let { errorTypes } = require('../../../lib/braintree/error_types');
 
 describe("Util", function() {
   describe("convertObjectKeysToUnderscores", function() {

@@ -1,5 +1,5 @@
-import '../../spec_helper';
-import { ValidationErrorsCollection } from '../../../lib/braintree/validation_errors_collection';
+require('../../spec_helper');
+let { ValidationErrorsCollection } = require('../../../lib/braintree/validation_errors_collection');
 
 describe("ValidationErrorsCollection", () =>
   describe("on", () =>

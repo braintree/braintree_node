@@ -1,6 +1,6 @@
-import '../../spec_helper';
-import { UsBankAccount } from '../../../lib/braintree/us_bank_account';
-import { Transaction } from '../../../lib/braintree/transaction';
+require('../../spec_helper');
+let { UsBankAccount } = require('../../../lib/braintree/us_bank_account');
+let { Transaction } = require('../../../lib/braintree/transaction');
 
 describe("UsBankAccountGateway", function() {
   describe("find", function() {

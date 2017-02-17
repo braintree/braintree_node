@@ -1,5 +1,5 @@
-import '../../spec_helper';
-import { Digest } from '../../../lib/braintree/digest';
+require('../../spec_helper');
+let { Digest } = require('../../../lib/braintree/digest');
 
 describe("Util", function() {
   describe("Sha1hexdigest", function() {

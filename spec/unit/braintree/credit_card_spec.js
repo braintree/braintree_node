@@ -1,7 +1,7 @@
-import '../../spec_helper';
-import { _ } from 'underscore';
+require('../../spec_helper');
+let { _ } = require('underscore');
 let { braintree } = specHelper;
-import { CreditCard } from '../../../lib/braintree/credit_card';
+let { CreditCard } = require('../../../lib/braintree/credit_card');
 
 describe("CreditCard", () =>
   describe("constructor", () =>

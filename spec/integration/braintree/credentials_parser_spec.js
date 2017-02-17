@@ -1,6 +1,6 @@
-import '../../spec_helper';
+require('../../spec_helper');
 
-import { CredentialsParser } from '../../../lib/braintree/credentials_parser';
+let { CredentialsParser } = require('../../../lib/braintree/credentials_parser');
 
 let { braintree } = specHelper;
 

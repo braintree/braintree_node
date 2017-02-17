@@ -1,5 +1,5 @@
-import Braintree from "../../../lib/braintree";
-import "../../spec_helper";
+let Braintree = require("../../../lib/braintree");
+require('../../spec_helper');
 let { Subscription } = Braintree;
 
 describe("SubscriptionSearch", () =>
@@ -262,7 +262,7 @@ describe("SubscriptionSearch", () =>
         };
 
         return specHelper.defaultGateway.subscription.create(subscriptionParams, function(err, response) {
-          let subscriptionId = response.subscription.id; 
+          let subscriptionId = response.subscription.id;
 
           let multipleValueCriteria = {
             merchantAccountId: 'sandbox_credit_card',
@@ -305,7 +305,7 @@ describe("SubscriptionSearch", () =>
         };
 
         return specHelper.defaultGateway.subscription.create(subscriptionParams, function(err, response) {
-          let subscriptionId = response.subscription.id; 
+          let subscriptionId = response.subscription.id;
 
           let multipleValueCriteria = {
             merchantAccountId: ['sandbox_credit_card', 'invalid_merchant_id'],
@@ -348,7 +348,7 @@ describe("SubscriptionSearch", () =>
         };
 
         return specHelper.defaultGateway.subscription.create(subscriptionParams, function(err, response) {
-          let subscriptionId = response.subscription.id; 
+          let subscriptionId = response.subscription.id;
 
           let multipleValueCriteria = {
             merchantAccountId: 'invalid_merchant_id',

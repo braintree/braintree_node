@@ -1,8 +1,8 @@
-import '../../spec_helper';
+require('../../spec_helper');
 
 let { braintree } = specHelper;
-import { MerchantAccount } from '../../../lib/braintree/merchant_account';
-import { ValidationErrorCodes } from '../../../lib/braintree/validation_error_codes';
+let { MerchantAccount } = require('../../../lib/braintree/merchant_account');
+let { ValidationErrorCodes } = require('../../../lib/braintree/validation_error_codes');
 
 let legacyMerchantAccountParams = {
   applicantDetails: {

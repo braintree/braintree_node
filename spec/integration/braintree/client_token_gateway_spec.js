@@ -1,6 +1,6 @@
-import '../../spec_helper';
+require('../../spec_helper');
 let { braintree } = specHelper;
-import { Config } from '../../../lib/braintree/config';
+let { Config } = require('../../../lib/braintree/config');
 
 describe("ClientTokenGateway", function() {
   it("generates an authorization fingerprint that is accepted by the gateway", function(done) {
