@@ -1,17 +1,15 @@
 'use strict';
 
 require('../../spec_helper');
-let CreditCardVerification = require('../../../lib/braintree/credit_card_verification').CreditCardVerification;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
 
-describe("CreditCardVerificationGateway", function() {
-  describe("find", function() {
-    it("finds a verification", function(done) {
+describe('CreditCardVerificationGateway', function () {
+  describe('find', function () {
+    it('finds a verification', function (done) {
       let customerParams = {
         creditCard: {
-          cardholderName: "John Smith",
+          cardholderName: 'John Smith',
           number: '4000111111111115',
           expirationDate: '05/2014',
           options: {
@@ -21,7 +19,7 @@ describe("CreditCardVerificationGateway", function() {
       };
 
       return specHelper.defaultGateway.customer.create(customerParams, (err, response) =>
-        specHelper.defaultGateway.creditCardVerification.find(response.verification.id, function(err, verification) {
+        specHelper.defaultGateway.creditCardVerification.find(response.verification.id, function (err, verification) {
           assert.isNull(err);
           assert.equal(verification.creditCard.cardholderName, 'John Smith');
 
@@ -30,16 +28,16 @@ describe("CreditCardVerificationGateway", function() {
       );
     });
 
-    it("handles not finding a verification", done =>
-      specHelper.defaultGateway.creditCardVerification.find('nonexistent_verification', function(err, verification) {
+    it('handles not finding a verification', done =>
+      specHelper.defaultGateway.creditCardVerification.find('nonexistent_verification', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
         return done();
       })
     );
 
-    return it("handles whitespace ids", done =>
-      specHelper.defaultGateway.creditCardVerification.find(' ', function(err, verification) {
+    return it('handles whitespace ids', done =>
+      specHelper.defaultGateway.creditCardVerification.find(' ', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
         return done();
@@ -47,17 +45,17 @@ describe("CreditCardVerificationGateway", function() {
     );
   });
 
-  return describe("create", function() {
-    it("handles verified verifications", function(done) {
+  return describe('create', function () {
+    it('handles verified verifications', function (done) {
       let params = {
         creditCard: {
-          cardholderName: "John Smith",
+          cardholderName: 'John Smith',
           number: '4111111111111111',
           expirationDate: '05/2014'
         }
       };
 
-      return specHelper.defaultGateway.creditCardVerification.create(params, function(err, response) {
+      return specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
@@ -65,37 +63,37 @@ describe("CreditCardVerificationGateway", function() {
       });
     });
 
-    it("handles processor declined verifications", function(done) {
+    it('handles processor declined verifications', function (done) {
       let params = {
         creditCard: {
-          cardholderName: "John Smith",
+          cardholderName: 'John Smith',
           number: '4000111111111115',
           expirationDate: '05/2014'
         }
       };
 
-      return specHelper.defaultGateway.creditCardVerification.create(params, function(err, response) {
+      return specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
         assert.isFalse(response.success);
 
         return done();
       });
     });
 
-    return it("handles validation errors", function(done) {
+    return it('handles validation errors', function (done) {
       let params = {
         creditCard: {
-          cardholderName: "John Smith",
+          cardholderName: 'John Smith',
           number: '4111111111111111',
           expirationDate: '05/2014'
         },
         options: {
-          amount: "-10.00"
+          amount: '-10.00'
         }
       };
 
-      return specHelper.defaultGateway.creditCardVerification.create(params, function(err, response) {
+      return specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
         assert.equal(
-          response.errors.for("verification").for("options").on("amount")[0].code,
+          response.errors.for('verification').for('options').on('amount')[0].code,
           ValidationErrorCodes.Verification.Options.AmountCannotBeNegative
         );
 

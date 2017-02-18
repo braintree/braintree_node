@@ -3,9 +3,9 @@
 require('../../spec_helper');
 let _ = require('underscore')._;
 
-describe("DiscountGateway", () =>
-  describe("self.all", () =>
-    it("gets all discounts", function(done) {
+describe('DiscountGateway', () =>
+  describe('self.all', () =>
+    it('gets all discounts', function (done) {
       let discountId = `testDiscount${specHelper.randomId()}`;
       let attributes = {
         id: discountId,
@@ -18,11 +18,12 @@ describe("DiscountGateway", () =>
       };
 
       return specHelper.createModificationForTests(attributes, () =>
-        specHelper.defaultGateway.discount.all(function(err, response) {
+        specHelper.defaultGateway.discount.all(function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
 
           let discount = _.find(response.discounts, discount => discount.id === attributes.id);
+
           assert.equal(attributes.name, discount.name);
           assert.equal(attributes.amount, discount.amount);
           assert.equal(attributes.description, discount.description);

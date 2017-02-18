@@ -3,29 +3,29 @@
 require('../../spec_helper');
 let SearchResponse = require('../../../lib/braintree/search_response').SearchResponse;
 
-describe("SearchResponse", function() {
-  describe("first", function() {
-    it("calls gateway#find with results", function() {
+describe('SearchResponse', function () {
+  describe('first', function () {
+    it('calls gateway#find with results', function () {
       let fakeGateway = {
-        find(id, callback) {
-          throw new Error("This exception SHOULD be thrown");
+        find() {
+          throw new Error('This exception SHOULD be thrown');
         }
       };
       let fakeResults = {
         searchResults: {
-          ids: [ specHelper.randomId() ]
+          ids: [specHelper.randomId()]
         }
       };
 
       let searchResponse = new SearchResponse(fakeGateway, fakeResults);
 
-      return assert.throws((() => this.searchResponse.first()), Error);
+      return assert.throws(() => searchResponse.first(), Error); // eslint-disable-line no-invalid-this
     });
 
-    return it("does not call gateway#find with zero results", function(done) {
+    return it('does not call gateway#find with zero results', function (done) {
       let fakeGateway = {
-        find(id, callback) {
-          throw new Error("This exception should NOT be thrown");
+        find() {
+          throw new Error('This exception should NOT be thrown');
         }
       };
       let fakeResults = {
@@ -35,18 +35,18 @@ describe("SearchResponse", function() {
       };
       let searchResponse = new SearchResponse(fakeGateway, fakeResults);
 
-      return searchResponse.first(function() {
+      return searchResponse.first(function () {
         assert.isTrue(true);
         return done();
       });
     });
   });
 
-  describe("each", () =>
-    it("does not call pagingFunding with zero results", function() {
-      let fakePagingFunction = function(ids, callback) {
-          throw new Error("This exception should NOT be thrown");
-        };
+  describe('each', () =>
+    it('does not call pagingFunding with zero results', function () {
+      let fakePagingFunction = () => { // eslint-disable-line func-style
+        throw new Error('This exception should NOT be thrown');
+      };
       let fakeResults = {
         searchResults: {
           ids: []
@@ -55,15 +55,15 @@ describe("SearchResponse", function() {
 
       let searchResponse = new SearchResponse(fakePagingFunction, fakeResults);
 
-      return assert.doesNotThrow((() => searchResponse.each()), Error);
+      return assert.doesNotThrow(() => searchResponse.each(), Error);
     })
   );
 
-  return describe("length", () =>
-    it("returns the correct length", function() {
+  return describe('length', () =>
+    it('returns the correct length', function () {
       let fakeResults = {
         searchResults: {
-          ids: [ 1, 2 ]
+          ids: [1, 2]
         }
       };
 

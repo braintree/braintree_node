@@ -1,11 +1,11 @@
 'use strict';
 
 require('../../spec_helper');
-let _ = require('underscore')._ ;
+let _ = require('underscore')._;
 
-describe("AddOnGateway", () =>
-  describe("self.all", () =>
-    it("gets all addons", function(done) {
+describe('AddOnGateway', () =>
+  describe('self.all', () =>
+    it('gets all addons', function (done) {
       let addOnId = `testAddOn${specHelper.randomId()}`;
       let attributes = {
         id: addOnId,
@@ -18,11 +18,12 @@ describe("AddOnGateway", () =>
       };
 
       return specHelper.createModificationForTests(attributes, () =>
-        specHelper.defaultGateway.addOn.all(function(err, response) {
+        specHelper.defaultGateway.addOn.all(function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
 
           let addOn = _.find(response.addOns, addOn => addOn.id === attributes.id);
+
           assert.equal(attributes.name, addOn.name);
           assert.equal(attributes.amount, addOn.amount);
           assert.equal(attributes.description, addOn.description);

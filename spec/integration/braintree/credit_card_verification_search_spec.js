@@ -1,26 +1,27 @@
 'use strict';
 
-let Braintree = require("../../../lib/braintree");
 require('../../spec_helper');
+
+let Braintree = require('../../../lib/braintree');
 let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 let CreditCard = Braintree.CreditCard;
 let CreditCardVerification = Braintree.CreditCardVerification;
 
-describe("CreditCardVerification", () =>
-  describe("search", function() {
-    it("can return empty results", done =>
-      specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(specHelper.randomId() + " Smith")
-      , function(err, response) {
+describe('CreditCardVerification', () =>
+  describe('search', function () {
+    it('can return empty results', done =>
+      specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(specHelper.randomId() + ' Smith')
+      , function (err, response) {
         assert.isNull(err);
         assert.equal(response.length(), 0);
 
-        return done();
+        done();
       })
     );
 
-    it("handles responses with a single result", function(done) {
+    it('handles responses with a single result', function (done) {
+      let customerId = specHelper.randomId();
       let customerEmail = `sandworm${customerId}@example.com`;
-      var customerId = specHelper.randomId();
       let expirationMonth = '12';
       let expirationYear = '2016';
       let expirationDate = expirationMonth + '/' + expirationYear;
@@ -51,8 +52,8 @@ describe("CreditCardVerification", () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, (err, response) =>
-        specHelper.defaultGateway.creditCardVerification.search(function(search) {
+      return specHelper.defaultGateway.customer.create(customerParams, () =>
+        specHelper.defaultGateway.creditCardVerification.search(function (search) {
           search.billingAddressDetailsPostalCode().is(postalCode);
           search.creditCardCardType().is(CreditCard.CardType.Visa);
           search.creditCardCardholderName().is(name);
@@ -64,9 +65,9 @@ describe("CreditCardVerification", () =>
           return search.status().is(CreditCardVerification.StatusType.Verified);
         }
 
-        , function(err, response) {
+        , function (err, response) {
           assert.equal(response.length(), 1);
-          return response.first(function(err, verification) {
+          return response.first(function (err, verification) {
             let createdAt = verification.createdAt;
             let verificationId = verification.id;
 
@@ -78,19 +79,19 @@ describe("CreditCardVerification", () =>
             assert.equal(verification.creditCard.cardType, CreditCard.CardType.Visa);
             assert.equal(verification.status, CreditCardVerification.StatusType.Verified);
 
-            return specHelper.defaultGateway.creditCardVerification.search(function(search) {
+            return specHelper.defaultGateway.creditCardVerification.search(function (search) {
               search.createdAt().is(createdAt);
               search.id().is(verificationId);
               return search.ids().in(verificationId);
             }
 
-            , function(err, response) {
+            , function (err, response) {
               assert.equal(response.length(), 1);
-              return response.first(function(err, verification) {
+              return response.first(function (err, verification) {
                 assert.equal(verification.createdAt, createdAt);
                 assert.equal(verification.id, verificationId);
 
-                return done();
+                done();
               });
             });
           });
@@ -98,7 +99,7 @@ describe("CreditCardVerification", () =>
       );
     });
 
-    it("allows stream style interation of results", function(done) {
+    it('allows stream style interation of results', function (done) {
       let name = specHelper.randomId() + ' Smith';
       let customerParams = {
         creditCard: {
@@ -111,29 +112,29 @@ describe("CreditCardVerification", () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function(err, response) {
+      return specHelper.defaultGateway.customer.create(customerParams, function () {
         let search = specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(name));
 
         let verifications = [];
 
         search.on('data', verification => verifications.push(verification));
 
-        search.on('end', function() {
+        search.on('end', function () {
           assert.equal(verifications[0].creditCard.bin, '400011');
           assert.equal(verifications[0].creditCard.cardholderName, name);
 
-          return done();
+          done();
         });
 
         return search.resume();
       });
     });
 
-    it("can return multiple results", function(done) {
+    it('can return multiple results', function (done) {
       let name = specHelper.randomId() + ' Smith';
       let creditCardNumber = CreditCardNumbers.CardTypeIndicators.Debit;
       let expirationDate = '12/2016';
-      let email = "mike.a@example.com";
+      let email = 'mike.a@example.com';
       let firstCustomerId = specHelper.randomId();
       let secondCustomerId = specHelper.randomId();
 
@@ -163,19 +164,19 @@ describe("CreditCardVerification", () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, (err, response) =>
-        specHelper.defaultGateway.customer.create(customerParams2, (err, response) =>
-          specHelper.defaultGateway.creditCardVerification.search(function(search) {
+      return specHelper.defaultGateway.customer.create(customerParams, () =>
+        specHelper.defaultGateway.customer.create(customerParams2, () =>
+          specHelper.defaultGateway.creditCardVerification.search(function (search) {
             search.creditCardCardholderName().is(name);
             search.creditCardNumber().is(creditCardNumber);
             search.creditCardExpirationDate().is(expirationDate);
             search.creditCardCardType().in(CreditCard.CardType.Visa);
             return search.customerEmail().is(email);
           }
-          , function(err, response) {
+          , function (err, response) {
             let verifications = [];
 
-            return response.each(function(err, verification) {
+            return response.each(function (err, verification) {
               verifications.push(verification);
               if (verifications.length === 2) {
                 assert.isNull(err);
@@ -183,7 +184,7 @@ describe("CreditCardVerification", () =>
                 assert.equal(verifications[0].creditCard.cardholderName, name);
                 assert.equal(verifications[1].creditCard.cardholderName, name);
 
-                return done();
+                done();
               }
             });
           })
@@ -191,8 +192,9 @@ describe("CreditCardVerification", () =>
       );
     });
 
-    return it("returns card type indicators", function(done) {
+    return it('returns card type indicators', function (done) {
       let name = specHelper.randomId() + ' Smith';
+
       return specHelper.defaultGateway.customer.create({
         creditCard: {
           cardholderName: name,
@@ -202,11 +204,10 @@ describe("CreditCardVerification", () =>
             verifyCard: true
           }
         }
-      }
-      , (err, response) =>
+      }, () =>
         specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(name)
         , (err, response) =>
-          response.first(function(err, verification) {
+          response.first(function (err, verification) {
             assert.isNull(err);
             assert.equal(verification.creditCard.cardholderName, name);
             assert.equal(verification.creditCard.prepaid, CreditCard.Prepaid.Unknown);
@@ -219,7 +220,7 @@ describe("CreditCardVerification", () =>
             assert.equal(verification.creditCard.issuingBank, CreditCard.IssuingBank.Unknown);
             assert.equal(verification.creditCard.productId, CreditCard.ProductId.Unknown);
 
-            return done();
+            done();
           })
         )
       );

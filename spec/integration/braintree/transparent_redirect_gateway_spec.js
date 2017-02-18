@@ -2,14 +2,13 @@
 
 require('../../spec_helper');
 
-let _ = require('underscore')._;
 let braintree = specHelper.braintree;
 
-describe("TransparentRedirectGateway", function() {
+describe('TransparentRedirectGateway', function () {
   let url = specHelper.defaultGateway.transparentRedirect.url;
 
-  describe("createCustomerData", function() {
-    it("generates tr data for the customer", function(done) {
+  describe('createCustomerData', function () {
+    it('generates tr data for the customer', function (done) {
       let trData = specHelper.defaultGateway.transparentRedirect.createCustomerData({
         redirectUrl: 'http://www.example.com/',
         customer: {
@@ -19,12 +18,12 @@ describe("TransparentRedirectGateway", function() {
 
       let customerParams = {
         customer: {
-          last_name: 'Smith'
+          last_name: 'Smith' // eslint-disable-line camelcase
         }
       };
 
       return specHelper.simulateTrFormPost(url, trData, customerParams, (err, response) =>
-        specHelper.defaultGateway.transparentRedirect.confirm(response, function(err, response) {
+        specHelper.defaultGateway.transparentRedirect.confirm(response, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.customer.firstName, 'Dan');
@@ -35,7 +34,7 @@ describe("TransparentRedirectGateway", function() {
       );
     });
 
-    return it("can include the credit card and billing address", function(done) {
+    return it('can include the credit card and billing address', function (done) {
       let trData = specHelper.defaultGateway.transparentRedirect.createCustomerData({
         redirectUrl: 'http://www.example.com/',
         customer: {
@@ -51,7 +50,7 @@ describe("TransparentRedirectGateway", function() {
 
       let customerParams = {
         customer: {
-          last_name: 'Smith',
+          last_name: 'Smith', // eslint-disable-line camelcase
           creditCard: {
             number: '5105105105105100',
             expirationMonth: '05',
@@ -64,7 +63,7 @@ describe("TransparentRedirectGateway", function() {
       };
 
       return specHelper.simulateTrFormPost(url, trData, customerParams, (err, response) =>
-        specHelper.defaultGateway.transparentRedirect.confirm(response, function(err, response) {
+        specHelper.defaultGateway.transparentRedirect.confirm(response, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.customer.firstName, 'Dan');
@@ -82,14 +81,14 @@ describe("TransparentRedirectGateway", function() {
     });
   });
 
-  describe("updateCustomerData", () =>
-    it("updates a customer", function(done) {
+  describe('updateCustomerData', () =>
+    it('updates a customer', function (done) {
       let customerParams = {
         firstName: 'Old First Name',
         lastName: 'Old Last Name'
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function(err, response) {
+      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let trData = specHelper.defaultGateway.transparentRedirect.updateCustomerData({
           redirectUrl: 'http://www.example.com/',
           customerId: response.customer.id,
@@ -105,7 +104,7 @@ describe("TransparentRedirectGateway", function() {
         };
 
         return specHelper.simulateTrFormPost(url, trData, updateParams, (err, response) =>
-          specHelper.defaultGateway.transparentRedirect.confirm(response, function(err, response) {
+          specHelper.defaultGateway.transparentRedirect.confirm(response, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.customer.firstName, 'New First Name');
@@ -118,8 +117,8 @@ describe("TransparentRedirectGateway", function() {
     })
   );
 
-  describe("transactionData", () =>
-    it("creates a transaction", function(done) {
+  describe('transactionData', () =>
+    it('creates a transaction', function (done) {
       let trData = specHelper.defaultGateway.transparentRedirect.transactionData({
         redirectUrl: 'http://www.example.com/',
         transaction: {
@@ -138,7 +137,7 @@ describe("TransparentRedirectGateway", function() {
       };
 
       return specHelper.simulateTrFormPost(url, trData, transactionParams, (err, response) =>
-        specHelper.defaultGateway.transparentRedirect.confirm(response, function(err, response) {
+        specHelper.defaultGateway.transparentRedirect.confirm(response, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, 'authorized');
@@ -151,9 +150,9 @@ describe("TransparentRedirectGateway", function() {
     })
   );
 
-  describe("createCreditCard", () =>
-    it("creates a credit card", done =>
-      specHelper.defaultGateway.customer.create({firstName: 'Customer First Name'}, function(err, response) {
+  describe('createCreditCard', () =>
+    it('creates a credit card', done =>
+      specHelper.defaultGateway.customer.create({firstName: 'Customer First Name'}, function (err, response) {
         let trData = specHelper.defaultGateway.transparentRedirect.createCreditCardData({
           redirectUrl: 'http://www.example.com/',
           creditCard: {
@@ -170,7 +169,7 @@ describe("TransparentRedirectGateway", function() {
         };
 
         return specHelper.simulateTrFormPost(url, trData, creditCardParams, (err, response) =>
-          specHelper.defaultGateway.transparentRedirect.confirm(response, function(err, response) {
+          specHelper.defaultGateway.transparentRedirect.confirm(response, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.creditCard.cardholderName, 'Dan');
@@ -183,8 +182,8 @@ describe("TransparentRedirectGateway", function() {
     )
   );
 
-  describe("updateCreditCard", () =>
-    it("updates a credit card", function(done) {
+  describe('updateCreditCard', () =>
+    it('updates a credit card', function (done) {
       let customerParams = {
         firstName: 'Customer First Name',
         creditCard: {
@@ -194,7 +193,7 @@ describe("TransparentRedirectGateway", function() {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function(err, response) {
+      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let trData = specHelper.defaultGateway.transparentRedirect.updateCreditCardData({
           redirectUrl: 'http://www.example.com/',
           paymentMethodToken: response.customer.creditCards[0].token,
@@ -210,7 +209,7 @@ describe("TransparentRedirectGateway", function() {
         };
 
         return specHelper.simulateTrFormPost(url, trData, creditCardParams, (err, response) =>
-          specHelper.defaultGateway.transparentRedirect.confirm(response, function(err, response) {
+          specHelper.defaultGateway.transparentRedirect.confirm(response, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.creditCard.cardholderName, 'New Cardholder Name');
@@ -223,45 +222,44 @@ describe("TransparentRedirectGateway", function() {
     })
   );
 
-  return describe("confirm", function() {
-    it("handles invalid hashes", done =>
-      specHelper.defaultGateway.transparentRedirect.confirm('a=b&hash=invalid', function(err, response) {
+  return describe('confirm', function () {
+    it('handles invalid hashes', done =>
+      specHelper.defaultGateway.transparentRedirect.confirm('a=b&hash=invalid', function (err) {
         assert.equal(err.type, braintree.errorTypes.invalidTransparentRedirectHashError);
         return done();
       })
     );
 
-    it("handles status 401", done =>
-      specHelper.defaultGateway.transparentRedirect.confirm('http_status=401&hash=none', function(err, response) {
+    it('handles status 401', done =>
+      specHelper.defaultGateway.transparentRedirect.confirm('http_status=401&hash=none', function (err) {
         assert.equal(err.type, braintree.errorTypes.authenticationError);
         return done();
       })
     );
 
-
-    it("handles status 403", done =>
-      specHelper.defaultGateway.transparentRedirect.confirm('http_status=403&hash=irrelevant', function(err, response) {
+    it('handles status 403', done =>
+      specHelper.defaultGateway.transparentRedirect.confirm('http_status=403&hash=irrelevant', function (err) {
         assert.equal(err.type, braintree.errorTypes.authorizationError);
         return done();
       })
     );
 
-    it("handles status 426", done =>
-      specHelper.defaultGateway.transparentRedirect.confirm('http_status=426&hash=irrelevant', function(err, response) {
+    it('handles status 426', done =>
+      specHelper.defaultGateway.transparentRedirect.confirm('http_status=426&hash=irrelevant', function (err) {
         assert.equal(err.type, braintree.errorTypes.upgradeRequired);
         return done();
       })
     );
 
-    it("handles status 500", done =>
-      specHelper.defaultGateway.transparentRedirect.confirm('http_status=500&hash=irrelevant', function(err, response) {
+    it('handles status 500', done =>
+      specHelper.defaultGateway.transparentRedirect.confirm('http_status=500&hash=irrelevant', function (err) {
         assert.equal(err.type, braintree.errorTypes.serverError);
         return done();
       })
     );
 
-    return it("handles status 503", done =>
-      specHelper.defaultGateway.transparentRedirect.confirm('http_status=503&hash=irrelevant', function(err, response) {
+    return it('handles status 503', done =>
+      specHelper.defaultGateway.transparentRedirect.confirm('http_status=503&hash=irrelevant', function (err) {
         assert.equal(err.type, braintree.errorTypes.downForMaintenanceError);
         return done();
       })

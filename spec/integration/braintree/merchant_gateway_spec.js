@@ -5,19 +5,20 @@ let ValidationErrorCodes = require('../../../lib/braintree/validation_error_code
 
 let braintree = specHelper.braintree;
 
-describe("MerchantGateway", function() {
-  describe("create", () =>
-    it("creates a merchant", function(done) {
+describe('MerchantGateway', function () {
+  describe('create', () =>
+    it('creates a merchant', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
-      return gateway.merchant.create({email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['credit_card', 'paypal']}, function(err, response) {
+      return gateway.merchant.create({email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['credit_card', 'paypal']}, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
         let merchant = response.merchant;
+
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -27,6 +28,7 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryName, 'United States of America');
 
         let credentials = response.credentials;
+
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
@@ -38,14 +40,13 @@ describe("MerchantGateway", function() {
     })
   );
 
-  it("returns an error when using invalid payment methods", function(done) {
+  it('returns an error when using invalid payment methods', function (done) {
     let gateway = braintree.connect({
       clientId: 'client_id$development$integration_client_id',
       clientSecret: 'client_secret$development$integration_client_secret'
     });
 
-    return gateway.merchant.create({email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['fake_money']}, function(err, response) {
-
+    return gateway.merchant.create({email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['fake_money']}, function (err, response) {
       assert.isNotNull(response.errors);
       assert.isFalse(response.success);
 
@@ -58,8 +59,8 @@ describe("MerchantGateway", function() {
     });
   });
 
-  return describe("create_multi_currency", function() {
-    it("creates a multi-currency merchant", function(done) {
+  return describe('create_multi_currency', function () {
+    it('creates a multi-currency merchant', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
@@ -70,11 +71,12 @@ describe("MerchantGateway", function() {
         countryCodeAlpha3: 'USA',
         paymentMethods: ['credit_card', 'paypal'],
         currencies: ['GBP', 'USD']
-      }, function(err, response) {
+      }, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
         let merchant = response.merchant;
+
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -84,6 +86,7 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryName, 'United States of America');
 
         let credentials = response.credentials;
+
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
@@ -91,14 +94,17 @@ describe("MerchantGateway", function() {
         assert.equal(credentials.tokenType, 'bearer');
 
         let merchantAccounts = merchant.merchantAccounts;
+
         assert.equal(merchantAccounts.length, 2);
 
         let usdMerchantAccount = (merchantAccounts.filter(x => x.id === 'USD'))[0];
+
         assert.isNotNull(usdMerchantAccount);
         assert.equal(usdMerchantAccount.default, true);
         assert.equal(usdMerchantAccount.currencyIsoCode, 'USD');
 
         let gbpMerchantAccount = (merchantAccounts.filter(x => x.id === 'GBP'))[0];
+
         assert.isNotNull(gbpMerchantAccount);
         assert.equal(gbpMerchantAccount.default, false);
         assert.equal(gbpMerchantAccount.currencyIsoCode, 'GBP');
@@ -107,7 +113,7 @@ describe("MerchantGateway", function() {
       });
     });
 
-    it("creates a paypal-only merchant", function(done) {
+    it('creates a paypal-only merchant', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
@@ -122,11 +128,12 @@ describe("MerchantGateway", function() {
           clientId: 'fake_client_id',
           clientSecret: 'fake_client_secret'
         }
-      }, function(err, response) {
+      }, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
         let merchant = response.merchant;
+
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -136,6 +143,7 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryName, 'United States of America');
 
         let credentials = response.credentials;
+
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
@@ -143,14 +151,17 @@ describe("MerchantGateway", function() {
         assert.equal(credentials.tokenType, 'bearer');
 
         let merchantAccounts = merchant.merchantAccounts;
+
         assert.equal(merchantAccounts.length, 2);
 
         let usdMerchantAccount = (merchantAccounts.filter(x => x.id === 'USD'))[0];
+
         assert.isNotNull(usdMerchantAccount);
         assert.equal(usdMerchantAccount.default, true);
         assert.equal(usdMerchantAccount.currencyIsoCode, 'USD');
 
         let gbpMerchantAccount = (merchantAccounts.filter(x => x.id === 'GBP'))[0];
+
         assert.isNotNull(gbpMerchantAccount);
         assert.equal(gbpMerchantAccount.default, false);
         assert.equal(gbpMerchantAccount.currencyIsoCode, 'GBP');
@@ -159,7 +170,7 @@ describe("MerchantGateway", function() {
       });
     });
 
-    it("allows creation of non-US merchant if onboarding application is internal", function(done) {
+    it('allows creation of non-US merchant if onboarding application is internal', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
@@ -173,11 +184,12 @@ describe("MerchantGateway", function() {
           clientId: 'fake_client_id',
           clientSecret: 'fake_client_secret'
         }
-      }, function(err, response) {
+      }, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
         let merchant = response.merchant;
+
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -187,6 +199,7 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryName, 'Japan');
 
         let credentials = response.credentials;
+
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
@@ -194,9 +207,11 @@ describe("MerchantGateway", function() {
         assert.equal(credentials.tokenType, 'bearer');
 
         let merchantAccounts = merchant.merchantAccounts;
+
         assert.equal(merchantAccounts.length, 1);
 
         let merchantAccount = merchantAccounts[0];
+
         assert.equal(merchantAccount.default, true);
         assert.equal(merchantAccount.currencyIsoCode, 'JPY');
 
@@ -204,7 +219,7 @@ describe("MerchantGateway", function() {
       });
     });
 
-    it("defaults to USD for non-US merchant if onboarding application is internal and country currency not supported", function(done) {
+    it('defaults to USD for non-US merchant if onboarding application is internal and country currency not supported', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
@@ -218,11 +233,12 @@ describe("MerchantGateway", function() {
           clientId: 'fake_client_id',
           clientSecret: 'fake_client_secret'
         }
-      }, function(err, response) {
+      }, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
         let merchant = response.merchant;
+
         assert.isNotNull(merchant.id);
         assert.equal(merchant.email, 'name@email.com');
         assert.equal(merchant.companyName, 'name@email.com');
@@ -232,6 +248,7 @@ describe("MerchantGateway", function() {
         assert.equal(merchant.countryName, 'Yemen');
 
         let credentials = response.credentials;
+
         assert.isNotNull(credentials.accessToken);
         assert.equal(credentials.accessToken.indexOf('access_token'), 0);
         assert.isNotNull(credentials.refreshToken);
@@ -239,9 +256,11 @@ describe("MerchantGateway", function() {
         assert.equal(credentials.tokenType, 'bearer');
 
         let merchantAccounts = merchant.merchantAccounts;
+
         assert.equal(merchantAccounts.length, 1);
 
         let merchantAccount = merchantAccounts[0];
+
         assert.equal(merchantAccount.default, true);
         assert.equal(merchantAccount.currencyIsoCode, 'USD');
 
@@ -249,7 +268,7 @@ describe("MerchantGateway", function() {
       });
     });
 
-    return it("returns error if invalid currency is passed", function(done) {
+    return it('returns error if invalid currency is passed', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
@@ -264,7 +283,7 @@ describe("MerchantGateway", function() {
           clientId: 'fake_client_id',
           clientSecret: 'fake_client_secret'
         }
-      }, function(err, response) {
+      }, function (err, response) {
         assert.isNotNull(response.errors);
         assert.isFalse(response.success);
 

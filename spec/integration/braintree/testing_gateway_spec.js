@@ -3,12 +3,11 @@
 require('../../spec_helper');
 
 let braintree = specHelper.braintree;
-let Transaction = require('../../../lib/braintree/transaction').Transaction;
 let Environment = require('../../../lib/braintree/environment').Environment;
 
-describe("TestingGateway", () =>
-  describe("test settlement methods", function() {
-    it("settles a transaction", function(done) {
+describe('TestingGateway', () =>
+  describe('test settlement methods', function () {
+    it('settles a transaction', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -20,11 +19,11 @@ describe("TestingGateway", () =>
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function(err, transactionResponse) {
+      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
         assert.isNull(err);
         assert.isTrue(transactionResponse.success);
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement');
-        return specHelper.defaultGateway.testing.settle(transactionResponse.transaction.id, function(err, settleResponse) {
+        return specHelper.defaultGateway.testing.settle(transactionResponse.transaction.id, function (err, settleResponse) {
           assert.isNull(err);
           assert.equal(settleResponse.transaction.status, 'settled');
 
@@ -33,7 +32,7 @@ describe("TestingGateway", () =>
       });
     });
 
-    it("marks a transaction settlement pending", function(done) {
+    it('marks a transaction settlement pending', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -45,11 +44,11 @@ describe("TestingGateway", () =>
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function(err, transactionResponse) {
+      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
         assert.isNull(err);
         assert.isTrue(transactionResponse.success);
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement');
-        return specHelper.defaultGateway.testing.settlementPending(transactionResponse.transaction.id, function(err, settleResponse) {
+        return specHelper.defaultGateway.testing.settlementPending(transactionResponse.transaction.id, function (err, settleResponse) {
           assert.isNull(err);
           assert.equal(settleResponse.transaction.status, 'settlement_pending');
 
@@ -58,7 +57,7 @@ describe("TestingGateway", () =>
       });
     });
 
-    it("marks a transaction settlement confirmed", function(done) {
+    it('marks a transaction settlement confirmed', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -70,11 +69,11 @@ describe("TestingGateway", () =>
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function(err, transactionResponse) {
+      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
         assert.isNull(err);
         assert.isTrue(transactionResponse.success);
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement');
-        return specHelper.defaultGateway.testing.settlementConfirm(transactionResponse.transaction.id, function(err, settleResponse) {
+        return specHelper.defaultGateway.testing.settlementConfirm(transactionResponse.transaction.id, function (err, settleResponse) {
           assert.isNull(err);
           assert.equal(settleResponse.transaction.status, 'settlement_confirmed');
 
@@ -83,7 +82,7 @@ describe("TestingGateway", () =>
       });
     });
 
-    it("marks a transaction settlement declined", function(done) {
+    it('marks a transaction settlement declined', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -95,11 +94,11 @@ describe("TestingGateway", () =>
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function(err, transactionResponse) {
+      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
         assert.isNull(err);
         assert.isTrue(transactionResponse.success);
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement');
-        return specHelper.defaultGateway.testing.settlementDecline(transactionResponse.transaction.id, function(err, settleResponse) {
+        return specHelper.defaultGateway.testing.settlementDecline(transactionResponse.transaction.id, function (err, settleResponse) {
           assert.isNull(err);
           assert.equal(settleResponse.transaction.status, 'settlement_declined');
 
@@ -108,7 +107,7 @@ describe("TestingGateway", () =>
       });
     });
 
-    return it("throws an error if testing gateway settlement methods are used in production", function(done) {
+    return it('throws an error if testing gateway settlement methods are used in production', function (done) {
       let gatewayConfig = {
         environment: Environment.Production,
         merchantId: 'integration_merchant_id',
@@ -117,7 +116,8 @@ describe("TestingGateway", () =>
       };
 
       let gateway = braintree.connect(gatewayConfig);
-      return gateway.testing.settlementConfirm('transaction_id', function(err, transactionResponse) {
+
+      gateway.testing.settlementConfirm('transaction_id', function (err) {
         assert.equal(err.type, braintree.errorTypes.testOperationPerformedInProductionError);
 
         return done();

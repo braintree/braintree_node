@@ -1,11 +1,12 @@
 'use strict';
+/* eslint-disable no-new */
 
-require("../spec_helper");
+require('../spec_helper');
 let Config = require('../../lib/braintree/config').Config;
 let Environment = require('../../lib/braintree/environment').Environment;
 
-describe("Config", function() {
-  it("can be configured with merchant credentials", function() {
+describe('Config', function () {
+  it('can be configured with merchant credentials', function () {
     let config = new Config({
       merchantId: 'merchantId',
       publicKey: 'publicKey',
@@ -18,7 +19,7 @@ describe("Config", function() {
     return assert.equal(config.privateKey, 'privateKey');
   });
 
-  it("can be configured with partner credentials", function() {
+  it('can be configured with partner credentials', function () {
     let config = new Config({
       partnerId: 'partnerId',
       publicKey: 'publicKey',
@@ -31,10 +32,9 @@ describe("Config", function() {
     return assert.equal(config.privateKey, 'privateKey');
   });
 
-  it("raises an exception if merchantId is null", () =>
-    assert.throws(function() {
-      let config;
-      return config = new Config({
+  it('raises an exception if merchantId is null', () =>
+    assert.throws(function () {
+      new Config({
         publicKey: 'publicKey',
         privateKey: 'privateKey',
         environment: 'development'
@@ -43,10 +43,9 @@ describe("Config", function() {
     , 'Missing merchantId')
   );
 
-  it("raises an exception if merchantId is empty", () =>
-    assert.throws(function() {
-      let config;
-      return config = new Config({
+  it('raises an exception if merchantId is empty', () =>
+    assert.throws(function () {
+      new Config({
         merchantId: '',
         publicKey: 'publicKey',
         privateKey: 'privateKey',
@@ -56,10 +55,9 @@ describe("Config", function() {
     , 'Missing merchantId')
   );
 
-  it("raises an exception if publicKey is null", () =>
-    assert.throws(function() {
-      let config;
-      return config = new Config({
+  it('raises an exception if publicKey is null', () =>
+    assert.throws(function () {
+      new Config({
         merchantId: 'merchantId',
         privateKey: 'privateKey',
         environment: 'development'
@@ -68,10 +66,9 @@ describe("Config", function() {
     , 'Missing publicKey')
   );
 
-  it("raises an exception if publicKey is empty", () =>
-    assert.throws(function() {
-      let config;
-      return config = new Config({
+  it('raises an exception if publicKey is empty', () =>
+    assert.throws(function () {
+      new Config({
         merchantId: 'merchantId',
         publicKey: '',
         privateKey: 'privateKey',
@@ -81,10 +78,9 @@ describe("Config", function() {
     , 'Missing publicKey')
   );
 
-  it("raises an exception if privateKey is null", () =>
-    assert.throws(function() {
-      let config;
-      return config = new Config({
+  it('raises an exception if privateKey is null', () =>
+    assert.throws(function () {
+      new Config({
         merchantId: 'merchantId',
         publicKey: 'publicKey',
         environment: 'development'
@@ -93,10 +89,9 @@ describe("Config", function() {
     , 'Missing privateKey')
   );
 
-  it("raises an exception if privateKey is empty", () =>
-    assert.throws(function() {
-      let config;
-      return config = new Config({
+  it('raises an exception if privateKey is empty', () =>
+    assert.throws(function () {
+      new Config({
         merchantId: 'merchantId',
         publicKey: 'publicKey',
         privateKey: '',
@@ -106,10 +101,9 @@ describe("Config", function() {
     , 'Missing privateKey')
   );
 
-  it("raises an exception if environment is null", () =>
-    assert.throws(function() {
-      let config;
-      return config = new Config({
+  it('raises an exception if environment is null', () =>
+    assert.throws(function () {
+      new Config({
         merchantId: 'merchantId',
         publicKey: 'publicKey',
         privateKey: 'privateKey'
@@ -118,10 +112,9 @@ describe("Config", function() {
     , 'Missing environment')
   );
 
-  it("raises an exception if environment is empty", () =>
-    assert.throws(function() {
-      let config;
-      return config = new Config({
+  it('raises an exception if environment is empty', () =>
+    assert.throws(function () {
+      new Config({
         merchantId: 'merchantId',
         publicKey: 'publicKey',
         privateKey: 'privateKey',
@@ -131,8 +124,8 @@ describe("Config", function() {
     , 'Missing environment')
   );
 
-  describe("baseMerchantUrl", () =>
-    it("returns the url for a merchant", function() {
+  describe('baseMerchantUrl', () =>
+    it('returns the url for a merchant', function () {
       let config = new Config({
         merchantId: 'merchantId',
         publicKey: 'publicKey',
@@ -140,12 +133,12 @@ describe("Config", function() {
         environment: new Environment('localhost', 3000, false)
       });
 
-      return assert.equal(config.baseMerchantUrl(), "http://localhost/merchants/merchantId");
+      return assert.equal(config.baseMerchantUrl(), 'http://localhost/merchants/merchantId');
     })
   );
 
-  return describe("timeout", () =>
-    it("defaults to 60 seconds", function() {
+  return describe('timeout', () =>
+    it('defaults to 60 seconds', function () {
       let config = new Config({
         merchantId: 'merchantId',
         publicKey: 'publicKey',

@@ -3,19 +3,19 @@
 require('../../spec_helper');
 let _ = require('underscore')._;
 
-describe("PlanGateway", () =>
-  describe("self.all", () =>
-    it("gets all plans", function(done) {
+describe('PlanGateway', () =>
+  describe('self.all', () =>
+    it('gets all plans', function (done) {
       let planToken = `testPlan${specHelper.randomId()}`;
       let attributes = {
         id: planToken,
         billingDayOfMonth: 1,
         billingFrequency: 1,
-        currencyIsoCode: "USD",
-        description: "some description",
-        name: "nodeTestPlan",
+        currencyIsoCode: 'USD',
+        description: 'some description',
+        name: 'nodeTestPlan',
         numberOfBillingCycles: 1,
-        price: "1.00",
+        price: '1.00',
         trialPeriod: false
       };
 
@@ -35,7 +35,7 @@ describe("PlanGateway", () =>
       return specHelper.createPlanForTests(attributes, () =>
         specHelper.createModificationForTests(addOnAttributes, () =>
           specHelper.createModificationForTests(discountAttributes, () =>
-            specHelper.defaultGateway.plan.all(function(err, response) {
+            specHelper.defaultGateway.plan.all(function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
 

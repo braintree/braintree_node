@@ -3,13 +3,13 @@
 require('../../spec_helper');
 let UnknownPaymentMethod = require('../../../lib/braintree/unknown_payment_method').UnknownPaymentMethod;
 
-describe("UnknownPaymentMethod", () =>
-  describe("imageUrl", () =>
-    it("returns the correct image url", function() {
+describe('UnknownPaymentMethod', () =>
+  describe('imageUrl', () =>
+    it('returns the correct image url', function () {
       let response = {
         unknownPaymentMethod: {
           token: 1234,
-          default: true,
+          'default': true,
           key: 'value',
           imageUrl: 'http://www.some.other.image.com'
         }
@@ -21,7 +21,7 @@ describe("UnknownPaymentMethod", () =>
       assert.isTrue(unknownPaymentMethod.default);
       return assert.equal(
         unknownPaymentMethod.imageUrl,
-        "https://assets.braintreegateway.com/payment_method_logo/unknown.png"
+        'https://assets.braintreegateway.com/payment_method_logo/unknown.png'
       );
     })
   )

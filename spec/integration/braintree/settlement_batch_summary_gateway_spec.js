@@ -2,30 +2,28 @@
 
 require('../../spec_helper');
 
-let braintree = specHelper.braintree;
-
-describe("SettlementBatchSummaryGateway", () =>
-  describe("generate", function() {
-    it("creates a batch with no records", done =>
-      specHelper.defaultGateway.settlementBatchSummary.generate({settlementDate: '2011-01-01'}, function(err, response) {
+describe('SettlementBatchSummaryGateway', () =>
+  describe('generate', function () {
+    it('creates a batch with no records', done =>
+      specHelper.defaultGateway.settlementBatchSummary.generate({settlementDate: '2011-01-01'}, function (err, response) {
         assert.isTrue(response.success);
         assert.deepEqual(response.settlementBatchSummary.records, []);
 
-        return done();
+        done();
       })
     );
 
-    it("returns an error if the date cannot be parsed", done =>
-      specHelper.defaultGateway.settlementBatchSummary.generate({settlementDate: 'NOT A DATE'}, function(err, response) {
+    it('returns an error if the date cannot be parsed', done =>
+      specHelper.defaultGateway.settlementBatchSummary.generate({settlementDate: 'NOT A DATE'}, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.errors.for('settlementBatchSummary').on('settlementDate')[0].code, '82302');
         assert.equal(response.errors.for('settlementBatchSummary').on('settlementDate')[0].attribute, 'settlement_date');
 
-        return done();
+        done();
       })
     );
 
-    it("creates a settlement batch with the appropriate records", function(done) {
+    it('creates a settlement batch with the appropriate records', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -34,24 +32,26 @@ describe("SettlementBatchSummaryGateway", () =>
         }
       };
 
-      return specHelper.defaultGateway.transaction.credit(transactionParams, (err, transactionResponse) =>
-        specHelper.defaultGateway.testing.settle(transactionResponse.transaction.id, function(err, settleResponse) {
+      specHelper.defaultGateway.transaction.credit(transactionParams, (err, transactionResponse) =>
+        specHelper.defaultGateway.testing.settle(transactionResponse.transaction.id, function () {
           let settlementDateInEastern = specHelper.settlementDate(new Date());
           let formattedDate = specHelper.dateToMdy(settlementDateInEastern);
-          return specHelper.defaultGateway.settlementBatchSummary.generate({settlementDate: formattedDate}, function(err, settleBatchResponse) {
+
+          specHelper.defaultGateway.settlementBatchSummary.generate({settlementDate: formattedDate}, function (err, settleBatchResponse) {
             assert.isTrue(settleBatchResponse.success);
 
-            let visaRecords = (Array.from(settleBatchResponse.settlementBatchSummary.records).filter((record) => record.cardType === "Visa").map((record) => record));
-            assert.ok(visaRecords[0]['count'] >= 1);
-            assert.ok(parseFloat(visaRecords[0]['amountSettled']) >= parseFloat("5.00"));
+            let visaRecords = Array.from(settleBatchResponse.settlementBatchSummary.records).filter((record) => record.cardType === 'Visa').map((record) => record);
 
-            return done();
+            assert.ok(visaRecords[0].count >= 1);
+            assert.ok(parseFloat(visaRecords[0].amountSettled) >= parseFloat('5.00'));
+
+            done();
           });
         })
       );
     });
 
-    return it("groups by custom field", function(done) {
+    it('groups by custom field', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -59,25 +59,26 @@ describe("SettlementBatchSummaryGateway", () =>
           expirationDate: '05/12'
         },
         customFields: {
-          store_me: 1
+          storeMe: 1
         }
       };
 
-      return specHelper.defaultGateway.transaction.credit(transactionParams, (err, transactionResponse) =>
-        specHelper.defaultGateway.testing.settle(transactionResponse.transaction.id, function(err, settleResponse) {
+      specHelper.defaultGateway.transaction.credit(transactionParams, (err, transactionResponse) =>
+        specHelper.defaultGateway.testing.settle(transactionResponse.transaction.id, function () {
           let settlementDateInEastern = specHelper.settlementDate(new Date());
           let formattedDate = specHelper.dateToMdy(settlementDateInEastern);
           let settlementBatchParams = {
             settlementDate: formattedDate,
-            groupByCustomField: "store_me"
+            groupByCustomField: 'store_me'
           };
 
-          return specHelper.defaultGateway.settlementBatchSummary.generate(settlementBatchParams, function(err, settleBatchResponse) {
+          specHelper.defaultGateway.settlementBatchSummary.generate(settlementBatchParams, function (err, settleBatchResponse) {
             assert.isTrue(settleBatchResponse.success);
             let records = settleBatchResponse.settlementBatchSummary.records;
-            assert.ok(records[0]['store_me']);
 
-            return done();
+            assert.ok(records[0].store_me); // eslint-disable-line camelcase
+
+            done();
           });
         })
       );

@@ -1,42 +1,43 @@
 'use strict';
 
 require('../../spec_helper');
+
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
-let Environment = require('../../../lib/braintree/environment').Environment;
 let Digest = require('../../../lib/braintree/digest').Digest;
 
 let braintree = specHelper.braintree;
 
-describe("OAuthGateway", function() {
-  describe("createTokenFromCode", function() {
-    it("creates token from code using oauth credentials", function(done) {
+describe('OAuthGateway', function () {
+  describe('createTokenFromCode', function () {
+    it('creates token from code using oauth credentials', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
       return specHelper.createGrant(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) =>
-        gateway.oauth.createTokenFromCode({code, scope: 'read_write'}, function(err, response) {
+        gateway.oauth.createTokenFromCode({code, scope: 'read_write'}, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           let credentials = response.credentials;
+
           assert.isNotNull(credentials.accessToken);
           assert.isNotNull(credentials.refreshToken);
           assert.isNotNull(credentials.expiresAt);
           assert.equal(credentials.tokenType, 'bearer');
 
-          return done();
+          done();
         })
       );
     });
 
-    return it("returns validation errors when using a bad grant code", function(done) {
+    return it('returns validation errors when using a bad grant code', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
-      return gateway.oauth.createTokenFromCode({code: 'badCode', scope: 'read_write'}, function(err, response) {
+      return gateway.oauth.createTokenFromCode({code: 'badCode', scope: 'read_write'}, function (err, response) {
         assert.isNull(err);
         assert.isFalse(response.success);
         assert.equal(
@@ -48,13 +49,13 @@ describe("OAuthGateway", function() {
           'Invalid grant: code not found'
         );
 
-        return done();
+        done();
       });
     });
   });
 
-  describe("createTokenFromRefreshToken", () =>
-    it("creates an access token from a refresh token", function(done) {
+  describe('createTokenFromRefreshToken', () =>
+    it('creates an access token from a refresh token', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
@@ -62,24 +63,25 @@ describe("OAuthGateway", function() {
 
       return specHelper.createGrant(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) =>
         gateway.oauth.createTokenFromCode({code, scope: 'read_write'}, (err, refreshTokenResponse) =>
-          gateway.oauth.createTokenFromRefreshToken({refreshToken: refreshTokenResponse.credentials.refreshToken, scope: 'read_write'}, function(err, response) {
+          gateway.oauth.createTokenFromRefreshToken({refreshToken: refreshTokenResponse.credentials.refreshToken, scope: 'read_write'}, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             let credentials = response.credentials;
+
             assert.isNotNull(credentials.accessToken);
             assert.isNotNull(credentials.refreshToken);
             assert.isNotNull(credentials.expiresAt);
-            assert.equal(credentials.tokenType, "bearer");
+            assert.equal(credentials.tokenType, 'bearer');
 
-            return done();
+            done();
           })
         )
       );
     })
   );
 
-  describe("revokeAccessToken", () =>
-    it("revokes an access token", function(done) {
+  describe('revokeAccessToken', () =>
+    it('revokes an access token', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
@@ -87,7 +89,7 @@ describe("OAuthGateway", function() {
 
       return specHelper.createGrant(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) =>
         gateway.oauth.createTokenFromCode({code, scope: 'read_write'}, (err, accessTokenResponse) =>
-          gateway.oauth.revokeAccessToken(accessTokenResponse.credentials.accessToken, function(err, response) {
+          gateway.oauth.revokeAccessToken(accessTokenResponse.credentials.accessToken, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.isTrue(response.result.success);
@@ -96,11 +98,11 @@ describe("OAuthGateway", function() {
               accessToken: accessTokenResponse.credentials.accessToken
             });
 
-            return gateway.customer.create({}, function(err, response) {
+            return gateway.customer.create({}, function (err) {
               assert.isNotNull(err);
               assert.equal(err.name, 'authenticationError');
 
-              return done();
+              done();
             });
           })
         )
@@ -108,63 +110,66 @@ describe("OAuthGateway", function() {
     })
   );
 
-  return describe("connectUrl", function() {
-    it("builds a connect url", function() {
+  return describe('connectUrl', function () {
+    it('builds a connect url', function () {
+      let queryString;
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
       let url = gateway.oauth.connectUrl({
-        merchantId: "integration_merchant_id",
-        redirectUri: "http://bar.example.com",
-        scope: "read_write",
-        state: "baz_state",
-        landingPage: "login",
+        merchantId: 'integration_merchant_id',
+        redirectUri: 'http://bar.example.com',
+        scope: 'read_write',
+        state: 'baz_state',
+        landingPage: 'login',
         user: {
-          country: "USA",
-          email: "foo@example.com",
-          firstName: "Bob",
-          lastName: "Jones",
-          phone: "555-555-5555",
-          dobYear: "1970",
-          dobMonth: "01",
-          dobDay: "01",
-          streetAddress: "222 W Merchandise Mart",
-          locality: "Chicago",
-          region: "IL",
-          postalCode: "60606"
+          country: 'USA',
+          email: 'foo@example.com',
+          firstName: 'Bob',
+          lastName: 'Jones',
+          phone: '555-555-5555',
+          dobYear: '1970',
+          dobMonth: '01',
+          dobDay: '01',
+          streetAddress: '222 W Merchandise Mart',
+          locality: 'Chicago',
+          region: 'IL',
+          postalCode: '60606'
         },
         business: {
-          name: "14 Ladders",
-          registeredAs: "14.0 Ladders",
-          industry: "Ladders",
-          description: "We sell the best ladders",
-          streetAddress: "111 N Canal",
-          locality: "Chicago",
-          region: "IL",
-          postalCode: "60606",
-          country: "USA",
-          annualVolumeAmount: "1000000",
-          averageTransactionAmount: "100",
-          maximumTransactionAmount: "10000",
+          name: '14 Ladders',
+          registeredAs: '14.0 Ladders',
+          industry: 'Ladders',
+          description: 'We sell the best ladders',
+          streetAddress: '111 N Canal',
+          locality: 'Chicago',
+          region: 'IL',
+          postalCode: '60606',
+          country: 'USA',
+          annualVolumeAmount: '1000000',
+          averageTransactionAmount: '100',
+          maximumTransactionAmount: '10000',
           shipPhysicalGoods: true,
           fulfillmentCompletedIn: 7,
-          currency: "USD",
-          website: "http://example.com"
+          currency: 'USD',
+          website: 'http://example.com'
         },
-        paymentMethods: ["credit_card", "paypal"]
+        paymentMethods: ['credit_card', 'paypal']
       });
 
-      let query = function(searchKey) {
+      let query = function (searchKey) { // eslint-disable-line func-style
         let parts = queryString.split('&');
         let foundValue = null;
-        parts.forEach(function(part) {
+
+        parts.forEach(function (part) {
           let parts = Array.from(part.split('='));
           let key = parts[0];
           let value = parts[1];
+
           if (decodeURIComponent(key) === searchKey) {
-            return foundValue = decodeURIComponent(value);
+            foundValue = decodeURIComponent(value);
           }
         });
 
@@ -173,8 +178,10 @@ describe("OAuthGateway", function() {
 
       let parts = Array.from(url.split('?'));
       let urlAndPath = parts[0];
-      let queryString = parts[1];
-      let port = process.env['GATEWAY_PORT'] || '3000';
+      let port = process.env.GATEWAY_PORT || '3000';
+
+      queryString = parts[1];
+
       assert.equal(urlAndPath, `http://localhost:${port}/oauth/connect`);
 
       assert.equal(query('merchant_id'), 'integration_merchant_id');
@@ -224,7 +231,8 @@ describe("OAuthGateway", function() {
       return assert.equal(query('algorithm'), 'SHA256');
     });
 
-    it("builds a connect url without optional parameters", function() {
+    it('builds a connect url without optional parameters', function () {
+      let queryString;
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
@@ -232,15 +240,17 @@ describe("OAuthGateway", function() {
 
       let url = gateway.oauth.connectUrl({});
 
-      let query = function(searchKey) {
+      let query = function (searchKey) { // eslint-disable-line func-style
         let parts = queryString.split('&');
         let foundValue = null;
-        parts.forEach(function(part) {
+
+        parts.forEach(function (part) {
           let parts = Array.from(part.split('='));
           let key = parts[0];
           let value = parts[1];
+
           if (decodeURIComponent(key) === searchKey) {
-            return foundValue = decodeURIComponent(value);
+            foundValue = decodeURIComponent(value);
           }
         });
 
@@ -248,36 +258,39 @@ describe("OAuthGateway", function() {
       };
 
       let parts = Array.from(url.split('?'));
-      let urlAndPath = parts[0];
-      let queryString = parts[1];
+
+      queryString = parts[1];
 
       return assert.equal(query('redirect_url'), null);
     });
 
-    it("encodes connect url query parameters containing special characters not encoded by encodeURIComponent", function() {
+    it('encodes connect url query parameters containing special characters not encoded by encodeURIComponent', function () {
+      let queryString;
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
       let url = gateway.oauth.connectUrl({
-        merchantId: "integration_merchant_id",
-        redirectUri: "http://bar.example.com",
+        merchantId: 'integration_merchant_id',
+        redirectUri: 'http://bar.example.com',
         business: {
           name: "wacky symbols !'()*"
         }
       });
 
-      let queryString = Array.from(url.split('?'))[1];
-      let parts = Array.from(queryString.split('&').find(item => item.indexOf('wacky') > -1).split("="));
+      queryString = Array.from(url.split('?'))[1];
+
+      let parts = Array.from(queryString.split('&').find(item => item.indexOf('wacky') > -1).split('='));
       let key = parts[0];
       let value = parts[1];
 
-      assert.equal(key, "business%5Bname%5D");
-      return assert.equal(value, "wacky%20symbols%20%21%27%28%29%2A");
+      assert.equal(key, 'business%5Bname%5D');
+      return assert.equal(value, 'wacky%20symbols%20%21%27%28%29%2A');
     });
 
-    it("builds a connect url with multiple payment methods", function() {
+    it('builds a connect url with multiple payment methods', function () {
+      let queryString;
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
@@ -287,15 +300,17 @@ describe("OAuthGateway", function() {
         paymentMethods: ['credit_card', 'paypal']
       });
 
-      let query = function(searchKey) {
+      let query = function (searchKey) { // eslint-disable-line func-style
         let parts = queryString.split('&');
         let matches = [];
-        parts.forEach(function(part) {
+
+        parts.forEach(function (part) {
           let parts = Array.from(part.split('='));
           let key = parts[0];
           let value = parts[1];
+
           if (decodeURIComponent(key) === searchKey) {
-            return matches.push(decodeURIComponent(value));
+            matches.push(decodeURIComponent(value));
           }
         });
 
@@ -303,13 +318,13 @@ describe("OAuthGateway", function() {
       };
 
       let parts = Array.from(url.split('?'));
-      let urlAndPath = parts[0];
-      let queryString = parts[1];
+
+      queryString = parts[1];
 
       return assert.deepEqual(query('payment_methods[]'), ['credit_card', 'paypal']);
     });
 
-    return it("generates the correct signature", function() {
+    return it('generates the correct signature', function () {
       let url = 'http://localhost:3000/oauth/connect?business%5Bname%5D=We+Like+Spaces&client_id=client_id%24development%24integration_client_id';
       let signature = Digest.Sha256hexdigest('client_secret$development$integration_client_secret', url);
 

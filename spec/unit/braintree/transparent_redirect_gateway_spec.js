@@ -5,9 +5,9 @@ let braintree = require('../../../lib/braintree');
 
 let TransparentRedirectGateway = require('../../../lib/braintree/transparent_redirect_gateway').TransparentRedirectGateway;
 
-describe("TransparentRedirectGateway", () =>
-  describe("url", function() {
-    it("gives the correct url for sandbox", function() {
+describe('TransparentRedirectGateway', () =>
+  describe('url', function () {
+    it('gives the correct url for sandbox', function () {
       let config = {
         environment: braintree.Environment.Sandbox,
         merchantId: 'integration_merchant_id',
@@ -19,7 +19,7 @@ describe("TransparentRedirectGateway", () =>
       return assert.equal(gateway.url, 'https://api.sandbox.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests');
     });
 
-    it("gives the correct url for the production environment", function() {
+    it('gives the correct url for the production environment', function () {
       let config = {
         environment: braintree.Environment.Production,
         merchantId: 'integration_merchant_id',
@@ -31,7 +31,7 @@ describe("TransparentRedirectGateway", () =>
       return assert.equal(gateway.url, 'https://api.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests');
     });
 
-    return it("gives the correct url for the development environment", function() {
+    return it('gives the correct url for the development environment', function () {
       let config = {
         environment: braintree.Environment.Development,
         merchantId: 'integration_merchant_id',

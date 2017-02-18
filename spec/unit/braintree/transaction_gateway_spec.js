@@ -3,12 +3,12 @@
 require('../../spec_helper');
 let TransactionGateway = require('../../../lib/braintree/transaction_gateway').TransactionGateway;
 
-describe("TransactionGateway", () =>
-  describe("sale", function() {
+describe('TransactionGateway', () =>
+  describe('sale', function () {
     let fakeGateway = {
       config: {
         baseMerchantPath() {
-          return "";
+          return '';
         }
       },
       http: {
@@ -18,7 +18,7 @@ describe("TransactionGateway", () =>
       }
     };
 
-    it('accepts skip_advanced_fraud_checking options', function(done) {
+    it('accepts skip_advanced_fraud_checking options', function (done) {
       let transactionGateway = new TransactionGateway(fakeGateway);
       let transactionParams = {
         amount: '5.00',
@@ -31,13 +31,14 @@ describe("TransactionGateway", () =>
         }
       };
 
-      let assertRequestBody = params => assert.isTrue(params.transaction.options.skipAdvancedFraudChecking);
+      let assertRequestBody = params => assert.isTrue(params.transaction.options.skipAdvancedFraudChecking); // eslint-disable-line func-style
 
-      let paymentMethod = transactionGateway.sale(transactionParams, assertRequestBody);
-      return done();
+      transactionGateway.sale(transactionParams, assertRequestBody);
+
+      done();
     });
 
-    return it('does not include skip_advanced_fraud_checking in params if its not specified', function(done) {
+    it('does not include skip_advanced_fraud_checking in params if its not specified', function (done) {
       let transactionGateway = new TransactionGateway(fakeGateway);
       let transactionParams = {
         amount: '5.00',
@@ -50,10 +51,11 @@ describe("TransactionGateway", () =>
         }
       };
 
-      let assertRequestBody = params => assert.isFalse(params.transaction.options.skipAdvancedFraudChecking != null);
+      let assertRequestBody = params => assert.isFalse(params.transaction.options.skipAdvancedFraudChecking != null); // eslint-disable-line func-style
 
-      let paymentMethod = transactionGateway.sale(transactionParams, assertRequestBody);
-      return done();
+      transactionGateway.sale(transactionParams, assertRequestBody);
+
+      done();
     });
   })
 );
