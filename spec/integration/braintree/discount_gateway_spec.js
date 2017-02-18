@@ -17,7 +17,7 @@ describe('DiscountGateway', () =>
         numberOfBillingCycles: 1
       };
 
-      return specHelper.createModificationForTests(attributes, () =>
+      specHelper.createModificationForTests(attributes, () =>
         specHelper.defaultGateway.discount.all(function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
@@ -31,7 +31,7 @@ describe('DiscountGateway', () =>
           assert.equal(attributes.neverExpires, discount.neverExpires);
           assert.equal(attributes.numberOfBillingCycles, discount.numberOfBillingCycles);
 
-          return done();
+          done();
         })
       );
     })

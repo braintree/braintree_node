@@ -18,15 +18,15 @@ describe('PaymentMethodNonceGateway', function () {
         }
       };
 
-      return specHelper.generateNonceForNewPaymentMethod(nonceParams, customerId, function (nonce) {
+      specHelper.generateNonceForNewPaymentMethod(nonceParams, customerId, function (nonce) {
         let paymentMethodParams = {
           customerId,
           paymentMethodNonce: nonce
         };
 
-        return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
           paymentMethodToken = response.paymentMethod.token;
-          return done();
+          done();
         });
       });
     })
@@ -42,20 +42,20 @@ describe('PaymentMethodNonceGateway', function () {
         assert.isNotNull(paymentMethodNonce.nonce);
         assert.isString(paymentMethodNonce.type);
 
-        return done();
+        done();
       })
     );
 
-    return it('returns an error if unable to find the payment_method', done =>
+    it('returns an error if unable to find the payment_method', done =>
       specHelper.defaultGateway.paymentMethodNonce.create('not-a-token-at-all', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });
 
-  return describe('find', function () {
+  describe('find', function () {
     it('find the nonce', function (done) {
       let nonceParams = {
         creditCard: {
@@ -65,10 +65,10 @@ describe('PaymentMethodNonceGateway', function () {
         }
       };
 
-      return specHelper.generate3DSNonce(nonceParams, function (nonce) {
+      specHelper.generate3DSNonce(nonceParams, function (nonce) {
         assert.isNotNull(nonce);
 
-        return specHelper.defaultGateway.paymentMethodNonce.find(nonce, function (err, paymentMethodNonce) {
+        specHelper.defaultGateway.paymentMethodNonce.find(nonce, function (err, paymentMethodNonce) {
           assert.isNull(err);
           let info = paymentMethodNonce.threeDSecureInfo;
 
@@ -78,7 +78,7 @@ describe('PaymentMethodNonceGateway', function () {
           assert.equal(info.enrolled, 'Y');
           assert.equal(info.status, 'authenticate_successful');
 
-          return done();
+          done();
         });
       });
     });
@@ -94,21 +94,21 @@ describe('PaymentMethodNonceGateway', function () {
           }
         };
 
-        return specHelper.generateNonceForNewPaymentMethod(nonceParams, customerId, nonce =>
+        specHelper.generateNonceForNewPaymentMethod(nonceParams, customerId, nonce =>
           specHelper.defaultGateway.paymentMethodNonce.find(nonce, function (err, paymentMethodNonce) {
             assert.isNull(err);
             assert.isNull(paymentMethodNonce.threeDSecureInfo);
-            return done();
+            done();
           })
         );
       })
     );
 
-    return it('returns an error if unable to find the payment_method', done =>
+    it('returns an error if unable to find the payment_method', done =>
       specHelper.defaultGateway.paymentMethodNonce.find('not-a-nonce-at-all', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });

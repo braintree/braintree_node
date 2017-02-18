@@ -26,7 +26,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.type, 'sale');
@@ -34,7 +34,7 @@ describe('TransactionGateway', function () {
         assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
         assert.isNull(response.transaction.voiceReferralNumber);
 
-        return done();
+        done();
       });
     });
 
@@ -44,7 +44,7 @@ describe('TransactionGateway', function () {
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
-      return specHelper.createToken(oauthGateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
+      specHelper.createToken(oauthGateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
         let gateway = braintree.connect({
           accessToken: response.credentials.accessToken
         });
@@ -65,7 +65,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
           assert.isNull(response.transaction.voiceReferralNumber);
 
-          return done();
+          done();
         });
       });
     });
@@ -81,13 +81,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let transactionParams = {
           customerId: response.customer.id,
           amount: '100.00'
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.type, 'sale');
@@ -97,7 +97,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
           assert.equal(response.transaction.creditCard.expirationDate, '05/2014');
 
-          return done();
+          done();
         });
       });
     });
@@ -113,13 +113,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let transactionParams = {
           paymentMethodToken: response.customer.creditCards[0].token,
           amount: '100.00'
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.type, 'sale');
@@ -129,7 +129,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
           assert.equal(response.transaction.creditCard.expirationDate, '05/2014');
 
-          return done();
+          done();
         });
       });
     });
@@ -143,12 +143,12 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CreditCard);
 
-        return done();
+        done();
       });
     });
 
@@ -162,10 +162,10 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err) {
         assert.equal(err.type, 'invalidKeysError');
         assert.equal(err.message, 'These keys are invalid: creditCard[fakeData]');
-        return done();
+        done();
       });
     });
 
@@ -181,11 +181,11 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.isNull(response.transaction.riskData.id);
-        return done();
+        done();
       });
     });
 
@@ -197,14 +197,14 @@ describe('TransactionGateway', function () {
             amount: '100.00'
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard);
             assert.isNotNull(response.transaction.applePayCard.card_type);
             assert.isNotNull(response.transaction.applePayCard.payment_instrument_name);
 
-            return done();
+            done();
           });
         })
       )
@@ -218,7 +218,7 @@ describe('TransactionGateway', function () {
             amount: '100.00'
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AndroidPayCard);
@@ -226,7 +226,7 @@ describe('TransactionGateway', function () {
             assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover);
             assert.equal(response.transaction.androidPayCard.last4, '1117');
 
-            return done();
+            done();
           });
         })
       )
@@ -240,7 +240,7 @@ describe('TransactionGateway', function () {
             amount: '100.00'
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AndroidPayCard);
@@ -248,7 +248,7 @@ describe('TransactionGateway', function () {
             assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.MasterCard);
             assert.equal(response.transaction.androidPayCard.last4, '4444');
 
-            return done();
+            done();
           });
         })
       )
@@ -263,14 +263,14 @@ describe('TransactionGateway', function () {
             amount: '100.00'
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AmexExpressCheckoutCard);
             assert.equal(response.transaction.amexExpressCheckoutCard.cardType, specHelper.braintree.CreditCard.CardType.AmEx);
             assert.match(response.transaction.amexExpressCheckoutCard.cardMemberNumber, /^\d{4}$/);
 
-            return done();
+            done();
           });
         })
       )
@@ -285,14 +285,14 @@ describe('TransactionGateway', function () {
             amount: '100.00'
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.VenmoAccount);
             assert.equal(response.transaction.venmoAccount.username, 'venmojoe');
             assert.equal(response.transaction.venmoAccount.venmoUserId, 'Venmo-Joe-1');
 
-            return done();
+            done();
           });
         })
       )
@@ -306,13 +306,13 @@ describe('TransactionGateway', function () {
             amount: '100.00'
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CoinbaseAccount);
             assert.isNotNull(response.transaction.coinbaseAccount.user_email);
 
-            return done();
+            done();
           });
         })
       )
@@ -326,12 +326,12 @@ describe('TransactionGateway', function () {
             amount: '100.00'
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.PayPalAccount);
 
-            return done();
+            done();
           });
         })
       );
@@ -346,22 +346,22 @@ describe('TransactionGateway', function () {
             }
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             let transactionId = response.transaction.id;
 
-            return specHelper.defaultGateway.testing.settlementDecline(transactionId, () =>
+            specHelper.defaultGateway.testing.settlementDecline(transactionId, () =>
               specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
                 assert.equal(transaction.processorSettlementResponseCode, '4001');
                 assert.equal(transaction.processorSettlementResponseText, 'Settlement Declined');
-                return done();
+                done();
               })
             );
           });
         });
 
-        return it('includes processorSettlementResponseCode and processorSettlementResponseText for settlement pending transactions', function (done) {
+        it('includes processorSettlementResponseCode and processorSettlementResponseText for settlement pending transactions', function (done) {
           let transactionParams = {
             paymentMethodNonce: Nonces.PayPalOneTimePayment,
             amount: '10.00',
@@ -370,16 +370,16 @@ describe('TransactionGateway', function () {
             }
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             let transactionId = response.transaction.id;
 
-            return specHelper.defaultGateway.testing.settlementPending(transactionId, () =>
+            specHelper.defaultGateway.testing.settlementPending(transactionId, () =>
               specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
                 assert.equal(transaction.processorSettlementResponseCode, '4002');
                 assert.equal(transaction.processorSettlementResponseText, 'Settlement Pending');
-                return done();
+                done();
               })
             );
           });
@@ -397,13 +397,13 @@ describe('TransactionGateway', function () {
               }
             };
 
-            return specHelper.generateNonceForNewPaymentMethod(nonceParams, customerId, function (nonce) {
+            specHelper.generateNonceForNewPaymentMethod(nonceParams, customerId, function (nonce) {
               let paymentMethodParams = {
                 paymentMethodNonce: nonce,
                 customerId
               };
 
-              return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+              specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
                 let paymentMethodToken = response.paymentMethod.token;
 
                 let transactionParams = {
@@ -411,7 +411,7 @@ describe('TransactionGateway', function () {
                   amount: '100.00'
                 };
 
-                return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
                   assert.isNull(err);
                   assert.isTrue(response.success);
                   assert.equal(response.transaction.type, 'sale');
@@ -420,7 +420,7 @@ describe('TransactionGateway', function () {
                   assert.isString(response.transaction.paypalAccount.imageUrl);
                   assert.isString(response.transaction.paypalAccount.debugId);
 
-                  return done();
+                  done();
                 });
               });
             });
@@ -448,13 +448,13 @@ describe('TransactionGateway', function () {
             return myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', params, function (statusCode, body) {
               let nonce = JSON.parse(body).paypalAccounts[0].nonce;
 
-              return specHelper.defaultGateway.customer.create({}, function () {
+              specHelper.defaultGateway.customer.create({}, function () {
                 let transactionParams = {
                   paymentMethodNonce: nonce,
                   amount: '100.00'
                 };
 
-                return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
                   assert.isNull(err);
                   assert.isTrue(response.success);
                   assert.equal(response.transaction.type, 'sale');
@@ -463,10 +463,10 @@ describe('TransactionGateway', function () {
                   assert.isString(response.transaction.paypalAccount.authorizationId);
                   assert.isString(response.transaction.paypalAccount.debugId);
 
-                  return specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
+                  specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
                     assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-                    return done();
+                    done();
                   });
                 });
               });
@@ -474,7 +474,7 @@ describe('TransactionGateway', function () {
           });
         });
 
-        return it('vaults when explicitly asked', function (done) {
+        it('vaults when explicitly asked', function (done) {
           let paymentMethodToken = `PAYPAL_ACCOUNT_${specHelper.randomId()}`;
 
           let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
@@ -493,7 +493,7 @@ describe('TransactionGateway', function () {
             return myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', params, function (statusCode, body) {
               let nonce = JSON.parse(body).paypalAccounts[0].nonce;
 
-              return specHelper.defaultGateway.customer.create({}, function () {
+              specHelper.defaultGateway.customer.create({}, function () {
                 let transactionParams = {
                   paymentMethodNonce: nonce,
                   amount: '100.00',
@@ -502,7 +502,7 @@ describe('TransactionGateway', function () {
                   }
                 };
 
-                return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
                   assert.isNull(err);
                   assert.isTrue(response.success);
                   assert.equal(response.transaction.type, 'sale');
@@ -511,10 +511,10 @@ describe('TransactionGateway', function () {
                   assert.isString(response.transaction.paypalAccount.authorizationId);
                   assert.isString(response.transaction.paypalAccount.debugId);
 
-                  return specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
+                  specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
                     assert.isNull(err);
 
-                    return done();
+                    done();
                   });
                 });
               });
@@ -527,13 +527,13 @@ describe('TransactionGateway', function () {
         it('successfully creates a transaction', function (done) {
           let nonce = Nonces.PayPalOneTimePayment;
 
-          return specHelper.defaultGateway.customer.create({}, function () {
+          specHelper.defaultGateway.customer.create({}, function () {
             let transactionParams = {
               paymentMethodNonce: nonce,
               amount: '100.00'
             };
 
-            return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.type, 'sale');
@@ -542,7 +542,7 @@ describe('TransactionGateway', function () {
               assert.isString(response.transaction.paypalAccount.authorizationId);
               assert.isString(response.transaction.paypalAccount.debugId);
 
-              return done();
+              done();
             });
           });
         });
@@ -550,7 +550,7 @@ describe('TransactionGateway', function () {
         it('successfully creates a transaction with a payee email', function (done) {
           let nonce = Nonces.PayPalOneTimePayment;
 
-          return specHelper.defaultGateway.customer.create({}, function () {
+          specHelper.defaultGateway.customer.create({}, function () {
             let transactionParams = {
               paymentMethodNonce: nonce,
               amount: '100.00',
@@ -559,7 +559,7 @@ describe('TransactionGateway', function () {
               }
             };
 
-            return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.type, 'sale');
@@ -569,7 +569,7 @@ describe('TransactionGateway', function () {
               assert.isString(response.transaction.paypalAccount.debugId);
               assert.equal(response.transaction.paypalAccount.payeeEmail, 'payee@example.com');
 
-              return done();
+              done();
             });
           });
         });
@@ -577,7 +577,7 @@ describe('TransactionGateway', function () {
         it('successfully creates a transaction with a payee email in the options params', function (done) {
           let nonce = Nonces.PayPalOneTimePayment;
 
-          return specHelper.defaultGateway.customer.create({}, function () {
+          specHelper.defaultGateway.customer.create({}, function () {
             let transactionParams = {
               paymentMethodNonce: nonce,
               amount: '100.00',
@@ -587,7 +587,7 @@ describe('TransactionGateway', function () {
               }
             };
 
-            return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.type, 'sale');
@@ -597,7 +597,7 @@ describe('TransactionGateway', function () {
               assert.isString(response.transaction.paypalAccount.debugId);
               assert.equal(response.transaction.paypalAccount.payeeEmail, 'payee@example.com');
 
-              return done();
+              done();
             });
           });
         });
@@ -605,7 +605,7 @@ describe('TransactionGateway', function () {
         it('successfully creates a transaction with a payee email in transaction.options.paypal', function (done) {
           let nonce = Nonces.PayPalOneTimePayment;
 
-          return specHelper.defaultGateway.customer.create({}, function () {
+          specHelper.defaultGateway.customer.create({}, function () {
             let transactionParams = {
               paymentMethodNonce: nonce,
               amount: '100.00',
@@ -617,7 +617,7 @@ describe('TransactionGateway', function () {
               }
             };
 
-            return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.type, 'sale');
@@ -627,7 +627,7 @@ describe('TransactionGateway', function () {
               assert.isString(response.transaction.paypalAccount.debugId);
               assert.equal(response.transaction.paypalAccount.payeeEmail, 'payee@example.com');
 
-              return done();
+              done();
             });
           });
         });
@@ -635,7 +635,7 @@ describe('TransactionGateway', function () {
         it('successfully creates a transaction with a PayPal custom field', function (done) {
           let nonce = Nonces.PayPalOneTimePayment;
 
-          return specHelper.defaultGateway.customer.create({}, function () {
+          specHelper.defaultGateway.customer.create({}, function () {
             let transactionParams = {
               paymentMethodNonce: nonce,
               amount: '100.00',
@@ -647,7 +647,7 @@ describe('TransactionGateway', function () {
               }
             };
 
-            return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.type, 'sale');
@@ -657,7 +657,7 @@ describe('TransactionGateway', function () {
               assert.isString(response.transaction.paypalAccount.debugId);
               assert.equal(response.transaction.paypalAccount.customField, 'custom field junk');
 
-              return done();
+              done();
             });
           });
         });
@@ -665,7 +665,7 @@ describe('TransactionGateway', function () {
         it('successfully creates a transaction with PayPal supplementary data', function (done) {
           let nonce = Nonces.PayPalOneTimePayment;
 
-          return specHelper.defaultGateway.customer.create({}, function () {
+          specHelper.defaultGateway.customer.create({}, function () {
             let transactionParams = {
               paymentMethodNonce: nonce,
               amount: '100.00',
@@ -681,11 +681,11 @@ describe('TransactionGateway', function () {
             };
 
             // note - supplementary data is not returned in response
-            return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
 
-              return done();
+              done();
             });
           });
         });
@@ -693,7 +693,7 @@ describe('TransactionGateway', function () {
         it('successfully creates a transaction with a PayPal description', function (done) {
           let nonce = Nonces.PayPalOneTimePayment;
 
-          return specHelper.defaultGateway.customer.create({}, function () {
+          specHelper.defaultGateway.customer.create({}, function () {
             let transactionParams = {
               paymentMethodNonce: nonce,
               amount: '100.00',
@@ -705,20 +705,20 @@ describe('TransactionGateway', function () {
               }
             };
 
-            return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.paypalAccount.description, 'product description');
 
-              return done();
+              done();
             });
           });
         });
 
-        return it('does not vault even when explicitly asked', function (done) {
+        it('does not vault even when explicitly asked', function (done) {
           let nonce = Nonces.PayPalOneTimePayment;
 
-          return specHelper.defaultGateway.customer.create({}, function () {
+          specHelper.defaultGateway.customer.create({}, function () {
             let transactionParams = {
               paymentMethodNonce: nonce,
               amount: '100.00',
@@ -727,7 +727,7 @@ describe('TransactionGateway', function () {
               }
             };
 
-            return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.type, 'sale');
@@ -736,7 +736,7 @@ describe('TransactionGateway', function () {
               assert.isString(response.transaction.paypalAccount.authorizationId);
               assert.isString(response.transaction.paypalAccount.debugId);
 
-              return done();
+              done();
             });
           });
         });
@@ -755,12 +755,12 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.status, 'submitted_for_settlement');
 
-        return done();
+        done();
       });
     });
 
@@ -776,13 +776,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.match(response.transaction.customer.id, /^\d+$/);
         assert.match(response.transaction.creditCard.token, /^\w+$/);
 
-        return done();
+        done();
       });
     });
 
@@ -798,12 +798,12 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.customFields.storeMe, 'custom value');
 
-        return done();
+        done();
       });
     });
 
@@ -817,12 +817,12 @@ describe('TransactionGateway', function () {
         recurring: true
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.recurring, true);
 
-        return done();
+        done();
       });
     });
 
@@ -836,12 +836,12 @@ describe('TransactionGateway', function () {
         transactionSource: 'recurring'
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.recurring, true);
 
-        return done();
+        done();
       });
     });
 
@@ -855,12 +855,12 @@ describe('TransactionGateway', function () {
         transactionSource: 'moto'
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.recurring, false);
 
-        return done();
+        done();
       });
     });
 
@@ -873,7 +873,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.equal(response.transaction.creditCard.prepaid, CreditCard.Prepaid.Unknown);
         assert.equal(response.transaction.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown);
         assert.equal(response.transaction.creditCard.commercial, CreditCard.Commercial.Unknown);
@@ -884,7 +884,7 @@ describe('TransactionGateway', function () {
         assert.equal(response.transaction.creditCard.issuingBank, CreditCard.IssuingBank.Unknown);
         assert.equal(response.transaction.creditCard.productId, CreditCard.ProductId.Unknown);
 
-        return done();
+        done();
       });
     });
 
@@ -897,13 +897,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.transaction.amount, '2000.00');
         assert.equal(response.transaction.status, 'processor_declined');
         assert.equal(response.transaction.additionalProcessorResponse, '2000 : Do Not Honor');
 
-        return done();
+        done();
       });
     });
 
@@ -916,11 +916,11 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.transaction.riskData.decision, 'Not Evaluated');
         assert.equal(response.transaction.riskData.id, null);
-        return done();
+        done();
       });
     });
 
@@ -933,11 +933,11 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
         assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud);
-        return done();
+        done();
       });
     });
 
@@ -952,10 +952,10 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
-        return done();
+        done();
       });
     });
 
@@ -972,10 +972,10 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
-        return done();
+        done();
       });
     });
 
@@ -986,7 +986,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.message, 'Amount is required.\nExpiration date is required.');
         assert.equal(
@@ -1008,7 +1008,7 @@ describe('TransactionGateway', function () {
         assert.include(errorCodes, '81502');
         assert.include(errorCodes, '81709');
 
-        return done();
+        done();
       });
     });
 
@@ -1026,13 +1026,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.transaction.descriptor.name, 'abc*def');
         assert.equal(response.transaction.descriptor.phone, '1234567890');
         assert.equal(response.transaction.descriptor.url, 'ebay.com');
 
-        return done();
+        done();
       });
     });
 
@@ -1050,7 +1050,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(
           response.errors.for('transaction').for('descriptor').on('name')[0].code,
@@ -1064,7 +1064,7 @@ describe('TransactionGateway', function () {
           response.errors.for('transaction').for('descriptor').on('url')[0].code,
           ValidationErrorCodes.Descriptor.UrlFormatIsInvalid
         );
-        return done();
+        done();
       });
     });
 
@@ -1086,10 +1086,10 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
 
-        return done();
+        done();
       });
     });
 
@@ -1111,14 +1111,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(
           response.errors.for('transaction').for('industry').on('checkOutDate')[0].code,
           ValidationErrorCodes.Transaction.IndustryData.Lodging.CheckOutDateMustFollowCheckInDate
         );
 
-        return done();
+        done();
       });
     });
 
@@ -1141,10 +1141,10 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
 
-        return done();
+        done();
       });
     });
 
@@ -1167,14 +1167,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(
           response.errors.for('transaction').for('industry').on('travelPackage')[0].code,
           ValidationErrorCodes.Transaction.IndustryData.TravelCruise.TravelPackageIsInvalid
         );
 
-        return done();
+        done();
       });
     });
 
@@ -1190,12 +1190,12 @@ describe('TransactionGateway', function () {
           serviceFeeAmount: '1.00'
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.serviceFeeAmount, '1.00');
 
-          return done();
+          done();
         });
       });
 
@@ -1210,7 +1210,7 @@ describe('TransactionGateway', function () {
           serviceFeeAmount: '5.00'
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(
@@ -1218,11 +1218,11 @@ describe('TransactionGateway', function () {
             ValidationErrorCodes.Transaction.ServiceFeeAmountIsTooLarge
           );
 
-          return done();
+          done();
         });
       });
 
-      return it('sub merchant accounts must provide a service fee', function (done) {
+      it('sub merchant accounts must provide a service fee', function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
           amount: '1.00',
@@ -1232,7 +1232,7 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(
@@ -1240,7 +1240,7 @@ describe('TransactionGateway', function () {
             ValidationErrorCodes.Transaction.SubMerchantAccountRequiresServiceFeeAmount
           );
 
-          return done();
+          done();
         });
       });
     });
@@ -1267,11 +1267,11 @@ describe('TransactionGateway', function () {
             response.transaction.escrowStatus,
             Transaction.EscrowStatus.HoldPending
           );
-          return done();
+          done();
         });
       });
 
-      return it('can not be held for escrow if not a submerchant', function (done) {
+      it('can not be held for escrow if not a submerchant', function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.defaultMerchantAccountId,
           amount: '10.00',
@@ -1292,7 +1292,7 @@ describe('TransactionGateway', function () {
             response.errors.for('transaction').on('base')[0].code,
             ValidationErrorCodes.Transaction.CannotHoldInEscrow
           );
-          return done();
+          done();
         });
       });
     });
@@ -1304,12 +1304,12 @@ describe('TransactionGateway', function () {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.escrowStatus, Transaction.EscrowStatus.ReleasePending);
-            return done();
+            done();
           })
         )
       );
 
-      return it('cannot submit a non-escrowed transaction for release', function (done) {
+      it('cannot submit a non-escrowed transaction for release', function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
           amount: '10.00',
@@ -1323,7 +1323,7 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
           specHelper.defaultGateway.transaction.releaseFromEscrow(response.transaction.id, function (err, response) {
             assert.isNull(err);
             assert.isFalse(response.success);
@@ -1331,7 +1331,7 @@ describe('TransactionGateway', function () {
               response.errors.for('transaction').on('base')[0].code,
               ValidationErrorCodes.Transaction.CannotReleaseFromEscrow
             );
-            return done();
+            done();
           })
         );
       });
@@ -1348,13 +1348,13 @@ describe('TransactionGateway', function () {
                 response.transaction.escrowStatus,
                 Transaction.EscrowStatus.Held
               );
-              return done();
+              done();
             })
           )
         )
       );
 
-      return it('cannot cancel release a transaction that has not been submitted for release', done =>
+      it('cannot cancel release a transaction that has not been submitted for release', done =>
         specHelper.createEscrowedTransaction(transaction =>
           specHelper.defaultGateway.transaction.cancelRelease(transaction.id, function (err, response) {
             assert.isNull(err);
@@ -1363,7 +1363,7 @@ describe('TransactionGateway', function () {
               response.errors.for('transaction').on('base')[0].code,
               ValidationErrorCodes.Transaction.CannotCancelRelease
             );
-            return done();
+            done();
           })
         )
       );
@@ -1381,7 +1381,7 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
           specHelper.defaultGateway.transaction.holdInEscrow(response.transaction.id, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
@@ -1389,12 +1389,12 @@ describe('TransactionGateway', function () {
               response.transaction.escrowStatus,
               Transaction.EscrowStatus.HoldPending
             );
-            return done();
+            done();
           })
         );
       });
 
-      return it('cannot hold settled transactions for escrow', function (done) {
+      it('cannot hold settled transactions for escrow', function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
           amount: '10.00',
@@ -1408,7 +1408,7 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
           specHelper.defaultGateway.testing.settle(response.transaction.id, (err, response) =>
             specHelper.defaultGateway.transaction.holdInEscrow(response.transaction.id, function (err, response) {
               assert.isFalse(response.success);
@@ -1416,7 +1416,7 @@ describe('TransactionGateway', function () {
                 response.errors.for('transaction').on('base')[0].code,
                 ValidationErrorCodes.Transaction.CannotHoldInEscrow
               );
-              return done();
+              done();
             })
           )
         );
@@ -1429,12 +1429,12 @@ describe('TransactionGateway', function () {
         venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.creditCard.bin, '411111');
 
-        return done();
+        done();
       });
     });
 
@@ -1450,12 +1450,12 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.isTrue(response.transaction.creditCard.venmoSdk);
 
-        return done();
+        done();
       });
     });
 
@@ -1465,7 +1465,7 @@ describe('TransactionGateway', function () {
         lastName: 'Jones'
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let customerId = response.customer.id;
         let paymentMethodParams = {
           creditCard: {
@@ -1481,11 +1481,11 @@ describe('TransactionGateway', function () {
             paymentMethodNonce: nonce
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
 
-            return done();
+            done();
           }); });
       });
     });
@@ -1496,7 +1496,7 @@ describe('TransactionGateway', function () {
         lastName: 'Jones'
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let customerId = response.customer.id;
         let paymentMethodParams = {
           paypalAccount: {
@@ -1504,17 +1504,17 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, customerId, function (nonce) {
+        specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, customerId, function (nonce) {
           let transactionParams = {
             amount: '1.00',
             paymentMethodNonce: nonce
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
 
-            return done();
+            done();
           }); });
       });
     });
@@ -1534,11 +1534,11 @@ describe('TransactionGateway', function () {
           paymentMethodNonce: nonce
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
 
-          return done();
+          done();
         }); });
     });
 
@@ -1548,11 +1548,11 @@ describe('TransactionGateway', function () {
         paymentMethodNonce: Nonces.AbstractTransactable
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        return done();
+        done();
       });
     });
 
@@ -1576,11 +1576,11 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement);
 
-          return done();
+          done();
         });
       });
 
@@ -1603,15 +1603,15 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement);
 
-          return done();
+          done();
         });
       });
 
-      return it("succeeds even if the card's balance is insufficient", function (done) {
+      it("succeeds even if the card's balance is insufficient", function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
           amount: '10.00',
@@ -1630,11 +1630,11 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement);
 
-          return done();
+          done();
         });
       });
     });
@@ -1652,7 +1652,7 @@ describe('TransactionGateway', function () {
             }
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isTrue(response.success);
             assert.equal(response.transaction.status, Transaction.Status.SettlementPending);
             assert.equal(response.transaction.usBankAccount.last4, '1234');
@@ -1663,7 +1663,7 @@ describe('TransactionGateway', function () {
             assert.equal(response.transaction.usBankAccount.achMandate.text, 'cl mandate text');
             assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date);
 
-            return done();
+            done();
           });
         })
       );
@@ -1680,7 +1680,7 @@ describe('TransactionGateway', function () {
             }
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isTrue(response.success);
             assert.equal(response.transaction.status, Transaction.Status.SettlementPending);
             assert.equal(response.transaction.usBankAccount.last4, '1234');
@@ -1701,7 +1701,7 @@ describe('TransactionGateway', function () {
               }
             };
 
-            return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
               assert.isTrue(response.success);
               assert.equal(response.transaction.status, Transaction.Status.SettlementPending);
               assert.equal(response.transaction.usBankAccount.last4, '1234');
@@ -1712,13 +1712,13 @@ describe('TransactionGateway', function () {
               assert.equal(response.transaction.usBankAccount.achMandate.text, 'cl mandate text');
               assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date);
 
-              return done();
+              done();
             });
           });
         })
       );
 
-      return it('fails when us bank account nonce is not found', function (done) {
+      it('fails when us bank account nonce is not found', function (done) {
         let transactionParams = {
           merchantAccountId: 'us_bank_merchant_account',
           amount: '10.00',
@@ -1729,14 +1729,14 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success);
           assert.equal(
             response.errors.for('transaction').on('paymentMethodNonce')[0].code,
             ValidationErrorCodes.Transaction.PaymentMethodNonceUnknown
           );
 
-          return done();
+          done();
         });
       });
     });
@@ -1752,14 +1752,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.credit(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.credit(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.type, 'credit');
         assert.equal(response.transaction.amount, '5.00');
         assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
 
-        return done();
+        done();
       });
     });
 
@@ -1770,7 +1770,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.credit(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.credit(transactionParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.message, 'Amount is required.\nExpiration date is required.');
         assert.equal(
@@ -1791,7 +1791,7 @@ describe('TransactionGateway', function () {
         assert.include(errorCodes, '81502');
         assert.include(errorCodes, '81709');
 
-        return done();
+        done();
       });
     });
 
@@ -1814,11 +1814,11 @@ describe('TransactionGateway', function () {
             threeDSecureToken
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
 
-            return done();
+            done();
           });
         });
       });
@@ -1834,14 +1834,14 @@ describe('TransactionGateway', function () {
           threeDSecureToken: null
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success);
           assert.equal(
             response.errors.for('transaction').on('threeDSecureToken')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureTokenIsInvalid
           );
 
-          return done();
+          done();
         });
       });
 
@@ -1852,7 +1852,7 @@ describe('TransactionGateway', function () {
           expirationYear: '2009'
         };
 
-        return specHelper.create3DSVerification(specHelper.threeDSecureMerchantAccountId, threeDVerificationParams, function (threeDSecureToken) {
+        specHelper.create3DSVerification(specHelper.threeDSecureMerchantAccountId, threeDVerificationParams, function (threeDSecureToken) {
           let transactionParams = {
             merchantAccountId: specHelper.threeDSecureMerchantAccountId,
             amount: '5.00',
@@ -1863,14 +1863,14 @@ describe('TransactionGateway', function () {
             threeDSecureToken
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isFalse(response.success);
             assert.equal(
               response.errors.for('transaction').on('threeDSecureToken')[0].code,
               ValidationErrorCodes.Transaction.ThreeDSecureTransactionDataDoesntMatchVerify
             );
 
-            return done();
+            done();
           });
         });
       });
@@ -1884,7 +1884,7 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.generateNonceForNewPaymentMethod(nonceParams, null, function (nonce) {
+        specHelper.generateNonceForNewPaymentMethod(nonceParams, null, function (nonce) {
           let transactionParams = {
             merchantAccountId: specHelper.threeDSecureMerchantAccountId,
             amount: '5.00',
@@ -1896,12 +1896,12 @@ describe('TransactionGateway', function () {
             }
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isFalse(response.success);
             assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
             assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.ThreeDSecure);
 
-            return done();
+            done();
           });
         });
       });
@@ -1921,11 +1921,11 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, Transaction.Status.Authorized);
 
-          return done();
+          done();
         });
       });
 
@@ -1944,14 +1944,14 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success);
           assert.equal(
             response.errors.for('transaction').on('merchantAccountId')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureMerchantAccountDoesNotSupportCardType
           );
 
-          return done();
+          done();
         });
       });
 
@@ -1970,14 +1970,14 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success);
           assert.equal(
             response.errors.for('transaction').for('threeDSecurePassThru').on('eciFlag')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsRequired
           );
 
-          return done();
+          done();
         });
       });
 
@@ -1996,7 +1996,7 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success);
           assert.equal(
             response.errors.for('transaction').for('threeDSecurePassThru').on('cavv')[0].code,
@@ -2007,11 +2007,11 @@ describe('TransactionGateway', function () {
             ValidationErrorCodes.Transaction.ThreeDSecureXidIsRequired
           );
 
-          return done();
+          done();
         });
       });
 
-      return it('returns an error for transaction when the threeDSecurePassThru eciFlag is invalid', function (done) {
+      it('returns an error for transaction when the threeDSecurePassThru eciFlag is invalid', function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.threeDSecureMerchantAccountId,
           amount: '5.00',
@@ -2026,14 +2026,14 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success);
           assert.equal(
             response.errors.for('transaction').for('threeDSecurePassThru').on('eciFlag')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsInvalid
           );
 
-          return done();
+          done();
         });
       });
     });
@@ -2049,11 +2049,11 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.find(response.transaction.id, function (err, transaction) {
           assert.equal(transaction.amount, '5.00');
 
-          return done();
+          done();
         })
       );
     });
@@ -2061,7 +2061,7 @@ describe('TransactionGateway', function () {
     it('exposes disbursementDetails', function (done) {
       let transactionId = 'deposittransaction';
 
-      return specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
         assert.equal(transaction.isDisbursed(), true);
 
         let disbursementDetails = transaction.disbursementDetails;
@@ -2073,14 +2073,14 @@ describe('TransactionGateway', function () {
         assert.equal(disbursementDetails.success, true);
         assert.equal(disbursementDetails.fundsHeld, false);
 
-        return done();
+        done();
       });
     });
 
     it('exposes disputes', function (done) {
       let transactionId = 'disputedtransaction';
 
-      return specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
         let dispute = transaction.disputes[0];
 
         assert.equal(dispute.amount, '250.00');
@@ -2095,14 +2095,14 @@ describe('TransactionGateway', function () {
         assert.equal(dispute.dateOpened, '2014-03-01');
         assert.equal(dispute.dateWon, '2014-03-07');
 
-        return done();
+        done();
       });
     });
 
     it('exposes retrievals', function (done) {
       let transactionId = 'retrievaltransaction';
 
-      return specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
         let dispute = transaction.disputes[0];
 
         assert.equal(dispute.amount, '1000.00');
@@ -2112,7 +2112,7 @@ describe('TransactionGateway', function () {
         assert.equal(dispute.transactionDetails.id, transactionId);
         assert.equal(dispute.transactionDetails.amount, '1000.00');
 
-        return done();
+        done();
       });
     });
 
@@ -2120,7 +2120,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.find('nonexistent_transaction', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
 
@@ -2128,7 +2128,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.find(' ', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
 
@@ -2146,7 +2146,7 @@ describe('TransactionGateway', function () {
         assert.isString(transaction.paypalAccount.refundId);
         assert.isString(transaction.paypalAccount.transactionFeeAmount);
         assert.isString(transaction.paypalAccount.transactionFeeCurrencyIsoCode);
-        return done();
+        done();
       })
     );
 
@@ -2159,14 +2159,14 @@ describe('TransactionGateway', function () {
           assert.isTrue(info.liabilityShiftPossible);
           assert.equal(info.enrolled, 'Y');
           assert.equal(info.status, 'authenticate_successful');
-          return done();
+          done();
         })
       );
 
-      return it("returns null if it's empty", done =>
+      it("returns null if it's empty", done =>
         specHelper.defaultGateway.transaction.find('settledtransaction', function (err, transaction) {
           assert.isNull(transaction.threeDSecureInfo);
-          return done();
+          done();
         })
       );
     });
@@ -2181,7 +2181,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.type, 'credit');
           assert.equal(response.transaction.refundedTransactionId, transaction.id);
 
-          return done();
+          done();
         })
       )
     );
@@ -2194,7 +2194,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.type, 'credit');
           assert.equal(response.transaction.refundedTransactionId, transaction.id);
 
-          return done();
+          done();
         })
       )
     );
@@ -2208,7 +2208,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.refundedTransactionId, transaction.id);
           assert.equal(response.transaction.amount, '1.00');
 
-          return done();
+          done();
         })
       )
     );
@@ -2220,7 +2220,7 @@ describe('TransactionGateway', function () {
           amount: '1.00'
         };
 
-        return specHelper.defaultGateway.transaction.refund(transaction.id, options, function (err, response) {
+        specHelper.defaultGateway.transaction.refund(transaction.id, options, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.type, 'credit');
@@ -2228,12 +2228,12 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.orderId, 'abcd');
           assert.equal(response.transaction.amount, '1.00');
 
-          return done();
+          done();
         });
       })
     );
 
-    return it('handles validation errors', function (done) {
+    it('handles validation errors', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -2245,13 +2245,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.refund(response.transaction.id, '5.00', function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(response.errors.for('transaction').on('base')[0].code, '91506');
 
-          return done();
+          done();
         })
       );
     });
@@ -2267,14 +2267,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, 'submitted_for_settlement');
           assert.equal(response.transaction.amount, '5.00');
 
-          return done();
+          done();
         })
       );
     });
@@ -2286,20 +2286,20 @@ describe('TransactionGateway', function () {
           paymentMethodNonce: Nonces.PayPalFuturePayment
         };
 
-        return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
           let transactionParams = {
             amount: '5.00',
             paymentMethodToken: response.paymentMethod.token
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+          specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
             specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.status, 'settling');
               assert.equal(response.transaction.amount, '5.00');
 
-              return done();
+              done();
             })
           );
         });
@@ -2315,14 +2315,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, '3.00', function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, 'submitted_for_settlement');
           assert.equal(response.transaction.amount, '3.00');
 
-          return done();
+          done();
         })
       );
     });
@@ -2336,14 +2336,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, '3.00', {orderId: 'ABC123'}, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, 'submitted_for_settlement');
           assert.equal(response.transaction.orderId, 'ABC123');
 
-          return done();
+          done();
         })
       );
     });
@@ -2357,7 +2357,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, {orderId: 'ABC123'}, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
@@ -2365,7 +2365,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.orderId, 'ABC123');
           assert.equal(response.transaction.amount, '5.00');
 
-          return done();
+          done();
         })
       );
     });
@@ -2387,14 +2387,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.descriptor.name, 'abc*def');
           assert.equal(response.transaction.descriptor.phone, '1234567890');
           assert.equal(response.transaction.descriptor.url, 'ebay.com');
 
-          return done();
+          done();
         })
       );
     });
@@ -2411,13 +2411,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(response.errors.for('transaction').on('base')[0].code, '91507');
 
-          return done();
+          done();
         })
       );
     });
@@ -2431,14 +2431,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, '5.00', {
           invalidKey: '1234'
         }, function (err) {
           assert.equal(err.type, 'invalidKeysError');
           assert.equal(err.message, 'These keys are invalid: invalidKey');
 
-          return done();
+          done();
         })
       );
     });
@@ -2462,14 +2462,14 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, Transaction.Status.Authorized);
 
-          return specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
+          specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
             assert.isTrue(response.success);
 
-            return done();
+            done();
           });
         });
       });
@@ -2492,19 +2492,19 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, Transaction.Status.Authorized);
 
-          return specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
+          specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
             assert.isTrue(response.success);
 
-            return done();
+            done();
           });
         });
       });
 
-      return it("succeeds even if the card's balance is insufficient", function (done) {
+      it("succeeds even if the card's balance is insufficient", function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
           amount: '10.00',
@@ -2522,14 +2522,14 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, Transaction.Status.Authorized);
 
-          return specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
+          specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
             assert.isTrue(response.success);
 
-            return done();
+            done();
           });
         });
       });
@@ -2559,7 +2559,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
@@ -2570,7 +2570,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.descriptor.phone, '1234567890');
           assert.equal(response.transaction.descriptor.url, 'ebay.com');
 
-          return done();
+          done();
         })
       );
     });
@@ -2592,12 +2592,12 @@ describe('TransactionGateway', function () {
         invalidParam: 'something invalid'
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err) {
           assert.equal(err.type, 'invalidKeysError');
           assert.equal(err.message, 'These keys are invalid: invalidParam');
 
-          return done();
+          done();
         })
       );
     });
@@ -2617,13 +2617,13 @@ describe('TransactionGateway', function () {
       let updateParams =
         {amount: '555.00'};
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(response.errors.for('transaction').on('amount')[0].code, '91522');
 
-          return done();
+          done();
         })
       );
     });
@@ -2650,7 +2650,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
@@ -2658,7 +2658,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.errors.for('transaction').for('descriptor').on('phone')[0].code, '92202');
           assert.equal(response.errors.for('transaction').for('descriptor').on('url')[0].code, '92206');
 
-          return done();
+          done();
         })
       );
     });
@@ -2678,13 +2678,13 @@ describe('TransactionGateway', function () {
       let updateParams =
         {orderId: new Array(257).join('X')};
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(response.errors.for('transaction').on('orderId')[0].code, '91501');
 
-          return done();
+          done();
         })
       );
     });
@@ -2712,18 +2712,18 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(response.errors.for('transaction').on('base')[0].code, '915130');
 
-          return done();
+          done();
         })
       );
     });
 
-    return it('validates status', function (done) {
+    it('validates status', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -2742,13 +2742,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(response.errors.for('transaction').on('base')[0].code, '915129');
 
-          return done();
+          done();
         })
       );
     });
@@ -2764,13 +2764,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.void(response.transaction.id, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, 'voided');
 
-          return done();
+          done();
         })
       );
     });
@@ -2782,26 +2782,26 @@ describe('TransactionGateway', function () {
           paymentMethodNonce: Nonces.PayPalFuturePayment
         };
 
-        return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
           let transactionParams = {
             amount: '5.00',
             paymentMethodToken: response.paymentMethod.token
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+          specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
             specHelper.defaultGateway.transaction.void(response.transaction.id, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.status, 'voided');
 
-              return done();
+              done();
             })
           );
         });
       })
     );
 
-    return it('handles validation errors', function (done) {
+    it('handles validation errors', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -2810,14 +2810,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.void(response.transaction.id, (err, response) =>
           specHelper.defaultGateway.transaction.void(response.transaction.id, function (err, response) {
             assert.isNull(err);
             assert.isFalse(response.success);
             assert.equal(response.errors.for('transaction').on('base')[0].code, '91504');
 
-            return done();
+            done();
           })
         )
       );
@@ -2834,7 +2834,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         let cloneParams = {
           amount: '123.45',
           channel: 'MyShoppingCartProvider',
@@ -2843,7 +2843,7 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, cloneParams, function (err, response) {
+        specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, cloneParams, function (err, response) {
           assert.isTrue(response.success);
           let transaction = response.transaction;
 
@@ -2852,7 +2852,7 @@ describe('TransactionGateway', function () {
           assert.equal(transaction.creditCard.maskedNumber, '510510******5100');
           assert.equal(transaction.creditCard.expirationDate, '05/2012');
 
-          return done();
+          done();
         });
       });
     });
@@ -2866,7 +2866,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.credit(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.credit(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, {amount: '123.45'}, function (err, response) {
           assert.isFalse(response.success);
           assert.equal(
@@ -2874,12 +2874,12 @@ describe('TransactionGateway', function () {
             '91543'
           );
 
-          return done();
+          done();
         })
       );
     });
 
-    return it('can submit for settlement', function (done) {
+    it('can submit for settlement', function (done) {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -2888,7 +2888,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         let cloneParams = {
           amount: '123.45',
           channel: 'MyShoppingCartProvider',
@@ -2897,16 +2897,16 @@ describe('TransactionGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, cloneParams, function (err, response) {
+        specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, cloneParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, 'submitted_for_settlement');
-          return done();
+          done();
         });
       });
     });
   });
 
-  return describe('submitForPartialSettlement', function () {
+  describe('submitForPartialSettlement', function () {
     it('creates partial settlement transactions for an authorized transaction', function (done) {
       let transactionParams = {
         amount: '10.00',
@@ -2916,27 +2916,27 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         let authorizedTransaction = response.transaction;
 
-        return specHelper.defaultGateway.transaction.submitForPartialSettlement(authorizedTransaction.id, '6.00', function (err, response) {
+        specHelper.defaultGateway.transaction.submitForPartialSettlement(authorizedTransaction.id, '6.00', function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, 'submitted_for_settlement');
           assert.equal(response.transaction.amount, '6.00');
 
-          return specHelper.defaultGateway.transaction.submitForPartialSettlement(authorizedTransaction.id, '4.00', function (err, response) {
+          specHelper.defaultGateway.transaction.submitForPartialSettlement(authorizedTransaction.id, '4.00', function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.status, 'submitted_for_settlement');
             assert.equal(response.transaction.amount, '4.00');
 
-            return specHelper.defaultGateway.transaction.find(authorizedTransaction.id, function (err, transaction) {
+            specHelper.defaultGateway.transaction.find(authorizedTransaction.id, function (err, transaction) {
               assert.isTrue(response.success);
               assert.equal(2, transaction.partialSettlementTransactionIds.length);
-              return done();
+              done();
             });
           });
         });
@@ -2952,14 +2952,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, '3.00', {orderId: 'ABC123'}, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, 'submitted_for_settlement');
           assert.equal(response.transaction.orderId, 'ABC123');
 
-          return done();
+          done();
         })
       );
     });
@@ -2981,14 +2981,14 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, '3.00', submitForPartialSettlementParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.descriptor.name, 'abc*def');
           assert.equal(response.transaction.descriptor.phone, '1234567890');
           assert.equal(response.transaction.descriptor.url, 'ebay.com');
 
-          return done();
+          done();
         })
       );
     });
@@ -3005,13 +3005,13 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(response.errors.for('transaction').on('base')[0].code, '91507');
 
-          return done();
+          done();
         })
       );
     });
@@ -3025,23 +3025,23 @@ describe('TransactionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         let authorizedTransaction = response.transaction;
 
-        return specHelper.defaultGateway.transaction.submitForPartialSettlement(authorizedTransaction.id, '6.00', function (err, response) {
+        specHelper.defaultGateway.transaction.submitForPartialSettlement(authorizedTransaction.id, '6.00', function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, 'submitted_for_settlement');
           assert.equal(response.transaction.amount, '6.00');
 
-          return specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, '4.00', function (err, response) {
+          specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, '4.00', function (err, response) {
             assert.isFalse(response.success);
             let errorCode = response.errors.for('transaction').on('base')[0].code;
 
             assert.equal(errorCode, ValidationErrorCodes.Transaction.CannotSubmitForPartialSettlement);
-            return done();
+            done();
           });
         });
       });
@@ -3107,12 +3107,12 @@ describe('TransactionGateway', function () {
                 scope: 'grant_payment_method,shared_vault_transactions'
               };
 
-              return specHelper.createToken(oauthGateway, accessTokenParams, function (err, response) {
+              specHelper.createToken(oauthGateway, accessTokenParams, function (err, response) {
                 grantingGateway = braintree.connect({
                   accessToken: response.credentials.accessToken,
                   environment: Environment.Development
                 });
-                return done();
+                done();
               });
             });
           });
@@ -3126,12 +3126,12 @@ describe('TransactionGateway', function () {
             amount: Braintree.Test.TransactionAmounts.Authorize
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isTrue(response.success);
             assert.equal(response.transaction.facilitatorDetails.oauthApplicationClientId, 'client_id$development$integration_client_id');
             assert.equal(response.transaction.facilitatorDetails.oauthApplicationName, 'PseudoShop');
             assert.isNull(response.transaction.billing.postalCode);
-            return done();
+            done();
           });
         })
       );
@@ -3146,15 +3146,15 @@ describe('TransactionGateway', function () {
             amount: Braintree.Test.TransactionAmounts.Authorize
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isTrue(response.success);
             assert.equal(response.transaction.billing.postalCode, '95131');
-            return done();
+            done();
           });
         })
       );
 
-      return it('allows transactions to be created with a shared payment method, customer, billing and shipping addresses', function (done) {
+      it('allows transactions to be created with a shared payment method, customer, billing and shipping addresses', function (done) {
         let transactionParams = {
           sharedPaymentMethodToken: creditCard.token,
           sharedCustomerId: customer.id,
@@ -3167,7 +3167,7 @@ describe('TransactionGateway', function () {
           assert.isTrue(response.success);
           assert.equal(response.transaction.shipping.firstName, address.firstName);
           assert.equal(response.transaction.billing.firstName, address.firstName);
-          return done();
+          done();
         });
       });
     });

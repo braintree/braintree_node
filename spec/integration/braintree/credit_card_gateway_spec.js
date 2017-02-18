@@ -15,7 +15,7 @@ describe('CreditCardGateway', function () {
     before(done =>
       specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
         customerId = response.customer.id;
-        return done();
+        done();
       })
     );
 
@@ -26,7 +26,7 @@ describe('CreditCardGateway', function () {
         expirationDate: '05/2012'
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.creditCard.maskedNumber, '510510******5100');
@@ -34,7 +34,7 @@ describe('CreditCardGateway', function () {
         assert.isTrue(response.creditCard.uniqueNumberIdentifier.length === 32);
         assert.match(response.creditCard.imageUrl, /png/);
 
-        return done();
+        done();
       });
     });
 
@@ -48,7 +48,7 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isNull(err);
         assert.isFalse(response.success);
 
@@ -56,7 +56,7 @@ describe('CreditCardGateway', function () {
         assert.equal(response.verification.processorResponseCode, '2000');
         assert.equal(response.verification.processorResponseText, 'Do Not Honor');
 
-        return done();
+        done();
       });
     });
 
@@ -70,14 +70,14 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
         assert.equal(response.creditCard.verification.riskData.decision, 'Not Evaluated');
         assert.equal(response.creditCard.verification.riskData.id, null);
 
-        return done();
+        done();
       });
     });
 
@@ -92,7 +92,7 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isNull(err);
         assert.isFalse(response.success);
 
@@ -100,7 +100,7 @@ describe('CreditCardGateway', function () {
         assert.equal(response.verification.processorResponseCode, '2000');
         assert.equal(response.verification.processorResponseText, 'Do Not Honor');
 
-        return done();
+        done();
       });
     });
 
@@ -117,7 +117,7 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.creditCard.maskedNumber, '510510******5100');
@@ -127,7 +127,7 @@ describe('CreditCardGateway', function () {
         assert.equal(response.creditCard.billingAddress.region, 'IL');
         assert.equal(response.creditCard.billingAddress.postalCode, '60607');
 
-        return done();
+        done();
       });
     });
 
@@ -138,7 +138,7 @@ describe('CreditCardGateway', function () {
         expirationDate: '05/2012'
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.message, 'Credit card number must be 12-19 digits.');
         assert.equal(
@@ -154,7 +154,7 @@ describe('CreditCardGateway', function () {
         assert.equal(1, errorCodes.length);
         assert.include(errorCodes, '81716');
 
-        return done();
+        done();
       });
     });
 
@@ -164,13 +164,13 @@ describe('CreditCardGateway', function () {
         venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.creditCard.maskedNumber, '411111******1111');
         assert.isTrue(response.creditCard.venmoSdk);
 
-        return done();
+        done();
       });
     });
 
@@ -180,7 +180,7 @@ describe('CreditCardGateway', function () {
         venmoSdkPaymentMethodCode: VenmoSdk.InvalidPaymentMethodCode
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isNull(err);
         assert.isFalse(response.success);
         let errorCodes = Array.from(response.errors.deepErrors()).map((error) => error.code);
@@ -189,7 +189,7 @@ describe('CreditCardGateway', function () {
         assert.include(errorCodes, '91727');
         assert.equal(response.message, 'Invalid VenmoSDK payment method code');
 
-        return done();
+        done();
       });
     });
 
@@ -203,13 +203,13 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.creditCard.maskedNumber, '510510******5100');
         assert.isTrue(response.creditCard.venmoSdk);
 
-        return done();
+        done();
       });
     });
 
@@ -223,20 +223,20 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.creditCard.maskedNumber, '510510******5100');
         assert.isFalse(response.creditCard.venmoSdk);
 
-        return done();
+        done();
       });
     });
 
     it('accepts a payment method nonce', function (done) {
       let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-      return specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+      specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
         assert.isTrue(result.success);
         let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
         let authorizationFingerprint = clientToken.authorizationFingerprint;
@@ -260,12 +260,12 @@ describe('CreditCardGateway', function () {
             paymentMethodNonce: nonce
           };
 
-          return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+          specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.creditCard.maskedNumber, '411111******1111');
 
-            return done();
+            done();
           }); });
       });
     });
@@ -281,10 +281,10 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.equal(response.creditCard.prepaid, CreditCard.Prepaid.Yes);
 
-          return done();
+          done();
         });
       });
 
@@ -298,10 +298,10 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.equal(response.creditCard.commercial, CreditCard.Commercial.Yes);
 
-          return done();
+          done();
         });
       });
 
@@ -315,11 +315,11 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.equal(response.creditCard.payroll, CreditCard.Payroll.Yes);
           assert.equal(response.creditCard.productId, 'MSA');
 
-          return done();
+          done();
         });
       });
 
@@ -333,11 +333,11 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.equal(response.creditCard.healthcare, CreditCard.Healthcare.Yes);
           assert.equal(response.creditCard.productId, 'J3');
 
-          return done();
+          done();
         });
       });
 
@@ -351,10 +351,10 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.equal(response.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Yes);
 
-          return done();
+          done();
         });
       });
 
@@ -368,10 +368,10 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.equal(response.creditCard.debit, CreditCard.Debit.Yes);
 
-          return done();
+          done();
         });
       });
 
@@ -385,14 +385,14 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.equal(response.creditCard.countryOfIssuance, CreditCardDefaults.CountryOfIssuance);
 
-          return done();
+          done();
         });
       });
 
-      return it('sets the issuing bank', function (done) {
+      it('sets the issuing bank', function (done) {
         let creditCardParams = {
           customerId,
           number: CreditCardNumbers.CardTypeIndicators.IssuingBank,
@@ -402,10 +402,10 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.equal(response.creditCard.issuingBank, CreditCardDefaults.IssuingBank);
 
-          return done();
+          done();
         });
       });
     });
@@ -423,9 +423,9 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           createResponse = response;
-          return done();
+          done();
         });
       });
 
@@ -441,10 +441,10 @@ describe('CreditCardGateway', function () {
 
       it('sets the heathcare field to No', () => assert.equal(createResponse.creditCard.healthcare, CreditCard.Healthcare.No));
 
-      return it('sets the product id field to MSB', () => assert.equal(createResponse.creditCard.productId, 'MSB'));
+      it('sets the product id field to MSB', () => assert.equal(createResponse.creditCard.productId, 'MSB'));
     });
 
-    return context('unknown card type indicators', function () {
+    context('unknown card type indicators', function () {
       let createResponse = null;
 
       before(function (done) {
@@ -457,9 +457,9 @@ describe('CreditCardGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
           createResponse = response;
-          return done();
+          done();
         });
       });
 
@@ -479,7 +479,7 @@ describe('CreditCardGateway', function () {
 
       it('sets the issuing bank field to Unknown', () => assert.equal(createResponse.creditCard.issuingBank, CreditCard.IssuingBank.Unknown));
 
-      return it('sets the product id field to Unknown', () => assert.equal(createResponse.creditCard.productId, CreditCard.ProductId.Unknown));
+      it('sets the product id field to Unknown', () => assert.equal(createResponse.creditCard.productId, CreditCard.ProductId.Unknown));
     });
   });
 
@@ -494,9 +494,9 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         customerToken = response.customer.creditCards[0].token;
-        return done();
+        done();
       });
     });
 
@@ -504,18 +504,18 @@ describe('CreditCardGateway', function () {
       specHelper.defaultGateway.creditCard.delete(customerToken, function (err) {
         assert.isNull(err);
 
-        return specHelper.defaultGateway.creditCard.find(customerToken, function (err) {
+        specHelper.defaultGateway.creditCard.find(customerToken, function (err) {
           assert.equal(err.type, braintree.errorTypes.notFoundError);
-          return done();
+          done();
         });
       })
     );
 
-    return it('handles invalid tokens', done =>
+    it('handles invalid tokens', done =>
       specHelper.defaultGateway.creditCard.delete('nonexistent_token', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });
@@ -529,13 +529,13 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let testCard = response.customer.creditCards[0];
 
-        return specHelper.defaultGateway.creditCard.expired(function (err, result) {
+        specHelper.defaultGateway.creditCard.expired(function (err, result) {
           assert.include(result.ids, testCard.token);
 
-          return done();
+          done();
         });
       });
     })
@@ -550,17 +550,17 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let testCard = response.customer.creditCards[0];
 
         let before = new Date('2016-04-31');
         let after = new Date('2016-10-01');
 
-        return specHelper.defaultGateway.creditCard.expiringBetween(before, after, function (err, result) {
+        specHelper.defaultGateway.creditCard.expiringBetween(before, after, function (err, result) {
           assert.isNull(err);
           assert.include(result.ids, testCard.token);
 
-          return done();
+          done();
         });
       });
     })
@@ -577,9 +577,9 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         customerToken = response.customer.creditCards[0].token;
-        return done();
+        done();
       });
     });
 
@@ -589,7 +589,7 @@ describe('CreditCardGateway', function () {
         assert.equal(creditCard.maskedNumber, '510510******5100');
         assert.equal(creditCard.expirationDate, '05/2014');
 
-        return done();
+        done();
       })
     );
 
@@ -597,15 +597,15 @@ describe('CreditCardGateway', function () {
       specHelper.defaultGateway.creditCard.find('nonexistent_token', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
 
-    return it('handles whitespace', done =>
+    it('handles whitespace', done =>
       specHelper.defaultGateway.creditCard.find(' ', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });
@@ -616,14 +616,14 @@ describe('CreditCardGateway', function () {
     before(done =>
       specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
         customerId = response.customer.id;
-        return done();
+        done();
       })
     );
 
     it('returns a credit card for the supplied nonce', function (done) {
       let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-      return specHelper.defaultGateway.clientToken.generate({customerId}, function (err, result) {
+      specHelper.defaultGateway.clientToken.generate({customerId}, function (err, result) {
         let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
         let authorizationFingerprint = clientToken.authorizationFingerprint;
 
@@ -641,12 +641,12 @@ describe('CreditCardGateway', function () {
         return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode, body) {
           let nonce = JSON.parse(body).creditCards[0].nonce;
 
-          return specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err, creditCard) {
+          specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err, creditCard) {
             assert.isNull(err);
             assert.equal(creditCard.maskedNumber, '411111******1111');
             assert.equal(creditCard.expirationDate, '11/2099');
 
-            return done();
+            done();
           });
         });
       });
@@ -655,7 +655,7 @@ describe('CreditCardGateway', function () {
     it('returns an error if the supplied nonce points to a shared card', function (done) {
       let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-      return specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+      specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
         let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
         let authorizationFingerprint = clientToken.authorizationFingerprint;
 
@@ -674,21 +674,21 @@ describe('CreditCardGateway', function () {
         return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode, body) {
           let nonce = JSON.parse(body).creditCards[0].nonce;
 
-          return specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err, creditCard) {
+          specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err, creditCard) {
             assert.isNull(creditCard);
             assert.equal(err.type, 'notFoundError');
             assert.include(err.message, 'not found');
 
-            return done();
+            done();
           });
         });
       });
     });
 
-    return it('returns an error if the supplied nonce is consumed', function (done) {
+    it('returns an error if the supplied nonce is consumed', function (done) {
       let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-      return specHelper.defaultGateway.clientToken.generate({customerId}, function (err, result) {
+      specHelper.defaultGateway.clientToken.generate({customerId}, function (err, result) {
         let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
         let authorizationFingerprint = clientToken.authorizationFingerprint;
 
@@ -706,14 +706,14 @@ describe('CreditCardGateway', function () {
         return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode, body) {
           let nonce = JSON.parse(body).creditCards[0].nonce;
 
-          return specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err) {
+          specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err) {
             assert.isNull(err);
-            return specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err, creditCard) {
+            specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err, creditCard) {
               assert.isNull(creditCard);
               assert.equal(err.type, 'notFoundError');
               assert.include(err.message, 'consumed');
 
-              return done();
+              done();
             });
           });
         });
@@ -721,7 +721,7 @@ describe('CreditCardGateway', function () {
     });
   });
 
-  return describe('update', function () {
+  describe('update', function () {
     let creditCardToken = null;
 
     before(function (done) {
@@ -738,9 +738,9 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         creditCardToken = response.customer.creditCards[0].token;
-        return done();
+        done();
       });
     });
 
@@ -751,14 +751,14 @@ describe('CreditCardGateway', function () {
         expirationDate: '12/2015'
       };
 
-      return specHelper.defaultGateway.creditCard.update(creditCardToken, updateParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.update(creditCardToken, updateParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.creditCard.cardholderName, 'New Cardholder Name');
         assert.equal(response.creditCard.maskedNumber, '411111******1111');
         assert.equal(response.creditCard.expirationDate, '12/2015');
 
-        return done();
+        done();
       });
     });
 
@@ -777,7 +777,7 @@ describe('CreditCardGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.creditCard.update(creditCardToken, updateParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.update(creditCardToken, updateParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.creditCard.cardholderName, 'New Cardholder Name');
@@ -789,15 +789,15 @@ describe('CreditCardGateway', function () {
         assert.equal(billingAddress.locality, 'New City');
         assert.equal(billingAddress.region, 'New Region');
 
-        return done();
+        done();
       });
     });
 
-    return it('handles errors', function (done) {
+    it('handles errors', function (done) {
       let updateParams =
         {number: 'invalid'};
 
-      return specHelper.defaultGateway.creditCard.update(creditCardToken, updateParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.update(creditCardToken, updateParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.message, 'Credit card number must be 12-19 digits.');
         assert.equal(
@@ -813,7 +813,7 @@ describe('CreditCardGateway', function () {
         assert.equal(1, errorCodes.length);
         assert.include(errorCodes, '81716');
 
-        return done();
+        done();
       });
     });
   });

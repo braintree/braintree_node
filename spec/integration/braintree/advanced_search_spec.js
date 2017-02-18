@@ -17,16 +17,16 @@ describe('AdvancedSearch', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let creditCard = response.customer.creditCards[0];
 
-        return specHelper.defaultGateway.subscription.create({
+        specHelper.defaultGateway.subscription.create({
           paymentMethodToken: creditCard.token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         }, function (err, response) {
           subscription1 = response.subscription;
-          return specHelper.defaultGateway.subscription.create({
+          specHelper.defaultGateway.subscription.create({
             paymentMethodToken: creditCard.token,
             planId: specHelper.plans.trialless.id,
             id: specHelper.randomId()
@@ -93,7 +93,7 @@ describe('AdvancedSearch', function () {
       })
     );
 
-    return it("accepts the 'contains' operator", done =>
+    it("accepts the 'contains' operator", done =>
       specHelper.defaultGateway.subscription.search(search => search.id().contains(subscription1.id.slice(1, subscription1.id.length - 1)), function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.length(), 1);
@@ -122,10 +122,10 @@ describe('AdvancedSearch', function () {
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         let transaction1 = response.transaction;
 
-        return specHelper.defaultGateway.testing.settle(transaction1.id, function () {
+        specHelper.defaultGateway.testing.settle(transaction1.id, function () {
           transactionParams = {
             amount: '10.00',
             creditCard: {
@@ -137,10 +137,10 @@ describe('AdvancedSearch', function () {
             }
           };
 
-          return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             let transaction2 = response.transaction;
 
-            return specHelper.defaultGateway.testing.settle(transaction2.id, () =>
+            specHelper.defaultGateway.testing.settle(transaction2.id, () =>
               specHelper.defaultGateway.transaction.refund(transaction1.id, () =>
                 specHelper.defaultGateway.transaction.search(function (search) {
                   search.id().is(transaction1.id);
@@ -178,16 +178,16 @@ describe('AdvancedSearch', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let creditCard = response.customer.creditCards[0];
 
-        return specHelper.defaultGateway.subscription.create({
+        specHelper.defaultGateway.subscription.create({
           paymentMethodToken: creditCard.token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         }, function (err, response) {
           subscription1 = response.subscription;
-          return specHelper.defaultGateway.subscription.create({
+          specHelper.defaultGateway.subscription.create({
             paymentMethodToken: creditCard.token,
             planId: specHelper.plans.trialless.id,
             id: specHelper.randomId()
@@ -218,7 +218,7 @@ describe('AdvancedSearch', function () {
       })
     );
 
-    return it("accepts the 'is' operator", done =>
+    it("accepts the 'is' operator", done =>
       specHelper.defaultGateway.subscription.search(search => search.ids().is(subscription1.id), function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.ids.length, 1);
@@ -242,16 +242,16 @@ describe('AdvancedSearch', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let creditCard = response.customer.creditCards[0];
 
-        return specHelper.defaultGateway.subscription.create({
+        specHelper.defaultGateway.subscription.create({
           paymentMethodToken: creditCard.token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         }, function (err, response) {
           subscription1 = response.subscription;
-          return specHelper.defaultGateway.subscription.create({
+          specHelper.defaultGateway.subscription.create({
             paymentMethodToken: creditCard.token,
             planId: specHelper.plans.addonDiscountPlan.id,
             id: specHelper.randomId()
@@ -313,7 +313,7 @@ describe('AdvancedSearch', function () {
       })
     );
 
-    return it("accepts the 'contains' operator", done =>
+    it("accepts the 'contains' operator", done =>
       specHelper.defaultGateway.subscription.search(search => search.planId().contains(subscription1.planId.slice(1, subscription1.planId.length - 1)), function (err, response) {
         assert.isTrue(response.success);
         assert.include(response.ids, subscription1.id);
@@ -324,7 +324,7 @@ describe('AdvancedSearch', function () {
     );
   });
 
-  return describe('rangeFields', function () {
+  describe('rangeFields', function () {
     let subscription1 = null;
     let subscription2 = null;
 
@@ -336,16 +336,16 @@ describe('AdvancedSearch', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let creditCard = response.customer.creditCards[0];
 
-        return specHelper.defaultGateway.subscription.create({
+        specHelper.defaultGateway.subscription.create({
           paymentMethodToken: creditCard.token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         }, function (err, response) {
           subscription1 = response.subscription;
-          return specHelper.defaultGateway.subscription.create({
+          specHelper.defaultGateway.subscription.create({
             paymentMethodToken: creditCard.token,
             planId: specHelper.plans.addonDiscountPlan.id,
             id: specHelper.randomId()
@@ -377,10 +377,10 @@ describe('AdvancedSearch', function () {
       })
     );
 
-    return it("accepts the 'between' operator", function (done) {
+    it("accepts the 'between' operator", function (done) {
       let subscriptionPrice = Number(subscription1.price);
 
-      return specHelper.defaultGateway.subscription.search(search => search.price().between(subscriptionPrice - 0.01, subscriptionPrice + 0.01), function (err, response) {
+      specHelper.defaultGateway.subscription.search(search => search.price().between(subscriptionPrice - 0.01, subscriptionPrice + 0.01), function (err, response) {
         assert.isTrue(response.success);
         assert.include(response.ids, subscription1.id);
         specHelper.doesNotInclude(response.ids, subscription2.id);

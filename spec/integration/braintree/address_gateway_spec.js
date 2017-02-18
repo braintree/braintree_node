@@ -17,7 +17,7 @@ describe('AddressGateway', function () {
           countryName: 'United States of America'
         };
 
-        return specHelper.defaultGateway.address.create(addressParams, function (err, response) {
+        specHelper.defaultGateway.address.create(addressParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.address.streetAddress, '123 Fake St');
@@ -26,19 +26,19 @@ describe('AddressGateway', function () {
           assert.equal(response.address.region, 'IL');
           assert.equal(response.address.postalCode, '60607');
           assert.equal(response.address.countryName, 'United States of America');
-          return done();
+          done();
         });
       })
     );
 
-    return it('handles error responses', done =>
+    it('handles error responses', done =>
       specHelper.defaultGateway.customer.create({}, function (err, response) {
         let addressParams = {
           customerId: response.customer.id,
           countryName: 'invalid country'
         };
 
-        return specHelper.defaultGateway.address.create(addressParams, function (err, response) {
+        specHelper.defaultGateway.address.create(addressParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
           assert.equal(response.message, 'Country name is not an accepted country.');
@@ -58,7 +58,7 @@ describe('AddressGateway', function () {
 
           assert.equal(errorCodes.length, 1);
           assert.include(errorCodes, '91803');
-          return done();
+          done();
         });
       })
     );
@@ -72,14 +72,14 @@ describe('AddressGateway', function () {
           countryName: 'United States of America'
         };
 
-        return specHelper.defaultGateway.address.create(addressParams, (err, response) => {
+        specHelper.defaultGateway.address.create(addressParams, (err, response) => {
           let address = response.address;
 
           specHelper.defaultGateway.address.delete(address.customerId, address.id, () =>
             specHelper.defaultGateway.address.find(address.customerId, address.id, function (err, address) {
               assert.isNull(address);
               assert.equal(err.type, braintree.errorTypes.notFoundError);
-              return done();
+              done();
             })
           );
         });
@@ -109,7 +109,7 @@ describe('AddressGateway', function () {
             assert.equal(address.region, 'IL');
             assert.equal(address.postalCode, '60607');
             assert.equal(address.countryName, 'United States of America');
-            return done();
+            done();
           });
         })
       )
@@ -119,7 +119,7 @@ describe('AddressGateway', function () {
       specHelper.defaultGateway.address.find('non-existent-customer', 'id', function (err, address) {
         assert.isNull(address);
         assert.equal(err.type, braintree.errorTypes.notFoundError);
-        return done();
+        done();
       })
     );
 
@@ -127,20 +127,20 @@ describe('AddressGateway', function () {
       specHelper.defaultGateway.address.find(' ', 'id', function (err, address) {
         assert.isNull(address);
         assert.equal(err.type, braintree.errorTypes.notFoundError);
-        return done();
+        done();
       })
     );
 
-    return it('handles whitespace in the address', done =>
+    it('handles whitespace in the address', done =>
       specHelper.defaultGateway.address.find('blah', '\t ', function (err, address) {
         assert.isNull(address);
         assert.equal(err.type, braintree.errorTypes.notFoundError);
-        return done();
+        done();
       })
     );
   });
 
-  return describe('update', function () {
+  describe('update', function () {
     it('yields the updated address', done =>
       specHelper.defaultGateway.customer.create({}, (err, response) =>
         specHelper.defaultGateway.address.create({
@@ -170,13 +170,13 @@ describe('AddressGateway', function () {
             assert.equal(response.address.region, 'New State');
             assert.equal(response.address.postalCode, '60630');
             assert.equal(response.address.countryName, 'United States of America');
-            return done();
+            done();
           });
         })
       )
     );
 
-    return it('handles invalid params', done =>
+    it('handles invalid params', done =>
       specHelper.defaultGateway.customer.create({}, (err, response) =>
         specHelper.defaultGateway.address.create({
           customerId: response.customer.id,
@@ -210,7 +210,7 @@ describe('AddressGateway', function () {
 
             assert.equal(errorCodes.length, 1);
             assert.include(errorCodes, '91803');
-            return done();
+            done();
           });
         })
       )

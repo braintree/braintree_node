@@ -11,7 +11,7 @@ describe('Util', function () {
       assert.equal(digest, 'aa4ae5e15272d00e95705637ce8a3b55ed402112');
     });
 
-    return it('passes test case 7 from RFC 2202', function () {
+    it('passes test case 7 from RFC 2202', function () {
       let digest = Digest.Sha1hexdigest(specHelper.multiplyString('\xaa', 80), 'Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data');
 
       assert.equal(digest, 'e8e99d0f45237d786d6bbaa7965c7808bbff1a91');
@@ -26,11 +26,11 @@ describe('Util', function () {
     })
   );
 
-  return describe('secureCompare', function () {
+  describe('secureCompare', function () {
     it('returns true if strings are the same', () => assert(new Digest().secureCompare('a_string', 'a_string')));
 
     it('returns false if strings are different lengths', () => assert.strictEqual(false, new Digest().secureCompare('a_string', 'a_string_that_is_longer')));
 
-    return it('returns false if strings are different', () => assert.strictEqual(false, new Digest().secureCompare('a_string', 'a_strong')));
+    it('returns false if strings are different', () => assert.strictEqual(false, new Digest().secureCompare('a_string', 'a_strong')));
   });
 });

@@ -30,7 +30,7 @@ describe('Http', () =>
       return http.get('/not_found', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       });
     });
 
@@ -45,7 +45,7 @@ describe('Http', () =>
       return http.get('/not_found', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       });
     });
 
@@ -64,11 +64,11 @@ describe('Http', () =>
         assert.equal(err.type, braintree.errorTypes.unexpectedError);
         assert.equal(err.message, 'Request timed out');
 
-        return done();
+        done();
       });
     });
 
-    return it('returns errors to the callback', function (done) {
+    it('returns errors to the callback', function (done) {
       let config = new Config({
         environment: new Environment('not_a_subdomain.braintreegateway.com', '12345', false),
         merchantId: 'node',
@@ -81,7 +81,7 @@ describe('Http', () =>
         assert.equal(err.type, braintree.errorTypes.unexpectedError);
         assert.match(err.message, /Unexpected request error:/);
 
-        return done();
+        done();
       });
     });
   })

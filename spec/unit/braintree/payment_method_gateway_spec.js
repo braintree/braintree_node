@@ -20,11 +20,11 @@ describe('PaymentMethodGateway', function () {
       assert.equal(paymentMethod.token, 1234);
       assert.isTrue(paymentMethod.default);
 
-      return done();
+      done();
     })
   );
 
-  return describe('delete', function () {
+  describe('delete', function () {
     let fakeGateway = {
       config: {
         baseMerchantPath() {
@@ -33,7 +33,7 @@ describe('PaymentMethodGateway', function () {
       },
       http: {
         delete(url, callback) {
-          return callback(url);
+          callback(url);
         }
       }
     };
@@ -45,7 +45,7 @@ describe('PaymentMethodGateway', function () {
       let assertRequestUrl = url => assert.equal(expectedURL, url); // eslint-disable-line func-style
 
       paymentMethodGateway.delete('some_token', deleteOptions, assertRequestUrl);
-      return done();
+      done();
     });
 
     it('accepts revokeAllGrants option with value false', function (done) {
@@ -55,7 +55,7 @@ describe('PaymentMethodGateway', function () {
       let assertRequestUrl = url => assert.equal(expectedURL, url); // eslint-disable-line func-style
 
       paymentMethodGateway.delete('some_token', deleteOptions, assertRequestUrl);
-      return done();
+      done();
     });
 
     it('accepts just the token, revokeAllGrants is optional', function (done) {
@@ -64,10 +64,10 @@ describe('PaymentMethodGateway', function () {
       let assertRequestUrl = url => assert.equal(expectedURL, url); // eslint-disable-line func-style
 
       paymentMethodGateway.delete('some_token', assertRequestUrl);
-      return done();
+      done();
     });
 
-    return it('calls callback with error if keys are invalid', function (done) {
+    it('calls callback with error if keys are invalid', function (done) {
       let paymentMethodGateway = new PaymentMethodGateway(fakeGateway);
       let deleteOptions = {invalid_key: 'true'}; // eslint-disable-line camelcase
 
@@ -75,7 +75,7 @@ describe('PaymentMethodGateway', function () {
         assert.instanceOf(err, Error);
         assert.equal(err.type, errorTypes.invalidKeysError);
         assert.equal(err.message, 'These keys are invalid: invalid_key');
-        return done();
+        done();
       });
     });
   });

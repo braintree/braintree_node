@@ -15,7 +15,7 @@ describe('OAuthGateway', function () {
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
-      return specHelper.createGrant(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) =>
+      specHelper.createGrant(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) =>
         gateway.oauth.createTokenFromCode({code, scope: 'read_write'}, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
@@ -31,7 +31,7 @@ describe('OAuthGateway', function () {
       );
     });
 
-    return it('returns validation errors when using a bad grant code', function (done) {
+    it('returns validation errors when using a bad grant code', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
@@ -61,7 +61,7 @@ describe('OAuthGateway', function () {
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
-      return specHelper.createGrant(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) =>
+      specHelper.createGrant(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) =>
         gateway.oauth.createTokenFromCode({code, scope: 'read_write'}, (err, refreshTokenResponse) =>
           gateway.oauth.createTokenFromRefreshToken({refreshToken: refreshTokenResponse.credentials.refreshToken, scope: 'read_write'}, function (err, response) {
             assert.isNull(err);
@@ -87,7 +87,7 @@ describe('OAuthGateway', function () {
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
-      return specHelper.createGrant(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) =>
+      specHelper.createGrant(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, (err, code) =>
         gateway.oauth.createTokenFromCode({code, scope: 'read_write'}, (err, accessTokenResponse) =>
           gateway.oauth.revokeAccessToken(accessTokenResponse.credentials.accessToken, function (err, response) {
             assert.isNull(err);
@@ -110,7 +110,7 @@ describe('OAuthGateway', function () {
     })
   );
 
-  return describe('connectUrl', function () {
+  describe('connectUrl', function () {
     it('builds a connect url', function () {
       let queryString;
       let gateway = braintree.connect({
@@ -228,7 +228,7 @@ describe('OAuthGateway', function () {
       assert.equal(query('business[website]'), 'http://example.com');
 
       assert.equal(query('signature').length, 64);
-      return assert.equal(query('algorithm'), 'SHA256');
+      assert.equal(query('algorithm'), 'SHA256');
     });
 
     it('builds a connect url without optional parameters', function () {
@@ -261,7 +261,7 @@ describe('OAuthGateway', function () {
 
       queryString = parts[1];
 
-      return assert.equal(query('redirect_url'), null);
+      assert.equal(query('redirect_url'), null);
     });
 
     it('encodes connect url query parameters containing special characters not encoded by encodeURIComponent', function () {
@@ -286,7 +286,7 @@ describe('OAuthGateway', function () {
       let value = parts[1];
 
       assert.equal(key, 'business%5Bname%5D');
-      return assert.equal(value, 'wacky%20symbols%20%21%27%28%29%2A');
+      assert.equal(value, 'wacky%20symbols%20%21%27%28%29%2A');
     });
 
     it('builds a connect url with multiple payment methods', function () {
@@ -321,14 +321,14 @@ describe('OAuthGateway', function () {
 
       queryString = parts[1];
 
-      return assert.deepEqual(query('payment_methods[]'), ['credit_card', 'paypal']);
+      assert.deepEqual(query('payment_methods[]'), ['credit_card', 'paypal']);
     });
 
-    return it('generates the correct signature', function () {
+    it('generates the correct signature', function () {
       let url = 'http://localhost:3000/oauth/connect?business%5Bname%5D=We+Like+Spaces&client_id=client_id%24development%24integration_client_id';
       let signature = Digest.Sha256hexdigest('client_secret$development$integration_client_secret', url);
 
-      return assert.equal(signature, 'a36bcf10dd982e2e47e0d6a2cb930aea47ade73f954b7d59c58dae6167894d41');
+      assert.equal(signature, 'a36bcf10dd982e2e47e0d6a2cb930aea47ade73f954b7d59c58dae6167894d41');
     });
   });
 });

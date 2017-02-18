@@ -32,7 +32,7 @@ describe('PlanGateway', () =>
         name: 'nodeDiscount'
       };
 
-      return specHelper.createPlanForTests(attributes, () =>
+      specHelper.createPlanForTests(attributes, () =>
         specHelper.createModificationForTests(addOnAttributes, () =>
           specHelper.createModificationForTests(discountAttributes, () =>
             specHelper.defaultGateway.plan.all(function (err, response) {
@@ -55,7 +55,7 @@ describe('PlanGateway', () =>
               assert.equal(addOnAttributes.name, plan.addOns[0].name);
               assert.equal(discountAttributes.name, plan.discounts[0].name);
 
-              return done();
+              done();
             })
           )
         )

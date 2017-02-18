@@ -19,15 +19,15 @@ describe('TestingGateway', () =>
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
         assert.isNull(err);
         assert.isTrue(transactionResponse.success);
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement');
-        return specHelper.defaultGateway.testing.settle(transactionResponse.transaction.id, function (err, settleResponse) {
+        specHelper.defaultGateway.testing.settle(transactionResponse.transaction.id, function (err, settleResponse) {
           assert.isNull(err);
           assert.equal(settleResponse.transaction.status, 'settled');
 
-          return done();
+          done();
         });
       });
     });
@@ -44,15 +44,15 @@ describe('TestingGateway', () =>
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
         assert.isNull(err);
         assert.isTrue(transactionResponse.success);
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement');
-        return specHelper.defaultGateway.testing.settlementPending(transactionResponse.transaction.id, function (err, settleResponse) {
+        specHelper.defaultGateway.testing.settlementPending(transactionResponse.transaction.id, function (err, settleResponse) {
           assert.isNull(err);
           assert.equal(settleResponse.transaction.status, 'settlement_pending');
 
-          return done();
+          done();
         });
       });
     });
@@ -69,15 +69,15 @@ describe('TestingGateway', () =>
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
         assert.isNull(err);
         assert.isTrue(transactionResponse.success);
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement');
-        return specHelper.defaultGateway.testing.settlementConfirm(transactionResponse.transaction.id, function (err, settleResponse) {
+        specHelper.defaultGateway.testing.settlementConfirm(transactionResponse.transaction.id, function (err, settleResponse) {
           assert.isNull(err);
           assert.equal(settleResponse.transaction.status, 'settlement_confirmed');
 
-          return done();
+          done();
         });
       });
     });
@@ -94,20 +94,20 @@ describe('TestingGateway', () =>
         }
       };
 
-      return specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, transactionResponse) {
         assert.isNull(err);
         assert.isTrue(transactionResponse.success);
         assert.equal(transactionResponse.transaction.status, 'submitted_for_settlement');
-        return specHelper.defaultGateway.testing.settlementDecline(transactionResponse.transaction.id, function (err, settleResponse) {
+        specHelper.defaultGateway.testing.settlementDecline(transactionResponse.transaction.id, function (err, settleResponse) {
           assert.isNull(err);
           assert.equal(settleResponse.transaction.status, 'settlement_declined');
 
-          return done();
+          done();
         });
       });
     });
 
-    return it('throws an error if testing gateway settlement methods are used in production', function (done) {
+    it('throws an error if testing gateway settlement methods are used in production', function (done) {
       let gatewayConfig = {
         environment: Environment.Production,
         merchantId: 'integration_merchant_id',
@@ -120,7 +120,7 @@ describe('TestingGateway', () =>
       gateway.testing.settlementConfirm('transaction_id', function (err) {
         assert.equal(err.type, braintree.errorTypes.testOperationPerformedInProductionError);
 
-        return done();
+        done();
       });
     });
   })

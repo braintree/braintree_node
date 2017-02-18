@@ -7,7 +7,7 @@ describe('ClientTokenGateway', function () {
   it('generates an authorization fingerprint that is accepted by the gateway', function (done) {
     let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-    return specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+    specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
       assert.isTrue(result.success);
       let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
       let encodedFingerprint = clientToken.authorizationFingerprint;
@@ -26,7 +26,7 @@ describe('ClientTokenGateway', function () {
   });
 
   it('it allows a client token version to be specified', function (done) {
-    return specHelper.defaultGateway.clientToken.generate({version: 1}, function (err, result) {
+    specHelper.defaultGateway.clientToken.generate({version: 1}, function (err, result) {
       assert.isTrue(result.success);
       let clientToken = JSON.parse(result.clientToken);
 
@@ -36,7 +36,7 @@ describe('ClientTokenGateway', function () {
   });
 
   it('defaults to version 2', function (done) {
-    return specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+    specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
       let encodedClientToken = result.clientToken;
       let decodedClientToken = new Buffer(encodedClientToken, 'base64').toString('utf8');
       let clientToken = JSON.parse(decodedClientToken);
@@ -51,7 +51,7 @@ describe('ClientTokenGateway', function () {
       let customerId = result.customer.id;
       let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-      return specHelper.defaultGateway.clientToken.generate({
+      specHelper.defaultGateway.clientToken.generate({
         customerId,
         options: {
           verifyCard: true
@@ -84,7 +84,7 @@ describe('ClientTokenGateway', function () {
     specHelper.defaultGateway.customer.create({}, function (err, result) {
       let customerId = result.customer.id;
 
-      return specHelper.defaultGateway.creditCard.create({
+      specHelper.defaultGateway.creditCard.create({
         customerId,
         number: '4242424242424242',
         expirationDate: '11/2099'
@@ -92,7 +92,7 @@ describe('ClientTokenGateway', function () {
         assert.isTrue(result.success);
         let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-        return specHelper.defaultGateway.clientToken.generate({
+        specHelper.defaultGateway.clientToken.generate({
           customerId,
           options: {
             makeDefault: true
@@ -114,7 +114,7 @@ describe('ClientTokenGateway', function () {
 
           return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode) {
             assert.equal(statusCode, 201);
-            return specHelper.defaultGateway.customer.find(customerId, function (err, customer) {
+            specHelper.defaultGateway.customer.find(customerId, function (err, customer) {
               assert.equal(2, customer.creditCards.length);
               for (let index in customer.creditCards) {
                 if (!customer.creditCards.hasOwnProperty(index)) {
@@ -140,7 +140,7 @@ describe('ClientTokenGateway', function () {
 
       let customer = result.customer;
 
-      return specHelper.defaultGateway.clientToken.generate({
+      specHelper.defaultGateway.clientToken.generate({
         customerId: customer.id
       }, function (err, result) {
         let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
@@ -159,7 +159,7 @@ describe('ClientTokenGateway', function () {
 
         return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode) {
           assert.equal(statusCode, 201);
-          return specHelper.defaultGateway.clientToken.generate({
+          specHelper.defaultGateway.clientToken.generate({
             customerId: customer.id,
             options: {
               failOnDuplicatePaymentMethod: true
@@ -185,7 +185,7 @@ describe('ClientTokenGateway', function () {
       merchantAccountId: 'my_merchant_account'
     };
 
-    return specHelper.defaultGateway.clientToken.generate(clientTokenParams, function (err, result) {
+    specHelper.defaultGateway.clientToken.generate(clientTokenParams, function (err, result) {
       assert.isTrue(result.success);
       let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
 

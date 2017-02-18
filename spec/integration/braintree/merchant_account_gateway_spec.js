@@ -75,7 +75,7 @@ describe('MerchantAccountGateway', function () {
         assert.equal(response.merchantAccount.status, MerchantAccount.Status.Pending);
         assert.equal(response.merchantAccount.masterMerchantAccount.id, 'sandbox_master_merchant_account');
 
-        return done();
+        done();
       })
     );
 
@@ -85,7 +85,7 @@ describe('MerchantAccountGateway', function () {
         assert.equal(response.merchantAccount.status, MerchantAccount.Status.Pending);
         assert.equal(response.merchantAccount.masterMerchantAccount.id, 'sandbox_master_merchant_account');
 
-        return done();
+        done();
       })
     );
 
@@ -101,13 +101,13 @@ describe('MerchantAccountGateway', function () {
       let rand = Math.floor(Math.random() * 1000);
 
       paramsWithId.id = `sub_merchant_account_id${rand}`;
-      return specHelper.defaultGateway.merchantAccount.create(paramsWithId, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.create(paramsWithId, function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.merchantAccount.status, MerchantAccount.Status.Pending);
         assert.equal(response.merchantAccount.masterMerchantAccount.id, 'sandbox_master_merchant_account');
         assert.equal(response.merchantAccount.id, `sub_merchant_account_id${rand}`);
 
-        return done();
+        done();
       });
     });
 
@@ -119,7 +119,7 @@ describe('MerchantAccountGateway', function () {
           ValidationErrorCodes.MerchantAccount.MasterMerchantAccountIdIsRequired
         );
 
-        return done();
+        done();
       })
     );
 
@@ -128,18 +128,18 @@ describe('MerchantAccountGateway', function () {
         master_merchant_account_id: 'sandbox_master_merchant_account' // eslint-disable-line camelcase
       };
 
-      return specHelper.defaultGateway.merchantAccount.create(params, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.create(params, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(
           response.errors.for('merchantAccount').on('tosAccepted')[0].code,
           ValidationErrorCodes.MerchantAccount.TosAcceptedIsRequired
         );
 
-        return done();
+        done();
       });
     });
 
-    return describe('funding destination', function () {
+    describe('funding destination', function () {
       it('accepts a bank', function (done) {
         let params = new validMerchantAccountParams.constructor();
 
@@ -151,12 +151,12 @@ describe('MerchantAccountGateway', function () {
         }
         params.funding.destination = MerchantAccount.FundingDestination.Bank;
 
-        return specHelper.defaultGateway.merchantAccount.create(params, function (err, response) {
+        specHelper.defaultGateway.merchantAccount.create(params, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.merchantAccount.status, MerchantAccount.Status.Pending);
           assert.equal(response.merchantAccount.masterMerchantAccount.id, 'sandbox_master_merchant_account');
 
-          return done();
+          done();
         });
       });
 
@@ -172,16 +172,16 @@ describe('MerchantAccountGateway', function () {
         params.funding.destination = MerchantAccount.FundingDestination.Email;
         params.funding.email = 'joejosey@compuserve.com';
 
-        return specHelper.defaultGateway.merchantAccount.create(params, function (err, response) {
+        specHelper.defaultGateway.merchantAccount.create(params, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.merchantAccount.status, MerchantAccount.Status.Pending);
           assert.equal(response.merchantAccount.masterMerchantAccount.id, 'sandbox_master_merchant_account');
 
-          return done();
+          done();
         });
       });
 
-      return it('accepts a mobile phone', function (done) {
+      it('accepts a mobile phone', function (done) {
         let params = new validMerchantAccountParams.constructor();
 
         for (let key in validMerchantAccountParams) {
@@ -193,12 +193,12 @@ describe('MerchantAccountGateway', function () {
         params.funding.destination = MerchantAccount.FundingDestination.MobilePhone;
         params.funding.mobile_phone = '1112223333';
 
-        return specHelper.defaultGateway.merchantAccount.create(params, function (err, response) {
+        specHelper.defaultGateway.merchantAccount.create(params, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.merchantAccount.status, MerchantAccount.Status.Pending);
           assert.equal(response.merchantAccount.masterMerchantAccount.id, 'sandbox_master_merchant_account');
 
-          return done();
+          done();
         });
       });
     });
@@ -241,7 +241,7 @@ describe('MerchantAccountGateway', function () {
       params.funding.destination = MerchantAccount.FundingDestination.MobilePhone;
       params.funding.descriptor = 'James Bloggs FL';
 
-      return specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.merchantAccount.status, MerchantAccount.Status.Active);
         assert.equal(response.merchantAccount.id, 'sandbox_sub_merchant_account');
@@ -270,7 +270,7 @@ describe('MerchantAccountGateway', function () {
         assert.equal(response.merchantAccount.funding.destination, MerchantAccount.FundingDestination.MobilePhone);
         assert.equal(response.merchantAccount.funding.descriptor, 'James Bloggs FL');
 
-        return done();
+        done();
       });
     });
 
@@ -282,7 +282,7 @@ describe('MerchantAccountGateway', function () {
       }, function (err, response) {
         assert.isTrue(response.success);
 
-        return done();
+        done();
       })
     );
 
@@ -320,7 +320,7 @@ describe('MerchantAccountGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
         assert.isFalse(response.success);
 
         assert.equal(
@@ -360,11 +360,11 @@ describe('MerchantAccountGateway', function () {
           ValidationErrorCodes.MerchantAccount.Funding.DestinationIsRequired
         );
 
-        return done();
+        done();
       });
     });
 
-    return it('handles validation errors for invalid fields', function (done) {
+    it('handles validation errors for invalid fields', function (done) {
       let params = {
         individual: {
           first_name: '<>',
@@ -398,7 +398,7 @@ describe('MerchantAccountGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
         assert.isFalse(response.success);
 
         assert.equal(
@@ -480,7 +480,7 @@ describe('MerchantAccountGateway', function () {
           ValidationErrorCodes.MerchantAccount.Funding.MobilePhoneIsInvalid
         );
 
-        return done();
+        done();
       });
     });
   });
@@ -494,7 +494,7 @@ describe('MerchantAccountGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
         assert.isFalse(response.success);
 
         assert.equal(
@@ -507,11 +507,11 @@ describe('MerchantAccountGateway', function () {
           ValidationErrorCodes.MerchantAccount.Business.LegalNameIsRequiredWithTaxId
         );
 
-        return done();
+        done();
       });
     });
 
-    return it('requires tax id with legal name', function (done) {
+    it('requires tax id with legal name', function (done) {
       let params = {
         business: {
           legal_name: 'legal name',
@@ -519,7 +519,7 @@ describe('MerchantAccountGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
         assert.isFalse(response.success);
 
         assert.equal(
@@ -527,7 +527,7 @@ describe('MerchantAccountGateway', function () {
           ValidationErrorCodes.MerchantAccount.Business.TaxIdIsRequiredWithLegalName
         );
 
-        return done();
+        done();
       });
     });
   });
@@ -542,7 +542,7 @@ describe('MerchantAccountGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
         assert.isFalse(response.success);
 
         assert.equal(
@@ -555,7 +555,7 @@ describe('MerchantAccountGateway', function () {
           ValidationErrorCodes.MerchantAccount.Funding.RoutingNumberIsRequired
         );
 
-        return done();
+        done();
       });
     });
 
@@ -567,7 +567,7 @@ describe('MerchantAccountGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
         assert.isFalse(response.success);
 
         assert.equal(
@@ -575,11 +575,11 @@ describe('MerchantAccountGateway', function () {
           ValidationErrorCodes.MerchantAccount.Funding.EmailIsRequired
         );
 
-        return done();
+        done();
       });
     });
 
-    return it('requires mobile_phone when a mobile_phone destination is specified', function (done) {
+    it('requires mobile_phone when a mobile_phone destination is specified', function (done) {
       let params = {
         funding: {
           destination: MerchantAccount.FundingDestination.MobilePhone,
@@ -587,7 +587,7 @@ describe('MerchantAccountGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
+      specHelper.defaultGateway.merchantAccount.update('sandbox_sub_merchant_account', params, function (err, response) {
         assert.isFalse(response.success);
 
         assert.equal(
@@ -595,7 +595,7 @@ describe('MerchantAccountGateway', function () {
           ValidationErrorCodes.MerchantAccount.Funding.MobilePhoneIsRequired
         );
 
-        return done();
+        done();
       });
     });
   });
@@ -606,11 +606,11 @@ describe('MerchantAccountGateway', function () {
         assert.isTrue(response.success);
         let merchantAccountId = response.merchantAccount.id;
 
-        return specHelper.defaultGateway.merchantAccount.find(merchantAccountId, function (err, merchantAccount) {
+        specHelper.defaultGateway.merchantAccount.find(merchantAccountId, function (err, merchantAccount) {
           assert.equal(null, err);
           assert.equal(merchantAccount.id, merchantAccountId);
 
-          return done();
+          done();
         });
       })
     );
@@ -619,15 +619,15 @@ describe('MerchantAccountGateway', function () {
       specHelper.defaultGateway.merchantAccount.find('sandbox_master_merchant_account', function (err, merchantAccount) {
         assert.equal(merchantAccount.currencyIsoCode, 'USD');
 
-        return done();
+        done();
       })
     );
 
-    return it('returns a not found error if given a bad id', done =>
+    it('returns a not found error if given a bad id', done =>
       specHelper.defaultGateway.merchantAccount.find(' ', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });
@@ -640,14 +640,14 @@ describe('MerchantAccountGateway', function () {
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
-        return specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
+        specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
           gateway = braintree.connect({
             accessToken: response.credentials.accessToken
           });
 
           return gateway.merchantAccount.all(function (err, merchantAccounts) {
             assert.equal(true, merchantAccounts.length > 20);
-            return done();
+            done();
           });
         });
       });
@@ -669,7 +669,7 @@ describe('MerchantAccountGateway', function () {
             let merchantAccount = merchantAccounts[0];
 
             assert.equal(merchantAccount.currencyIsoCode, 'USD');
-            return done();
+            done();
           });
         });
       });
@@ -693,18 +693,18 @@ describe('MerchantAccountGateway', function () {
             assert.equal(merchantAccount.currencyIsoCode, 'USD');
             assert.equal(merchantAccount.status, 'active');
             assert.equal(merchantAccount.default, true);
-            return done();
+            done();
           });
         });
       });
 
-      return it('gracefully handles errors', function (done) {
+      it('gracefully handles errors', function (done) {
         let gateway = braintree.connect({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
-        return specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
+        specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
           gateway = braintree.connect({
             accessToken: response.credentials.accessToken
           });
@@ -714,20 +714,20 @@ describe('MerchantAccountGateway', function () {
           return gateway.merchantAccount.all(function (err) {
             assert(err);
             assert.equal(err.type, braintree.errorTypes.authenticationError);
-            return done();
+            done();
           });
         });
       });
     });
 
-    return context('using a stream', function () {
+    context('using a stream', function () {
       it('returns a stream if no callback is provided', function (done) {
         let gateway = braintree.connect({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
-        return specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
+        specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
           gateway = braintree.connect({
             accessToken: response.credentials.accessToken
           });
@@ -739,7 +739,7 @@ describe('MerchantAccountGateway', function () {
 
           return merchantAccountStream.on('end', function () {
             assert.equal(true, merchantAccounts.length > 20);
-            return done();
+            done();
           });
         });
       });
@@ -766,18 +766,18 @@ describe('MerchantAccountGateway', function () {
             assert.equal(merchantAccount.currencyIsoCode, 'USD');
             assert.equal(merchantAccount.status, 'active');
             assert.equal(merchantAccount.default, true);
-            return done();
+            done();
           });
         });
       });
 
-      return it('gracefully handles errors', function (done) {
+      it('gracefully handles errors', function (done) {
         let gateway = braintree.connect({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
-        return specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
+        specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
           gateway = braintree.connect({
             accessToken: response.credentials.accessToken
           });
@@ -788,7 +788,7 @@ describe('MerchantAccountGateway', function () {
 
           merchantAccountStream.on('error', function (error) {
             assert.equal(error.type, braintree.errorTypes.authenticationError);
-            return done();
+            done();
           });
 
           merchantAccountStream.on('data', function () {
@@ -803,7 +803,7 @@ describe('MerchantAccountGateway', function () {
     });
   });
 
-  return describe('createForCurrency', function () {
+  describe('createForCurrency', function () {
     it('creates a new merchant account for currency', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$signup_client_id',
@@ -829,7 +829,7 @@ describe('MerchantAccountGateway', function () {
           assert.isTrue(response.success);
 
           assert.equal(response.merchantAccount.currencyIsoCode, 'JPY');
-          return done();
+          done();
         });
       });
     });
@@ -862,7 +862,7 @@ describe('MerchantAccountGateway', function () {
             response.errors.for('merchant').on('currency')[0].code,
             ValidationErrorCodes.Merchant.MerchantAccountExistsForCurrency
           );
-          return done();
+          done();
         });
       });
     });
@@ -895,7 +895,7 @@ describe('MerchantAccountGateway', function () {
             ValidationErrorCodes.Merchant.CurrencyIsRequired
           );
 
-          return done();
+          done();
         });
       });
     });
@@ -929,12 +929,12 @@ describe('MerchantAccountGateway', function () {
             ValidationErrorCodes.Merchant.CurrencyIsInvalid
           );
 
-          return done();
+          done();
         });
       });
     });
 
-    return it('returns error if merchant account exists for id', function (done) {
+    it('returns error if merchant account exists for id', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
@@ -959,13 +959,13 @@ describe('MerchantAccountGateway', function () {
           assert.isNotNull(response.errors);
           assert.isFalse(response.success);
 
-          return assert.equal(
+          assert.equal(
             response.errors.for('merchant').on('id')[0].code,
             ValidationErrorCodes.Merchant.MerchantAccountExistsForId
           );
         });
 
-        return done();
+        done();
       });
     });
   });

@@ -16,7 +16,7 @@ describe('Config', function () {
 
     assert.equal(config.merchantId, 'merchantId');
     assert.equal(config.publicKey, 'publicKey');
-    return assert.equal(config.privateKey, 'privateKey');
+    assert.equal(config.privateKey, 'privateKey');
   });
 
   it('can be configured with partner credentials', function () {
@@ -29,7 +29,7 @@ describe('Config', function () {
 
     assert.equal(config.merchantId, 'partnerId');
     assert.equal(config.publicKey, 'publicKey');
-    return assert.equal(config.privateKey, 'privateKey');
+    assert.equal(config.privateKey, 'privateKey');
   });
 
   it('raises an exception if merchantId is null', () =>
@@ -133,11 +133,11 @@ describe('Config', function () {
         environment: new Environment('localhost', 3000, false)
       });
 
-      return assert.equal(config.baseMerchantUrl(), 'http://localhost/merchants/merchantId');
+      assert.equal(config.baseMerchantUrl(), 'http://localhost/merchants/merchantId');
     })
   );
 
-  return describe('timeout', () =>
+  describe('timeout', () =>
     it('defaults to 60 seconds', function () {
       let config = new Config({
         merchantId: 'merchantId',
@@ -146,7 +146,7 @@ describe('Config', function () {
         environment: 'development'
       });
 
-      return assert.equal(config.timeout, 60000);
+      assert.equal(config.timeout, 60000);
     })
   );
 });

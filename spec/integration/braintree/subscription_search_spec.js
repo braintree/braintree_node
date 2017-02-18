@@ -15,14 +15,14 @@ describe('SubscriptionSearch', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let subscriptionParams = {
           paymentMethodToken: response.customer.creditCards[0].token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         };
 
-        return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+        specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
           let subscriptionId = response.subscription.id;
           let textCriteria = {
             id: subscriptionParams.id,
@@ -131,7 +131,7 @@ describe('SubscriptionSearch', () =>
             })();
           };
 
-          return specHelper.defaultGateway.subscription.search(search, function (err, response) {
+          specHelper.defaultGateway.subscription.search(search, function (err, response) {
             assert.isTrue(response.success);
             assert.equal(response.length(), 1);
 
@@ -140,7 +140,7 @@ describe('SubscriptionSearch', () =>
               assert.equal(subscription.id, subscriptionId);
               assert.isNull(err);
 
-              return done();
+              done();
             });
           });
         });
@@ -155,14 +155,14 @@ describe('SubscriptionSearch', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let subscriptionParams = {
           paymentMethodToken: response.customer.creditCards[0].token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         };
 
-        return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+        specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
           let textCriteria = {
             id: subscriptionParams.id,
             transactionId: response.subscription.transactions[0].id
@@ -270,11 +270,11 @@ describe('SubscriptionSearch', () =>
             })();
           };
 
-          return specHelper.defaultGateway.subscription.search(search, function (err, response) {
+          specHelper.defaultGateway.subscription.search(search, function (err, response) {
             assert.isTrue(response.success);
             assert.equal(response.length(), 0);
 
-            return done();
+            done();
           });
         });
       });
@@ -288,14 +288,14 @@ describe('SubscriptionSearch', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let subscriptionParams = {
           paymentMethodToken: response.customer.creditCards[0].token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         };
 
-        return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+        specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
           let subscriptionId = response.subscription.id;
 
           let subscriptions = [];
@@ -308,7 +308,7 @@ describe('SubscriptionSearch', () =>
             assert.equal(subscriptions.length, 1);
             assert.equal(subscriptions[0].id, subscriptionId);
 
-            return done();
+            done();
           });
 
           return search.resume();
@@ -324,14 +324,14 @@ describe('SubscriptionSearch', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let subscriptionParams = {
           paymentMethodToken: response.customer.creditCards[0].token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         };
 
-        return specHelper.defaultGateway.subscription.create(subscriptionParams, function () {
+        specHelper.defaultGateway.subscription.create(subscriptionParams, function () {
           let multipleValueCriteria = {
             merchantAccountId: 'sandbox_credit_card',
             ids: subscriptionParams.id
@@ -356,10 +356,10 @@ describe('SubscriptionSearch', () =>
             })()
           ;
 
-          return specHelper.defaultGateway.subscription.search(search, function (err, response) {
+          specHelper.defaultGateway.subscription.search(search, function (err, response) {
             assert.isTrue(response.success);
             assert.equal(1, response.length());
-            return done();
+            done();
           });
         });
       });
@@ -373,14 +373,14 @@ describe('SubscriptionSearch', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let subscriptionParams = {
           paymentMethodToken: response.customer.creditCards[0].token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         };
 
-        return specHelper.defaultGateway.subscription.create(subscriptionParams, function () {
+        specHelper.defaultGateway.subscription.create(subscriptionParams, function () {
           let multipleValueCriteria = {
             merchantAccountId: ['sandbox_credit_card', 'invalid_merchant_id'],
             ids: subscriptionParams.id
@@ -405,16 +405,16 @@ describe('SubscriptionSearch', () =>
             })()
           ;
 
-          return specHelper.defaultGateway.subscription.search(search, function (err, response) {
+          specHelper.defaultGateway.subscription.search(search, function (err, response) {
             assert.isTrue(response.success);
             assert.equal(1, response.length());
-            return done();
+            done();
           });
         });
       });
     });
 
-    return it('filters on invalid merchant account ids', function (done) {
+    it('filters on invalid merchant account ids', function (done) {
       let customerParams = {
         creditCard: {
           number: '5105105105105100',
@@ -422,14 +422,14 @@ describe('SubscriptionSearch', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let subscriptionParams = {
           paymentMethodToken: response.customer.creditCards[0].token,
           planId: specHelper.plans.trialless.id,
           id: specHelper.randomId()
         };
 
-        return specHelper.defaultGateway.subscription.create(subscriptionParams, function () {
+        specHelper.defaultGateway.subscription.create(subscriptionParams, function () {
           let multipleValueCriteria = {
             merchantAccountId: 'invalid_merchant_id',
             ids: subscriptionParams.id
@@ -454,10 +454,10 @@ describe('SubscriptionSearch', () =>
             })()
           ;
 
-          return specHelper.defaultGateway.subscription.search(search, function (err, response) {
+          specHelper.defaultGateway.subscription.search(search, function (err, response) {
             assert.isTrue(response.success);
             assert.equal(0, response.length());
-            return done();
+            done();
           });
         });
       });

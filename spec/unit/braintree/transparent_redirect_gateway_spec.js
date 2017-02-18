@@ -16,7 +16,7 @@ describe('TransparentRedirectGateway', () =>
       };
       let gateway = new TransparentRedirectGateway(braintree.connect(config));
 
-      return assert.equal(gateway.url, 'https://api.sandbox.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests');
+      assert.equal(gateway.url, 'https://api.sandbox.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests');
     });
 
     it('gives the correct url for the production environment', function () {
@@ -28,10 +28,10 @@ describe('TransparentRedirectGateway', () =>
       };
       let gateway = new TransparentRedirectGateway(braintree.connect(config));
 
-      return assert.equal(gateway.url, 'https://api.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests');
+      assert.equal(gateway.url, 'https://api.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests');
     });
 
-    return it('gives the correct url for the development environment', function () {
+    it('gives the correct url for the development environment', function () {
       let config = {
         environment: braintree.Environment.Development,
         merchantId: 'integration_merchant_id',
@@ -40,7 +40,7 @@ describe('TransparentRedirectGateway', () =>
       };
       let gateway = new TransparentRedirectGateway(braintree.connect(config));
 
-      return assert.equal(gateway.url, `http://localhost:${gateway.gateway.config.environment.port}/merchants/integration_merchant_id/transparent_redirect_requests`);
+      assert.equal(gateway.url, `http://localhost:${gateway.gateway.config.environment.port}/merchants/integration_merchant_id/transparent_redirect_requests`);
     });
   })
 );

@@ -9,6 +9,6 @@ describe('SignatureService', () =>
     let signatureService = new SignatureService('my-key', hashFunction);
     let signed = signatureService.sign('my-data');
 
-    return assert.equal(signed, 'my-data-hashed-with-my-key|my-data');
+    assert.equal(signed, 'my-data-hashed-with-my-key|my-data');
   })
 );

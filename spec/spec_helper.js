@@ -1,5 +1,5 @@
 'use strict';
-/* eslint-disable func-style */
+/* eslint-disable func-style, no-console */
 
 let http = require('http');
 let https = require('https');
@@ -18,7 +18,7 @@ global.assert = chai.assert;
 
 global.assert.isEmptyArray = function (array) {
   assert.isArray(array);
-  return assert.equal(array.length, 0);
+  assert.equal(array.length, 0);
 };
 
 global.inspect = object => console.dir(object);
@@ -80,7 +80,7 @@ let create3DSVerification = function (merchantAccountId, params, callback) {
     callback(threeDSecureToken);
   };
 
-  return defaultGateway.http.post(
+  defaultGateway.http.post(
     `${defaultGateway.config.baseMerchantPath()}/three_d_secure/create_verification/${merchantAccountId}`,
     {three_d_secure_verification: params}, // eslint-disable-line camelcase
     responseCallback
@@ -94,7 +94,7 @@ let generate3DSNonce = function (params, callback) {
     callback(threeDSecureNonce);
   };
 
-  return defaultGateway.http.post(
+  defaultGateway.http.post(
     `${defaultGateway.config.baseMerchantPath()}/three_d_secure/create_nonce/${specHelper.threeDSecureMerchantAccountId}`,
     params,
     responseCallback
@@ -176,7 +176,7 @@ let generateNonceForNewPaymentMethod = function (paymentMethodParams, customerId
   let clientTokenOptions = {};
 
   if (customerId) { clientTokenOptions.customerId = customerId; }
-  return specHelper.defaultGateway.clientToken.generate(clientTokenOptions, function (err, result) {
+  specHelper.defaultGateway.clientToken.generate(clientTokenOptions, function (err, result) {
     let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
     let params = {authorizationFingerprint: clientToken.authorizationFingerprint};
 
@@ -287,7 +287,7 @@ let createTransactionToRefund = function (callback) {
     }
   };
 
-  return specHelper.defaultGateway.transaction.sale(transactionParams, (err, result) =>
+  specHelper.defaultGateway.transaction.sale(transactionParams, (err, result) =>
     specHelper.defaultGateway.testing.settle(result.transaction.id, () =>
       specHelper.defaultGateway.transaction.find(result.transaction.id, (err, transaction) => callback(transaction))
     )
@@ -311,10 +311,10 @@ let createPayPalTransactionToRefund = function (callback) {
       }
     };
 
-    return defaultGateway.transaction.sale(transactionParams, function (err, response) {
+    defaultGateway.transaction.sale(transactionParams, function (err, response) {
       let transactionId = response.transaction.id;
 
-      return specHelper.settlePayPalTransaction(transactionId, () =>
+      specHelper.settlePayPalTransaction(transactionId, () =>
         defaultGateway.transaction.find(transactionId, (err, transaction) => callback(transaction))
       );
     });
@@ -335,7 +335,7 @@ let createEscrowedTransaction = function (callback) {
     }
   };
 
-  return specHelper.defaultGateway.transaction.sale(transactionParams, (err, result) =>
+  specHelper.defaultGateway.transaction.sale(transactionParams, (err, result) =>
     specHelper.escrowTransaction(result.transaction.id, () =>
       specHelper.defaultGateway.transaction.find(result.transaction.id, (err, transaction) => callback(transaction))
     )

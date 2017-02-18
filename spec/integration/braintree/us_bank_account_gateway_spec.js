@@ -14,7 +14,7 @@ describe('UsBankAccountGateway', function () {
             paymentMethodNonce: nonce
           };
 
-          return specHelper.defaultGateway.paymentMethod.create(usBankAccountParams, function (err, response) {
+          specHelper.defaultGateway.paymentMethod.create(usBankAccountParams, function (err, response) {
             let usBankAccountToken = response.paymentMethod.token;
 
             specHelper.defaultGateway.usBankAccount.find(usBankAccountToken, function (err, usBankAccount) {
@@ -28,27 +28,27 @@ describe('UsBankAccountGateway', function () {
               assert.isTrue(usBankAccount.achMandate.acceptedAt instanceof Date);
               assert.isTrue(usBankAccount.default);
 
-              return done();
+              done();
             });
           });
         })
       )
     );
 
-    return it('does not find invalid US bank account', done =>
+    it('does not find invalid US bank account', done =>
       specHelper.defaultGateway.customer.create({}, function (err, response) {
         assert.isTrue(response.success);
-        return specHelper.defaultGateway.usBankAccount.find(specHelper.generateInvalidUsBankAccountNonce(), function (err, usBankAccount) {
+        specHelper.defaultGateway.usBankAccount.find(specHelper.generateInvalidUsBankAccountNonce(), function (err, usBankAccount) {
           assert.isNull(usBankAccount);
           assert.equal(err.type, 'notFoundError');
 
-          return done();
+          done();
         });
       })
     );
   });
 
-  return describe('sale', () =>
+  describe('sale', () =>
     it('transacts on a US bank account', done =>
       specHelper.defaultGateway.customer.create({}, (err, response) =>
         specHelper.generateValidUsBankAccountNonce(function (nonce) {
@@ -57,7 +57,7 @@ describe('UsBankAccountGateway', function () {
             paymentMethodNonce: nonce
           };
 
-          return specHelper.defaultGateway.paymentMethod.create(usBankAccountParams, function (err, response) {
+          specHelper.defaultGateway.paymentMethod.create(usBankAccountParams, function (err, response) {
             let transactionParams = {
               merchantAccountId: 'us_bank_merchant_account',
               amount: '10.00'
@@ -75,7 +75,7 @@ describe('UsBankAccountGateway', function () {
               assert.equal(response.transaction.usBankAccount.achMandate.text, 'cl mandate text');
               assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date);
 
-              return done();
+              done();
             });
           });
         })

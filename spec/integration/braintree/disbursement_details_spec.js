@@ -11,15 +11,15 @@ describe('DisbursementDetails', () =>
         disbursementDate: '2013-04-10'});
 
       assert.equal(details.isValid(), true);
-      return done();
+      done();
     });
 
-    return it('returns false if DisbursementDetails are absent', function (done) {
+    it('returns false if DisbursementDetails are absent', function (done) {
       let details = new DisbursementDetails({
         disbursementDate: null});
 
       assert.equal(details.isValid(), false);
-      return done();
+      done();
     });
   })
 );

@@ -15,7 +15,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.equal(result.top_level.nested_one.nested_two, 'aValue');
+      assert.equal(result.top_level.nested_one.nested_two, 'aValue');
     });
 
     it('does not affect date values', function () {
@@ -24,7 +24,7 @@ describe('Util', function () {
           new Date()
       });
 
-      return assert.instanceOf(result.some_date, Date);
+      assert.instanceOf(result.some_date, Date);
     });
 
     it('does not affect null', function () {
@@ -33,7 +33,7 @@ describe('Util', function () {
           null
       });
 
-      return assert.strictEqual(result.something_null, null);
+      assert.strictEqual(result.something_null, null);
     });
 
     it('works on array values', function () {
@@ -50,7 +50,7 @@ describe('Util', function () {
       assert.equal(result.top_level.things[0].camel_one, 'value1');
       assert.equal(result.top_level.things[0].camel_two, 'value2');
       assert.equal(result.top_level.things[1].camel_one, 'value3');
-      return assert.equal(result.top_level.things[1].camel_two, 'value4');
+      assert.equal(result.top_level.things[1].camel_two, 'value4');
     });
   });
 
@@ -58,7 +58,7 @@ describe('Util', function () {
     it('converts a single value', function () {
       let result = Util.convertNodeToObject('foobar');
 
-      return assert.equal(result, 'foobar');
+      assert.equal(result, 'foobar');
     });
 
     it('converts a hash of values', function () {
@@ -67,7 +67,7 @@ describe('Util', function () {
         ping: 'pong'
       });
 
-      return assert.deepEqual(result, {
+      assert.deepEqual(result, {
         fooBar: 'baz',
         ping: 'pong'
       }
@@ -82,7 +82,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.deepEqual(result, {
+      assert.deepEqual(result, {
         fooBar: 'baz',
         hash: {
           pingPong: 'paddle'
@@ -105,7 +105,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.deepEqual(result, {
+      assert.deepEqual(result, {
         creditCardTransactions: {
           currentPageNumber: 1,
           pageSize: 50,
@@ -133,7 +133,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.deepEqual(result, {
+      assert.deepEqual(result, {
         creditCardTransactions: {
           currentPageNumber: 1,
           pageSize: 50,
@@ -154,7 +154,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.deepEqual(result, []);
+      assert.deepEqual(result, []);
     });
 
     it('converts an array with one item', function () {
@@ -167,7 +167,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.deepEqual(result, [{foo: 'bar'}]);
+      assert.deepEqual(result, [{foo: 'bar'}]);
     });
 
     it('converts an array with multiple items', function () {
@@ -181,7 +181,7 @@ describe('Util', function () {
         ]
       });
 
-      return assert.deepEqual(result, [
+      assert.deepEqual(result, [
         {prop: 'value'},
         {prop: 'value'}
       ]);
@@ -200,7 +200,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.deepEqual(result, {
+      assert.deepEqual(result, {
         items: [
           {prop: 'value'},
           {prop: 'value'}
@@ -216,7 +216,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.isNull(result);
+      assert.isNull(result);
     });
 
     it('converts symbols to strings', function () {
@@ -229,7 +229,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.deepEqual(result, {attribute: 'country_name'});
+      assert.deepEqual(result, {attribute: 'country_name'});
     });
 
     it('converts integers', function () {
@@ -242,7 +242,7 @@ describe('Util', function () {
         }
       });
 
-      return assert.deepEqual(result, {attribute: 1234});
+      assert.deepEqual(result, {attribute: 1234});
     });
 
     it('converts booleans', function () {
@@ -262,13 +262,13 @@ describe('Util', function () {
       });
 
       assert.isTrue(result.a1);
-      return assert.isFalse(result.a2);
+      assert.isFalse(result.a2);
     });
 
     it('converts an empty object to an empty string', function () {
       let result = Util.convertNodeToObject({attribute: {}});
 
-      return assert.deepEqual(result, {attribute: ''});
+      assert.deepEqual(result, {attribute: ''});
     });
   });
 
@@ -276,13 +276,13 @@ describe('Util', function () {
     it('returns true for empty objects', function () {
       let result = Util.objectIsEmpty({});
 
-      return assert.isTrue(result);
+      assert.isTrue(result);
     });
 
     it('returns false for non-empty objects', function () {
       let result = Util.objectIsEmpty({key: 'value'});
 
-      return assert.isFalse(result);
+      assert.isFalse(result);
     });
   });
 
@@ -290,19 +290,19 @@ describe('Util', function () {
     it('returns true for empty arrays', function () {
       let result = Util.arrayIsEmpty([]);
 
-      return assert.isTrue(result);
+      assert.isTrue(result);
     });
 
     it('returns false for non-empty arrays', function () {
       let result = Util.arrayIsEmpty([1, 2, 3]);
 
-      return assert.isFalse(result);
+      assert.isFalse(result);
     });
 
     it('returns false if not given an array', function () {
       let result = Util.arrayIsEmpty({});
 
-      return assert.isFalse(result);
+      assert.isFalse(result);
     });
   });
 
@@ -310,19 +310,19 @@ describe('Util', function () {
     it('converts a string with underscores', function () {
       let result = Util.toCamelCase('one_two_three');
 
-      return assert.equal(result, 'oneTwoThree');
+      assert.equal(result, 'oneTwoThree');
     });
 
     it('converts a string with hyphens', function () {
       let result = Util.toCamelCase('one-two-three');
 
-      return assert.equal(result, 'oneTwoThree');
+      assert.equal(result, 'oneTwoThree');
     });
 
     it('converts a string with a hyphen followed by a number', function () {
       let result = Util.toCamelCase('last-4');
 
-      return assert.equal(result, 'last4');
+      assert.equal(result, 'last4');
     });
   });
 
@@ -330,13 +330,13 @@ describe('Util', function () {
     it('converts a camel cased string', function () {
       let result = Util.toUnderscore('oneTwoThree');
 
-      return assert.equal(result, 'one_two_three');
+      assert.equal(result, 'one_two_three');
     });
 
     it('handles words with contiguous uppercase letters', function () {
       let result = Util.toUnderscore('headlineCNNNews');
 
-      return assert.equal(result, 'headline_cnn_news');
+      assert.equal(result, 'headline_cnn_news');
     });
   });
 
@@ -344,19 +344,19 @@ describe('Util', function () {
     it('flattens a deeply nested array', function () {
       let result = Util.flatten([[1], [2, [3, [4, [5, [6, [7, [8, [9]]]]]]]]]);
 
-      return assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
     });
 
     it('flattens an array with varying levels of nesting', function () {
       let result = Util.flatten([[1, 2], [3, 4], [5], [6, [7, [8, [9]]]]]);
 
-      return assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      assert.deepEqual(result, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
     });
 
     it('flattens a deeply nested single element array', function () {
       let result = Util.flatten([[[[[[[[[[[[[[[[[[[[1]]]]]]]]]]]]]]]]]]]]);
 
-      return assert.deepEqual(result, [1]);
+      assert.deepEqual(result, [1]);
     });
   });
 
@@ -364,7 +364,7 @@ describe('Util', function () {
     it('concats two objects', function () {
       let result = Util.merge({key: 'value', key2: 'value2'});
 
-      return assert.deepEqual(result, {
+      assert.deepEqual(result, {
         key: 'value',
         key2: 'value2'
       }
@@ -374,7 +374,7 @@ describe('Util', function () {
     it('overrides existing values', function () {
       let result = Util.merge({key: 'value'}, {key: 'value2'});
 
-      return assert.deepEqual(result, {key: 'value2'});
+      assert.deepEqual(result, {key: 'value2'});
     });
   });
 
@@ -382,13 +382,13 @@ describe('Util', function () {
     it('returns the difference between two arrays', function () {
       let result = Util.without([1, 2, 3, 4, 5], [1, 4]);
 
-      return assert.deepEqual(result, [2, 3, 5]);
+      assert.deepEqual(result, [2, 3, 5]);
     });
 
     it('returns the initial array if there are no differences', function () {
       let result = Util.without([1, 2, 3], [4, 5]);
 
-      return assert.deepEqual(result, [1, 2, 3]);
+      assert.deepEqual(result, [1, 2, 3]);
     });
   });
 
@@ -409,11 +409,11 @@ describe('Util', function () {
 
       let result = Util.flattenKeys(transactionParams);
 
-      return assert.deepEqual(result, ['amount', 'creditCard[number]', 'creditCard[expirationDate]', 'options[threeDSecure][required]']);
+      assert.deepEqual(result, ['amount', 'creditCard[number]', 'creditCard[expirationDate]', 'options[threeDSecure][required]']);
     })
   );
 
-  return describe('verifyKeys', function () {
+  describe('verifyKeys', function () {
     let signature, transactionParams;
 
     it("doesn't return an error if params are equal to the signature", function () {
@@ -431,7 +431,7 @@ describe('Util', function () {
 
       let error = Util.verifyKeys(signature, transactionParams);
 
-      return assert.isUndefined(error);
+      assert.isUndefined(error);
     });
 
     it("doesn't return an error if params are a subset of signature", function () {
@@ -449,7 +449,7 @@ describe('Util', function () {
 
       let error = Util.verifyKeys(signature, transactionParams);
 
-      return assert.isUndefined(error);
+      assert.isUndefined(error);
     });
 
     it('ignores specified keys without deleting them', () => {
@@ -478,7 +478,7 @@ describe('Util', function () {
 
       Util.verifyKeys(signature, transactionParams);
       assert.equal(transactionParams.topLevelKey.ignore, 'foo');
-      return assert.equal(transactionParams.options.nested.key.ignore, 'bar');
+      assert.equal(transactionParams.options.nested.key.ignore, 'bar');
     }
     );
 
@@ -500,7 +500,7 @@ describe('Util', function () {
 
       assert.instanceOf(error, Error);
       assert.equal(error.type, errorTypes.invalidKeysError);
-      return assert.equal(error.message, 'These keys are invalid: invalidKey, creditCard[nestedInvalidKey]');
+      assert.equal(error.message, 'These keys are invalid: invalidKey, creditCard[nestedInvalidKey]');
     });
   });
 });

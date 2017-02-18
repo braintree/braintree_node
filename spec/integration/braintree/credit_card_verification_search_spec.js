@@ -52,7 +52,7 @@ describe('CreditCardVerification', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, () =>
+      specHelper.defaultGateway.customer.create(customerParams, () =>
         specHelper.defaultGateway.creditCardVerification.search(function (search) {
           search.billingAddressDetailsPostalCode().is(postalCode);
           search.creditCardCardType().is(CreditCard.CardType.Visa);
@@ -79,7 +79,7 @@ describe('CreditCardVerification', () =>
             assert.equal(verification.creditCard.cardType, CreditCard.CardType.Visa);
             assert.equal(verification.status, CreditCardVerification.StatusType.Verified);
 
-            return specHelper.defaultGateway.creditCardVerification.search(function (search) {
+            specHelper.defaultGateway.creditCardVerification.search(function (search) {
               search.createdAt().is(createdAt);
               search.id().is(verificationId);
               return search.ids().in(verificationId);
@@ -112,7 +112,7 @@ describe('CreditCardVerification', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function () {
+      specHelper.defaultGateway.customer.create(customerParams, function () {
         let search = specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(name));
 
         let verifications = [];
@@ -164,7 +164,7 @@ describe('CreditCardVerification', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, () =>
+      specHelper.defaultGateway.customer.create(customerParams, () =>
         specHelper.defaultGateway.customer.create(customerParams2, () =>
           specHelper.defaultGateway.creditCardVerification.search(function (search) {
             search.creditCardCardholderName().is(name);
@@ -192,10 +192,10 @@ describe('CreditCardVerification', () =>
       );
     });
 
-    return it('returns card type indicators', function (done) {
+    it('returns card type indicators', function (done) {
       let name = specHelper.randomId() + ' Smith';
 
-      return specHelper.defaultGateway.customer.create({
+      specHelper.defaultGateway.customer.create({
         creditCard: {
           cardholderName: name,
           number: CreditCardNumbers.CardTypeIndicators.Unknown,

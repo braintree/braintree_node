@@ -19,7 +19,7 @@ describe('UnknownPaymentMethod', () =>
 
       assert.equal(unknownPaymentMethod.token, 1234);
       assert.isTrue(unknownPaymentMethod.default);
-      return assert.equal(
+      assert.equal(
         unknownPaymentMethod.imageUrl,
         'https://assets.braintreegateway.com/payment_method_logo/unknown.png'
       );

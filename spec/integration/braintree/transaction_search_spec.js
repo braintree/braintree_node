@@ -650,7 +650,7 @@ describe('TransactionSearch', () =>
       );
     });
 
-    return it('raises Down For Maintenance Error for search timeouts', done =>
+    it('raises Down For Maintenance Error for search timeouts', done =>
       specHelper.defaultGateway.transaction.search(search => search.amount().is(-10), function (err) {
         assert.equal(err.type, braintree.errorTypes.downForMaintenanceError);
 

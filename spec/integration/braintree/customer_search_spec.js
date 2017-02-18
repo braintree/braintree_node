@@ -9,7 +9,7 @@ describe('CustomerSearch', () =>
 
     before(function (done) {
       lastName = specHelper.randomId();
-      return specHelper.defaultGateway.customer.create({firstName: 'Bob', lastName}, () =>
+      specHelper.defaultGateway.customer.create({firstName: 'Bob', lastName}, () =>
         specHelper.defaultGateway.customer.create({firstName: 'Ryan', lastName}, () => done())
       );
     });
@@ -29,7 +29,7 @@ describe('CustomerSearch', () =>
         return search.lastName().is(lastName);
       };
 
-      return specHelper.defaultGateway.customer.search(search, (err, response) =>
+      specHelper.defaultGateway.customer.search(search, (err, response) =>
         response.first(function (err, customer) {
           assert.equal(customer.firstName, 'Bob');
           assert.equal(customer.lastName, lastName);
@@ -84,7 +84,7 @@ describe('CustomerSearch', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(joe, function (err, response) {
+      specHelper.defaultGateway.customer.create(joe, function (err, response) {
         let token = response.customer.creditCards[0].token;
         let joeId = response.customer.id;
 
@@ -96,7 +96,7 @@ describe('CustomerSearch', () =>
           }
         };
 
-        return specHelper.defaultGateway.customer.create(jim, function (err, response) {
+        specHelper.defaultGateway.customer.create(jim, function (err, response) {
           let jimId = response.customer.id;
 
           let search = function (search) { // eslint-disable-line func-style
@@ -104,7 +104,7 @@ describe('CustomerSearch', () =>
             return search.ids().in([joeId, jimId]);
           };
 
-          return specHelper.defaultGateway.customer.search(search, function (err, response) {
+          specHelper.defaultGateway.customer.search(search, function (err, response) {
             let customers = [];
 
             return response.each(function (err, customer) {
@@ -158,7 +158,7 @@ describe('CustomerSearch', () =>
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function () {
+      specHelper.defaultGateway.customer.create(customerParams, function () {
         let textCriteria = {
           addressCountryName: 'United States of America',
           addressExtendedAddress: 'Suite 403',
@@ -274,7 +274,7 @@ describe('CustomerSearch', () =>
           })();
         };
 
-        return specHelper.defaultGateway.customer.search(search, function (err, response) {
+        specHelper.defaultGateway.customer.search(search, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.length(), 1);
 
@@ -289,7 +289,7 @@ describe('CustomerSearch', () =>
       });
     });
 
-    return it("searches on customer's paypal account by email", function (done) {
+    it("searches on customer's paypal account by email", function (done) {
       let customerId = `CUSTOMER_${specHelper.randomId()}`;
       let firstName = `John_${specHelper.randomId()}`;
 
@@ -302,10 +302,10 @@ describe('CustomerSearch', () =>
         lastName
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function () {
+      specHelper.defaultGateway.customer.create(customerParams, function () {
         let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-        return specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+        specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
           let authorizationFingerprint = clientToken.authorizationFingerprint;
 
@@ -324,13 +324,13 @@ describe('CustomerSearch', () =>
               paymentMethodNonce: nonce
             };
 
-            return specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
+            specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
               let search = function (searchResult) { // eslint-disable-line func-style
                 searchResult.paypalAccountEmail().is(response.paymentMethod.email);
                 return searchResult.id().is(customerId);
               };
 
-              return specHelper.defaultGateway.customer.search(search, function (err, response) {
+              specHelper.defaultGateway.customer.search(search, function (err, response) {
                 assert.isTrue(response.success);
                 assert.equal(response.length(), 1);
 

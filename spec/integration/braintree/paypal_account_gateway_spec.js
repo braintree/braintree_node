@@ -15,17 +15,17 @@ describe('PayPalGateway', function () {
           paymentMethodNonce: Nonces.PayPalFuturePayment
         };
 
-        return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
           let paymentMethodToken = response.paymentMethod.token;
 
-          return specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err, paypalAccount) {
+          specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err, paypalAccount) {
             assert.isNull(err);
             assert.isString(paypalAccount.email);
             assert.isString(paypalAccount.imageUrl);
             assert.isString(paypalAccount.createdAt);
             assert.isString(paypalAccount.updatedAt);
 
-            return done();
+            done();
           });
         });
       })
@@ -38,13 +38,13 @@ describe('PayPalGateway', function () {
           paymentMethodNonce: Nonces.PayPalBillingAgreement
         };
 
-        return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
           let paymentMethodToken = response.paymentMethod.token;
 
-          return specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err, paypalAccount) {
+          specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err, paypalAccount) {
             assert.isNull(err);
             assert.isString(paypalAccount.billingAgreementId);
-            return done();
+            done();
           });
         });
       })
@@ -54,7 +54,7 @@ describe('PayPalGateway', function () {
       specHelper.defaultGateway.paypalAccount.find('NONEXISTENT_TOKEN', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
 
@@ -62,18 +62,18 @@ describe('PayPalGateway', function () {
       specHelper.defaultGateway.paypalAccount.find(' ', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
 
-    return it('returns subscriptions associated with a paypal account', done =>
+    it('returns subscriptions associated with a paypal account', done =>
       specHelper.defaultGateway.customer.create({}, function (err, response) {
         let paymentMethodParams = {
           customerId: response.customer.id,
           paymentMethodNonce: Nonces.PayPalFuturePayment
         };
 
-        return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
           let token = response.paymentMethod.token;
 
           let subscriptionParams = {
@@ -81,19 +81,19 @@ describe('PayPalGateway', function () {
             planId: specHelper.plans.trialless.id
           };
 
-          return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+          specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
 
             let subscription1 = response.subscription;
 
-            return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+            specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
 
               let subscription2 = response.subscription;
 
-              return specHelper.defaultGateway.paypalAccount.find(token, function (err, paypalAccount) {
+              specHelper.defaultGateway.paypalAccount.find(token, function (err, paypalAccount) {
                 assert.isNull(err);
 
                 assert.equal(paypalAccount.subscriptions.length, 2);
@@ -102,7 +102,7 @@ describe('PayPalGateway', function () {
                 assert.include(subscriptionIds, subscription1.id);
                 assert.include(subscriptionIds, subscription2.id);
 
-                return done();
+                done();
               });
             });
           });
@@ -118,12 +118,12 @@ describe('PayPalGateway', function () {
     beforeEach(function (done) {
       paymentMethodToken = Math.floor(Math.random() * Math.pow(36, 3)).toString(36);
 
-      return specHelper.defaultGateway.customer.create({firstName: 'Jane', lastName: 'Doe'}, function (err, response) {
+      specHelper.defaultGateway.customer.create({firstName: 'Jane', lastName: 'Doe'}, function (err, response) {
         customerId = response.customer.id;
 
         let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-        return specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+        specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
           let authorizationFingerprint = clientToken.authorizationFingerprint;
 
@@ -142,10 +142,10 @@ describe('PayPalGateway', function () {
               paymentMethodNonce: nonce
             };
 
-            return specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
+            specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
               paymentMethodToken = response.paymentMethod.token;
 
-              return done();
+              done();
             }); });
         });
       });
@@ -155,15 +155,15 @@ describe('PayPalGateway', function () {
       let updateParams =
         {token: paymentMethodToken + '123'};
 
-      return specHelper.defaultGateway.paypalAccount.update(paymentMethodToken, updateParams, function (err, response) {
+      specHelper.defaultGateway.paypalAccount.update(paymentMethodToken, updateParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.paypalAccount.token, paymentMethodToken + '123');
 
-        return specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
+        specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
           assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-          return done();
+          done();
         });
       });
     });
@@ -178,7 +178,7 @@ describe('PayPalGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
         assert.isTrue(response.success);
         assert.isTrue(response.creditCard.default);
 
@@ -189,45 +189,45 @@ describe('PayPalGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.paypalAccount.update(paymentMethodToken, updateParams, function (err, response) {
+        specHelper.defaultGateway.paypalAccount.update(paymentMethodToken, updateParams, function (err, response) {
           assert.isTrue(response.success);
           assert.isTrue(response.paypalAccount.default);
-          return done();
+          done();
         });
       });
     });
 
-    return it('handles errors', function (done) {
+    it('handles errors', function (done) {
       let paypalAccountParams = {
         customerId,
         paymentMethodNonce: Nonces.PayPalFuturePayment
       };
 
-      return specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
+      specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
         assert.isTrue(response.success);
         let originalToken = response.paymentMethod.token;
 
-        return specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
+        specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
           let newPaymentMethodToken = response.paymentMethod.token;
 
           let updateParams =
             {token: originalToken};
 
-          return specHelper.defaultGateway.paypalAccount.update(newPaymentMethodToken, updateParams, function (err, response) {
+          specHelper.defaultGateway.paypalAccount.update(newPaymentMethodToken, updateParams, function (err, response) {
             assert.isFalse(response.success);
             assert.equal(
               response.errors.for('paypalAccount').on('token')[0].code,
               '92906'
             );
 
-            return done();
+            done();
           });
         });
       });
     });
   });
 
-  return describe('delete', function () {
+  describe('delete', function () {
     let paymentMethodToken = null;
 
     before(done =>
@@ -254,10 +254,10 @@ describe('PayPalGateway', function () {
               paymentMethodNonce: nonce
             };
 
-            return specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
+            specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
               paymentMethodToken = response.paymentMethod.token;
 
-              return done();
+              done();
             }); });
         });
       })
@@ -267,18 +267,18 @@ describe('PayPalGateway', function () {
       specHelper.defaultGateway.paypalAccount.delete(paymentMethodToken, function (err) {
         assert.isNull(err);
 
-        return specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
+        specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
           assert.equal(err.type, braintree.errorTypes.notFoundError);
-          return done();
+          done();
         });
       })
     );
 
-    return it('handles invalid tokens', done =>
+    it('handles invalid tokens', done =>
       specHelper.defaultGateway.paypalAccount.delete('NON_EXISTENT_TOKEN', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });

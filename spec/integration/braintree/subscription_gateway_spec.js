@@ -19,10 +19,10 @@ describe('SubscriptionGateway', function () {
       }
     };
 
-    return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+    specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
       customerId = response.customer.id;
       creditCardToken = response.customer.creditCards[0].token;
-      return done();
+      done();
     });
   });
 
@@ -33,7 +33,7 @@ describe('SubscriptionGateway', function () {
         planId: specHelper.plans.trialless.id
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.subscription.planId, specHelper.plans.trialless.id);
@@ -44,7 +44,7 @@ describe('SubscriptionGateway', function () {
         assert.isNotNull(response.subscription.createdAt);
         assert.isNotNull(response.subscription.updatedAt);
 
-        return done();
+        done();
       });
     });
 
@@ -63,11 +63,11 @@ describe('SubscriptionGateway', function () {
           planId: specHelper.plans.trialless.id
         };
 
-        return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+        specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.subscription.transactions[0].creditCard.maskedNumber, '411111******1111');
-          return done();
+          done();
         }); });
     });
 
@@ -84,11 +84,11 @@ describe('SubscriptionGateway', function () {
           planId: specHelper.plans.trialless.id
         };
 
-        return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+        specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.isString(response.subscription.transactions[0].paypalAccount.payerEmail);
-          return done();
+          done();
         }); });
     });
 
@@ -102,13 +102,13 @@ describe('SubscriptionGateway', function () {
           }
         };
 
-        return specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
+        specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
           paymentMethodParams = {
             paymentMethodNonce: nonce,
             customerId: paypalCustomerId
           };
 
-          return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
             let paymentMethodToken = response.paymentMethod.token;
 
             let subscriptionParams = {
@@ -116,11 +116,11 @@ describe('SubscriptionGateway', function () {
               planId: specHelper.plans.trialless.id
             };
 
-            return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+            specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.isString(response.subscription.transactions[0].paypalAccount.payerEmail);
-              return done();
+              done();
             });
           });
         });
@@ -133,12 +133,12 @@ describe('SubscriptionGateway', function () {
         planId: specHelper.plans.trialless.id
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         assert.isNull(err);
         assert.isFalse(response.success);
         assert.equal(response.errors.for('subscription').on('paymentMethodNonce')[0].code, '91925');
 
-        return done();
+        done();
       });
     });
 
@@ -152,7 +152,7 @@ describe('SubscriptionGateway', function () {
         firstBillingDate
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         let expectedDate = new Date();
@@ -163,7 +163,7 @@ describe('SubscriptionGateway', function () {
 
         assert.equal(response.subscription.firstBillingDate, expectedDateString);
 
-        return done();
+        done();
       });
     });
 
@@ -174,14 +174,14 @@ describe('SubscriptionGateway', function () {
         planId: specHelper.plans.trialless.id
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         assert.isNull(err);
         assert.isFalse(response.success);
         assert.match(response.transaction.id, /^\w{6,}$/);
         assert.equal(response.transaction.status, 'processor_declined');
         assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
 
-        return done();
+        done();
       });
     });
 
@@ -191,7 +191,7 @@ describe('SubscriptionGateway', function () {
         planId: specHelper.plans.addonDiscountPlan.id
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
@@ -231,7 +231,7 @@ describe('SubscriptionGateway', function () {
         assert.isTrue(discounts[1].neverExpires);
         assert.equal(discounts[1].currentBillingCycle, 0);
 
-        return done();
+        done();
       });
     });
 
@@ -241,7 +241,7 @@ describe('SubscriptionGateway', function () {
         planId: 'invalid_plan_id'
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         assert.isFalse(response.success);
 
         let messages = response.message.split('\n');
@@ -252,11 +252,11 @@ describe('SubscriptionGateway', function () {
         assert.equal(response.errors.for('subscription').on('planId')[0].code, '91904');
         assert.equal(response.errors.for('subscription').on('paymentMethodToken')[0].code, '91903');
 
-        return done();
+        done();
       });
     });
 
-    return it('handles validation errors on modification updates', function (done) {
+    it('handles validation errors on modification updates', function (done) {
       let subscriptionParams = {
         paymentMethodToken: creditCardToken,
         planId: specHelper.plans.addonDiscountPlan.id,
@@ -267,13 +267,13 @@ describe('SubscriptionGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         assert.isNull(err);
         assert.isFalse(response.success);
         assert.equal(response.errors.for('subscription').for('addOns').for('update').forIndex(0).on('amount')[0].code, '92002');
         assert.equal(response.errors.for('subscription').for('addOns').for('update').forIndex(1).on('quantity')[0].code, '92001');
 
-        return done();
+        done();
       });
     });
   });
@@ -285,7 +285,7 @@ describe('SubscriptionGateway', function () {
         planId: specHelper.plans.trialless.id
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, (err, response) =>
+      specHelper.defaultGateway.subscription.create(subscriptionParams, (err, response) =>
         specHelper.defaultGateway.subscription.find(response.subscription.id, function (err, subscription) {
           assert.isNull(err);
           assert.equal(subscription.planId, specHelper.plans.trialless.id);
@@ -293,16 +293,16 @@ describe('SubscriptionGateway', function () {
           assert.equal(subscription.status, 'Active');
           assert.equal(subscription.currentBillingCycle, 1);
 
-          return done();
+          done();
         })
       );
     });
 
-    return it('returns a not found error if given a bad id', done =>
+    it('returns a not found error if given a bad id', done =>
       specHelper.defaultGateway.subscription.find(' ', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });
@@ -317,9 +317,9 @@ describe('SubscriptionGateway', function () {
         price: '5.00'
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         subscription = response.subscription;
-        return done();
+        done();
       });
     });
 
@@ -327,12 +327,12 @@ describe('SubscriptionGateway', function () {
       let subscriptionParams =
         {price: '8.00'};
 
-      return specHelper.defaultGateway.subscription.update(subscription.id, subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.update(subscription.id, subscriptionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.subscription.price, '8.00');
 
-        return done();
+        done();
       });
     });
 
@@ -351,28 +351,28 @@ describe('SubscriptionGateway', function () {
           planId: specHelper.plans.trialless.id
         };
 
-        return specHelper.defaultGateway.subscription.update(subscription.id, subscriptionParams, function (err, response) {
+        specHelper.defaultGateway.subscription.update(subscription.id, subscriptionParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
 
-          return specHelper.defaultGateway.creditCard.find(response.subscription.paymentMethodToken, function (err, creditCard) {
+          specHelper.defaultGateway.creditCard.find(response.subscription.paymentMethodToken, function (err, creditCard) {
             assert.equal(creditCard.maskedNumber, '411111******1111');
-            return done();
+            done();
           });
         }); });
     });
 
-    return it('handles validation errors', function (done) {
+    it('handles validation errors', function (done) {
       let subscriptionParams =
         {price: 'invalid'};
 
-      return specHelper.defaultGateway.subscription.update(subscription.id, subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.update(subscription.id, subscriptionParams, function (err, response) {
         assert.isNull(err);
         assert.isFalse(response.success);
         assert.equal(response.errors.for('subscription').on('price')[0].message, 'Price is an invalid format.');
         assert.equal(response.errors.for('subscription').on('price')[0].code, '81904');
 
-        return done();
+        done();
       });
     });
   });
@@ -386,9 +386,9 @@ describe('SubscriptionGateway', function () {
         planId: specHelper.plans.trialless.id
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         subscription = response.subscription;
-        return specHelper.makePastDue(response.subscription, () => done());
+        specHelper.makePastDue(response.subscription, () => done());
       });
     });
 
@@ -400,11 +400,11 @@ describe('SubscriptionGateway', function () {
         assert.equal(response.transaction.type, 'sale');
         assert.equal(response.transaction.status, 'authorized');
 
-        return done();
+        done();
       })
     );
 
-    return it('allows specifying an amount', done =>
+    it('allows specifying an amount', done =>
       specHelper.defaultGateway.subscription.retryCharge(subscription.id, '6.00', function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
@@ -412,25 +412,25 @@ describe('SubscriptionGateway', function () {
         assert.equal(response.transaction.type, 'sale');
         assert.equal(response.transaction.status, 'authorized');
 
-        return done();
+        done();
       })
     );
   });
 
-  return describe('cancel', function () {
+  describe('cancel', function () {
     it('cancels a subscription', function (done) {
       let subscriptionParams = {
         paymentMethodToken: creditCardToken,
         planId: specHelper.plans.trialless.id
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, (err, response) =>
+      specHelper.defaultGateway.subscription.create(subscriptionParams, (err, response) =>
         specHelper.defaultGateway.subscription.cancel(response.subscription.id, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.subscription.status, 'Canceled');
 
-          return done();
+          done();
         })
       );
     });
@@ -441,26 +441,26 @@ describe('SubscriptionGateway', function () {
         planId: specHelper.plans.trialless.id
       };
 
-      return specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+      specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
         let subscriptionId = response.subscription.id;
 
-        return specHelper.defaultGateway.subscription.cancel(subscriptionId, () =>
+        specHelper.defaultGateway.subscription.cancel(subscriptionId, () =>
           specHelper.defaultGateway.subscription.cancel(subscriptionId, function (err, response) {
             assert.isFalse(response.success);
             assert.equal(response.message, 'Subscription has already been canceled.');
             assert.equal(response.errors.for('subscription').on('status')[0].code, '81905');
 
-            return done();
+            done();
           })
         );
       });
     });
 
-    return it('returns a not found error if provided a bad id', done =>
+    it('returns a not found error if provided a bad id', done =>
       specHelper.defaultGateway.subscription.cancel('nonexistent_subscription', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });

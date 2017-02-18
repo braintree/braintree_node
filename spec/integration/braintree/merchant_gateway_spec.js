@@ -35,7 +35,7 @@ describe('MerchantGateway', function () {
         assert.isNotNull(credentials.expiresAt);
         assert.equal(credentials.tokenType, 'bearer');
 
-        return done();
+        done();
       });
     })
   );
@@ -55,11 +55,11 @@ describe('MerchantGateway', function () {
         ValidationErrorCodes.Merchant.PaymentMethodsAreInvalid
       );
 
-      return done();
+      done();
     });
   });
 
-  return describe('create_multi_currency', function () {
+  describe('create_multi_currency', function () {
     it('creates a multi-currency merchant', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$signup_client_id',
@@ -109,7 +109,7 @@ describe('MerchantGateway', function () {
         assert.equal(gbpMerchantAccount.default, false);
         assert.equal(gbpMerchantAccount.currencyIsoCode, 'GBP');
 
-        return done();
+        done();
       });
     });
 
@@ -166,7 +166,7 @@ describe('MerchantGateway', function () {
         assert.equal(gbpMerchantAccount.default, false);
         assert.equal(gbpMerchantAccount.currencyIsoCode, 'GBP');
 
-        return done();
+        done();
       });
     });
 
@@ -215,7 +215,7 @@ describe('MerchantGateway', function () {
         assert.equal(merchantAccount.default, true);
         assert.equal(merchantAccount.currencyIsoCode, 'JPY');
 
-        return done();
+        done();
       });
     });
 
@@ -264,11 +264,11 @@ describe('MerchantGateway', function () {
         assert.equal(merchantAccount.default, true);
         assert.equal(merchantAccount.currencyIsoCode, 'USD');
 
-        return done();
+        done();
       });
     });
 
-    return it('returns error if invalid currency is passed', function (done) {
+    it('returns error if invalid currency is passed', function (done) {
       let gateway = braintree.connect({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
@@ -292,7 +292,7 @@ describe('MerchantGateway', function () {
           ValidationErrorCodes.Merchant.CurrenciesAreInvalid
         );
 
-        return done();
+        done();
       });
     });
   });

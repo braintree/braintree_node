@@ -17,7 +17,7 @@ describe('AddOnGateway', () =>
         numberOfBillingCycles: 1
       };
 
-      return specHelper.createModificationForTests(attributes, () =>
+      specHelper.createModificationForTests(attributes, () =>
         specHelper.defaultGateway.addOn.all(function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
@@ -31,7 +31,7 @@ describe('AddOnGateway', () =>
           assert.equal(attributes.neverExpires, addOn.neverExpires);
           assert.equal(attributes.numberOfBillingCycles, addOn.numberOfBillingCycles);
 
-          return done();
+          done();
         })
       );
     })

@@ -19,10 +19,10 @@ describe('SearchResponse', function () {
 
       let searchResponse = new SearchResponse(fakeGateway, fakeResults);
 
-      return assert.throws(() => searchResponse.first(), Error); // eslint-disable-line no-invalid-this
+      assert.throws(() => searchResponse.first(), Error); // eslint-disable-line no-invalid-this
     });
 
-    return it('does not call gateway#find with zero results', function (done) {
+    it('does not call gateway#find with zero results', function (done) {
       let fakeGateway = {
         find() {
           throw new Error('This exception should NOT be thrown');
@@ -37,7 +37,7 @@ describe('SearchResponse', function () {
 
       return searchResponse.first(function () {
         assert.isTrue(true);
-        return done();
+        done();
       });
     });
   });
@@ -55,11 +55,11 @@ describe('SearchResponse', function () {
 
       let searchResponse = new SearchResponse(fakePagingFunction, fakeResults);
 
-      return assert.doesNotThrow(() => searchResponse.each(), Error);
+      assert.doesNotThrow(() => searchResponse.each(), Error);
     })
   );
 
-  return describe('length', () =>
+  describe('length', () =>
     it('returns the correct length', function () {
       let fakeResults = {
         searchResults: {
@@ -69,7 +69,7 @@ describe('SearchResponse', function () {
 
       let searchResponse = new SearchResponse(null, fakeResults);
 
-      return assert.equal(searchResponse.length(), 2);
+      assert.equal(searchResponse.length(), 2);
     })
   );
 });

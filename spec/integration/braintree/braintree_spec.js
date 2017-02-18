@@ -17,7 +17,7 @@ describe('Braintree', () =>
       return gateway.transaction.sale({}, function (err) {
         assert.equal(err.type, braintree.errorTypes.authenticationError);
 
-        return done();
+        done();
       });
     })
   )

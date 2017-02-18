@@ -16,7 +16,7 @@ describe('CustomerGateway', function () {
         assert.equal(response.customer.firstName, 'John');
         assert.equal(response.customer.lastName, 'Smith');
 
-        return done();
+        done();
       })
     );
 
@@ -26,7 +26,7 @@ describe('CustomerGateway', function () {
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
-      return specHelper.createToken(oauthGateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
+      specHelper.createToken(oauthGateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
         let gateway = braintree.connect({
           accessToken: response.credentials.accessToken
         });
@@ -37,7 +37,7 @@ describe('CustomerGateway', function () {
           assert.equal(response.customer.firstName, 'John');
           assert.equal(response.customer.lastName, 'Smith');
 
-          return done();
+          done();
         });
       });
     });
@@ -58,11 +58,11 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        return done();
+        done();
       });
     });
 
@@ -73,7 +73,7 @@ describe('CustomerGateway', function () {
         assert.equal(response.customer.firstName, 'Jöhn');
         assert.equal(response.customer.lastName, 'Smith');
 
-        return done();
+        done();
       })
     );
 
@@ -82,7 +82,7 @@ describe('CustomerGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        return done();
+        done();
       })
     );
 
@@ -93,12 +93,12 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.customer.customFields.storeMe, 'custom value');
 
-        return done();
+        done();
       });
     });
 
@@ -113,7 +113,7 @@ describe('CustomerGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.customer.firstName, 'John');
@@ -124,14 +124,14 @@ describe('CustomerGateway', function () {
           assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100');
           assert.isTrue(/^\w{32}$/.test(response.customer.creditCards[0].uniqueNumberIdentifier));
 
-          return done();
+          done();
         });
       });
 
       it('creates a customer with a payment method nonce backed by a credit card', function (done) {
         let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
 
-        return specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+        specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
           let authorizationFingerprint = clientToken.authorizationFingerprint;
           let params = {
@@ -154,13 +154,13 @@ describe('CustomerGateway', function () {
               }
             };
 
-            return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+            specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.customer.creditCards[0].bin, '411111');
               assert.equal(response.customer.paymentMethods[0].bin, '411111');
 
-              return done();
+              done();
             }); });
         });
       });
@@ -169,7 +169,7 @@ describe('CustomerGateway', function () {
         let customerParams =
           {paymentMethodNonce: Nonces.ApplePayAmEx};
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.isNotNull(response.customer.applePayCards[0]);
@@ -178,7 +178,7 @@ describe('CustomerGateway', function () {
           assert.isNotNull(applePayCard.token);
           assert.isNotNull(applePayCard.payment_instrument_name);
 
-          return done();
+          done();
         });
       });
 
@@ -186,7 +186,7 @@ describe('CustomerGateway', function () {
         let customerParams =
           {paymentMethodNonce: Nonces.AndroidPayDiscover};
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.isNotNull(response.customer.androidPayCards[0]);
@@ -197,7 +197,7 @@ describe('CustomerGateway', function () {
           assert.equal(androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover);
           assert.equal(androidPayCard.last4, '1117');
 
-          return done();
+          done();
         });
       });
 
@@ -205,7 +205,7 @@ describe('CustomerGateway', function () {
         let customerParams =
           {paymentMethodNonce: Nonces.AndroidPayMasterCard};
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.isNotNull(response.customer.androidPayCards[0]);
@@ -216,7 +216,7 @@ describe('CustomerGateway', function () {
           assert.equal(androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.MasterCard);
           assert.equal(androidPayCard.last4, '4444');
 
-          return done();
+          done();
         });
       });
 
@@ -224,7 +224,7 @@ describe('CustomerGateway', function () {
         let customerParams =
           {paymentMethodNonce: Nonces.AmexExpressCheckout};
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.isNotNull(response.customer.amexExpressCheckoutCards[0]);
@@ -235,7 +235,7 @@ describe('CustomerGateway', function () {
           assert.match(amexExpressCheckoutCard.cardMemberNumber, /^\d{4}$/);
           assert.equal(response.customer.paymentMethods[0], amexExpressCheckoutCard);
 
-          return done();
+          done();
         });
       });
 
@@ -243,7 +243,7 @@ describe('CustomerGateway', function () {
         let customerParams =
           {paymentMethodNonce: Nonces.VenmoAccount};
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.isNotNull(response.customer.venmoAccounts[0]);
@@ -254,7 +254,7 @@ describe('CustomerGateway', function () {
           assert.equal(venmoAccount.venmoUserId, 'Venmo-Joe-1');
           assert.equal(response.customer.paymentMethods[0], venmoAccount);
 
-          return done();
+          done();
         });
       });
 
@@ -263,7 +263,7 @@ describe('CustomerGateway', function () {
           let customerParams =
             {paymentMethodNonce: token};
 
-          return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+          specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.isNotNull(response.customer.usBankAccounts[0]);
@@ -277,7 +277,7 @@ describe('CustomerGateway', function () {
             assert.match(usBankAccount.bankName, /CHASE/);
             assert.equal(response.customer.paymentMethods[0], usBankAccount);
 
-            return done();
+            done();
           }); })
       );
 
@@ -285,12 +285,12 @@ describe('CustomerGateway', function () {
         let customerParams =
           {paymentMethodNonce: Nonces.Coinbase};
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.isNotNull(response.customer.coinbaseAccounts[0]);
 
-          return done();
+          done();
         });
       });
 
@@ -298,29 +298,29 @@ describe('CustomerGateway', function () {
         let customerParams =
           {paymentMethodNonce: Nonces.PayPalFuturePayment};
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.isString(response.customer.paypalAccounts[0].email);
 
-          return done();
+          done();
         });
       });
 
-      return it('does not vault a paypal account only authorized for one-time use', function (done) {
+      it('does not vault a paypal account only authorized for one-time use', function (done) {
         let customerParams =
           {paymentMethodNonce: Nonces.PayPalOneTimePayment};
 
         specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
-          return assert.equal(
+          assert.equal(
             response.errors.for('customer').for('paypalAccount').on('base')[0].code,
             '82902'
           );
         });
 
-        return done();
+        done();
       });
     });
 
@@ -337,7 +337,7 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, () =>
+      specHelper.defaultGateway.customer.create(customerParams, () =>
         specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isFalse(response.success);
           assert.equal(
@@ -345,7 +345,7 @@ describe('CustomerGateway', function () {
             '81724'
           );
 
-          return done();
+          done();
         })
       );
     });
@@ -363,11 +363,11 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        return done();
+        done();
       });
     });
 
@@ -385,11 +385,11 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        return done();
+        done();
       });
     });
 
@@ -406,14 +406,14 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
         assert.isFalse(response.success);
         assert.equal(response.verification.status, 'processor_declined');
         assert.equal(response.verification.processorResponseCode, '2000');
         assert.equal(response.verification.processorResponseText, 'Do Not Honor');
 
-        return done();
+        done();
       });
     });
 
@@ -425,7 +425,7 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.message, 'Credit card number is invalid.');
         assert.equal(
@@ -437,7 +437,7 @@ describe('CustomerGateway', function () {
         assert.equal(errorCodes.length, 1);
         assert.include(errorCodes, '81715');
 
-        return done();
+        done();
       });
     });
 
@@ -459,7 +459,7 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.customer.firstName, 'John');
@@ -478,7 +478,7 @@ describe('CustomerGateway', function () {
         assert.equal(billingAddress.postalCode, '60607');
         assert.equal(billingAddress.countryName, 'United States of America');
 
-        return done();
+        done();
       });
     });
 
@@ -493,7 +493,7 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.message, 'Credit card number is invalid.\nCountry name is not an accepted country.');
         assert.equal(
@@ -512,7 +512,7 @@ describe('CustomerGateway', function () {
         assert.equal(response.params.customer.creditCard.expirationDate, '05/2012');
         assert.equal(response.params.customer.creditCard.billingAddress.countryName, 'invalid country');
 
-        return done();
+        done();
       });
     });
 
@@ -523,12 +523,12 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.customer.creditCards[0].bin, '411111');
 
-        return done();
+        done();
       });
     });
 
@@ -543,16 +543,16 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.isTrue(response.customer.creditCards[0].venmoSdk);
 
-        return done();
+        done();
       });
     });
 
-    return it('creates a customer with a params nonce', function (done) {
+    it('creates a customer with a params nonce', function (done) {
       let paymentMethodParams = {
         creditCard: {
           number: '4111111111111111',
@@ -561,19 +561,19 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
+      specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
         let customerParams = {
           firstName: 'Bob',
           lastName: 'Fisher',
           paymentMethodNonce: nonce
         };
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.customer.creditCards[0].bin, '411111');
 
-          return done();
+          done();
         }); });
     });
   });
@@ -596,9 +596,9 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
-        return specHelper.defaultGateway.customer.find(response.customer.id, function (err, customer) {
+        specHelper.defaultGateway.customer.find(response.customer.id, function (err, customer) {
           assert.isNull(err);
           assert.equal(customer.firstName, 'John');
           assert.equal(customer.lastName, 'Smith');
@@ -607,7 +607,7 @@ describe('CustomerGateway', function () {
           assert.equal(billingAddress.streetAddress, '123 E Fake St');
           assert.equal(billingAddress.company, '');
 
-          return done();
+          done();
         });
       });
     });
@@ -629,7 +629,7 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, customerResponse) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, customerResponse) {
         assert.isNull(err);
         assert.equal(customerResponse.success, true);
 
@@ -638,18 +638,18 @@ describe('CustomerGateway', function () {
           paymentMethodNonce: Nonces.PayPalFuturePayment
         };
 
-        return specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, paypalResponse) {
+        specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, paypalResponse) {
           assert.isNull(err);
           assert.equal(paypalResponse.success, true);
 
-          return specHelper.defaultGateway.customer.find(customerResponse.customer.id, function (err, customer) {
+          specHelper.defaultGateway.customer.find(customerResponse.customer.id, function (err, customer) {
             assert.isNull(err);
             assert.equal(customer.firstName, 'John');
             assert.equal(customer.lastName, 'Smith');
             assert.equal(customer.creditCards.length, 1);
             assert.equal(customer.paypalAccounts.length, 1);
 
-            return done();
+            done();
           });
         });
       });
@@ -660,11 +660,11 @@ describe('CustomerGateway', function () {
         let customerParams =
           {paymentMethodNonce: token};
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
 
-          return specHelper.defaultGateway.customer.find(response.customer.id, function (err, customer) {
+          specHelper.defaultGateway.customer.find(response.customer.id, function (err, customer) {
             assert.isNull(err);
             assert.isNotNull(customer);
             assert.isNotNull(customer.usBankAccounts[0]);
@@ -678,7 +678,7 @@ describe('CustomerGateway', function () {
             assert.match(usBankAccount.bankName, /CHASE/);
             assert.equal(customer.paymentMethods[0], usBankAccount);
 
-            return done();
+            done();
           });
         });
       })
@@ -688,15 +688,15 @@ describe('CustomerGateway', function () {
       specHelper.defaultGateway.customer.find('nonexistent_customer', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
 
-    return it('handles whitespace ids', done =>
+    it('handles whitespace ids', done =>
       specHelper.defaultGateway.customer.find(' ', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });
@@ -710,9 +710,9 @@ describe('CustomerGateway', function () {
         lastName: 'Old Last Name'
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         customerId = response.customer.id;
-        return done();
+        done();
       });
     });
 
@@ -722,13 +722,13 @@ describe('CustomerGateway', function () {
         lastName: 'New Last Name'
       };
 
-      return specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.customer.firstName, 'New First Name');
         assert.equal(response.customer.lastName, 'New Last Name');
 
-        return done();
+        done();
       });
     });
 
@@ -740,7 +740,7 @@ describe('CustomerGateway', function () {
         token: token1
       };
 
-      return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+      specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.paymentMethod.default);
 
@@ -752,7 +752,7 @@ describe('CustomerGateway', function () {
           token: token2
         };
 
-        return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.paymentMethod.default);
 
@@ -765,14 +765,14 @@ describe('CustomerGateway', function () {
             }
           };
 
-          return specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+          specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
             assert.isTrue(response.success);
 
-            return specHelper.defaultGateway.paymentMethod.find(token2, function (err, creditCard) {
+            specHelper.defaultGateway.paymentMethod.find(token2, function (err, creditCard) {
               assert.isTrue(creditCard.default);
               assert.equal(creditCard.token, token2);
 
-              return done();
+              done();
             });
           });
         });
@@ -787,7 +787,7 @@ describe('CustomerGateway', function () {
         token: token1
       };
 
-      return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+      specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.paymentMethod.default);
 
@@ -799,21 +799,21 @@ describe('CustomerGateway', function () {
           token: token2
         };
 
-        return specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.paymentMethod.default);
 
           let customerParams =
             {defaultPaymentMethodToken: token2};
 
-          return specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+          specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
             assert.isTrue(response.success);
 
-            return specHelper.defaultGateway.paymentMethod.find(token2, function (err, creditCard) {
+            specHelper.defaultGateway.paymentMethod.find(token2, function (err, creditCard) {
               assert.isTrue(creditCard.default);
               assert.equal(creditCard.token, token2);
 
-              return done();
+              done();
             });
           });
         });
@@ -830,14 +830,14 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.customer.firstName, 'New First Name');
         assert.equal(response.customer.lastName, 'New Last Name');
         assert.equal(response.customer.creditCards[0].maskedNumber, '510510******5100');
 
-        return done();
+        done();
       });
     });
 
@@ -849,20 +849,20 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.create(customerParams, function (err, createResponse) {
+      specHelper.defaultGateway.customer.create(customerParams, function (err, createResponse) {
         assert.isTrue(createResponse.success);
 
         customerParams.creditCard.options =
             {failOnDuplicatePaymentMethod: true};
 
-        return specHelper.defaultGateway.customer.update(createResponse.customer.id, customerParams, function (err, updateResponse) {
+        specHelper.defaultGateway.customer.update(createResponse.customer.id, customerParams, function (err, updateResponse) {
           assert.isFalse(updateResponse.success);
           assert.equal(
             updateResponse.errors.for('customer').for('creditCard').on('number')[0].code,
             '81724'
           );
 
-          return done();
+          done();
         });
       });
     });
@@ -881,11 +881,11 @@ describe('CustomerGateway', function () {
         }
       };
 
-      return specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+      specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        return done();
+        done();
       });
     });
 
@@ -906,7 +906,7 @@ describe('CustomerGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.customer.firstName, 'New First Name');
@@ -923,7 +923,7 @@ describe('CustomerGateway', function () {
           assert.equal(response.customer.addresses[0].region, 'IL');
           assert.equal(response.customer.addresses[0].postalCode, '60607');
 
-          return done();
+          done();
         });
       });
 
@@ -944,7 +944,7 @@ describe('CustomerGateway', function () {
           return myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', params, function (statusCode, body) {
             let nonce = JSON.parse(body).paypalAccounts[0].nonce;
 
-            return specHelper.defaultGateway.customer.create({}, function (err, response) {
+            specHelper.defaultGateway.customer.create({}, function (err, response) {
               let paypalCustomerId = response.customer.id;
 
               let customerParams = {
@@ -953,24 +953,24 @@ describe('CustomerGateway', function () {
                 paymentMethodNonce: nonce
               };
 
-              return specHelper.defaultGateway.customer.update(paypalCustomerId, customerParams, function (err, response) {
+              specHelper.defaultGateway.customer.update(paypalCustomerId, customerParams, function (err, response) {
                 assert.isNull(err);
                 assert.isTrue(response.success);
                 assert.isString(response.customer.paypalAccounts[0].email);
                 assert.equal(response.customer.firstName, 'New First Name');
                 assert.equal(response.customer.lastName, 'New Last Name');
 
-                return done();
+                done();
               });
             });
           });
         })
       );
 
-      return it('does not vault a one-time use paypal account', function (done) {
+      it('does not vault a one-time use paypal account', function (done) {
         let paymentMethodToken = specHelper.randomId();
 
-        return specHelper.defaultGateway.customer.create({}, function (err, response) {
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
           let paypalCustomerId = response.customer.id;
 
           let customerParams = {
@@ -982,7 +982,7 @@ describe('CustomerGateway', function () {
             }
           };
 
-          return specHelper.defaultGateway.customer.update(paypalCustomerId, customerParams, function (err, response) {
+          specHelper.defaultGateway.customer.update(paypalCustomerId, customerParams, function (err, response) {
             assert.isNull(err);
             assert.isFalse(response.success);
             assert.equal(
@@ -992,7 +992,7 @@ describe('CustomerGateway', function () {
 
             specHelper.defaultGateway.paymentMethod.find(paymentMethodToken, (err) => assert.equal(err.type, braintree.errorTypes.notFoundError));
 
-            return done();
+            done();
           });
         });
       });
@@ -1002,7 +1002,7 @@ describe('CustomerGateway', function () {
       specHelper.defaultGateway.customer.update('nonexistent_customer', {}, function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
 
@@ -1019,11 +1019,11 @@ describe('CustomerGateway', function () {
           'email'
         );
 
-        return done();
+        done();
       })
     );
 
-    return context('with existing card and billing address', function () {
+    context('with existing card and billing address', function () {
       let creditCardToken = null;
 
       beforeEach(function (done) {
@@ -1041,10 +1041,10 @@ describe('CustomerGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           customerId = response.customer.id;
           creditCardToken = response.customer.creditCards[0].token;
-          return done();
+          done();
         });
       });
 
@@ -1062,7 +1062,7 @@ describe('CustomerGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.customer.firstName, 'New First Name');
@@ -1071,7 +1071,7 @@ describe('CustomerGateway', function () {
           assert.equal(response.customer.creditCards[0].cardholderName, 'New Cardholder Name');
           assert.equal(response.customer.creditCards[0].expirationDate, '05/2014');
 
-          return done();
+          done();
         });
       });
 
@@ -1096,7 +1096,7 @@ describe('CustomerGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.customer.firstName, 'New First Name');
@@ -1110,11 +1110,11 @@ describe('CustomerGateway', function () {
           assert.equal(billingAddress.streetAddress, '123 New St');
           assert.equal(billingAddress.locality, 'New City');
 
-          return done();
+          done();
         });
       });
 
-      return it("doesn't serialize nulls as empty objects", function (done) {
+      it("doesn't serialize nulls as empty objects", function (done) {
         let customerParams = {
           creditCard: {
             number: '4111111111111111',
@@ -1126,39 +1126,39 @@ describe('CustomerGateway', function () {
           }
         };
 
-        return specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
           let billingAddress = response.customer.creditCards[0].billingAddress;
 
           assert.equal(billingAddress.streetAddress, null);
 
-          return done();
+          done();
         });
       });
     });
   });
 
-  return describe('delete', function () {
+  describe('delete', function () {
     it('deletes a customer', done =>
       specHelper.defaultGateway.customer.create({}, (err, response) =>
         specHelper.defaultGateway.customer.delete(response.customer.id, function (err) {
           assert.isNull(err);
 
-          return specHelper.defaultGateway.customer.find(response.customer.id, function (err) {
+          specHelper.defaultGateway.customer.find(response.customer.id, function (err) {
             assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-            return done();
+            done();
           });
         })
       )
     );
 
-    return it('handles invalid customer ids', done =>
+    it('handles invalid customer ids', done =>
       specHelper.defaultGateway.customer.delete('nonexistent_customer', function (err) {
         assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        return done();
+        done();
       })
     );
   });

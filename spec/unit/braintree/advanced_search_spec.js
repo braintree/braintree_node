@@ -12,14 +12,14 @@ describe('AdvancedSearch', function () {
       let search = newSearch();
 
       search.equality().is(value);
-      return assert.deepEqual(search.toHash(), {equality: {is: value}});
+      assert.deepEqual(search.toHash(), {equality: {is: value}});
     });
 
-    return it('supports isNot', function () {
+    it('supports isNot', function () {
       let search = newSearch();
 
       search.equality().isNot(value);
-      return assert.deepEqual(search.toHash(), {equality: {isNot: value}});
+      assert.deepEqual(search.toHash(), {equality: {isNot: value}});
     });
   });
 
@@ -28,21 +28,21 @@ describe('AdvancedSearch', function () {
       let search = newSearch();
 
       assert.isFunction(search.partialMatch().is);
-      return assert.isFunction(search.partialMatch().isNot);
+      assert.isFunction(search.partialMatch().isNot);
     });
 
     it('supports endsWith', function () {
       let search = newSearch();
 
       search.partialMatch().endsWith('example.com');
-      return assert.deepEqual(search.toHash(), {partialMatch: {endsWith: 'example.com'}});
+      assert.deepEqual(search.toHash(), {partialMatch: {endsWith: 'example.com'}});
     });
 
-    return it('supports startsWith', function () {
+    it('supports startsWith', function () {
       let search = newSearch();
 
       search.partialMatch().startsWith('mail');
-      return assert.deepEqual(search.toHash(), {partialMatch: {startsWith: 'mail'}});
+      assert.deepEqual(search.toHash(), {partialMatch: {startsWith: 'mail'}});
     });
   });
 
@@ -53,14 +53,14 @@ describe('AdvancedSearch', function () {
       assert.isFunction(search.text().is);
       assert.isFunction(search.text().isNot);
       assert.isFunction(search.text().endsWith);
-      return assert.isFunction(search.text().startsWith);
+      assert.isFunction(search.text().startsWith);
     });
 
-    return it('supports contains', function () {
+    it('supports contains', function () {
       let search = newSearch();
 
       search.text().contains('ample');
-      return assert.deepEqual(search.toHash(), {text: {contains: 'ample'}});
+      assert.deepEqual(search.toHash(), {text: {contains: 'ample'}});
     });
   });
 
@@ -69,7 +69,7 @@ describe('AdvancedSearch', function () {
       let search = newSearch();
 
       search.key().is(100);
-      return assert.deepEqual(search.toHash(), {key: 100});
+      assert.deepEqual(search.toHash(), {key: 100});
     })
   );
 
@@ -78,26 +78,26 @@ describe('AdvancedSearch', function () {
       let search = newSearch();
 
       search.multiple().in([1, 2, 3]);
-      return assert.deepEqual(search.toHash(), {multiple: [1, 2, 3]});
+      assert.deepEqual(search.toHash(), {multiple: [1, 2, 3]});
     });
 
     it('supports in with an allowed value', function () {
       let search = newSearch();
 
-      return assert.doesNotThrow(() => search.multipleWithAllows().in(['Hello']), Error);
+      assert.doesNotThrow(() => search.multipleWithAllows().in(['Hello']), Error);
     });
 
     it('supports in with an unallowed value', function () {
       let search = newSearch();
 
-      return assert.throws(() => search.multipleWithAllows().in(['Hello', 'Bah']), Error);
+      assert.throws(() => search.multipleWithAllows().in(['Hello', 'Bah']), Error);
     });
 
-    return it('supports is', function () {
+    it('supports is', function () {
       let search = newSearch();
 
       search.multiple().is(value);
-      return assert.deepEqual(search.toHash(), {multiple: [value]});
+      assert.deepEqual(search.toHash(), {multiple: [value]});
     });
   });
 
@@ -110,14 +110,14 @@ describe('AdvancedSearch', function () {
       assert.isFunction(search.multipleValueOrText().endsWith);
       assert.isFunction(search.multipleValueOrText().startsWith);
       assert.isFunction(search.multipleValueOrText().contains);
-      return assert.isFunction(search.multipleValueOrText().in);
+      assert.isFunction(search.multipleValueOrText().in);
     });
 
-    return it('delegates is to TextNode', function () {
+    it('delegates is to TextNode', function () {
       let search = newSearch();
 
       search.multipleValueOrText().is(value);
-      return assert.deepEqual(search.toHash(), {multipleValueOrText: {is: value}});
+      assert.deepEqual(search.toHash(), {multipleValueOrText: {is: value}});
     });
   });
 
@@ -126,37 +126,37 @@ describe('AdvancedSearch', function () {
       let search = newSearch();
 
       search.range().is(value);
-      return assert.deepEqual(search.toHash(), {range: {is: value}});
+      assert.deepEqual(search.toHash(), {range: {is: value}});
     });
 
     it('supports min', function () {
       let search = newSearch();
 
       search.range().min(50);
-      return assert.deepEqual(search.toHash(), {range: {min: 50}});
+      assert.deepEqual(search.toHash(), {range: {min: 50}});
     });
 
     it('supports max', function () {
       let search = newSearch();
 
       search.range().max(100);
-      return assert.deepEqual(search.toHash(), {range: {max: 100}});
+      assert.deepEqual(search.toHash(), {range: {max: 100}});
     });
 
-    return it('supports between', function () {
+    it('supports between', function () {
       let search = newSearch();
 
       search.range().between(50, 100);
-      return assert.deepEqual(search.toHash(), {range: {min: 50, max: 100}});
+      assert.deepEqual(search.toHash(), {range: {min: 50, max: 100}});
     });
   });
 
-  return describe('addCriteria', function () {
+  describe('addCriteria', function () {
     it('adds a numeric criteria', function () {
       let search = newSearch();
 
       search.addCriteria('numero', 2);
-      return assert.deepEqual(search.toHash(), {numero: 2});
+      assert.deepEqual(search.toHash(), {numero: 2});
     });
 
     it('merges in an object criteria', function () {
@@ -164,15 +164,15 @@ describe('AdvancedSearch', function () {
 
       search.addCriteria('object', {foo: 'bar', key1: 1});
       search.addCriteria('object', {foo: 'baz', key2: 2});
-      return assert.deepEqual(search.toHash(), {object: {foo: 'baz', key1: 1, key2: 2}});
+      assert.deepEqual(search.toHash(), {object: {foo: 'baz', key1: 1, key2: 2}});
     });
 
-    return it('replaces an array criteria', function () {
+    it('replaces an array criteria', function () {
       let search = newSearch();
 
       search.addCriteria('array', [0, 1, 2]);
       search.addCriteria('array', [3, 4]);
-      return assert.deepEqual(search.toHash(), {array: [3, 4]});
+      assert.deepEqual(search.toHash(), {array: [3, 4]});
     });
   });
 });

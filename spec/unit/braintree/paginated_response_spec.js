@@ -19,7 +19,7 @@ describe('PaginatedResponse', () =>
 
       return response.all(function (err) {
         assert.isTrue(err === null);
-        return done();
+        done();
       });
     });
 
@@ -38,11 +38,11 @@ describe('PaginatedResponse', () =>
         assert.isTrue(err === null);
         assert.equal(results[0], 1);
         assert.equal(results[1], 2);
-        return done();
+        done();
       });
     });
 
-    return it('fetches multiple pages', function (done) {
+    it('fetches multiple pages', function (done) {
       let pagingFunction = function (currentPage, callback) { // eslint-disable-line func-style
         if (currentPage > 2) {
           callback('too many pages requested', 2, 1, []);
@@ -57,7 +57,7 @@ describe('PaginatedResponse', () =>
         assert.isTrue(err === null);
         assert.equal(results[0], 1);
         assert.equal(results[1], 2);
-        return done();
+        done();
       });
     });
   })

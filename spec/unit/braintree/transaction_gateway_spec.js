@@ -13,7 +13,7 @@ describe('TransactionGateway', () =>
       },
       http: {
         post(url, params, callback) {
-          return callback(params);
+          callback(params);
         }
       }
     };

@@ -15,7 +15,7 @@ describe('ValidationErrorsCollection', () =>
 
       assert.equal(result.on('foo').length, 2);
       assert.equal(result.on('foo')[0].code, '1');
-      return assert.equal(result.on('foo')[1].code, '2');
+      assert.equal(result.on('foo')[1].code, '2');
     })
   )
 );

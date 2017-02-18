@@ -13,7 +13,7 @@ describe('WebhookNotificationGateway', function () {
     it('creates a verification string for the challenge', function () {
       let result = specHelper.defaultGateway.webhookNotification.verify('20f9f8ed05f77439fe955c977e4c8a53');
 
-      return assert.equal(result, 'integration_public_key|d9b899556c966b3f06945ec21311865d35df3ce4');
+      assert.equal(result, 'integration_public_key|d9b899556c966b3f06945ec21311865d35df3ce4');
     });
 
     it('throws an error when challenge contains non-hex chars', function (done) {
@@ -32,7 +32,7 @@ describe('WebhookNotificationGateway', function () {
     );
   });
 
-  return describe('sampleNotification', function () {
+  describe('sampleNotification', function () {
     it('returns a parsable signature and payload', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
