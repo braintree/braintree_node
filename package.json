@@ -33,9 +33,6 @@
     "eslint-config-braintree": "^1.0.2",
     "mocha": "3.2.0"
   },
-  "optionalDependencies": {
-    "source-map-support": "0.2.9"
-  },
   "license": "MIT",
   "scripts": {
     "lint": "eslint lib/ spec/",
