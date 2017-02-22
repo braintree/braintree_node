@@ -13,7 +13,7 @@ namespace :test do
   end
 
   # To run a specific it/context append ".only" like `it.only`
-  desc "Run tests in a specific file: rake test:focused[spec/integration/braintree/credit_card_gateway_spec.coffee]"
+  desc "Run tests in a specific file: rake test:focused[spec/integration/braintree/credit_card_gateway_spec.js]"
   task :focused, [:filename] => [:npm_install] do |t, args|
     filename = args[:filename]
 
@@ -30,5 +30,5 @@ task :npm_install do
 end
 
 def local_mocha
-  "./node_modules/mocha/bin/mocha --compilers coffee:coffee-script --timeout 62000 --reporter spec"
+  "./node_modules/mocha/bin/mocha --timeout 62000 --reporter spec"
 end

@@ -29,19 +29,15 @@
   },
   "devDependencies": {
     "chai": "1.5.0",
-    "coffee-script": "1.6.1",
     "eslint": "^2.7.0",
     "eslint-config-braintree": "^1.0.2",
     "mocha": "3.2.0"
   },
-  "optionalDependencies": {
-    "source-map-support": "0.2.9"
-  },
   "license": "MIT",
   "scripts": {
-    "lint": "eslint lib/",
-    "test:unit": "mocha spec/unit --recursive --compilers coffee:coffee-script",
-    "test:integration": "mocha --timeout 60000 --slow 2000 spec/integration --recursive --compilers coffee:coffee-script",
+    "lint": "eslint lib/ spec/",
+    "test:unit": "mocha spec/unit --recursive -r spec/spec_helper",
+    "test:integration": "mocha --timeout 60000 --slow 2000 spec/integration --recursive -r spec/spec_helper",
     "test": "npm run lint && npm run test:unit"
   }
 }
