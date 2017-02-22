@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let braintree = specHelper.braintree;
 let Config = require('../../../lib/braintree/config').Config;
 let Nonces = require('../../../lib/braintree/test/nonces').Nonces;

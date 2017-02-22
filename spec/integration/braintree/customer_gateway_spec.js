@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
 let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
 let Config = require('../../../lib/braintree/config').Config;

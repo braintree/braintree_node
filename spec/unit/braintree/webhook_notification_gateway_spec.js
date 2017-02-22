@@ -1,7 +1,6 @@
 'use strict';
 /* eslint-disable camelcase */
 
-require('../../spec_helper');
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let WebhookNotification = require('../../../lib/braintree').WebhookNotification;
 let Dispute = require('../../../lib/braintree/dispute').Dispute;

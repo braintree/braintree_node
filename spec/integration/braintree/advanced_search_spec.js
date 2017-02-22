@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 describe('AdvancedSearch', function () {
   beforeEach(function () {});
 

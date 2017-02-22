@@ -1,7 +1,6 @@
 'use strict';
 /* eslint-disable no-new */
 
-require('../spec_helper');
 let Config = require('../../lib/braintree/config').Config;
 let Environment = require('../../lib/braintree/environment').Environment;
 

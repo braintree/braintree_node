@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let Braintree = require('../../../lib/braintree');
 let Subscription = Braintree.Subscription;
 

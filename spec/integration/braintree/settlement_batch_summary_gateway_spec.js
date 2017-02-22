@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 describe('SettlementBatchSummaryGateway', () =>
   describe('generate', function () {
     it('creates a batch with no records', done =>

@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let braintree = specHelper.braintree;
 
 describe('PaymentMethodNonceGateway', function () {

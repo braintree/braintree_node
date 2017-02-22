@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let DisbursementDetails = require('../../../lib/braintree/disbursement_details').DisbursementDetails;
 
 describe('DisbursementDetails', () =>

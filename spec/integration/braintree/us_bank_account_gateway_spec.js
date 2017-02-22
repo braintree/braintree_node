@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let Transaction = require('../../../lib/braintree/transaction').Transaction;
 
 describe('UsBankAccountGateway', function () {

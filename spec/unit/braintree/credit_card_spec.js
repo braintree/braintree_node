@@ -1,8 +1,6 @@
 'use strict';
 /* eslint-disable camelcase */
 
-require('../../spec_helper');
-
 let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
 
 describe('CreditCard', () =>

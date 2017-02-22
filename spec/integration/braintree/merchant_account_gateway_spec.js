@@ -1,8 +1,6 @@
 'use strict';
 /* eslint-disable camelcase */
 
-require('../../spec_helper');
-
 let braintree = specHelper.braintree;
 let MerchantAccount = require('../../../lib/braintree/merchant_account').MerchantAccount;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;

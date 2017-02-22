@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let braintree = specHelper.braintree;
 let Environment = require('../../../lib/braintree/environment').Environment;
 

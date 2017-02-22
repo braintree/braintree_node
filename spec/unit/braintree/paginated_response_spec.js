@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let PaginatedResponse = require('../../../lib/braintree/paginated_response').PaginatedResponse;
 
 describe('PaginatedResponse', () =>

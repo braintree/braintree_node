@@ -1,6 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
 let _ = require('underscore')._;
 
 describe('DiscountGateway', () =>

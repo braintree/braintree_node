@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let braintree = specHelper.braintree;
 let Config = require('../../../lib/braintree/config').Config;
 let Http = require('../../../lib/braintree/http').Http;

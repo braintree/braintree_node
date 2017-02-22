@@ -1,7 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
-
 let dateFormat = require('dateformat');
 let _ = require('underscore')._;
 let braintree = specHelper.braintree;

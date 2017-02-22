@@ -1,6 +1,5 @@
 'use strict';
 
-require('../../spec_helper');
 let braintree = specHelper.braintree;
 let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
 let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
