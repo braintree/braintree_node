@@ -2000,10 +2000,6 @@ describe('TransactionGateway', function () {
             response.errors.for('transaction').for('threeDSecurePassThru').on('cavv')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureCavvIsRequired
           );
-          assert.equal(
-            response.errors.for('transaction').for('threeDSecurePassThru').on('xid')[0].code,
-            ValidationErrorCodes.Transaction.ThreeDSecureXidIsRequired
-          );
 
           done();
         });
