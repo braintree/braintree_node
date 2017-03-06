@@ -180,15 +180,16 @@ describe('ClientTokenGateway', function () {
   );
 
   it('can pass merchantAccountId', function (done) {
+    let expectedMerchantAccountId = specHelper.nonDefaultMerchantAccountId;
     let clientTokenParams = {
-      merchantAccountId: 'my_merchant_account'
+      merchantAccountId: expectedMerchantAccountId
     };
 
     specHelper.defaultGateway.clientToken.generate(clientTokenParams, function (err, result) {
       assert.isTrue(result.success);
       let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
 
-      assert.equal(clientToken.merchantAccountId, 'my_merchant_account');
+      assert.equal(clientToken.merchantAccountId, expectedMerchantAccountId);
       done();
     });
   });
