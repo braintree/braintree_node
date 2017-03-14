@@ -7,7 +7,6 @@ describe('IdealPaymentGateway', function () {
   describe('find', function () {
     it('finds the Ideal payment', done => {
       specHelper.generateValidIdealPaymentNonce(function (nonce) {
-
         specHelper.defaultGateway.idealPayment.find(nonce, function (err, idealPayment) {
           assert.isNull(err);
 
@@ -18,7 +17,7 @@ describe('IdealPaymentGateway', function () {
           assert.isDefined(idealPayment.status);
           assert.isDefined(idealPayment.orderId);
           assert.isDefined(idealPayment.issuer);
-          assert(idealPayment.approvalUrl.startsWith('https://'));;
+          assert(idealPayment.approvalUrl.startsWith('https://'));
           assert.isDefined(idealPayment.ibanBankAccount.accountHolderName);
           assert.isDefined(idealPayment.ibanBankAccount.bic);
           assert.isDefined(idealPayment.ibanBankAccount.maskedIban);
@@ -52,7 +51,7 @@ describe('IdealPaymentGateway', function () {
 
           done();
         });
-      })
+      });
     });
 
     it('fails on a non-complete Ideal payment', done => {
@@ -72,7 +71,7 @@ describe('IdealPaymentGateway', function () {
 
           done();
         });
-      })
+      });
     });
 
     it('fails with an invalid nonce', done => {
@@ -82,7 +81,7 @@ describe('IdealPaymentGateway', function () {
         amount: '100.00'
       };
 
-      specHelper.defaultGateway.idealPayment.sale("invalid nonce", transactionParams, function (err, response) {
+      specHelper.defaultGateway.idealPayment.sale('invalid nonce', transactionParams, function (err, response) {
         assert.isFalse(response.success);
 
         done();

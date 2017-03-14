@@ -297,6 +297,7 @@ let generateValidIdealPaymentNonce = function (amount, callback) {
       }
     };
 
+    /* eslint-disable camelcase */
     let payload = {
       issuer: 'RABONL2u',
       order_id: 'ABC123',
@@ -304,6 +305,7 @@ let generateValidIdealPaymentNonce = function (amount, callback) {
       currency: 'EUR',
       redirect_url: 'https://braintree-api.com'
     };
+    /* eslint-enable camelcase */
 
     let requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload));
 
@@ -321,17 +323,15 @@ let generateValidIdealPaymentNonce = function (amount, callback) {
         let json = JSON.parse(body);
 
         callback(json.data.id);
-      }
-      );
+      });
       return response.on('error', err => console.log(`Unexpected response error: ${err}`));
-    }
-    );
+    });
 
     req.on('error', err => console.log(`Unexpected request error: ${err}`));
 
     req.write(requestBody);
     return req.end();
-  })
+  });
 };
 
 let createTransactionToRefund = function (callback) {

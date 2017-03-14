@@ -1663,7 +1663,7 @@ describe('TransactionGateway', function () {
 
             done();
           });
-        })
+        });
       });
 
       it('succeeds and vaults a us bank account nonce and can transact on vaulted token', done =>
@@ -1764,8 +1764,8 @@ describe('TransactionGateway', function () {
 
           done();
         })
-      )
-    })
+      );
+    });
   });
 
   describe('credit', function () {
