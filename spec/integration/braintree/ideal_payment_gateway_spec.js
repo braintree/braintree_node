@@ -1,6 +1,7 @@
 'use strict';
 
 let Transaction = require('../../../lib/braintree/transaction').Transaction;
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
 describe('IdealPaymentGateway', function () {
   describe('find', function () {
@@ -48,6 +49,26 @@ describe('IdealPaymentGateway', function () {
           assert.isTrue(response.transaction.idealPaymentDetails.imageUrl.startsWith('https://'));
           assert.isDefined(response.transaction.idealPaymentDetails.maskedIban);
           assert.isDefined(response.transaction.idealPaymentDetails.bic);
+
+          done();
+        });
+      })
+    });
+
+    it('fails on a non-complete Ideal payment', done => {
+      specHelper.generateValidIdealPaymentNonce('3.00', function (nonce) {
+        let transactionParams = {
+          merchantAccountId: 'ideal_merchant_account',
+          orderId: 'ABC123',
+          amount: '3.00'
+        };
+
+        specHelper.defaultGateway.idealPayment.sale(nonce, transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').on('paymentMethodNonce')[0].code,
+            ValidationErrorCodes.Transaction.IdealPaymentNotComplete
+          );
 
           done();
         });

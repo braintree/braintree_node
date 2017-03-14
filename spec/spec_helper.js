@@ -275,7 +275,12 @@ let generateInvalidUsBankAccountNonce = function () {
   return nonce;
 };
 
-let generateValidIdealPaymentNonce = callback =>
+let generateValidIdealPaymentNonce = function (amount, callback) {
+  if (arguments.length === 1) {
+    callback = amount;
+    amount = '100.0';
+  }
+
   specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
     let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
     let url = uri.parse(clientToken.braintree_api.url);
@@ -295,9 +300,9 @@ let generateValidIdealPaymentNonce = callback =>
     let payload = {
       issuer: 'RABONL2u',
       order_id: 'ABC123',
-      amount: '100.00',
+      amount: amount,
       currency: 'EUR',
-      redirect_url: 'https://braitnree-api.com'
+      redirect_url: 'https://braintree-api.com'
     };
 
     let requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload));
@@ -327,7 +332,7 @@ let generateValidIdealPaymentNonce = callback =>
     req.write(requestBody);
     return req.end();
   })
-;
+};
 
 let createTransactionToRefund = function (callback) {
   let transactionParams = {
