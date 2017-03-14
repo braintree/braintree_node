@@ -1638,7 +1638,7 @@ describe('TransactionGateway', function () {
     });
 
     context('us bank account nonce', function () {
-      it('succeeds and vaults a us bank account nonce', done =>
+      it('succeeds and vaults a us bank account nonce', function (done) {
         specHelper.generateValidUsBankAccountNonce(function (nonce) {
           let transactionParams = {
             merchantAccountId: 'us_bank_merchant_account',
@@ -1664,7 +1664,7 @@ describe('TransactionGateway', function () {
             done();
           });
         })
-      );
+      });
 
       it('succeeds and vaults a us bank account nonce and can transact on vaulted token', done =>
         specHelper.generateValidUsBankAccountNonce(function (nonce) {
@@ -1738,6 +1738,34 @@ describe('TransactionGateway', function () {
         });
       });
     });
+
+    context('Ideal payment nonce', function () {
+      it('transacts on an Ideal payment nonce', done =>
+        specHelper.generateValidIdealPaymentNonce(function (nonce) {
+          let transactionParams = {
+            merchantAccountId: 'ideal_merchant_account',
+            orderId: 'ABC123',
+            amount: '100.00',
+            paymentMethodNonce: nonce,
+            options: {
+              submitForSettlement: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.status, Transaction.Status.Settled);
+            assert.match(response.transaction.idealPaymentDetails.idealPaymentId, /^idealpayment_\w{6,}$/);
+            assert.match(response.transaction.idealPaymentDetails.idealTransactionId, /^\d{16,}$/);
+            assert.isTrue(response.transaction.idealPaymentDetails.imageUrl.startsWith('https://'));
+            assert.isNotNull(response.transaction.idealPaymentDetails.maskedIban);
+            assert.isNotNull(response.transaction.idealPaymentDetails.bic);
+          });
+
+          done();
+        })
+      )
+    })
   });
 
   describe('credit', function () {
