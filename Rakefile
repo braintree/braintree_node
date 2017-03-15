@@ -4,7 +4,7 @@ task :test => %w[test:unit test:integration]
 namespace :test do
   desc "Run units"
   task :unit => [:npm_install] do
-    sh "npm run test:unit"
+    sh "npm test"
   end
 
   desc "Run integration"
