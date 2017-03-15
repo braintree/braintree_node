@@ -276,7 +276,7 @@ let generateInvalidUsBankAccountNonce = function () {
 };
 
 let generateValidIdealPaymentNonce = function (amount, callback) {
-  if (arguments.length === 1) {
+  if (!callback) {
     callback = amount;
     amount = '100.0';
   }
