@@ -275,7 +275,7 @@ let generateInvalidUsBankAccountNonce = function () {
   return nonce;
 };
 
-let generateValidIdealPaymentNonce = function (amount, callback) {
+let generateValidIdealPaymentId = function (amount, callback) {
   if (!callback) {
     callback = amount;
     amount = '100.0';
@@ -542,7 +542,7 @@ global.specHelper = {
   generateNonceForNewPaymentMethod,
   generateValidUsBankAccountNonce,
   generateInvalidUsBankAccountNonce,
-  generateValidIdealPaymentNonce,
+  generateValidIdealPaymentId,
   createPlanForTests,
   createModificationForTests,
   createGrant,

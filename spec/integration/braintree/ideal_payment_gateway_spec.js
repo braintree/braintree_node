@@ -6,8 +6,8 @@ let ValidationErrorCodes = require('../../../lib/braintree/validation_error_code
 describe('IdealPaymentGateway', function () {
   describe('find', function () {
     it('finds the Ideal payment', done => {
-      specHelper.generateValidIdealPaymentNonce(function (nonce) {
-        specHelper.defaultGateway.idealPayment.find(nonce, function (err, idealPayment) {
+      specHelper.generateValidIdealPaymentId(function (idealPaymentId) {
+        specHelper.defaultGateway.idealPayment.find(idealPaymentId, function (err, idealPayment) {
           assert.isNull(err);
 
           assert.match(idealPayment.id, /^idealpayment_\w{6,}$/);
@@ -32,15 +32,15 @@ describe('IdealPaymentGateway', function () {
   });
 
   describe('sale', () => {
-    it('transacts on an Ideal payment nonce', done => {
-      specHelper.generateValidIdealPaymentNonce(function (nonce) {
+    it('transacts on an Ideal payment ID', done => {
+      specHelper.generateValidIdealPaymentId(function (idealPaymentId) {
         let transactionParams = {
           merchantAccountId: 'ideal_merchant_account',
           orderId: 'ABC123',
           amount: '100.00'
         };
 
-        specHelper.defaultGateway.idealPayment.sale(nonce, transactionParams, function (err, response) {
+        specHelper.defaultGateway.idealPayment.sale(idealPaymentId, transactionParams, function (err, response) {
           assert.isTrue(response.success);
           assert.equal(response.transaction.status, Transaction.Status.Settled);
           assert.match(response.transaction.idealPaymentDetails.idealPaymentId, /^idealpayment_\w{6,}$/);
@@ -55,14 +55,14 @@ describe('IdealPaymentGateway', function () {
     });
 
     it('fails on a non-complete Ideal payment', done => {
-      specHelper.generateValidIdealPaymentNonce('3.00', function (nonce) {
+      specHelper.generateValidIdealPaymentId('3.00', function (idealPaymentId) {
         let transactionParams = {
           merchantAccountId: 'ideal_merchant_account',
           orderId: 'ABC123',
           amount: '3.00'
         };
 
-        specHelper.defaultGateway.idealPayment.sale(nonce, transactionParams, function (err, response) {
+        specHelper.defaultGateway.idealPayment.sale(idealPaymentId, transactionParams, function (err, response) {
           assert.isFalse(response.success);
           assert.equal(
             response.errors.for('transaction').on('paymentMethodNonce')[0].code,
@@ -74,14 +74,14 @@ describe('IdealPaymentGateway', function () {
       });
     });
 
-    it('fails with an invalid nonce', done => {
+    it('fails with an invalid ID', done => {
       let transactionParams = {
         merchantAccountId: 'ideal_merchant_account',
         orderId: 'ABC123',
         amount: '100.00'
       };
 
-      specHelper.defaultGateway.idealPayment.sale('invalid nonce', transactionParams, function (err, response) {
+      specHelper.defaultGateway.idealPayment.sale('invalid payment ID', transactionParams, function (err, response) {
         assert.isFalse(response.success);
 
         done();

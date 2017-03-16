@@ -1739,14 +1739,14 @@ describe('TransactionGateway', function () {
       });
     });
 
-    context('Ideal payment nonce', function () {
-      it('transacts on an Ideal payment nonce', done =>
-        specHelper.generateValidIdealPaymentNonce(function (nonce) {
+    context('Ideal payment ID', function () {
+      it('transacts on an Ideal payment ID', done =>
+        specHelper.generateValidIdealPaymentId(function (idealPaymentId) {
           let transactionParams = {
             merchantAccountId: 'ideal_merchant_account',
             orderId: 'ABC123',
             amount: '100.00',
-            paymentMethodNonce: nonce,
+            paymentMethodNonce: idealPaymentId,
             options: {
               submitForSettlement: true
             }
