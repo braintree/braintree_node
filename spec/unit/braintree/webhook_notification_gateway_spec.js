@@ -453,5 +453,41 @@ describe('WebhookNotificationGateway', function () {
         done();
       });
     });
+
+    it('returns a parsable signature and payload for iDEAL payment complete', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.IdealPaymentComplete,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.IdealPaymentComplete);
+        assert.equal('my_id', webhookNotification.idealPayment.id);
+        assert.equal('COMPLETE', webhookNotification.idealPayment.status);
+        assert.equal('ORDERABC', webhookNotification.idealPayment.orderId);
+        assert.equal('1234567890', webhookNotification.idealPayment.idealTransactionId);
+        done();
+      });
+    });
+
+    it('returns a parsable signature and payload for iDEAL payment failed', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.IdealPaymentFailed,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.IdealPaymentFailed);
+        assert.equal('my_id', webhookNotification.idealPayment.id);
+        assert.equal('FAILED', webhookNotification.idealPayment.status);
+        assert.equal('ORDERABC', webhookNotification.idealPayment.orderId);
+        assert.equal('1234567890', webhookNotification.idealPayment.idealTransactionId);
+        done();
+      });
+    });
   });
 });
