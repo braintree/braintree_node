@@ -305,6 +305,71 @@ describe('CustomerGateway', function () {
         });
       });
 
+      it('creates a customer with a paypal account payment method nonce with intent=order', function (done) {
+        specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+          let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
+          let nonceParams = {
+            authorizationFingerprint: authorizationFingerprint,
+            paypalAccount: {
+              intent: 'order',
+              paymentToken: 'paypal-payment-token',
+              payerId: 'paypal-payer-id'
+            }
+          };
+          let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+
+          myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', nonceParams, function (statusCode, body) {
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
+            let customerParams = {paymentMethodNonce: nonce};
+
+            specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.isString(response.customer.paypalAccounts[0].email);
+
+              done();
+            });
+          });
+        });
+      });
+
+      it('creates a customer with a paypal account payment method nonce with intent=order and payeeEmail', function (done) {
+        specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+          let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
+          let nonceParams = {
+            authorizationFingerprint: authorizationFingerprint,
+            paypalAccount: {
+              intent: 'order',
+              paymentToken: 'paypal-payment-token',
+              payerId: 'paypal-payer-id'
+            }
+          };
+          let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+
+          myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', nonceParams, function (statusCode, body) {
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
+            let customerParams = {
+              paymentMethodNonce: nonce,
+              options: {
+                paypal: {
+                  payeeEmail: 'payee@example.com'
+                }
+              }
+            };
+
+            specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.isString(response.customer.paypalAccounts[0].email);
+
+              done();
+            });
+          });
+        });
+      });
+
       it('does not vault a paypal account only authorized for one-time use', function (done) {
         let customerParams =
           {paymentMethodNonce: Nonces.PayPalOneTimePayment};
@@ -949,6 +1014,95 @@ describe('CustomerGateway', function () {
                 firstName: 'New First Name',
                 lastName: 'New Last Name',
                 paymentMethodNonce: nonce
+              };
+
+              specHelper.defaultGateway.customer.update(paypalCustomerId, customerParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.isString(response.customer.paypalAccounts[0].email);
+                assert.equal(response.customer.firstName, 'New First Name');
+                assert.equal(response.customer.lastName, 'New Last Name');
+
+                done();
+              });
+            });
+          });
+        })
+      );
+
+      it('vaults a paypal account from a payment method nonce with intent=order', done =>
+        specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+          let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
+
+          let params = {
+            authorizationFingerprint: authorizationFingerprint,
+            paypalAccount: {
+              intent: 'order',
+              paymentToken: 'paypal-payment-token',
+              payerId: 'paypal-payer-id'
+            }
+          };
+
+          let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+
+          return myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', params, function (statusCode, body) {
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
+
+            specHelper.defaultGateway.customer.create({}, function (err, response) {
+              let paypalCustomerId = response.customer.id;
+
+              let customerParams = {
+                firstName: 'New First Name',
+                lastName: 'New Last Name',
+                paymentMethodNonce: nonce
+              };
+
+              specHelper.defaultGateway.customer.update(paypalCustomerId, customerParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.isString(response.customer.paypalAccounts[0].email);
+                assert.equal(response.customer.firstName, 'New First Name');
+                assert.equal(response.customer.lastName, 'New Last Name');
+
+                done();
+              });
+            });
+          });
+        })
+      );
+
+      it('vaults a paypal account from a payment method nonce with intent=order and payeeEmail', done =>
+        specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+          let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
+
+          let params = {
+            authorizationFingerprint: authorizationFingerprint,
+            paypalAccount: {
+              intent: 'order',
+              paymentToken: 'paypal-payment-token',
+              payerId: 'paypal-payer-id'
+            }
+          };
+
+          let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+
+          return myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', params, function (statusCode, body) {
+            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
+
+            specHelper.defaultGateway.customer.create({}, function (err, response) {
+              let paypalCustomerId = response.customer.id;
+
+              let customerParams = {
+                firstName: 'New First Name',
+                lastName: 'New Last Name',
+                paymentMethodNonce: nonce,
+                options: {
+                  paypal: {
+                    payeeEmail: 'payee@example.com'
+                  }
+                }
               };
 
               specHelper.defaultGateway.customer.update(paypalCustomerId, customerParams, function (err, response) {
