@@ -1,3 +1,6 @@
+## UNRELEASED
+* All async methods (with the exception of search methods) return a promise if no callback is provided.
+
 ## 2.0.2
 * Fix a bug where merchantAccounts.all would attempt to fetch too many pages of merchant accounts
 * Fix a bug where OAuth connect urls did not properly escape special characters
