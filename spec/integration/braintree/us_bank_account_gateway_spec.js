@@ -37,7 +37,7 @@ describe('UsBankAccountGateway', function () {
       specHelper.defaultGateway.customer.create({}, function (err, response) {
         assert.isTrue(response.success);
         specHelper.defaultGateway.usBankAccount.find(specHelper.generateInvalidUsBankAccountNonce(), function (err, usBankAccount) {
-          assert.isNull(usBankAccount);
+          assert.isUndefined(usBankAccount);
           assert.equal(err.type, 'notFoundError');
 
           done();

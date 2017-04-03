@@ -76,7 +76,7 @@ describe('AddressGateway', function () {
 
           specHelper.defaultGateway.address.delete(address.customerId, address.id, () =>
             specHelper.defaultGateway.address.find(address.customerId, address.id, function (err, address) {
-              assert.isNull(address);
+              assert.isUndefined(address);
               assert.equal(err.type, braintree.errorTypes.notFoundError);
               done();
             })
@@ -116,7 +116,7 @@ describe('AddressGateway', function () {
 
     it('yields a not found error when the address cannot be found', done =>
       specHelper.defaultGateway.address.find('non-existent-customer', 'id', function (err, address) {
-        assert.isNull(address);
+        assert.isUndefined(address);
         assert.equal(err.type, braintree.errorTypes.notFoundError);
         done();
       })
@@ -124,7 +124,7 @@ describe('AddressGateway', function () {
 
     it('handles whitespace in the customer id', done =>
       specHelper.defaultGateway.address.find(' ', 'id', function (err, address) {
-        assert.isNull(address);
+        assert.isUndefined(address);
         assert.equal(err.type, braintree.errorTypes.notFoundError);
         done();
       })
@@ -132,7 +132,7 @@ describe('AddressGateway', function () {
 
     it('handles whitespace in the address', done =>
       specHelper.defaultGateway.address.find('blah', '\t ', function (err, address) {
-        assert.isNull(address);
+        assert.isUndefined(address);
         assert.equal(err.type, braintree.errorTypes.notFoundError);
         done();
       })

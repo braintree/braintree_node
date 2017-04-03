@@ -1274,7 +1274,7 @@ describe('PaymentMethodGateway', function () {
           };
 
           specHelper.defaultGateway.paymentMethod.update('doesNotExist', updateParams, function (err, response) {
-            assert.isNull(response);
+            assert.isUndefined(response);
             assert.isNotNull(err);
             done();
           });
@@ -1766,7 +1766,7 @@ describe('PaymentMethodGateway', function () {
                     assert.equal(paypalAccount.email, originalResult.email);
 
                     specHelper.defaultGateway.paypalAccount.find(originalToken, function (err, paypalAccount) {
-                      assert.isNull(paypalAccount);
+                      assert.isUndefined(paypalAccount);
                       assert.equal(err.type, braintree.errorTypes.notFoundError);
 
                       done();
@@ -2153,7 +2153,7 @@ describe('PaymentMethodGateway', function () {
       it("raises an error if the token isn't found", done =>
         grantingGateway.paymentMethod.grant('not_a_real_token', false, function (err, response) {
           assert.isObject(err);
-          assert.isNull(response);
+          assert.isUndefined(response);
           done();
         })
       );
@@ -2183,7 +2183,7 @@ describe('PaymentMethodGateway', function () {
       it("raises an error if the token isn't found", done =>
         grantingGateway.paymentMethod.revoke('not_a_real_token', function (err, response) {
           assert.isObject(err);
-          assert.isNull(response);
+          assert.isUndefined(response);
           done();
         })
       );

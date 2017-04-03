@@ -11,8 +11,8 @@ describe('TransactionGateway', () =>
         }
       },
       http: {
-        post(url, params, callback) {
-          callback(params);
+        post(url, params) {
+          return Promise.resolve(params);
         }
       }
     };

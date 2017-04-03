@@ -674,7 +674,7 @@ describe('CreditCardGateway', function () {
           let nonce = JSON.parse(body).creditCards[0].nonce;
 
           specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err, creditCard) {
-            assert.isNull(creditCard);
+            assert.isUndefined(creditCard);
             assert.equal(err.type, 'notFoundError');
             assert.include(err.message, 'not found');
 
@@ -708,7 +708,7 @@ describe('CreditCardGateway', function () {
           specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err) {
             assert.isNull(err);
             specHelper.defaultGateway.creditCard.fromNonce(nonce, function (err, creditCard) {
-              assert.isNull(creditCard);
+              assert.isUndefined(creditCard);
               assert.equal(err.type, 'notFoundError');
               assert.include(err.message, 'consumed');
 

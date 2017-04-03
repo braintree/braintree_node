@@ -31,8 +31,8 @@ describe('PaymentMethodGateway', function () {
         }
       },
       http: {
-        delete(url, callback) {
-          callback(url);
+        delete(url) {
+          return Promise.reject(url);
         }
       }
     };

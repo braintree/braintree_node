@@ -20,6 +20,7 @@ The Braintree Node library provides integration access to the Braintree Gateway.
 * [Bug Tracker](http://github.com/braintree/braintree_node/issues)
 
 ## Quick Start
+
 ```javascript
 var braintree = require('braintree');
 
@@ -49,6 +50,40 @@ gateway.transaction.sale({
   }
 });
 ```
+
+## Promises
+
+You can also use Promises instead of callbacks.
+
+```javascript
+var braintree = require('braintree');
+
+var gateway = braintree.connect({
+  environment: braintree.Environment.Sandbox,
+  merchantId: 'your_merchant_id',
+  publicKey: 'your_public_key',
+  privateKey: 'your_private_key'
+});
+
+gateway.transaction.sale({
+  amount: '5.00',
+  paymentMethodNonce: 'nonce-from-the-client',
+  options: {
+    submitForSettlement: true
+  }
+}).then(function (result) {
+  if (result.success) {
+    console.log('Transaction ID: ' + result.transaction.id);
+  } else {
+    console.error(result.message);
+  }
+}).catch(function (err) {
+  console.error(err);
+});
+```
+
+Almost all methods that uses a callback can alternatively use a Promise. The only exceptions are `gateway.merchantAccount.all` or any of the `search` methods because they return a stream if no callback is provided. 
+
 ## Tests
 
 The unit specs can be run by anyone on any system, but the integration specs are meant to be run against a local development server of our gateway code. These integration specs are not meant for public consumption and will likely fail if run on your system. To run unit tests use rake (`rake test:unit`) or npm (`npm test`).
