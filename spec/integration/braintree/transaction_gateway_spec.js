@@ -1760,9 +1760,9 @@ describe('TransactionGateway', function () {
             assert.isTrue(response.transaction.idealPaymentDetails.imageUrl.startsWith('https://'));
             assert.isNotNull(response.transaction.idealPaymentDetails.maskedIban);
             assert.isNotNull(response.transaction.idealPaymentDetails.bic);
-          });
 
-          done();
+            done();
+          });
         })
       );
     });

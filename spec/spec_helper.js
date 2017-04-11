@@ -281,56 +281,68 @@ let generateValidIdealPaymentId = function (amount, callback) {
     amount = '100.0';
   }
 
-  specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+  specHelper.defaultGateway.clientToken.generate({
+    merchantAccountId: 'ideal_merchant_account'
+  }, function (err, result) {
     let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-    let url = uri.parse(clientToken.braintree_api.url);
-    let token = clientToken.braintree_api.access_token;
-    let options = {
-      host: url.hostname,
-      port: url.port,
-      method: 'POST',
-      path: '/ideal-payments',
-      headers: {
-        'Content-Type': 'application/json',
-        'Braintree-Version': '2015-11-01',
-        Authorization: `Bearer ${token}`
-      }
-    };
+    let clientApi = new ClientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line no-use-before-define
 
-    /* eslint-disable camelcase */
-    let payload = {
-      issuer: 'RABONL2u',
-      order_id: 'ABC123',
-      amount: amount,
-      currency: 'EUR',
-      redirect_url: 'https://braintree-api.com'
-    };
-    /* eslint-enable camelcase */
+    clientApi.get('/client_api/v1/configuration', {
+      authorizationFingerprint: clientToken.authorizationFingerprint,
+      configVersion: 3
+    }, function (statusCode, body) {
+      let routeId = JSON.parse(body).ideal.routeId;
 
-    let requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload));
+      let url = uri.parse(clientToken.braintree_api.url);
+      let token = clientToken.braintree_api.access_token;
+      let options = {
+        host: url.hostname,
+        port: url.port,
+        method: 'POST',
+        path: '/ideal-payments',
+        headers: {
+          'Content-Type': 'application/json',
+          'Braintree-Version': '2015-11-01',
+          Authorization: `Bearer ${token}`
+        }
+      };
 
-    options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString();
+      /* eslint-disable camelcase */
+      let payload = {
+        issuer: 'RABONL2u',
+        order_id: 'ABC123',
+        amount: amount,
+        currency: 'EUR',
+        route_id: routeId,
+        redirect_url: 'https://braintree-api.com'
+      };
+      /* eslint-enable camelcase */
 
-    let req = https.request(options);
+      let requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload));
 
-    req.on('response', response => {
-      let body = '';
+      options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString();
 
-      response.on('data', responseBody => {
-        body += responseBody;
+      let req = https.request(options);
+
+      req.on('response', response => {
+        let body = '';
+
+        response.on('data', responseBody => {
+          body += responseBody;
+        });
+        response.on('end', () => {
+          let json = JSON.parse(body);
+
+          callback(json.data.id);
+        });
+        return response.on('error', err => console.log(`Unexpected response error: ${err}`));
       });
-      response.on('end', () => {
-        let json = JSON.parse(body);
 
-        callback(json.data.id);
-      });
-      return response.on('error', err => console.log(`Unexpected response error: ${err}`));
+      req.on('error', err => console.log(`Unexpected request error: ${err}`));
+
+      req.write(requestBody);
+      return req.end();
     });
-
-    req.on('error', err => console.log(`Unexpected request error: ${err}`));
-
-    req.write(requestBody);
-    return req.end();
   });
 };
 
