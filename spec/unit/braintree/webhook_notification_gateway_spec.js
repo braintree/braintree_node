@@ -403,6 +403,42 @@ describe('WebhookNotificationGateway', function () {
       });
     });
 
+    it('builds a sample notification for a connected merchant status transitioned webhook', (done) => {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.ConnectedMerchantStatusTransitioned,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.ConnectedMerchantStatusTransitioned);
+        assert.equal(webhookNotification.connectedMerchantStatusTransitioned.merchantPublicId, 'my_id');
+        assert.equal(webhookNotification.connectedMerchantStatusTransitioned.status, 'new_status');
+        assert.equal(webhookNotification.connectedMerchantStatusTransitioned.oauthApplicationClientId, 'oauth_application_client_id');
+        assert.ok(webhookNotification.timestamp != null);
+        done();
+      });
+    });
+
+    it('builds a sample notification for a connected merchant paypal status changed webhook', (done) => {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.ConnectedMerchantPayPalStatusChanged,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.ConnectedMerchantPayPalStatusChanged);
+        assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.merchantPublicId, 'my_id');
+        assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.action, 'link');
+        assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.oauthApplicationClientId, 'oauth_application_client_id');
+        assert.ok(webhookNotification.timestamp != null);
+        done();
+      });
+    });
+
     it('builds a sample notification for a successfully charged subscription', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionChargedSuccessfully,
