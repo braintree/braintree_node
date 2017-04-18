@@ -907,7 +907,8 @@ describe('PaymentMethodGateway', function () {
                   payeeEmail: 'payee@example.com',
                   orderId: 'merchant-order-id',
                   customField: 'custom merchant field',
-                  description: 'merchant description'
+                  description: 'merchant description',
+                  amount: '1.23'
                 }
               }
             };
