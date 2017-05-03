@@ -879,7 +879,7 @@ describe('PaymentMethodGateway', function () {
       })
     );
 
-    it('creates a paypal account from a payment method nonce with intent=order and payeeEmail', done =>
+    it('creates a paypal account from a payment method nonce with intent=order and paypal options', done =>
       specHelper.defaultGateway.customer.create({}, function (err, response) {
         customerId = response.customer.id;
         specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
@@ -904,7 +904,11 @@ describe('PaymentMethodGateway', function () {
               paymentMethodNonce: nonce,
               options: {
                 paypal: {
-                  payeeEmail: 'payee@example.com'
+                  payeeEmail: 'payee@example.com',
+                  orderId: 'merchant-order-id',
+                  customField: 'custom merchant field',
+                  description: 'merchant description',
+                  amount: '1.23'
                 }
               }
             };

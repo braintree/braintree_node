@@ -334,7 +334,7 @@ describe('CustomerGateway', function () {
         });
       });
 
-      it('creates a customer with a paypal account payment method nonce with intent=order and payeeEmail', function (done) {
+      it('creates a customer with a paypal account payment method nonce with intent=order and paypal options', function (done) {
         specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
           let authorizationFingerprint = clientToken.authorizationFingerprint;
@@ -354,7 +354,11 @@ describe('CustomerGateway', function () {
               paymentMethodNonce: nonce,
               options: {
                 paypal: {
-                  payeeEmail: 'payee@example.com'
+                  payeeEmail: 'payee@example.com',
+                  orderId: 'merchant-order-id',
+                  customField: 'custom merchant field',
+                  description: 'merchant description',
+                  amount: '1.23'
                 }
               }
             };
