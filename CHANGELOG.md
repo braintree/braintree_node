@@ -1,5 +1,10 @@
-## UNRELEASED
-* All async methods (with the exception of search methods) return a promise if no callback is provided.
+## 2.1.0
+* All async methods (with the exception of search methods) return a promise if no callback is provided
+* Add support for additional PayPal options when vaulting a PayPal Order
+* Add iDEAL support
+* Add Visa Checkout Support
+* Add Masterpass support
+* Add ConnectedMerchantPayPalStatusChanged and ConnectedMerchantStatusTransitioned webooks
 
 ## 2.0.2
 * Fix a bug where merchantAccounts.all would attempt to fetch too many pages of merchant accounts
