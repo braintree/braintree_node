@@ -1,6 +1,6 @@
 {
   "name": "braintree",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "A library for integrating with Braintree.",
   "keywords": [
     "braintree",
@@ -25,23 +25,21 @@
     "readable-stream": "1.1.10",
     "semver": "5.1.0",
     "underscore": "1.8.3",
-    "xml2js": "0.1.13"
+    "xml2js": "0.1.13",
+    "wrap-promise": "braintree/wrap-promise#1.1.0"
   },
   "devDependencies": {
     "chai": "1.5.0",
-    "coffee-script": "1.6.1",
     "eslint": "^2.7.0",
     "eslint-config-braintree": "^1.0.2",
     "mocha": "3.2.0"
   },
-  "optionalDependencies": {
-    "source-map-support": "0.2.9"
-  },
   "license": "MIT",
   "scripts": {
-    "lint": "eslint lib/",
-    "test:unit": "mocha spec/unit --recursive --compilers coffee:coffee-script",
-    "test:integration": "mocha --timeout 60000 --slow 2000 spec/integration --recursive --compilers coffee:coffee-script",
-    "test": "npm run lint && npm run test:unit"
+    "lint": "eslint lib/ spec/",
+    "pretest": "npm run lint",
+    "test:unit": "mocha spec/unit --recursive -r spec/spec_helper",
+    "test:integration": "mocha --timeout 60000 --slow 2000 spec/integration --recursive -r spec/spec_helper",
+    "test": "npm run test:unit"
   }
 }

@@ -1,0 +1,3197 @@
+'use strict';
+
+let braintree = specHelper.braintree;
+let Braintree = require('../../../lib/braintree');
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
+let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
+let PaymentInstrumentTypes = require('../../../lib/braintree/payment_instrument_types').PaymentInstrumentTypes;
+let Transaction = require('../../../lib/braintree/transaction').Transaction;
+let Dispute = require('../../../lib/braintree/dispute').Dispute;
+let Environment = require('../../../lib/braintree/environment').Environment;
+let Config = require('../../../lib/braintree/config').Config;
+
+describe('TransactionGateway', function () {
+  describe('sale', function () {
+    it('charges a card', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+        assert.isNull(response.transaction.voiceReferralNumber);
+
+        done();
+      });
+    });
+
+    it('charges a card using an access token', function (done) {
+      let oauthGateway = braintree.connect({
+        clientId: 'client_id$development$integration_client_id',
+        clientSecret: 'client_secret$development$integration_client_secret'
+      });
+
+      specHelper.createToken(oauthGateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
+        let gateway = braintree.connect({
+          accessToken: response.credentials.accessToken
+        });
+
+        let transactionParams = {
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          }
+        };
+
+        return gateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, 'sale');
+          assert.equal(response.transaction.amount, '5.00');
+          assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+          assert.isNull(response.transaction.voiceReferralNumber);
+
+          done();
+        });
+      });
+    });
+
+    it('can use a customer from the vault', function (done) {
+      let customerParams = {
+        firstName: 'Adam',
+        lastName: 'Jones',
+        creditCard: {
+          cardholderName: 'Adam Jones',
+          number: '5105105105105100',
+          expirationDate: '05/2014'
+        }
+      };
+
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        let transactionParams = {
+          customerId: response.customer.id,
+          amount: '100.00'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, 'sale');
+          assert.equal(response.transaction.customer.firstName, 'Adam');
+          assert.equal(response.transaction.customer.lastName, 'Jones');
+          assert.equal(response.transaction.creditCard.cardholderName, 'Adam Jones');
+          assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+          assert.equal(response.transaction.creditCard.expirationDate, '05/2014');
+
+          done();
+        });
+      });
+    });
+
+    it('can use a credit card from the vault', function (done) {
+      let customerParams = {
+        firstName: 'Adam',
+        lastName: 'Jones',
+        creditCard: {
+          cardholderName: 'Adam Jones',
+          number: '5105105105105100',
+          expirationDate: '05/2014'
+        }
+      };
+
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        let transactionParams = {
+          paymentMethodToken: response.customer.creditCards[0].token,
+          amount: '100.00'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, 'sale');
+          assert.equal(response.transaction.customer.firstName, 'Adam');
+          assert.equal(response.transaction.customer.lastName, 'Jones');
+          assert.equal(response.transaction.creditCard.cardholderName, 'Adam Jones');
+          assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+          assert.equal(response.transaction.creditCard.expirationDate, '05/2014');
+
+          done();
+        });
+      });
+    });
+
+    it('returns payment_instrument_type for credit_card', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CreditCard);
+
+        done();
+      });
+    });
+
+    it('calls callback with an error when options object contains invalid keys', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          fakeData: 'some non-matching param value',
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err) {
+        assert.equal(err.type, 'invalidKeysError');
+        assert.equal(err.message, 'These keys are invalid: creditCard[fakeData]');
+        done();
+      });
+    });
+
+    it('skips advanced fraud checking if transaction[options][skip_advanced_fraud_checking] is set to true', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          skipAdvancedFraudChecking: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.isNull(response.transaction.riskData.id);
+        done();
+      });
+    });
+
+    context('with apple pay', () =>
+      it('returns ApplePayCard for payment_instrument', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.ApplePayAmEx,
+            amount: '100.00'
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard);
+            assert.isNotNull(response.transaction.applePayCard.card_type);
+            assert.isNotNull(response.transaction.applePayCard.payment_instrument_name);
+
+            done();
+          });
+        })
+      )
+    );
+
+    context('with android pay proxy card', () =>
+      it('returns AndroidPayCard for payment_instrument', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.AndroidPayDiscover,
+            amount: '100.00'
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AndroidPayCard);
+            assert.isString(response.transaction.androidPayCard.googleTransactionId);
+            assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover);
+            assert.equal(response.transaction.androidPayCard.last4, '1117');
+
+            done();
+          });
+        })
+      )
+    );
+
+    context('with android pay network token', () =>
+      it('returns AndroidPayCard for payment_instrument', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.AndroidPayMasterCard,
+            amount: '100.00'
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AndroidPayCard);
+            assert.isString(response.transaction.androidPayCard.googleTransactionId);
+            assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.MasterCard);
+            assert.equal(response.transaction.androidPayCard.last4, '4444');
+
+            done();
+          });
+        })
+      )
+    );
+
+    context('with amex express checkout card', () =>
+      it('returns AmexExpressCheckoutCard for payment_instrument', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.AmexExpressCheckout,
+            merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
+            amount: '100.00'
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AmexExpressCheckoutCard);
+            assert.equal(response.transaction.amexExpressCheckoutCard.cardType, specHelper.braintree.CreditCard.CardType.AmEx);
+            assert.match(response.transaction.amexExpressCheckoutCard.cardMemberNumber, /^\d{4}$/);
+
+            done();
+          });
+        })
+      )
+    );
+
+    context('with venmo account', () =>
+      it('returns VenmoAccount for payment_instrument', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.VenmoAccount,
+            merchantAccountId: specHelper.fakeVenmoAccountMerchantAccountId,
+            amount: '100.00'
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.VenmoAccount);
+            assert.equal(response.transaction.venmoAccount.username, 'venmojoe');
+            assert.equal(response.transaction.venmoAccount.venmoUserId, 'Venmo-Joe-1');
+
+            done();
+          });
+        })
+      )
+    );
+
+    context('Coinbase', () =>
+      it('returns CoinbaseAccount for payment_instrument', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.Coinbase,
+            amount: '100.00'
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CoinbaseAccount);
+            assert.isNotNull(response.transaction.coinbaseAccount.user_email);
+
+            done();
+          });
+        })
+      )
+    );
+
+    context('with a paypal acount', function () {
+      it('returns PayPalAccount for payment_instrument', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.PayPalOneTimePayment,
+            amount: '100.00'
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.PayPalAccount);
+
+            done();
+          });
+        })
+      );
+
+      context('in-line capture', function () {
+        it('includes processorSettlementResponse_code and processorSettlementResponseText for settlement declined transactions', function (done) {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.PayPalOneTimePayment,
+            amount: '10.00',
+            options: {
+              submitForSettlement: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            let transactionId = response.transaction.id;
+
+            specHelper.defaultGateway.testing.settlementDecline(transactionId, () =>
+              specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+                assert.equal(transaction.processorSettlementResponseCode, '4001');
+                assert.equal(transaction.processorSettlementResponseText, 'Settlement Declined');
+                done();
+              })
+            );
+          });
+        });
+
+        it('includes processorSettlementResponseCode and processorSettlementResponseText for settlement pending transactions', function (done) {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.PayPalOneTimePayment,
+            amount: '10.00',
+            options: {
+              submitForSettlement: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            let transactionId = response.transaction.id;
+
+            specHelper.defaultGateway.testing.settlementPending(transactionId, () =>
+              specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+                assert.equal(transaction.processorSettlementResponseCode, '4002');
+                assert.equal(transaction.processorSettlementResponseText, 'Settlement Pending');
+                done();
+              })
+            );
+          });
+        });
+      });
+
+      context('as a vaulted payment method', () =>
+        it('successfully creates a transaction', done =>
+          specHelper.defaultGateway.customer.create({}, function (err, response) {
+            let customerId = response.customer.id;
+            let nonceParams = {
+              paypalAccount: {
+                consentCode: 'PAYPAL_CONSENT_CODE',
+                token: `PAYPAL_ACCOUNT_${specHelper.randomId()}`
+              }
+            };
+
+            specHelper.generateNonceForNewPaymentMethod(nonceParams, customerId, function (nonce) {
+              let paymentMethodParams = {
+                paymentMethodNonce: nonce,
+                customerId
+              };
+
+              specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+                let paymentMethodToken = response.paymentMethod.token;
+
+                let transactionParams = {
+                  paymentMethodToken,
+                  amount: '100.00'
+                };
+
+                specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                  assert.isNull(err);
+                  assert.isTrue(response.success);
+                  assert.equal(response.transaction.type, 'sale');
+                  assert.isString(response.transaction.paypalAccount.payerEmail);
+                  assert.isString(response.transaction.paypalAccount.authorizationId);
+                  assert.isString(response.transaction.paypalAccount.imageUrl);
+                  assert.isString(response.transaction.paypalAccount.debugId);
+
+                  done();
+                });
+              });
+            });
+          })
+        )
+      );
+
+      context('as a payment method nonce authorized for future payments', function () {
+        it("successfully creates a transaction but doesn't vault a paypal account", function (done) {
+          let paymentMethodToken = `PAYPAL_ACCOUNT_${specHelper.randomId()}`;
+
+          let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+
+          specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+            let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
+            let params = {
+              authorizationFingerprint,
+              paypalAccount: {
+                consentCode: 'PAYPAL_CONSENT_CODE',
+                token: paymentMethodToken
+              }
+            };
+
+            return myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', params, function (statusCode, body) {
+              let nonce = JSON.parse(body).paypalAccounts[0].nonce;
+
+              specHelper.defaultGateway.customer.create({}, function () {
+                let transactionParams = {
+                  paymentMethodNonce: nonce,
+                  amount: '100.00'
+                };
+
+                specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                  assert.isNull(err);
+                  assert.isTrue(response.success);
+                  assert.equal(response.transaction.type, 'sale');
+                  assert.isNull(response.transaction.paypalAccount.token);
+                  assert.isString(response.transaction.paypalAccount.payerEmail);
+                  assert.isString(response.transaction.paypalAccount.authorizationId);
+                  assert.isString(response.transaction.paypalAccount.debugId);
+
+                  specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
+                    assert.equal(err.type, braintree.errorTypes.notFoundError);
+
+                    done();
+                  });
+                });
+              });
+            });
+          });
+        });
+
+        it('vaults when explicitly asked', function (done) {
+          let paymentMethodToken = `PAYPAL_ACCOUNT_${specHelper.randomId()}`;
+
+          let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+
+          specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+            let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
+            let params = {
+              authorizationFingerprint,
+              paypalAccount: {
+                consentCode: 'PAYPAL_CONSENT_CODE',
+                token: paymentMethodToken
+              }
+            };
+
+            return myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', params, function (statusCode, body) {
+              let nonce = JSON.parse(body).paypalAccounts[0].nonce;
+
+              specHelper.defaultGateway.customer.create({}, function () {
+                let transactionParams = {
+                  paymentMethodNonce: nonce,
+                  amount: '100.00',
+                  options: {
+                    storeInVault: true
+                  }
+                };
+
+                specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                  assert.isNull(err);
+                  assert.isTrue(response.success);
+                  assert.equal(response.transaction.type, 'sale');
+                  assert.equal(response.transaction.paypalAccount.token, paymentMethodToken);
+                  assert.isString(response.transaction.paypalAccount.payerEmail);
+                  assert.isString(response.transaction.paypalAccount.authorizationId);
+                  assert.isString(response.transaction.paypalAccount.debugId);
+
+                  specHelper.defaultGateway.paypalAccount.find(paymentMethodToken, function (err) {
+                    assert.isNull(err);
+
+                    done();
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+
+      context('as a payment method nonce authorized for one-time use', function () {
+        it('successfully creates a transaction', function (done) {
+          let nonce = Nonces.PayPalOneTimePayment;
+
+          specHelper.defaultGateway.customer.create({}, function () {
+            let transactionParams = {
+              paymentMethodNonce: nonce,
+              amount: '100.00'
+            };
+
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.type, 'sale');
+              assert.isNull(response.transaction.paypalAccount.token);
+              assert.isString(response.transaction.paypalAccount.payerEmail);
+              assert.isString(response.transaction.paypalAccount.authorizationId);
+              assert.isString(response.transaction.paypalAccount.debugId);
+
+              done();
+            });
+          });
+        });
+
+        it('successfully creates a transaction with a payee email', function (done) {
+          let nonce = Nonces.PayPalOneTimePayment;
+
+          specHelper.defaultGateway.customer.create({}, function () {
+            let transactionParams = {
+              paymentMethodNonce: nonce,
+              amount: '100.00',
+              paypalAccount: {
+                payeeEmail: 'payee@example.com'
+              }
+            };
+
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.type, 'sale');
+              assert.isNull(response.transaction.paypalAccount.token);
+              assert.isString(response.transaction.paypalAccount.payerEmail);
+              assert.isString(response.transaction.paypalAccount.authorizationId);
+              assert.isString(response.transaction.paypalAccount.debugId);
+              assert.equal(response.transaction.paypalAccount.payeeEmail, 'payee@example.com');
+
+              done();
+            });
+          });
+        });
+
+        it('successfully creates a transaction with a payee email in the options params', function (done) {
+          let nonce = Nonces.PayPalOneTimePayment;
+
+          specHelper.defaultGateway.customer.create({}, function () {
+            let transactionParams = {
+              paymentMethodNonce: nonce,
+              amount: '100.00',
+              paypalAccount: {},
+              options: {
+                payeeEmail: 'payee@example.com'
+              }
+            };
+
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.type, 'sale');
+              assert.isNull(response.transaction.paypalAccount.token);
+              assert.isString(response.transaction.paypalAccount.payerEmail);
+              assert.isString(response.transaction.paypalAccount.authorizationId);
+              assert.isString(response.transaction.paypalAccount.debugId);
+              assert.equal(response.transaction.paypalAccount.payeeEmail, 'payee@example.com');
+
+              done();
+            });
+          });
+        });
+
+        it('successfully creates a transaction with a payee email in transaction.options.paypal', function (done) {
+          let nonce = Nonces.PayPalOneTimePayment;
+
+          specHelper.defaultGateway.customer.create({}, function () {
+            let transactionParams = {
+              paymentMethodNonce: nonce,
+              amount: '100.00',
+              paypalAccount: {},
+              options: {
+                paypal: {
+                  payeeEmail: 'payee@example.com'
+                }
+              }
+            };
+
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.type, 'sale');
+              assert.isNull(response.transaction.paypalAccount.token);
+              assert.isString(response.transaction.paypalAccount.payerEmail);
+              assert.isString(response.transaction.paypalAccount.authorizationId);
+              assert.isString(response.transaction.paypalAccount.debugId);
+              assert.equal(response.transaction.paypalAccount.payeeEmail, 'payee@example.com');
+
+              done();
+            });
+          });
+        });
+
+        it('successfully creates a transaction with a PayPal custom field', function (done) {
+          let nonce = Nonces.PayPalOneTimePayment;
+
+          specHelper.defaultGateway.customer.create({}, function () {
+            let transactionParams = {
+              paymentMethodNonce: nonce,
+              amount: '100.00',
+              paypalAccount: {},
+              options: {
+                paypal: {
+                  customField: 'custom field junk'
+                }
+              }
+            };
+
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.type, 'sale');
+              assert.isNull(response.transaction.paypalAccount.token);
+              assert.isString(response.transaction.paypalAccount.payerEmail);
+              assert.isString(response.transaction.paypalAccount.authorizationId);
+              assert.isString(response.transaction.paypalAccount.debugId);
+              assert.equal(response.transaction.paypalAccount.customField, 'custom field junk');
+
+              done();
+            });
+          });
+        });
+
+        it('successfully creates a transaction with PayPal supplementary data', function (done) {
+          let nonce = Nonces.PayPalOneTimePayment;
+
+          specHelper.defaultGateway.customer.create({}, function () {
+            let transactionParams = {
+              paymentMethodNonce: nonce,
+              amount: '100.00',
+              paypalAccount: {},
+              options: {
+                paypal: {
+                  supplementaryData: {
+                    key1: 'value1',
+                    key2: 'value2'
+                  }
+                }
+              }
+            };
+
+            // note - supplementary data is not returned in response
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+
+              done();
+            });
+          });
+        });
+
+        it('successfully creates a transaction with a PayPal description', function (done) {
+          let nonce = Nonces.PayPalOneTimePayment;
+
+          specHelper.defaultGateway.customer.create({}, function () {
+            let transactionParams = {
+              paymentMethodNonce: nonce,
+              amount: '100.00',
+              paypalAccount: {},
+              options: {
+                paypal: {
+                  description: 'product description'
+                }
+              }
+            };
+
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.paypalAccount.description, 'product description');
+
+              done();
+            });
+          });
+        });
+
+        it('does not vault even when explicitly asked', function (done) {
+          let nonce = Nonces.PayPalOneTimePayment;
+
+          specHelper.defaultGateway.customer.create({}, function () {
+            let transactionParams = {
+              paymentMethodNonce: nonce,
+              amount: '100.00',
+              options: {
+                storeInVault: true
+              }
+            };
+
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.type, 'sale');
+              assert.isNull(response.transaction.paypalAccount.token);
+              assert.isString(response.transaction.paypalAccount.payerEmail);
+              assert.isString(response.transaction.paypalAccount.authorizationId);
+              assert.isString(response.transaction.paypalAccount.debugId);
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    it('allows submitting for settlement', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.status, 'submitted_for_settlement');
+
+        done();
+      });
+    });
+
+    it('allows storing in the vault', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          storeInVault: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.match(response.transaction.customer.id, /^\d+$/);
+        assert.match(response.transaction.creditCard.token, /^\w+$/);
+
+        done();
+      });
+    });
+
+    it('can create transactions with custom fields', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        customFields: {
+          storeMe: 'custom value'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.customFields.storeMe, 'custom value');
+
+        done();
+      });
+    });
+
+    it("allows specifying transactions as 'recurring'", function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        recurring: true
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.recurring, true);
+
+        done();
+      });
+    });
+
+    it("allows specifying transactions with transaction source as 'recurring'", function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        transactionSource: 'recurring'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.recurring, true);
+
+        done();
+      });
+    });
+
+    it("allows specifying transactions with transaction source as 'moto'", function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        transactionSource: 'moto'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.recurring, false);
+
+        done();
+      });
+    });
+
+    it('sets card type indicators on the transaction', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: CreditCardNumbers.CardTypeIndicators.Unknown,
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.equal(response.transaction.creditCard.prepaid, CreditCard.Prepaid.Unknown);
+        assert.equal(response.transaction.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown);
+        assert.equal(response.transaction.creditCard.commercial, CreditCard.Commercial.Unknown);
+        assert.equal(response.transaction.creditCard.healthcare, CreditCard.Healthcare.Unknown);
+        assert.equal(response.transaction.creditCard.debit, CreditCard.Debit.Unknown);
+        assert.equal(response.transaction.creditCard.payroll, CreditCard.Payroll.Unknown);
+        assert.equal(response.transaction.creditCard.countryOfIssuance, CreditCard.CountryOfIssuance.Unknown);
+        assert.equal(response.transaction.creditCard.issuingBank, CreditCard.IssuingBank.Unknown);
+        assert.equal(response.transaction.creditCard.productId, CreditCard.ProductId.Unknown);
+
+        done();
+      });
+    });
+
+    it('handles processor declines', function (done) {
+      let transactionParams = {
+        amount: '2000.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success);
+        assert.equal(response.transaction.amount, '2000.00');
+        assert.equal(response.transaction.status, 'processor_declined');
+        assert.equal(response.transaction.additionalProcessorResponse, '2000 : Do Not Honor');
+
+        done();
+      });
+    });
+
+    it('handles risk data returned by the gateway', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/16'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.riskData.decision, 'Not Evaluated');
+        assert.equal(response.transaction.riskData.id, null);
+        done();
+      });
+    });
+
+    it('handles fraud rejection', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: CreditCardNumbers.CardTypeIndicators.Fraud,
+          expirationDate: '05/16'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success);
+        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
+        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud);
+        done();
+      });
+    });
+
+    it('allows fraud params', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        deviceSessionId: '123456789',
+        fraudMerchantId: '0000000031',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        done();
+      });
+    });
+
+    it('allows risk data params', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        },
+        riskData: {
+          customerBrowser: 'Edge',
+          customerIp: '127.0.0.0'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        done();
+      });
+    });
+
+    it('handles validation errors', function (done) {
+      let transactionParams = {
+        creditCard: {
+          number: '5105105105105100'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success);
+        assert.equal(response.message, 'Amount is required.\nExpiration date is required.');
+        assert.equal(
+          response.errors.for('transaction').on('amount')[0].code,
+          '81502'
+        );
+        assert.equal(
+          response.errors.for('transaction').on('amount')[0].attribute,
+          'amount'
+        );
+        assert.equal(
+          response.errors.for('transaction').for('creditCard').on('expirationDate')[0].code,
+          '81709'
+        );
+
+        let errorCodes = Array.from(response.errors.deepErrors()).map((error) => error.code);
+
+        assert.equal(errorCodes.length, 2);
+        assert.include(errorCodes, '81502');
+        assert.include(errorCodes, '81709');
+
+        done();
+      });
+    });
+
+    it('handles descriptors', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        },
+        descriptor: {
+          name: 'abc*def',
+          phone: '1234567890',
+          url: 'ebay.com'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.descriptor.name, 'abc*def');
+        assert.equal(response.transaction.descriptor.phone, '1234567890');
+        assert.equal(response.transaction.descriptor.url, 'ebay.com');
+
+        done();
+      });
+    });
+
+    it('handles descriptor validations', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        },
+        descriptor: {
+          name: 'abc',
+          phone: '1234567',
+          url: '12345678901234'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('transaction').for('descriptor').on('name')[0].code,
+          ValidationErrorCodes.Descriptor.NameFormatIsInvalid
+        );
+        assert.equal(
+          response.errors.for('transaction').for('descriptor').on('phone')[0].code,
+          ValidationErrorCodes.Descriptor.PhoneFormatIsInvalid
+        );
+        assert.equal(
+          response.errors.for('transaction').for('descriptor').on('url')[0].code,
+          ValidationErrorCodes.Descriptor.UrlFormatIsInvalid
+        );
+        done();
+      });
+    });
+
+    it('handles lodging industry data', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        },
+        industry: {
+          industryType: Transaction.IndustryData.Lodging,
+          data: {
+            folioNumber: 'aaa',
+            checkInDate: '2014-07-07',
+            checkOutDate: '2014-08-08',
+            roomRate: '239.00'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isTrue(response.success);
+
+        done();
+      });
+    });
+
+    it('handles lodging industry data validations', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        },
+        industry: {
+          industryType: Transaction.IndustryData.Lodging,
+          data: {
+            folioNumber: 'aaa',
+            checkInDate: '2014-07-07',
+            checkOutDate: '2014-06-06',
+            roomRate: '239.00'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('transaction').for('industry').on('checkOutDate')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.Lodging.CheckOutDateMustFollowCheckInDate
+        );
+
+        done();
+      });
+    });
+
+    it('handles travel cruise industry data', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        },
+        industry: {
+          industryType: Transaction.IndustryData.TravelAndCruise,
+          data: {
+            travelPackage: 'flight',
+            departureDate: '2014-07-07',
+            lodgingCheckInDate: '2014-07-07',
+            lodgingCheckOutDate: '2014-08-08',
+            lodgingName: 'Disney'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isTrue(response.success);
+
+        done();
+      });
+    });
+
+    it('handles lodging industry data validations', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        },
+        industry: {
+          industryType: Transaction.IndustryData.TravelAndCruise,
+          data: {
+            travelPackage: 'onfoot',
+            departureDate: '2014-07-07',
+            lodgingCheckInDate: '2014-07-07',
+            lodgingCheckOutDate: '2014-08-08',
+            lodgingName: 'Disney'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('transaction').for('industry').on('travelPackage')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.TravelCruise.TravelPackageIsInvalid
+        );
+
+        done();
+      });
+    });
+
+    context('with a service fee', function () {
+      it('persists the service fee', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          },
+          serviceFeeAmount: '1.00'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.serviceFeeAmount, '1.00');
+
+          done();
+        });
+      });
+
+      it('handles validation errors on service fees', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '1.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          },
+          serviceFeeAmount: '5.00'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').on('serviceFeeAmount')[0].code,
+            ValidationErrorCodes.Transaction.ServiceFeeAmountIsTooLarge
+          );
+
+          done();
+        });
+      });
+
+      it('sub merchant accounts must provide a service fee', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '1.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').on('merchantAccountId')[0].code,
+            ValidationErrorCodes.Transaction.SubMerchantAccountRequiresServiceFeeAmount
+          );
+
+          done();
+        });
+      });
+    });
+
+    context('with escrow status', function () {
+      it('can specify transactions to be held for escrow', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '10.00',
+          serviceFeeAmount: '1.00',
+          creditCard: {
+            number: '4111111111111111',
+            expirationDate: '05/12'
+          },
+          options: {
+            holdInEscrow: true
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(
+            response.transaction.escrowStatus,
+            Transaction.EscrowStatus.HoldPending
+          );
+          done();
+        });
+      });
+
+      it('can not be held for escrow if not a submerchant', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.defaultMerchantAccountId,
+          amount: '10.00',
+          serviceFeeAmount: '1.00',
+          creditCard: {
+            number: '4111111111111111',
+            expirationDate: '05/12'
+          },
+          options: {
+            holdInEscrow: true
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').on('base')[0].code,
+            ValidationErrorCodes.Transaction.CannotHoldInEscrow
+          );
+          done();
+        });
+      });
+    });
+
+    context('releaseFromEscrow', function () {
+      it('can release an escrowed transaction', done =>
+        specHelper.createEscrowedTransaction(transaction =>
+          specHelper.defaultGateway.transaction.releaseFromEscrow(transaction.id, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.escrowStatus, Transaction.EscrowStatus.ReleasePending);
+            done();
+          })
+        )
+      );
+
+      it('cannot submit a non-escrowed transaction for release', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '10.00',
+          serviceFeeAmount: '1.00',
+          creditCard: {
+            number: '4111111111111111',
+            expirationDate: '05/12'
+          },
+          options: {
+            holdInEscrow: true
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+          specHelper.defaultGateway.transaction.releaseFromEscrow(response.transaction.id, function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success);
+            assert.equal(
+              response.errors.for('transaction').on('base')[0].code,
+              ValidationErrorCodes.Transaction.CannotReleaseFromEscrow
+            );
+            done();
+          })
+        );
+      });
+    });
+
+    context('cancelRelease', function () {
+      it('can cancel release for a transaction that has been submitted for release', done =>
+        specHelper.createEscrowedTransaction(transaction =>
+          specHelper.defaultGateway.transaction.releaseFromEscrow(transaction.id, () =>
+            specHelper.defaultGateway.transaction.cancelRelease(transaction.id, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(
+                response.transaction.escrowStatus,
+                Transaction.EscrowStatus.Held
+              );
+              done();
+            })
+          )
+        )
+      );
+
+      it('cannot cancel release a transaction that has not been submitted for release', done =>
+        specHelper.createEscrowedTransaction(transaction =>
+          specHelper.defaultGateway.transaction.cancelRelease(transaction.id, function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success);
+            assert.equal(
+              response.errors.for('transaction').on('base')[0].code,
+              ValidationErrorCodes.Transaction.CannotCancelRelease
+            );
+            done();
+          })
+        )
+      );
+    });
+
+    context('holdInEscrow', function () {
+      it('can hold authorized or submitted for settlement transactions for escrow', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '10.00',
+          serviceFeeAmount: '1.00',
+          creditCard: {
+            number: '4111111111111111',
+            expirationDate: '05/12'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+          specHelper.defaultGateway.transaction.holdInEscrow(response.transaction.id, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(
+              response.transaction.escrowStatus,
+              Transaction.EscrowStatus.HoldPending
+            );
+            done();
+          })
+        );
+      });
+
+      it('cannot hold settled transactions for escrow', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
+          amount: '10.00',
+          serviceFeeAmount: '1.00',
+          creditCard: {
+            number: '4111111111111111',
+            expirationDate: '05/12'
+          },
+          options: {
+            submitForSettlement: true
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+          specHelper.defaultGateway.testing.settle(response.transaction.id, (err, response) =>
+            specHelper.defaultGateway.transaction.holdInEscrow(response.transaction.id, function (err, response) {
+              assert.isFalse(response.success);
+              assert.equal(
+                response.errors.for('transaction').on('base')[0].code,
+                ValidationErrorCodes.Transaction.CannotHoldInEscrow
+              );
+              done();
+            })
+          )
+        );
+      });
+    });
+
+    it('can use venmo sdk payment method codes', function (done) {
+      let transactionParams = {
+        amount: '1.00',
+        venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.creditCard.bin, '411111');
+
+        done();
+      });
+    });
+
+    it('can use venmo sdk session', function (done) {
+      let transactionParams = {
+        amount: '1.00',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/12'
+        },
+        options: {
+          venmoSdkSession: VenmoSdk.Session
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.isTrue(response.transaction.creditCard.venmoSdk);
+
+        done();
+      });
+    });
+
+    it('can use vaulted credit card nonce', function (done) {
+      let customerParams = {
+        firstName: 'Adam',
+        lastName: 'Jones'
+      };
+
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        let customerId = response.customer.id;
+        let paymentMethodParams = {
+          creditCard: {
+            number: '4111111111111111',
+            expirationMonth: '12',
+            expirationYear: '2099'
+          }
+        };
+
+        specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, customerId, function (nonce) {
+          let transactionParams = {
+            amount: '1.00',
+            paymentMethodNonce: nonce
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            done();
+          }); });
+      });
+    });
+
+    it('can use vaulted PayPal account nonce', function (done) {
+      let customerParams = {
+        firstName: 'Adam',
+        lastName: 'Jones'
+      };
+
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        let customerId = response.customer.id;
+        let paymentMethodParams = {
+          paypalAccount: {
+            consent_code: 'PAYPAL_CONSENT_CODE' // eslint-disable-line camelcase
+          }
+        };
+
+        specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, customerId, function (nonce) {
+          let transactionParams = {
+            amount: '1.00',
+            paymentMethodNonce: nonce
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            done();
+          }); });
+      });
+    });
+
+    it('can use params nonce', function (done) {
+      let paymentMethodParams = {
+        creditCard: {
+          number: '4111111111111111',
+          expirationMonth: '12',
+          expirationYear: '2099'
+        }
+      };
+
+      specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
+        let transactionParams = {
+          amount: '1.00',
+          paymentMethodNonce: nonce
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          done();
+        }); });
+    });
+
+    it('works with an unknown payment instrument', function (done) {
+      let transactionParams = {
+        amount: '1.00',
+        paymentMethodNonce: Nonces.AbstractTransactable
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+
+        done();
+      });
+    });
+
+    context('amex rewards', function () {
+      it('succeeds', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
+          amount: '10.00',
+          creditCard: {
+            number: CreditCardNumbers.AmexPayWithPoints.Success,
+            expirationDate: '12/2020'
+          },
+          options: {
+            submitForSettlement: true,
+            amexRewards: {
+              requestId: 'ABC123',
+              points: '1000',
+              currencyAmount: '10.00',
+              currencyIsoCode: 'USD'
+            }
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement);
+
+          done();
+        });
+      });
+
+      it('succeeds even if the card is ineligible', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
+          amount: '10.00',
+          creditCard: {
+            number: CreditCardNumbers.AmexPayWithPoints.IneligibleCard,
+            expirationDate: '12/2020'
+          },
+          options: {
+            submitForSettlement: true,
+            amexRewards: {
+              requestId: 'ABC123',
+              points: '1000',
+              currencyAmount: '10.00',
+              currencyIsoCode: 'USD'
+            }
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement);
+
+          done();
+        });
+      });
+
+      it("succeeds even if the card's balance is insufficient", function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
+          amount: '10.00',
+          creditCard: {
+            number: CreditCardNumbers.AmexPayWithPoints.InsufficientPoints,
+            expirationDate: '12/2020'
+          },
+          options: {
+            submitForSettlement: true,
+            amexRewards: {
+              requestId: 'ABC123',
+              points: '1000',
+              currencyAmount: '10.00',
+              currencyIsoCode: 'USD'
+            }
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, Transaction.Status.SubmittedForSettlement);
+
+          done();
+        });
+      });
+    });
+
+    context('us bank account nonce', function () {
+      it('succeeds and vaults a us bank account nonce', function (done) {
+        specHelper.generateValidUsBankAccountNonce(function (nonce) {
+          let transactionParams = {
+            merchantAccountId: 'us_bank_merchant_account',
+            amount: '10.00',
+            paymentMethodNonce: nonce,
+            options: {
+              submitForSettlement: true,
+              storeInVault: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.status, Transaction.Status.SettlementPending);
+            assert.equal(response.transaction.usBankAccount.last4, '1234');
+            assert.equal(response.transaction.usBankAccount.accountHolderName, 'Dan Schulman');
+            assert.equal(response.transaction.usBankAccount.routingNumber, '021000021');
+            assert.equal(response.transaction.usBankAccount.accountType, 'checking');
+            assert.match(response.transaction.usBankAccount.bankName, /CHASE/);
+            assert.equal(response.transaction.usBankAccount.achMandate.text, 'cl mandate text');
+            assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date);
+
+            done();
+          });
+        });
+      });
+
+      it('succeeds and vaults a us bank account nonce and can transact on vaulted token', done =>
+        specHelper.generateValidUsBankAccountNonce(function (nonce) {
+          let transactionParams = {
+            merchantAccountId: 'us_bank_merchant_account',
+            amount: '10.00',
+            paymentMethodNonce: nonce,
+            options: {
+              submitForSettlement: true,
+              storeInVault: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.status, Transaction.Status.SettlementPending);
+            assert.equal(response.transaction.usBankAccount.last4, '1234');
+            assert.equal(response.transaction.usBankAccount.accountHolderName, 'Dan Schulman');
+            assert.equal(response.transaction.usBankAccount.routingNumber, '021000021');
+            assert.equal(response.transaction.usBankAccount.accountType, 'checking');
+            assert.match(response.transaction.usBankAccount.bankName, /CHASE/);
+            assert.equal(response.transaction.usBankAccount.achMandate.text, 'cl mandate text');
+            assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date);
+            let token = response.transaction.usBankAccount.token;
+
+            transactionParams = {
+              merchantAccountId: 'us_bank_merchant_account',
+              amount: '10.00',
+              paymentMethodToken: token,
+              options: {
+                submitForSettlement: true
+              }
+            };
+
+            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.status, Transaction.Status.SettlementPending);
+              assert.equal(response.transaction.usBankAccount.last4, '1234');
+              assert.equal(response.transaction.usBankAccount.accountHolderName, 'Dan Schulman');
+              assert.equal(response.transaction.usBankAccount.routingNumber, '021000021');
+              assert.equal(response.transaction.usBankAccount.accountType, 'checking');
+              assert.match(response.transaction.usBankAccount.bankName, /CHASE/);
+              assert.equal(response.transaction.usBankAccount.achMandate.text, 'cl mandate text');
+              assert.isTrue(response.transaction.usBankAccount.achMandate.acceptedAt instanceof Date);
+
+              done();
+            });
+          });
+        })
+      );
+
+      it('fails when us bank account nonce is not found', function (done) {
+        let transactionParams = {
+          merchantAccountId: 'us_bank_merchant_account',
+          amount: '10.00',
+          paymentMethodNonce: specHelper.generateInvalidUsBankAccountNonce(),
+          options: {
+            submitForSettlement: true,
+            storeInVault: true
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').on('paymentMethodNonce')[0].code,
+            ValidationErrorCodes.Transaction.PaymentMethodNonceUnknown
+          );
+
+          done();
+        });
+      });
+    });
+
+    context('Ideal payment ID', function () {
+      it('transacts on an Ideal payment ID', done =>
+        specHelper.generateValidIdealPaymentId(function (idealPaymentId) {
+          let transactionParams = {
+            merchantAccountId: 'ideal_merchant_account',
+            orderId: 'ABC123',
+            amount: '100.00',
+            paymentMethodNonce: idealPaymentId,
+            options: {
+              submitForSettlement: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.status, Transaction.Status.Settled);
+            assert.match(response.transaction.idealPaymentDetails.idealPaymentId, /^idealpayment_\w{6,}$/);
+            assert.match(response.transaction.idealPaymentDetails.idealTransactionId, /^\d{16,}$/);
+            assert.isTrue(response.transaction.idealPaymentDetails.imageUrl.startsWith('https://'));
+            assert.isNotNull(response.transaction.idealPaymentDetails.maskedIban);
+            assert.isNotNull(response.transaction.idealPaymentDetails.bic);
+
+            done();
+          });
+        })
+      );
+    });
+  });
+
+  describe('credit', function () {
+    it('creates a credit', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.credit(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'credit');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+
+        done();
+      });
+    });
+
+    it('handles validation errors', function (done) {
+      let transactionParams = {
+        creditCard: {
+          number: '5105105105105100'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.credit(transactionParams, function (err, response) {
+        assert.isFalse(response.success);
+        assert.equal(response.message, 'Amount is required.\nExpiration date is required.');
+        assert.equal(
+          response.errors.for('transaction').on('amount')[0].code,
+          '81502'
+        );
+        assert.equal(
+          response.errors.for('transaction').on('amount')[0].attribute,
+          'amount'
+        );
+        assert.equal(
+          response.errors.for('transaction').for('creditCard').on('expirationDate')[0].code,
+          '81709'
+        );
+        let errorCodes = Array.from(response.errors.deepErrors()).map((error) => error.code);
+
+        assert.equal(errorCodes.length, 2);
+        assert.include(errorCodes, '81502');
+        assert.include(errorCodes, '81709');
+
+        done();
+      });
+    });
+
+    context('three d secure', function () {
+      it('creates a transaction with threeDSecureToken', function (done) {
+        let threeDVerificationParams = {
+          number: '4111111111111111',
+          expirationMonth: '05',
+          expirationYear: '2009'
+        };
+
+        specHelper.create3DSVerification(specHelper.threeDSecureMerchantAccountId, threeDVerificationParams, function (threeDSecureToken) {
+          let transactionParams = {
+            merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+            amount: '5.00',
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '05/2009'
+            },
+            threeDSecureToken
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            done();
+          });
+        });
+      });
+
+      it('returns an error if sent null threeDSecureToken', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '4111111111111111',
+            expirationDate: '05/2009'
+          },
+          threeDSecureToken: null
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').on('threeDSecureToken')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureTokenIsInvalid
+          );
+
+          done();
+        });
+      });
+
+      it("returns an error if 3ds lookup data doesn't match txn data", function (done) {
+        let threeDVerificationParams = {
+          number: '4111111111111111',
+          expirationMonth: '05',
+          expirationYear: '2009'
+        };
+
+        specHelper.create3DSVerification(specHelper.threeDSecureMerchantAccountId, threeDVerificationParams, function (threeDSecureToken) {
+          let transactionParams = {
+            merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+            amount: '5.00',
+            creditCard: {
+              number: '5105105105105100',
+              expirationDate: '05/2009'
+            },
+            threeDSecureToken
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isFalse(response.success);
+            assert.equal(
+              response.errors.for('transaction').on('threeDSecureToken')[0].code,
+              ValidationErrorCodes.Transaction.ThreeDSecureTransactionDataDoesntMatchVerify
+            );
+
+            done();
+          });
+        });
+      });
+
+      it('gateway rejects if 3ds is specified as required but not supplied', function (done) {
+        let nonceParams = {
+          creditCard: {
+            number: '4111111111111111',
+            expirationMonth: '05',
+            expirationYear: '2009'
+          }
+        };
+
+        specHelper.generateNonceForNewPaymentMethod(nonceParams, null, function (nonce) {
+          let transactionParams = {
+            merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+            amount: '5.00',
+            paymentMethodNonce: nonce,
+            options: {
+              threeDSecure: {
+                required: true
+              }
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isFalse(response.success);
+            assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
+            assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.ThreeDSecure);
+
+            done();
+          });
+        });
+      });
+
+      it('works for transaction with threeDSecurePassThru', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '02',
+            cavv: 'some_cavv',
+            xid: 'some_xid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, Transaction.Status.Authorized);
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction with threeDSecurePassThru when the merchant account does not support that card type', function (done) {
+        let transactionParams = {
+          merchantAccountId: 'adyen_ma',
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '02',
+            cavv: 'some_cavv',
+            xid: 'some_xid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').on('merchantAccountId')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureMerchantAccountDoesNotSupportCardType
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru eciFlag is missing', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '',
+            cavv: 'some_cavv',
+            xid: 'some_xid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('eciFlag')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsRequired
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru cavv or xid is missing', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '06',
+            cavv: '',
+            xid: ''
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('cavv')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureCavvIsRequired
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru eciFlag is invalid', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: 'bad_eci_flag',
+            cavv: 'some_cavv',
+            xid: 'some_xid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('eciFlag')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsInvalid
+          );
+
+          done();
+        });
+      });
+    });
+  });
+
+  describe('find', function () {
+    it('finds a transaction', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.find(response.transaction.id, function (err, transaction) {
+          assert.equal(transaction.amount, '5.00');
+
+          done();
+        })
+      );
+    });
+
+    it('exposes disbursementDetails', function (done) {
+      let transactionId = 'deposittransaction';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        assert.equal(transaction.isDisbursed(), true);
+
+        let disbursementDetails = transaction.disbursementDetails;
+
+        assert.equal(disbursementDetails.settlementAmount, '100.00');
+        assert.equal(disbursementDetails.settlementCurrencyIsoCode, 'USD');
+        assert.equal(disbursementDetails.settlementCurrencyExchangeRate, '1');
+        assert.equal(disbursementDetails.disbursementDate, '2013-04-10');
+        assert.equal(disbursementDetails.success, true);
+        assert.equal(disbursementDetails.fundsHeld, false);
+
+        done();
+      });
+    });
+
+    it('exposes disputes', function (done) {
+      let transactionId = 'disputedtransaction';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        let dispute = transaction.disputes[0];
+
+        assert.equal(dispute.amount, '250.00');
+        assert.equal(dispute.currencyIsoCode, 'USD');
+        assert.equal(dispute.status, Dispute.Status.Won);
+        assert.equal(dispute.receivedDate, '2014-03-01');
+        assert.equal(dispute.replyByDate, '2014-03-21');
+        assert.equal(dispute.reason, Dispute.Reason.Fraud);
+        assert.equal(dispute.transactionDetails.id, transactionId);
+        assert.equal(dispute.transactionDetails.amount, '1000.00');
+        assert.equal(dispute.kind, Dispute.Kind.Chargeback);
+        assert.equal(dispute.dateOpened, '2014-03-01');
+        assert.equal(dispute.dateWon, '2014-03-07');
+
+        done();
+      });
+    });
+
+    it('exposes retrievals', function (done) {
+      let transactionId = 'retrievaltransaction';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        let dispute = transaction.disputes[0];
+
+        assert.equal(dispute.amount, '1000.00');
+        assert.equal(dispute.currencyIsoCode, 'USD');
+        assert.equal(dispute.status, Dispute.Status.Open);
+        assert.equal(dispute.reason, Dispute.Reason.Retrieval);
+        assert.equal(dispute.transactionDetails.id, transactionId);
+        assert.equal(dispute.transactionDetails.amount, '1000.00');
+
+        done();
+      });
+    });
+
+    it('returns a not found error if given a bad id', done =>
+      specHelper.defaultGateway.transaction.find('nonexistent_transaction', function (err) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+
+        done();
+      })
+    );
+
+    it('handles whitespace ids', done =>
+      specHelper.defaultGateway.transaction.find(' ', function (err) {
+        assert.equal(err.type, braintree.errorTypes.notFoundError);
+
+        done();
+      })
+    );
+
+    it('returns all the required paypal fields', done =>
+      specHelper.defaultGateway.transaction.find('settledtransaction', function (err, transaction) {
+        assert.isString(transaction.paypalAccount.debugId);
+        assert.isString(transaction.paypalAccount.payerEmail);
+        assert.isString(transaction.paypalAccount.authorizationId);
+        assert.isString(transaction.paypalAccount.payerId);
+        assert.isString(transaction.paypalAccount.payerFirstName);
+        assert.isString(transaction.paypalAccount.payerLastName);
+        assert.isString(transaction.paypalAccount.payerStatus);
+        assert.isString(transaction.paypalAccount.sellerProtectionStatus);
+        assert.isString(transaction.paypalAccount.captureId);
+        assert.isString(transaction.paypalAccount.refundId);
+        assert.isString(transaction.paypalAccount.transactionFeeAmount);
+        assert.isString(transaction.paypalAccount.transactionFeeCurrencyIsoCode);
+        done();
+      })
+    );
+
+    context('threeDSecureInfo', function () {
+      it("returns three_d_secure_info if it's present", done =>
+        specHelper.defaultGateway.transaction.find('threedsecuredtransaction', function (err, transaction) {
+          let info = transaction.threeDSecureInfo;
+
+          assert.isTrue(info.liabilityShifted);
+          assert.isTrue(info.liabilityShiftPossible);
+          assert.equal(info.enrolled, 'Y');
+          assert.equal(info.status, 'authenticate_successful');
+          done();
+        })
+      );
+
+      it("returns null if it's empty", done =>
+        specHelper.defaultGateway.transaction.find('settledtransaction', function (err, transaction) {
+          assert.isNull(transaction.threeDSecureInfo);
+          done();
+        })
+      );
+    });
+  });
+
+  describe('refund', function () {
+    it('refunds a transaction', done =>
+      specHelper.createTransactionToRefund(transaction =>
+        specHelper.defaultGateway.transaction.refund(transaction.id, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, 'credit');
+          assert.equal(response.transaction.refundedTransactionId, transaction.id);
+
+          done();
+        })
+      )
+    );
+
+    it('refunds a paypal transaction', done =>
+      specHelper.createPayPalTransactionToRefund(transaction =>
+        specHelper.defaultGateway.transaction.refund(transaction.id, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, 'credit');
+          assert.equal(response.transaction.refundedTransactionId, transaction.id);
+
+          done();
+        })
+      )
+    );
+
+    it('allows refunding partial amounts', done =>
+      specHelper.createTransactionToRefund(transaction =>
+        specHelper.defaultGateway.transaction.refund(transaction.id, '1.00', function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, 'credit');
+          assert.equal(response.transaction.refundedTransactionId, transaction.id);
+          assert.equal(response.transaction.amount, '1.00');
+
+          done();
+        })
+      )
+    );
+
+    it('allows refunding with options param', done =>
+      specHelper.createTransactionToRefund(function (transaction) {
+        let options = {
+          order_id: 'abcd', // eslint-disable-line camelcase
+          amount: '1.00'
+        };
+
+        specHelper.defaultGateway.transaction.refund(transaction.id, options, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, 'credit');
+          assert.equal(response.transaction.refundedTransactionId, transaction.id);
+          assert.equal(response.transaction.orderId, 'abcd');
+          assert.equal(response.transaction.amount, '1.00');
+
+          done();
+        });
+      })
+    );
+
+    it('handles validation errors', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.refund(response.transaction.id, '5.00', function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').on('base')[0].code, '91506');
+
+          done();
+        })
+      );
+    });
+  });
+
+  describe('submitForSettlement', function () {
+    it('submits a transaction for settlement', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+          assert.equal(response.transaction.amount, '5.00');
+
+          done();
+        })
+      );
+    });
+
+    it('submits a paypal transaction for settlement', done =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        let paymentMethodParams = {
+          customerId: response.customer.id,
+          paymentMethodNonce: Nonces.PayPalFuturePayment
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+          let transactionParams = {
+            amount: '5.00',
+            paymentMethodToken: response.paymentMethod.token
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+            specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.status, 'settling');
+              assert.equal(response.transaction.amount, '5.00');
+
+              done();
+            })
+          );
+        });
+      })
+    );
+
+    it('allows submitting for a partial amount', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, '3.00', function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+          assert.equal(response.transaction.amount, '3.00');
+
+          done();
+        })
+      );
+    });
+
+    it('allows submitting with an order id', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, '3.00', {orderId: 'ABC123'}, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+          assert.equal(response.transaction.orderId, 'ABC123');
+
+          done();
+        })
+      );
+    });
+
+    it('allows submitting with an order id without specifying an amount', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, {orderId: 'ABC123'}, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+          assert.equal(response.transaction.orderId, 'ABC123');
+          assert.equal(response.transaction.amount, '5.00');
+
+          done();
+        })
+      );
+    });
+
+    it('allows submitting with a descriptor', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      let submitForSettlementParams = {
+        descriptor: {
+          name: 'abc*def',
+          phone: '1234567890',
+          url: 'ebay.com'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.descriptor.name, 'abc*def');
+          assert.equal(response.transaction.descriptor.phone, '1234567890');
+          assert.equal(response.transaction.descriptor.url, 'ebay.com');
+
+          done();
+        })
+      );
+    });
+
+    it('handles validation errors', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').on('base')[0].code, '91507');
+
+          done();
+        })
+      );
+    });
+
+    it('calls callback with an error when options object contains invalid keys', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, '5.00', {
+          invalidKey: '1234'
+        }, function (err) {
+          assert.equal(err.type, 'invalidKeysError');
+          assert.equal(err.message, 'These keys are invalid: invalidKey');
+
+          done();
+        })
+      );
+    });
+
+    context('amex rewards', function () {
+      it('succeeds', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
+          amount: '10.00',
+          creditCard: {
+            number: CreditCardNumbers.AmexPayWithPoints.Success,
+            expirationDate: '12/2020'
+          },
+          options: {
+            amexRewards: {
+              requestId: 'ABC123',
+              points: '1000',
+              currencyAmount: '10.00',
+              currencyIsoCode: 'USD'
+            }
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, Transaction.Status.Authorized);
+
+          specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
+            assert.isTrue(response.success);
+
+            done();
+          });
+        });
+      });
+
+      it('succeeds even if the card is ineligible', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
+          amount: '10.00',
+          creditCard: {
+            number: CreditCardNumbers.AmexPayWithPoints.IneligibleCard,
+            expirationDate: '12/2020'
+          },
+          options: {
+            amexRewards: {
+              requestId: 'ABC123',
+              points: '1000',
+              currencyAmount: '10.00',
+              currencyIsoCode: 'USD'
+            }
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, Transaction.Status.Authorized);
+
+          specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
+            assert.isTrue(response.success);
+
+            done();
+          });
+        });
+      });
+
+      it("succeeds even if the card's balance is insufficient", function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
+          amount: '10.00',
+          creditCard: {
+            number: CreditCardNumbers.AmexPayWithPoints.InsufficientPoints,
+            expirationDate: '12/2020'
+          },
+          options: {
+            amexRewards: {
+              requestId: 'ABC123',
+              points: '1000',
+              currencyAmount: '10.00',
+              currencyIsoCode: 'USD'
+            }
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, Transaction.Status.Authorized);
+
+          specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
+            assert.isTrue(response.success);
+
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  describe('updateDetails', function () {
+    it('updates the transaction details', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      let updateParams = {
+        amount: '4.00',
+        orderId: '123',
+        descriptor: {
+          name: 'abc*def',
+          phone: '1234567890',
+          url: 'ebay.com'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+          assert.equal(response.transaction.amount, '4.00');
+          assert.equal(response.transaction.orderId, '123');
+          assert.equal(response.transaction.descriptor.name, 'abc*def');
+          assert.equal(response.transaction.descriptor.phone, '1234567890');
+          assert.equal(response.transaction.descriptor.url, 'ebay.com');
+
+          done();
+        })
+      );
+    });
+
+    it('returns an authorizationError and logs when a key is invalid', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      let updateParams = {
+        amount: '4.00',
+        invalidParam: 'something invalid'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err) {
+          assert.equal(err.type, 'invalidKeysError');
+          assert.equal(err.message, 'These keys are invalid: invalidParam');
+
+          done();
+        })
+      );
+    });
+
+    it('validates amount', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      let updateParams =
+        {amount: '555.00'};
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').on('amount')[0].code, '91522');
+
+          done();
+        })
+      );
+    });
+
+    it('validates descriptor', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      let updateParams = {
+        amount: '4.00',
+        orderId: '123',
+        descriptor: {
+          name: 'invalid name',
+          phone: 'invalid phone',
+          url: 'invalid url that is invalid because it is too long'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('descriptor').on('name')[0].code, '92201');
+          assert.equal(response.errors.for('transaction').for('descriptor').on('phone')[0].code, '92202');
+          assert.equal(response.errors.for('transaction').for('descriptor').on('url')[0].code, '92206');
+
+          done();
+        })
+      );
+    });
+
+    it('validates orderId', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      let updateParams =
+        {orderId: new Array(257).join('X')};
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').on('orderId')[0].code, '91501');
+
+          done();
+        })
+      );
+    });
+
+    it('validates processor', function (done) {
+      let transactionParams = {
+        merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
+        amount: '10.00',
+        creditCard: {
+          number: CreditCardNumbers.AmexPayWithPoints.Success,
+          expirationDate: '12/2020'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      let updateParams = {
+        amount: '4.00',
+        orderId: '123',
+        descriptor: {
+          name: 'abc*def',
+          phone: '1234567890',
+          url: 'ebay.com'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').on('base')[0].code, '915130');
+
+          done();
+        })
+      );
+    });
+
+    it('validates status', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      let updateParams = {
+        amount: '4.00',
+        orderId: '123',
+        descriptor: {
+          name: 'abc*def',
+          phone: '1234567890',
+          url: 'ebay.com'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').on('base')[0].code, '915129');
+
+          done();
+        })
+      );
+    });
+  });
+
+  describe('void', function () {
+    it('voids a transaction', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.void(response.transaction.id, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'voided');
+
+          done();
+        })
+      );
+    });
+
+    it('voids a paypal transaction', done =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        let paymentMethodParams = {
+          customerId: response.customer.id,
+          paymentMethodNonce: Nonces.PayPalFuturePayment
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+          let transactionParams = {
+            amount: '5.00',
+            paymentMethodToken: response.paymentMethod.token
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+            specHelper.defaultGateway.transaction.void(response.transaction.id, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.status, 'voided');
+
+              done();
+            })
+          );
+        });
+      })
+    );
+
+    it('handles validation errors', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.void(response.transaction.id, (err, response) =>
+          specHelper.defaultGateway.transaction.void(response.transaction.id, function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success);
+            assert.equal(response.errors.for('transaction').on('base')[0].code, '91504');
+
+            done();
+          })
+        )
+      );
+    });
+  });
+
+  describe('cloneTransaction', function () {
+    it('clones a transaction', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        let cloneParams = {
+          amount: '123.45',
+          channel: 'MyShoppingCartProvider',
+          options: {
+            submitForSettlement: 'false'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, cloneParams, function (err, response) {
+          assert.isTrue(response.success);
+          let transaction = response.transaction;
+
+          assert.equal(transaction.amount, '123.45');
+          assert.equal(transaction.channel, 'MyShoppingCartProvider');
+          assert.equal(transaction.creditCard.maskedNumber, '510510******5100');
+          assert.equal(transaction.creditCard.expirationDate, '05/2012');
+
+          done();
+        });
+      });
+    });
+
+    it('handles validation errors', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.credit(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, {amount: '123.45'}, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for('transaction').on('base')[0].code,
+            '91543'
+          );
+
+          done();
+        })
+      );
+    });
+
+    it('can submit for settlement', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        let cloneParams = {
+          amount: '123.45',
+          channel: 'MyShoppingCartProvider',
+          options: {
+            submitForSettlement: 'true'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, cloneParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('submitForPartialSettlement', function () {
+    it('creates partial settlement transactions for an authorized transaction', function (done) {
+      let transactionParams = {
+        amount: '10.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        let authorizedTransaction = response.transaction;
+
+        specHelper.defaultGateway.transaction.submitForPartialSettlement(authorizedTransaction.id, '6.00', function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+          assert.equal(response.transaction.amount, '6.00');
+
+          specHelper.defaultGateway.transaction.submitForPartialSettlement(authorizedTransaction.id, '4.00', function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.status, 'submitted_for_settlement');
+            assert.equal(response.transaction.amount, '4.00');
+
+            specHelper.defaultGateway.transaction.find(authorizedTransaction.id, function (err, transaction) {
+              assert.isTrue(response.success);
+              assert.equal(2, transaction.partialSettlementTransactionIds.length);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    it('allows submitting with an order id', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, '3.00', {orderId: 'ABC123'}, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+          assert.equal(response.transaction.orderId, 'ABC123');
+
+          done();
+        })
+      );
+    });
+
+    it('allows submitting with a descriptor', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      let submitForPartialSettlementParams = {
+        descriptor: {
+          name: 'abc*def',
+          phone: '1234567890',
+          url: 'ebay.com'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, '3.00', submitForPartialSettlementParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.descriptor.name, 'abc*def');
+          assert.equal(response.transaction.descriptor.phone, '1234567890');
+          assert.equal(response.transaction.descriptor.url, 'ebay.com');
+
+          done();
+        })
+      );
+    });
+
+    it('handles validation errors', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').on('base')[0].code, '91507');
+
+          done();
+        })
+      );
+    });
+
+    it('cannot create a partial settlement transaction on a partial settlement transaction', function (done) {
+      let transactionParams = {
+        amount: '10.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        let authorizedTransaction = response.transaction;
+
+        specHelper.defaultGateway.transaction.submitForPartialSettlement(authorizedTransaction.id, '6.00', function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+          assert.equal(response.transaction.amount, '6.00');
+
+          specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, '4.00', function (err, response) {
+            assert.isFalse(response.success);
+            let errorCode = response.errors.for('transaction').on('base')[0].code;
+
+            assert.equal(errorCode, ValidationErrorCodes.Transaction.CannotSubmitForPartialSettlement);
+            done();
+          });
+        });
+      });
+    });
+
+    context('shared payment methods', function () {
+      let address = null;
+      let creditCard = null;
+      let customer = null;
+      let grantingGateway = null;
+
+      before(function (done) {
+        let partnerMerchantGateway = braintree.connect({
+          merchantId: 'integration_merchant_public_id',
+          publicKey: 'oauth_app_partner_user_public_key',
+          privateKey: 'oauth_app_partner_user_private_key',
+          environment: Environment.Development
+        });
+
+        let customerParams = {
+          firstName: 'Joe',
+          lastName: 'Brown',
+          company: 'ExampleCo',
+          email: 'joe@example.com',
+          phone: '312.555.1234',
+          fax: '614.555.5678',
+          website: 'www.example.com'
+        };
+
+        return partnerMerchantGateway.customer.create(customerParams, function (err, response) {
+          customer = response.customer;
+
+          let creditCardParams = {
+            customerId: customer.id,
+            cardholderName: 'Adam Davis',
+            number: '4111111111111111',
+            expirationDate: '05/2009',
+            billingAddress: {
+              postalCode: '95131'
+            }
+          };
+
+          let addressParams = {
+            customerId: customer.id,
+            firstName: 'Firsty',
+            lastName: 'Lasty'
+          };
+
+          return partnerMerchantGateway.address.create(addressParams, function (err, response) {
+            address = response.address;
+
+            return partnerMerchantGateway.creditCard.create(creditCardParams, function (err, response) {
+              creditCard = response.creditCard;
+
+              let oauthGateway = braintree.connect({
+                clientId: 'client_id$development$integration_client_id',
+                clientSecret: 'client_secret$development$integration_client_secret',
+                environment: Environment.Development
+              });
+
+              let accessTokenParams = {
+                merchantPublicId: 'integration_merchant_id',
+                scope: 'grant_payment_method,shared_vault_transactions'
+              };
+
+              specHelper.createToken(oauthGateway, accessTokenParams, function (err, response) {
+                grantingGateway = braintree.connect({
+                  accessToken: response.credentials.accessToken,
+                  environment: Environment.Development
+                });
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      it('returns oauth app details on transactions created via nonce granting', done =>
+        grantingGateway.paymentMethod.grant(creditCard.token, false, function (err, response) {
+          let transactionParams = {
+            paymentMethodNonce: response.paymentMethodNonce.nonce,
+            amount: Braintree.Test.TransactionAmounts.Authorize
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.facilitatorDetails.oauthApplicationClientId, 'client_id$development$integration_client_id');
+            assert.equal(response.transaction.facilitatorDetails.oauthApplicationName, 'PseudoShop');
+            assert.isNull(response.transaction.billing.postalCode);
+            done();
+          });
+        })
+      );
+
+      it('returns billing postal code in transactions created via nonce granting when requested during grant API', done =>
+        grantingGateway.paymentMethod.grant(creditCard.token, {
+          allow_vaulting: false, // eslint-disable-line camelcase
+          include_billing_postal_code: true // eslint-disable-line camelcase
+        }, function (err, response) {
+          let transactionParams = {
+            paymentMethodNonce: response.paymentMethodNonce.nonce,
+            amount: Braintree.Test.TransactionAmounts.Authorize
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.billing.postalCode, '95131');
+            done();
+          });
+        })
+      );
+
+      it('allows transactions to be created with a shared payment method, customer, billing and shipping addresses', function (done) {
+        let transactionParams = {
+          sharedPaymentMethodToken: creditCard.token,
+          sharedCustomerId: customer.id,
+          sharedShippingAddressId: address.id,
+          sharedBillingAddressId: address.id,
+          amount: Braintree.Test.TransactionAmounts.Authorize
+        };
+
+        return grantingGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.shipping.firstName, address.firstName);
+          assert.equal(response.transaction.billing.firstName, address.firstName);
+          done();
+        });
+      });
+    });
+  });
+});

@@ -6,3 +6,5 @@
     new-cap:
       - 2
       - {"capIsNewExceptions": ["Sha1hexdigest", "Sha256hexdigest"]}
+  globals:
+    Promise: 0
