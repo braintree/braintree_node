@@ -1,3 +1,6 @@
+## Unreleased
+* Fixes request timeout issue (closes #99)
+
 ## 2.1.0
 * All async methods (with the exception of search methods) return a promise if no callback is provided
 * Add support for additional PayPal options when vaulting a PayPal Order
