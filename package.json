@@ -26,7 +26,7 @@
     "semver": "5.1.0",
     "underscore": "1.8.3",
     "xml2js": "0.1.13",
-    "wrap-promise": "braintree/wrap-promise#1.1.0"
+    "@braintree/wrap-promise": "git+https://github.com/braintree/wrap-promise.git"
   },
   "devDependencies": {
     "chai": "1.5.0",
