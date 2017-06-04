@@ -1,6 +1,6 @@
 {
   "name": "braintree",
-  "version": "2.1.2",
+  "version": "2.1.1",
   "description": "A library for integrating with Braintree.",
   "keywords": [
     "braintree",
@@ -26,7 +26,7 @@
     "semver": "5.1.0",
     "underscore": "1.8.3",
     "xml2js": "0.1.13",
-    "@braintree/wrap-promise": "git+https://github.com/braintree/wrap-promise.git"
+    "@braintree/wrap-promise": "braintree/wrap-promise#1.1.1"
   },
   "devDependencies": {
     "chai": "1.5.0",
