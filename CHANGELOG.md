@@ -1,5 +1,5 @@
 ## Unreleased
-* Fixes wrap-promise issue (closes #102)
+* Fixes wrap-promise issue (closes #102) - Thanks @targunp
 
 ## 2.1.1
 * Fixes request timeout issue (closes #99)
