@@ -1,6 +1,7 @@
 ## Unreleased
 * Fixes wrap-promise issue (closes #102) - Thanks @targunp
 * Add iDEAL to PaymentInstrumentTypes
+* Adds support for gzip
 
 ## 2.1.1
 * Fixes request timeout issue (closes #99)
