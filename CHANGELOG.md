@@ -1,4 +1,4 @@
-## Unreleased
+## 2.2.0
 * Fixes wrap-promise issue (closes #102) - Thanks @targunp
 * Add iDEAL to PaymentInstrumentTypes
 * Adds support for gzip
