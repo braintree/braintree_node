@@ -4,7 +4,7 @@ let braintree = specHelper.braintree;
 let Config = require('../../../lib/braintree/config').Config;
 let Http = require('../../../lib/braintree/http').Http;
 
-describe('Http', () =>
+describe('Http', function () {
   describe('checkHttpStatus', function () {
     it('returns a null for non-error codes => ', function () {
       let http = new Http(new Config(specHelper.defaultConfig));
@@ -54,5 +54,13 @@ describe('Http', () =>
 
       assert.equal(http.checkHttpStatus(503).type, braintree.errorTypes.downForMaintenanceError);
     });
-  })
-);
+  });
+
+  describe('_headers', function () {
+    it('sets Accept-Encoding to gzip', function () {
+      let http = new Http(new Config(specHelper.defaultConfig));
+
+      assert.equal(http._headers()['Accept-Encoding'], 'gzip');
+    });
+  });
+});
