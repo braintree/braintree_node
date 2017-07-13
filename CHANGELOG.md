@@ -1,3 +1,6 @@
+## Unreleased
+* Add AuthorizationAdjustment class and `authorizationAdjustments` to Transaction
+
 ## 2.2.0
 * Fixes wrap-promise issue (closes #102) - Thanks @targunp
 * Add iDEAL to PaymentInstrumentTypes

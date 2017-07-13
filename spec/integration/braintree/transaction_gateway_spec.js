@@ -2099,6 +2099,20 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('exposes authorizationAdjustments', function (done) {
+      let transactionId = 'authadjustmenttransaction';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        let authorizationAdjustment = transaction.authorizationAdjustments[0];
+
+        assert.equal(authorizationAdjustment.amount, '-20.00');
+        assert.equal(authorizationAdjustment.success, true);
+        assert.exists(authorizationAdjustment.timestamp);
+
+        done();
+      });
+    });
+
     it('exposes disputes', function (done) {
       let transactionId = 'disputedtransaction';
 
