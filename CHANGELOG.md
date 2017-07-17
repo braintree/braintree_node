@@ -4,6 +4,7 @@
 * Add facilitated details to Transaction if present
 * Add `submit_for_settlement` to `Subscription.retryCharge`
 * Add `options` -> `paypal` -> `description` for creating and updating subscriptions
+* Add device_data_captured field in risk_data
 
 ## 2.2.0
 * Fixes wrap-promise issue (closes #102) - Thanks @targunp

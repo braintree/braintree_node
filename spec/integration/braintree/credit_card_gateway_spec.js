@@ -73,6 +73,7 @@ describe('CreditCardGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
 
+        assert.isDefined(response.creditCard.verification.riskData.deviceDataCaptured);
         assert.equal(response.creditCard.verification.riskData.decision, 'Not Evaluated');
         assert.equal(response.creditCard.verification.riskData.id, null);
 
