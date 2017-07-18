@@ -2156,8 +2156,8 @@ describe('PaymentMethodGateway', function () {
 
       it("raises an error if the token isn't found", done =>
         grantingGateway.paymentMethod.grant('not_a_real_token', false, function (err, response) {
-          assert.isObject(err);
-          assert.isUndefined(response);
+          assert.exists(err);
+          assert.notExists(response);
           done();
         })
       );
@@ -2186,8 +2186,8 @@ describe('PaymentMethodGateway', function () {
 
       it("raises an error if the token isn't found", done =>
         grantingGateway.paymentMethod.revoke('not_a_real_token', function (err, response) {
-          assert.isObject(err);
-          assert.isUndefined(response);
+          assert.exists(err);
+          assert.notExists(response);
           done();
         })
       );
