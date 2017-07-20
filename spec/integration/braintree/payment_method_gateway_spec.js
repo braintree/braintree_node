@@ -221,7 +221,7 @@ describe('PaymentMethodGateway', function () {
     });
 
     context('Coinbase', () =>
-      it('vaults a Coinbase account from the nonce', done =>
+      it('no longer supports vaulting a Coinbase account from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'Paul', lastName: 'Gross'}, function (err, response) {
           customerId = response.customer.id;
 
@@ -232,9 +232,12 @@ describe('PaymentMethodGateway', function () {
 
           specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
             assert.isNull(err);
-            assert.isTrue(response.success);
-            assert.isNotNull(response.paymentMethod.token);
-            assert.isNotNull(response.paymentMethod.customerId);
+            assert.isFalse(response.success);
+
+            assert.equal(
+              response.errors.for('coinbaseAccount').on('base')[0].code,
+              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
+            );
 
             done();
           });
@@ -1677,46 +1680,24 @@ describe('PaymentMethodGateway', function () {
 
     context('coinbase', () =>
 
-      it("updates a coinbase account's default flag", done =>
+      it("can no longer create a Coinbase payment method token", done =>
         specHelper.defaultGateway.customer.create({}, function (err, response) {
           let customerId = response.customer.id;
 
-          let creditCardParams = {
+          let paymentMethodParams = {
             customerId,
-            number: '4012888888881881',
-            expirationDate: '05/2009'
+            paymentMethodNonce: Nonces.Coinbase
           };
 
-          specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
-            assert.isTrue(response.success);
-            assert.isTrue(response.creditCard.default);
+          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+            assert.isFalse(response.success);
 
-            let paymentMethodParams = {
-              customerId,
-              paymentMethodNonce: Nonces.Coinbase
-            };
+            assert.equal(
+              response.errors.for('coinbaseAccount').on('base')[0].code,
+              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
+            );
 
-            specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-              assert.isTrue(response.success);
-              assert.isFalse(response.paymentMethod.default);
-
-              let coinbaseAccount = response.coinbaseAccount;
-
-              let updateParams = {
-                options: {
-                  makeDefault: 'true'
-                }
-              };
-
-              specHelper.defaultGateway.paymentMethod.update(coinbaseAccount.token, updateParams, function (err, response) {
-                assert.isNull(err);
-                assert.isTrue(response.success);
-                assert.equal(response.paymentMethod.token, coinbaseAccount.token);
-                assert.isTrue(response.paymentMethod.default);
-
-                done();
-              });
-            });
+            done();
           });
         })
       )

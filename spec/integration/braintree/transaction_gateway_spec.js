@@ -297,7 +297,7 @@ describe('TransactionGateway', function () {
     );
 
     context('Coinbase', () =>
-      it('returns CoinbaseAccount for payment_instrument', done =>
+      it('can no longer use Coinbase in a transaction sale', done =>
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             paymentMethodNonce: Nonces.Coinbase,
@@ -306,9 +306,12 @@ describe('TransactionGateway', function () {
 
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
-            assert.isTrue(response.success);
-            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CoinbaseAccount);
-            assert.isNotNull(response.transaction.coinbaseAccount.user_email);
+            assert.isFalse(response.success);
+
+            assert.equal(
+              response.errors.for('transaction').on('base')[0].code,
+              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
+            );
 
             done();
           });
