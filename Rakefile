@@ -19,7 +19,7 @@ namespace :test do
 
     command = local_mocha
     if filename.include? "integration"
-      command += "--slow 2000"
+      command += " --slow 2000"
     end
     sh "#{command} #{filename}"
   end
@@ -30,5 +30,5 @@ task :npm_install do
 end
 
 def local_mocha
-  "./node_modules/mocha/bin/mocha --timeout 62000 --reporter spec"
+  "./node_modules/mocha/bin/mocha --timeout 62000 --reporter spec -r spec/spec_helper"
 end
