@@ -1680,7 +1680,7 @@ describe('PaymentMethodGateway', function () {
 
     context('coinbase', () =>
 
-      it("can no longer create a Coinbase payment method token", done =>
+      it('can no longer create a Coinbase payment method token', done =>
         specHelper.defaultGateway.customer.create({}, function (err, response) {
           let customerId = response.customer.id;
 
