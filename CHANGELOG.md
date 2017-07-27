@@ -1,6 +1,7 @@
 ## Unreleased
 * Add AuthorizationAdjustment class and `authorizationAdjustments` to Transaction
 * Coinbase is no longer a supported payment method. `PaymentMethodNoLongerSupported` will be returned for Coinbase operations.
+* Add facilitated details to Transaction if present
 
 ## 2.2.0
 * Fixes wrap-promise issue (closes #102) - Thanks @targunp

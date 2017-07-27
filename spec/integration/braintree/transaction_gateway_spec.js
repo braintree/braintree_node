@@ -3158,7 +3158,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('returns oauth app details on transactions created via nonce granting', done =>
+      it('returns facilitated on transactions created via nonce granting', done => {
         grantingGateway.paymentMethod.grant(creditCard.token, false, function (err, response) {
           let transactionParams = {
             paymentMethodNonce: response.paymentMethodNonce.nonce,
@@ -3167,13 +3167,16 @@ describe('TransactionGateway', function () {
 
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isTrue(response.success);
+            assert.equal(response.transaction.facilitatedDetails.merchantId, 'integration_merchant_id');
+            assert.equal(response.transaction.facilitatedDetails.merchantName, '14ladders');
+            assert.equal(response.transaction.facilitatedDetails.paymentMethodNonce, response.paymentMethodNonce.nonce);
             assert.equal(response.transaction.facilitatorDetails.oauthApplicationClientId, 'client_id$development$integration_client_id');
             assert.equal(response.transaction.facilitatorDetails.oauthApplicationName, 'PseudoShop');
             assert.isNull(response.transaction.billing.postalCode);
             done();
           });
-        })
-      );
+        });
+      });
 
       it('returns billing postal code in transactions created via nonce granting when requested during grant API', done =>
         grantingGateway.paymentMethod.grant(creditCard.token, {
