@@ -3160,8 +3160,9 @@ describe('TransactionGateway', function () {
 
       it('returns facilitated on transactions created via nonce granting', done => {
         grantingGateway.paymentMethod.grant(creditCard.token, false, function (err, response) {
+          let nonce = response.paymentMethodNonce.nonce;
           let transactionParams = {
-            paymentMethodNonce: response.paymentMethodNonce.nonce,
+            paymentMethodNonce: nonce,
             amount: Braintree.Test.TransactionAmounts.Authorize
           };
 
@@ -3169,7 +3170,7 @@ describe('TransactionGateway', function () {
             assert.isTrue(response.success);
             assert.equal(response.transaction.facilitatedDetails.merchantId, 'integration_merchant_id');
             assert.equal(response.transaction.facilitatedDetails.merchantName, '14ladders');
-            assert.equal(response.transaction.facilitatedDetails.paymentMethodNonce, response.paymentMethodNonce.nonce);
+            assert.equal(response.transaction.facilitatedDetails.paymentMethodNonce, nonce);
             assert.equal(response.transaction.facilitatorDetails.oauthApplicationClientId, 'client_id$development$integration_client_id');
             assert.equal(response.transaction.facilitatorDetails.oauthApplicationName, 'PseudoShop');
             assert.isNull(response.transaction.billing.postalCode);
