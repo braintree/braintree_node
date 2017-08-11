@@ -125,6 +125,48 @@ describe('SubscriptionGateway', function () {
       })
     );
 
+    it('creates a subscription with a vaulted paypal account token and description', done =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        let paypalCustomerId = response.customer.id;
+        let paymentMethodParams = {
+          paypalAccount: {
+            consentCode: 'PAYPAL_CONSENT_CODE',
+            token: `PAYPAL_ACCOUNT_${specHelper.randomId()}`
+          }
+        };
+
+        specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
+          paymentMethodParams = {
+            paymentMethodNonce: nonce,
+            customerId: paypalCustomerId
+          };
+
+          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+            let paymentMethodToken = response.paymentMethod.token;
+
+            let subscriptionParams = {
+              paymentMethodToken,
+              planId: specHelper.plans.trialless.id,
+              options: {
+                paypal: {
+                  description: 'A great product'
+                }
+              }
+            };
+
+            specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.subscription.description, 'A great product');
+              assert.isString(response.subscription.transactions[0].paypalAccount.payerEmail);
+              assert.equal(response.subscription.transactions[0].paypalAccount.description, 'A great product');
+              done();
+            });
+          });
+        });
+      })
+    );
+
     it('does not vault an unverified paypal account payment method nonce', function (done) {
       let subscriptionParams = {
         paymentMethodNonce: Nonces.PayPalOneTimePayment,
@@ -358,6 +400,24 @@ describe('SubscriptionGateway', function () {
             done();
           });
         }); });
+    });
+
+    it('updates the description', function (done) {
+      let subscriptionParams = {
+        options: {
+          paypal: {
+            description: 'An incredible product'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.subscription.update(subscription.id, subscriptionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.subscription.description, 'An incredible product');
+
+        done();
+      });
     });
 
     it('handles validation errors', function (done) {
