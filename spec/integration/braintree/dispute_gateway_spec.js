@@ -49,7 +49,7 @@ describe.only('DisputeGateway', () => {
 
           assert.isFalse(response.success);
           assert.equal(ValidationErrorCodes.Dispute.CanOnlyAcceptOpenDispute, error.code);
-          assert.equal("Disputes can only be accepted when they are in an Open state", error.message);
+          assert.equal('Disputes can only be accepted when they are in an Open state', error.message);
         })
     });
 
@@ -80,7 +80,7 @@ describe.only('DisputeGateway', () => {
           let evidence = response.evidence;
 
           assert.isTrue(response.success);
-          assert.equal("text evidence", evidence.comment);
+          assert.equal('text evidence', evidence.comment);
           assert.isNotNull(evidence.createdAt);
           assert.isTrue(/^\w{16,}$/.test(evidence.id));
           assert.isNull(evidence.sentToProcessorAt);
@@ -89,7 +89,7 @@ describe.only('DisputeGateway', () => {
     });
 
     it('throws error when dispute not found', () => {
-      return disputeGateway.addTextEvidence("unknown_dispute_id", "text evidence")
+      return disputeGateway.addTextEvidence('unknown_dispute_id', 'text evidence')
         .then(assert.fail)
         .catch((err) => {
           assert.equal(err.type, 'notFoundError');
@@ -114,7 +114,7 @@ describe.only('DisputeGateway', () => {
 
           assert.isFalse(response.success);
           assert.equal(ValidationErrorCodes.Dispute.CanOnlyAddEvidenceToOpenDispute, error.code);
-          assert.equal("Evidence can only be attached to disputes that are in an Open state", error.message);
+          assert.equal('Evidence can only be attached to disputes that are in an Open state', error.message);
         });
     });
 
@@ -125,7 +125,7 @@ describe.only('DisputeGateway', () => {
         .then((dispute) => {
           disputeId = dispute.id;
 
-          return disputeGateway.addTextEvidence(disputeId, "text evidence");
+          return disputeGateway.addTextEvidence(disputeId, 'text evidence');
         })
         .then((result) => {
           evidenceId = result.evidence.id;
@@ -137,7 +137,7 @@ describe.only('DisputeGateway', () => {
 
           assert.isTrue(result.success);
           assert.equal(evidenceId, evidence.id);
-          assert.equal("text evidence", evidence.comment);
+          assert.equal('text evidence', evidence.comment);
         });
     });
   });
@@ -172,5 +172,57 @@ describe.only('DisputeGateway', () => {
   });
 
   describe('self.removeEvidence', (done) => {
+    it('removes evidence from a dispute', () => {
+      var disputeId;
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(disputeId, 'text evidence');
+        })
+        .then((response) => {
+          return disputeGateway.removeEvidence(disputeId, response.evidence.id);
+        })
+        .then((response) => {
+          assert.isTrue(response.success);
+        });
+    });
+
+    it('throws error when dispute or evidence not found', () => {
+      return disputeGateway.removeEvidence('unknown_dispute_id', 'unknown_evidence_id')
+        .then(() => {
+          assert.fail('removeEvidence should have failed');
+        })
+        .catch((err) => {
+          assert.equal(err.type, 'notFoundError');
+          assert.equal(err.message, 'evidence with id \'unknown_evidence_id\' for dispute with id \'unknown_dispute_id\' not found');
+        });
+    });
+
+    it('returns error when dispute not open', () => {
+      var disputeId, evidenceId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(disputeId, 'text evidence');
+        })
+        .then((response) => {
+          evidenceId = response.evidence.id;
+
+          return disputeGateway.accept(disputeId);
+        })
+        .then((response) => {
+          return disputeGateway.removeEvidence(disputeId, evidenceId);
+        })
+        .then((response) => {
+          let error = response.errors.for('dispute').on('status')[0];
+
+          assert.isFalse(response.success);
+          assert.equal(ValidationErrorCodes.Dispute.CanOnlyRemoveEvidenceFromOpenDispute, error.code);
+          assert.equal('Evidence can only be removed from disputes that are in an Open state', error.message);
+        });
+    });
   });
 });
