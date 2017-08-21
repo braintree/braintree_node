@@ -1,0 +1,176 @@
+'use strict';
+
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let Dispute = require('../../../lib/braintree/dispute').Dispute;
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
+
+describe.only('DisputeGateway', () => {
+  let disputeGateway;
+
+  beforeEach(() => {
+    disputeGateway = specHelper.defaultGateway.dispute;
+  });
+
+  function createSampleDispute() {
+    let transactionParams = {
+      amount: '100.00',
+      creditCard: {
+        number: CreditCardNumbers.Dispute.Chargeback,
+        expirationDate: '12/2019'
+      }
+    };
+
+    return specHelper.defaultGateway.transaction.sale(transactionParams).then((result) => {
+      return result.transaction.disputes[0];
+    });
+  }
+
+  describe('self.accept', (done) => {
+    it('changes dispute status to accept', () => {
+      var disputeId;
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.accept(disputeId);
+        })
+        .then((result) => {
+          return disputeGateway.find(disputeId);
+        })
+        .then((result) => {
+          assert.equal(Dispute.Status.Accepted, result.dispute.status);
+        });
+    });
+
+    it('returns error when dispute not open', () => {
+      return disputeGateway.accept('wells_dispute')
+        .then((response) => {
+          let error = response.errors.for('dispute').on('status')[0];
+
+          assert.isFalse(response.success);
+          assert.equal(ValidationErrorCodes.Dispute.CanOnlyAcceptOpenDispute, error.code);
+          assert.equal("Disputes can only be accepted when they are in an Open state", error.message);
+        })
+    });
+
+    it('throws error when dispute not found', () => {
+      return disputeGateway.accept('invalid-id')
+        .then(assert.fail)
+        .catch((err) => {
+          assert.equal(err.type, 'notFoundError');
+          assert.equal(err.message, 'dispute with id \'invalid-id\' not found');
+        });
+    });
+  });
+
+  describe('self.addFileEvidence', (done) => {
+  });
+
+  describe('self.addTextEvidence', (done) => {
+    it('adds text evidence to a dispute', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(disputeId, 'text evidence');
+        })
+        .then((response) => {
+          let evidence = response.evidence;
+
+          assert.isTrue(response.success);
+          assert.equal("text evidence", evidence.comment);
+          assert.isNotNull(evidence.createdAt);
+          assert.isTrue(/^\w{16,}$/.test(evidence.id));
+          assert.isNull(evidence.sentToProcessorAt);
+          assert.isNull(evidence.url);
+        });
+    });
+
+    it('throws error when dispute not found', () => {
+      return disputeGateway.addTextEvidence("unknown_dispute_id", "text evidence")
+        .then(assert.fail)
+        .catch((err) => {
+          assert.equal(err.type, 'notFoundError');
+          assert.equal(err.message, 'dispute with id \'unknown_dispute_id\' not found');
+        });
+    });
+
+    it('returns error when dispute not open', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.accept(disputeId)
+        })
+        .then(() => {
+            return disputeGateway.addTextEvidence(disputeId, 'text evidence')
+        })
+        .then((response) => {
+          let error = response.errors.for('dispute').on('status')[0];
+
+          assert.isFalse(response.success);
+          assert.equal(ValidationErrorCodes.Dispute.CanOnlyAddEvidenceToOpenDispute, error.code);
+          assert.equal("Evidence can only be attached to disputes that are in an Open state", error.message);
+        });
+    });
+
+    it('shows new evidence record in dispute', () => {
+      let disputeId, evidenceId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(disputeId, "text evidence");
+        })
+        .then((result) => {
+          evidenceId = result.evidence.id;
+
+          return disputeGateway.find(disputeId);
+        })
+        .then((result) => {
+          let evidence = result.dispute.evidence[0];
+
+          assert.isTrue(result.success);
+          assert.equal(evidenceId, evidence.id);
+          assert.equal("text evidence", evidence.comment);
+        });
+    });
+  });
+
+  describe('self.finalize', (done) => {
+  });
+
+  describe('self.find', (done) => {
+    it('returns a Dispute given a Dispute ID', () => {
+
+      return disputeGateway.find('open_dispute').then((response) => {
+        let dispute = response.dispute;
+
+        assert.equal('31.00', dispute.amountDisputed);
+        assert.equal('0.00', dispute.amountWon);
+        assert.equal('open_dispute', dispute.id);
+        assert.equal(Dispute.Status.Open, dispute.status);
+        assert.equal('open_disputed_transaction', dispute.transaction.id);
+      });
+    });
+
+    it('errors when dispute not found', () => {
+      return disputeGateway.find('invalid-id')
+        .then(() => {
+          assert.fail('find should have failed');
+        })
+        .catch((err) => {
+          assert.equal(err.type, 'notFoundError');
+          assert.equal(err.message, 'dispute with id \'invalid-id\' not found');
+        });
+    });
+  });
+
+  describe('self.removeEvidence', (done) => {
+  });
+});
