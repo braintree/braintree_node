@@ -142,10 +142,50 @@ describe.only('DisputeGateway', () => {
     });
   });
 
-  describe('self.finalize', (done) => {
+  describe('self.finalize', () => {
+    it('change dispute status to disputed', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.finalize(disputeId);
+        })
+        .then((result) => {
+          assert.isTrue(result.success);
+
+          return disputeGateway.find(disputeId);
+        })
+        .then((result) => {
+          assert.equal(Dispute.Status.Disputed, result.dispute.status);
+        });
+    });
+
+    it('returns error when dispute not open', () => {
+      return disputeGateway.finalize('wells_dispute')
+        .then((response) => {
+          let error = response.errors.for('dispute').on('status')[0];
+
+          assert.isFalse(response.success);
+          assert.equal(ValidationErrorCodes.Dispute.CanOnlyFinalizeOpenDispute, error.code);
+          assert.equal('Disputes can only be finalized when they are in an Open state', error.message);
+        });
+    });
+
+    it('throws error when dispute not found', () => {
+      return disputeGateway.finalize('invalid-id')
+        .then(() => {
+          assert.fail('finalize should have failed');
+        })
+        .catch((err) => {
+          assert.equal(err.type, 'notFoundError');
+          assert.equal(err.message, 'dispute with id \'invalid-id\' not found');
+        });
+    });
   });
 
-  describe('self.find', (done) => {
+  describe('self.find', () => {
     it('returns a Dispute given a Dispute ID', () => {
 
       return disputeGateway.find('open_dispute').then((response) => {
