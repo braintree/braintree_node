@@ -1,15 +1,29 @@
 'use strict';
 
+let fs = require('fs');
 let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 let Dispute = require('../../../lib/braintree/dispute').Dispute;
+let DocumentUpload = require('../../../lib/braintree/document_upload').DocumentUpload;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
-describe.only('DisputeGateway', () => {
+describe('DisputeGateway', () => {
   let disputeGateway;
 
   beforeEach(() => {
     disputeGateway = specHelper.defaultGateway.dispute;
   });
+
+  function createEvidenceDocument() {
+    let documentUploadParams = {
+      file: fs.createReadStream('./spec/fixtures/bt_logo.png'),
+      kind: DocumentUpload.Kind.EvidenceDocument
+    };
+
+    return specHelper.defaultGateway.documentUpload.create(documentUploadParams)
+      .then((result) => {
+        return result.documentUpload;
+      });
+  }
 
   function createSampleDispute() {
     let transactionParams = {
@@ -25,7 +39,7 @@ describe.only('DisputeGateway', () => {
     });
   }
 
-  describe('self.accept', (done) => {
+  describe('self.accept', () => {
     it('changes dispute status to accept', () => {
       var disputeId;
       return createSampleDispute()
@@ -63,10 +77,33 @@ describe.only('DisputeGateway', () => {
     });
   });
 
-  describe('self.addFileEvidence', (done) => {
+  describe('self.addFileEvidence', () => {
+    it('adds file evidence', () => {
+      let disputeId, evidenceId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return createEvidenceDocument();
+        })
+        .then((document) => {
+          return disputeGateway.addFileEvidence(disputeId, document.id);
+        })
+        .then((response) => {
+          evidenceId = response.evidence.id;
+
+          assert.isTrue(response.success);
+
+          return disputeGateway.find(disputeId);
+        })
+        .then((response) => {
+          assert.equal(evidenceId, response.dispute.evidence[0].id);
+        });
+    });
   });
 
-  describe('self.addTextEvidence', (done) => {
+  describe('self.addTextEvidence', () => {
     it('adds text evidence to a dispute', () => {
       let disputeId;
 
@@ -211,7 +248,7 @@ describe.only('DisputeGateway', () => {
     });
   });
 
-  describe('self.removeEvidence', (done) => {
+  describe('self.removeEvidence', () => {
     it('removes evidence from a dispute', () => {
       var disputeId;
       return createSampleDispute()
