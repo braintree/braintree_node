@@ -42,13 +42,14 @@ describe('DisputeGateway', () => {
   describe('self.accept', () => {
     it('changes dispute status to accept', () => {
       var disputeId;
+
       return createSampleDispute()
         .then((dispute) => {
           disputeId = dispute.id;
 
           return disputeGateway.accept(disputeId);
         })
-        .then((result) => {
+        .then(() => {
           return disputeGateway.find(disputeId);
         })
         .then((result) => {
@@ -64,7 +65,7 @@ describe('DisputeGateway', () => {
           assert.isFalse(response.success);
           assert.equal(ValidationErrorCodes.Dispute.CanOnlyAcceptOpenDispute, error.code);
           assert.equal('Disputes can only be accepted when they are in an Open state', error.message);
-        })
+        });
     });
 
     it('throws error when dispute not found', () => {
@@ -141,10 +142,10 @@ describe('DisputeGateway', () => {
         .then((dispute) => {
           disputeId = dispute.id;
 
-          return disputeGateway.accept(disputeId)
+          return disputeGateway.accept(disputeId);
         })
         .then(() => {
-            return disputeGateway.addTextEvidence(disputeId, 'text evidence')
+          return disputeGateway.addTextEvidence(disputeId, 'text evidence');
         })
         .then((response) => {
           let error = response.errors.for('dispute').on('status')[0];
@@ -224,7 +225,6 @@ describe('DisputeGateway', () => {
 
   describe('self.find', () => {
     it('returns a Dispute given a Dispute ID', () => {
-
       return disputeGateway.find('open_dispute').then((response) => {
         let dispute = response.dispute;
 
@@ -251,6 +251,7 @@ describe('DisputeGateway', () => {
   describe('self.removeEvidence', () => {
     it('removes evidence from a dispute', () => {
       var disputeId;
+
       return createSampleDispute()
         .then((dispute) => {
           disputeId = dispute.id;
@@ -290,7 +291,7 @@ describe('DisputeGateway', () => {
 
           return disputeGateway.accept(disputeId);
         })
-        .then((response) => {
+        .then(() => {
           return disputeGateway.removeEvidence(disputeId, evidenceId);
         })
         .then((response) => {

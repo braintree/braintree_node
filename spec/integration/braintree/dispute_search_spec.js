@@ -1,18 +1,15 @@
 'use strict';
 
-let Config = require('../../../lib/braintree/config').Config;
 let Dispute = require('../../../lib/braintree/dispute').Dispute;
 
 describe('DisputeSearch', () => {
   describe('callback', () => {
     it('returns no results', (done) => {
-      let search = (search) => {
+      specHelper.defaultGateway.dispute.search((search) => {
         return search.id().is('non_existent_dispute');
-      };
-
-      specHelper.defaultGateway.dispute.search(search, (err, response) => {
+      }, (err, response) => {
         assert.isNull(err);
-        assert.equal(0, response.length)
+        assert.equal(0, response.length);
 
         done();
       });
@@ -23,7 +20,7 @@ describe('DisputeSearch', () => {
         return search.id().is('open_dispute');
       }, function (err, response) {
         assert.isNull(err);
-        assert.equal(1, response.length)
+        assert.equal(1, response.length);
 
         done();
       });
@@ -37,7 +34,7 @@ describe('DisputeSearch', () => {
         ]);
       }, function (err, response) {
         assert.isNull(err);
-        assert.equal(2, response.length)
+        assert.equal(2, response.length);
 
         done();
       });
@@ -50,7 +47,7 @@ describe('DisputeSearch', () => {
         );
       }, function (err, response) {
         assert.isNull(err);
-        assert.equal(1, response.length)
+        assert.equal(1, response.length);
 
         done();
       });
@@ -69,13 +66,13 @@ describe('DisputeSearch', () => {
         return search.id().is('non_existent_dispute');
       });
 
-      stream.on('data', disptute => disputes.push(dispute));
+      stream.on('data', dispute => disputes.push(dispute));
 
       stream.on('end', () => {
-        assert.equal(0, disputes.length)
+        assert.equal(0, disputes.length);
 
         done();
-      })
+      });
     });
 
     it('returns a single dispute by ID', (done) => {
@@ -86,7 +83,7 @@ describe('DisputeSearch', () => {
       stream.on('data', dispute => disputes.push(dispute));
 
       stream.on('end', () => {
-        assert.equal(1, disputes.length)
+        assert.equal(1, disputes.length);
 
         done();
       });
@@ -103,7 +100,7 @@ describe('DisputeSearch', () => {
       stream.on('data', dispute => disputes.push(dispute));
 
       stream.on('end', () => {
-        assert.equal(2, disputes.length)
+        assert.equal(2, disputes.length);
 
         done();
       });
@@ -119,7 +116,7 @@ describe('DisputeSearch', () => {
       stream.on('data', dispute => disputes.push(dispute));
 
       stream.on('end', () => {
-        assert.equal(1, disputes.length)
+        assert.equal(1, disputes.length);
 
         done();
       });

@@ -18,6 +18,7 @@ describe('DocumentUploadGateway', () => {
         kind: 'evidence_document',
         file: file
       };
+
       return specHelper.defaultGateway.documentUpload.create(params).then((result) => {
         assert.isTrue(result.success);
       });
