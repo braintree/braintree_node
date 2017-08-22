@@ -402,6 +402,30 @@ describe('SubscriptionGateway', function () {
       })
     );
 
+    it('allows specifying submitForSettlemnt', done =>
+       specHelper.defaultGateway.subscription.retryCharge(subscription.id, '6.00', true, function (err, response) {
+         assert.isNull(err);
+         assert.isTrue(response.success);
+         assert.equal(response.transaction.amount, '6.00');
+         assert.equal(response.transaction.type, 'sale');
+         assert.equal(response.transaction.status, 'submitted_for_settlement');
+
+         done();
+       })
+    );
+
+    it('allows specifying submitForSettlement and amount', done =>
+      specHelper.defaultGateway.subscription.retryCharge(subscription.id, '6.00', true, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.amount, '6.00');
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.status, 'submitted_for_settlement');
+
+        done();
+      })
+    );
+
     it('allows specifying an amount', done =>
       specHelper.defaultGateway.subscription.retryCharge(subscription.id, '6.00', function (err, response) {
         assert.isNull(err);
