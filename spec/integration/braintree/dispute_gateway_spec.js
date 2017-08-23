@@ -102,6 +102,36 @@ describe('DisputeGateway', () => {
           assert.equal(evidenceId, response.dispute.evidence[0].id);
         });
     });
+
+    it('raises error when dispute not found', () => {
+      return disputeGateway.addFileEvidence('unknown_dispute_id', 'unknown_document_id')
+        .catch((err) => {
+          assert.equal('notFoundError', err.type);
+          assert.equal('dispute with id \'unknown_dispute_id\' not found', err.message);
+        });
+    });
+    it('raises error when dispute not open', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.accept(disputeId);
+        }).then(() => {
+          return createEvidenceDocument();
+        })
+        .then((document) => {
+          return disputeGateway.addFileEvidence(disputeId, document.id);
+        })
+        .then((response) => {
+          let error = response.errors.for('dispute').on('status')[0];
+
+          assert.isFalse(response.success);
+          assert.equal(ValidationErrorCodes.Dispute.CanOnlyAddEvidenceToOpenDispute, error.code);
+          assert.equal('Evidence can only be attached to disputes that are in an Open state', error.message);
+        });
+    });
   });
 
   describe('self.addTextEvidence', () => {

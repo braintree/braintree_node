@@ -36,6 +36,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.addTextEvidence(null, 'text evidence')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('dispute with id \'null\' not found', e.message);
         });
     });
@@ -44,6 +45,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.addTextEvidence(' ', 'text evidence')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('dispute with id \' \' not found', e.message);
         });
     });
@@ -72,6 +74,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.addFileEvidence(null, 'document_id')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('dispute with id \'null\' not found', e.message);
         });
     });
@@ -80,6 +83,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.addFileEvidence(' ', 'document_id')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('dispute with id \' \' not found', e.message);
         });
     });
@@ -88,6 +92,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.addFileEvidence('dispute_id', null)
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('document with id \'null\' not found', e.message);
         });
     });
@@ -96,6 +101,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.addFileEvidence('dispute_id', ' ')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('document with id \' \' not found', e.message);
         });
     });
@@ -106,6 +112,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.finalize(null)
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('dispute with id \'null\' not found', e.message);
         });
     });
@@ -114,6 +121,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.finalize(' ')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('dispute with id \' \' not found', e.message);
         });
     });
@@ -124,6 +132,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.find(null)
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('dispute with id \'null\' not found', e.message);
         });
     });
@@ -132,6 +141,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.find(' ')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('dispute with id \' \' not found', e.message);
         });
     });
@@ -142,6 +152,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.removeEvidence(null, 'evidence_id')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('evidence with id \'evidence_id\' for dispute with id \'null\' not found', e.message);
         });
     });
@@ -150,6 +161,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.removeEvidence(' ', 'evidence_id')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('evidence with id \'evidence_id\' for dispute with id \' \' not found', e.message);
         });
     });
@@ -158,6 +170,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.removeEvidence('dispute_id', null)
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('evidence with id \'null\' for dispute with id \'dispute_id\' not found', e.message);
         });
     });
@@ -166,6 +179,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.removeEvidence('dispute_id', ' ')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('notFoundError', e.type);
           assert.equal('evidence with id \' \' for dispute with id \'dispute_id\' not found', e.message);
         });
     });

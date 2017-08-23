@@ -74,6 +74,7 @@ describe('Dispute', function () {
       });
 
       assert.equal('123456', dispute.id);
+      assert.equal('100.00', dispute.amount);
       assert.equal('USD', dispute.currencyIsoCode);
       assert.equal(Dispute.Reason.Fraud, dispute.reason);
       assert.equal(Dispute.Status.Open, dispute.status);
@@ -88,6 +89,7 @@ describe('Dispute', function () {
       let dispute = new Dispute(attributes);
 
       assert.equal('123456', dispute.id);
+      assert.equal('100.00', dispute.amount);
       assert.equal('USD', dispute.currencyIsoCode);
       assert.equal(Dispute.Reason.Fraud, dispute.reason);
       assert.equal(Dispute.Status.Open, dispute.status);

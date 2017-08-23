@@ -70,10 +70,12 @@ describe('DocumentUploadGateway', () => {
     });
 
     it('returns error when file is over 4mb', () => {
-      var writeFile = fs.openSync('./spec/fixtures/large_file.png', 'w+');
-      for(var i = 0; i <= 1048577; i++) {
+      let writeFile = fs.openSync('./spec/fixtures/large_file.png', 'w+');
+
+      for (let i = 0; i <= 1048577; i++) {
         fs.writeSync(writeFile, 'aaaa');
       }
+
       fs.closeSync(writeFile);
 
       let file = fs.createReadStream(LARGE_FILE_PATH);
