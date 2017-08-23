@@ -52,6 +52,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.addTextEvidence('dispute_id', null)
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('invalidKeysError', e.type);
           assert.equal('content cannot be null', e.message);
         });
     });
@@ -60,6 +61,7 @@ describe('DisputeGateway', function () {
       return disputeGateway.addTextEvidence('dispute_id', ' ')
         .then(assert.fail)
         .catch((e) => {
+          assert.equal('invalidKeysError', e.type);
           assert.equal('content cannot be null', e.message);
         });
     });
