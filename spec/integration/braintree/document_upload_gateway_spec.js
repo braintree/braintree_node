@@ -104,10 +104,22 @@ describe('DocumentUploadGateway', () => {
       });
     });
 
-    it('throws error when not a file', () => {
+    it('throws error when file is a string', () => {
       let params = {
         kind: 'evidence_document',
         file: 'not-a-file'
+      };
+
+      return specHelper.defaultGateway.documentUpload.create(params).catch((err) => {
+        assert.equal('invalidKeysError', err.type);
+        assert.equal('file must be a Readable stream', err.message);
+      });
+    });
+
+    it('throws error when file is null', () => {
+      let params = {
+        kind: 'evidence_document',
+        file: null
       };
 
       return specHelper.defaultGateway.documentUpload.create(params).catch((err) => {
