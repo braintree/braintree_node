@@ -5,6 +5,14 @@
 * Add `submit_for_settlement` to `Subscription.retryCharge`
 * Add `options` -> `paypal` -> `description` for creating and updating subscriptions
 * Add device_data_captured field in risk_data
+* Add `accept` method for the Dispute API
+* Add `addTextEvidence` method for the Dispute API
+* Add `addFileEvidence` method for the Dispute API
+* Add `finalize` method for the Dispute API
+* Add `find` method for the Dispute API
+* Add `removeEvidence` method for the Dispute API
+* Add `search` method for the Dispute API
+* Add DocumentUpload
 
 ## 2.2.0
 * Fixes wrap-promise issue (closes #102) - Thanks @targunp
