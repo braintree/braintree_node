@@ -12,6 +12,7 @@
 * Add `removeEvidence` method for the Dispute API
 * Add `search` method for the Dispute API
 * Add DocumentUpload
+* Add `deviceDataCaptured` field in `riskData`
 
 ## 2.2.0
 * Fixes wrap-promise issue (closes #102) - Thanks @targunp

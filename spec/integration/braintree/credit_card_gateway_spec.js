@@ -66,7 +66,8 @@ describe('CreditCardGateway', function () {
         expirationDate: '05/2020',
         options: {
           verifyCard: 'true'
-        }
+        },
+        deviceSessionId: 'abc123'
       };
 
       specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
@@ -74,7 +75,7 @@ describe('CreditCardGateway', function () {
         assert.isTrue(response.success);
 
         assert.equal(response.creditCard.verification.riskData.decision, 'Not Evaluated');
-        assert.equal(response.creditCard.verification.riskData.id, null);
+        assert.isDefined(response.creditCard.verification.riskData.id);
 
         done();
       });

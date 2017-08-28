@@ -914,13 +914,14 @@ describe('TransactionGateway', function () {
         creditCard: {
           number: '4111111111111111',
           expirationDate: '05/16'
-        }
+        },
+        deviceSessionId: 'abc123'
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.transaction.riskData.decision, 'Not Evaluated');
-        assert.equal(response.transaction.riskData.id, null);
+        assert.isDefined(response.transaction.riskData.id);
         done();
       });
     });
