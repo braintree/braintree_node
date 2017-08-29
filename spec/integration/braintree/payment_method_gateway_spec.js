@@ -929,6 +929,43 @@ describe('PaymentMethodGateway', function () {
       })
     );
 
+    it('creates a paypal account from a paypal refresh token', done =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        customerId = response.customer.id;
+        let paypalAccountParams = {
+          customerId,
+          paypalRefreshToken: 'PAYPAL_REFRESH_TOKEN'
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.isString(response.paymentMethod.customerId);
+          assert.isString(response.paymentMethod.billingAgreementId);
+          done();
+        });
+      })
+    );
+
+    it('creates a paypal account from a paypal refresh token without upgrade', done =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        customerId = response.customer.id;
+        let paypalAccountParams = {
+          customerId,
+          paypalRefreshToken: 'PAYPAL_REFRESH_TOKEN',
+          paypalVaultWithoutUpgrade: true
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.isString(response.paymentMethod.customerId);
+          assert.isNull(response.paymentMethod.billingAgreementId);
+          done();
+        });
+      })
+    );
+
     it('can create a payment method and set the token and default', done =>
       specHelper.defaultGateway.customer.create({}, function (err, response) {
         customerId = response.customer.id;

@@ -13,6 +13,7 @@
 * Add `search` method for the Dispute API
 * Add DocumentUpload
 * Add `deviceDataCaptured` field in `riskData`
+* Add support for upgrading a PayPal future payment refresh token to a billing agreement
 
 ## 2.2.0
 * Fixes wrap-promise issue (closes #102) - Thanks @targunp
