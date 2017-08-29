@@ -919,7 +919,6 @@ describe('TransactionGateway', function () {
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
-        assert.isDefined(response.transaction.riskData.deviceDataCaptured);
         assert.equal(response.transaction.riskData.decision, 'Not Evaluated');
         assert.equal(response.transaction.riskData.id, null);
         done();
