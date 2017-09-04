@@ -546,9 +546,6 @@ describe('WebhookNotificationGateway', function () {
       let bt_payload = notification.bt_payload;
 
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
-        // console.log('notification: ', notification);
-        // console.log('notification with JSON payload: ', JSON.stringify(webhookNotification));
-        // console.log('notification err: ', err);
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.Check);
         done();
       });

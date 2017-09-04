@@ -20,14 +20,14 @@
     "node": ">=4"
   },
   "dependencies": {
-    "@braintree/wrap-promise": "1.1.1",
     "dateformat": "1.0.1-1.2.3",
     "depd": "~1.1.0",
-    "js2xmlparser": "^3.0.0",
     "readable-stream": "1.1.10",
     "semver": "5.1.0",
     "underscore": "1.8.3",
-    "xml2js": "0.1.13"
+    "xml2js": "0.1.13",
+    "@braintree/wrap-promise": "1.1.1",
+    "js2xmlparser": "^3.0.0"
   },
   "devDependencies": {
     "chai": "1.5.0",
