@@ -3,6 +3,7 @@
 let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
 let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
 let Config = require('../../../lib/braintree/config').Config;
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
 
 describe('CustomerGateway', function () {
@@ -279,14 +280,18 @@ describe('CustomerGateway', function () {
           }); })
       );
 
-      it('creates a customer with a Coinbase account payment method nonce', function (done) {
+      it('cannot create a customer with a Coinbase account payment method nonce', function (done) {
         let customerParams =
           {paymentMethodNonce: Nonces.Coinbase};
 
         specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.isNotNull(response.customer.coinbaseAccounts[0]);
+          assert.isFalse(response.success);
+
+          assert.equal(
+            response.errors.for('coinbaseAccount').on('base')[0].code,
+            ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
+          );
 
           done();
         });

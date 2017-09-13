@@ -297,7 +297,7 @@ describe('TransactionGateway', function () {
     );
 
     context('Coinbase', () =>
-      it('returns CoinbaseAccount for payment_instrument', done =>
+      it('can no longer use Coinbase in a transaction sale', done =>
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             paymentMethodNonce: Nonces.Coinbase,
@@ -306,9 +306,12 @@ describe('TransactionGateway', function () {
 
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
-            assert.isTrue(response.success);
-            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.CoinbaseAccount);
-            assert.isNotNull(response.transaction.coinbaseAccount.user_email);
+            assert.isFalse(response.success);
+
+            assert.equal(
+              response.errors.for('transaction').on('base')[0].code,
+              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
+            );
 
             done();
           });
@@ -911,13 +914,14 @@ describe('TransactionGateway', function () {
         creditCard: {
           number: '4111111111111111',
           expirationDate: '05/16'
-        }
+        },
+        deviceSessionId: 'abc123'
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.transaction.riskData.decision, 'Not Evaluated');
-        assert.equal(response.transaction.riskData.id, null);
+        assert.isDefined(response.transaction.riskData.id);
         done();
       });
     });
@@ -2099,6 +2103,20 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('exposes authorizationAdjustments', function (done) {
+      let transactionId = 'authadjustmenttransaction';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        let authorizationAdjustment = transaction.authorizationAdjustments[0];
+
+        assert.equal(authorizationAdjustment.amount, '-20.00');
+        assert.equal(authorizationAdjustment.success, true);
+        assert.exists(authorizationAdjustment.timestamp);
+
+        done();
+      });
+    });
+
     it('exposes disputes', function (done) {
       let transactionId = 'disputedtransaction';
 
@@ -3141,22 +3159,26 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('returns oauth app details on transactions created via nonce granting', done =>
+      it('returns facilitated on transactions created via nonce granting', done => {
         grantingGateway.paymentMethod.grant(creditCard.token, false, function (err, response) {
+          let nonce = response.paymentMethodNonce.nonce;
           let transactionParams = {
-            paymentMethodNonce: response.paymentMethodNonce.nonce,
+            paymentMethodNonce: nonce,
             amount: Braintree.Test.TransactionAmounts.Authorize
           };
 
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isTrue(response.success);
+            assert.equal(response.transaction.facilitatedDetails.merchantId, 'integration_merchant_id');
+            assert.equal(response.transaction.facilitatedDetails.merchantName, '14ladders');
+            assert.equal(response.transaction.facilitatedDetails.paymentMethodNonce, nonce);
             assert.equal(response.transaction.facilitatorDetails.oauthApplicationClientId, 'client_id$development$integration_client_id');
             assert.equal(response.transaction.facilitatorDetails.oauthApplicationName, 'PseudoShop');
             assert.isNull(response.transaction.billing.postalCode);
             done();
           });
-        })
-      );
+        });
+      });
 
       it('returns billing postal code in transactions created via nonce granting when requested during grant API', done =>
         grantingGateway.paymentMethod.grant(creditCard.token, {

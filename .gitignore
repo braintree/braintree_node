@@ -1,3 +1,5 @@
 node_modules
 spec_compiled
 tags
+npm-debug.log
+large_file.png
