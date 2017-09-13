@@ -1,17 +1,11 @@
-## Unreleased
+## 2.3.0
 * Add AuthorizationAdjustment class and `authorizationAdjustments` to Transaction
 * Coinbase is no longer a supported payment method. `PaymentMethodNoLongerSupported` will be returned for Coinbase operations.
 * Add facilitated details to Transaction if present
 * Add `submit_for_settlement` to `Subscription.retryCharge`
 * Add `options` -> `paypal` -> `description` for creating and updating subscriptions
-* Add `accept` method for the Dispute API
-* Add `addTextEvidence` method for the Dispute API
-* Add `addFileEvidence` method for the Dispute API
-* Add `finalize` method for the Dispute API
-* Add `find` method for the Dispute API
-* Add `removeEvidence` method for the Dispute API
-* Add `search` method for the Dispute API
-* Add DocumentUpload
+* Add Dispute API
+* Add DocumentUpload API
 * Add `deviceDataCaptured` field in `riskData`
 * Add support for upgrading a PayPal future payment refresh token to a billing agreement
 
