@@ -1,3 +1,6 @@
+## Unreleased
+* Add Too Many Requests error
+
 ## 2.3.0
 * Add AuthorizationAdjustment class and `authorizationAdjustments` to Transaction
 * Coinbase is no longer a supported payment method. `PaymentMethodNoLongerSupported` will be returned for Coinbase operations.
