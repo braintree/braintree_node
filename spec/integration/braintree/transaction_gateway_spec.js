@@ -337,6 +337,56 @@ describe('TransactionGateway', function () {
         })
       );
 
+      context('in-line capture', function () {
+        it('includes processorSettlementResponse_code and processorSettlementResponseText for settlement declined transactions', function (done) {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.PayPalOneTimePayment,
+            amount: '10.00',
+            options: {
+              submitForSettlement: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            let transactionId = response.transaction.id;
+
+            specHelper.defaultGateway.testing.settlementDecline(transactionId, () =>
+              specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+                assert.equal(transaction.processorSettlementResponseCode, '4001');
+                assert.equal(transaction.processorSettlementResponseText, 'Settlement Declined');
+                done();
+              })
+            );
+          });
+        });
+
+        it('includes processorSettlementResponseCode and processorSettlementResponseText for settlement pending transactions', function (done) {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.PayPalOneTimePayment,
+            amount: '10.00',
+            options: {
+              submitForSettlement: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            let transactionId = response.transaction.id;
+
+            specHelper.defaultGateway.testing.settlementPending(transactionId, () =>
+              specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+                assert.equal(transaction.processorSettlementResponseCode, '4002');
+                assert.equal(transaction.processorSettlementResponseText, 'Settlement Pending');
+                done();
+              })
+            );
+          });
+        });
+      });
+
       context('as a vaulted payment method', () =>
         it('successfully creates a transaction', done =>
           specHelper.defaultGateway.customer.create({}, function (err, response) {
@@ -2286,7 +2336,7 @@ describe('TransactionGateway', function () {
             specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
-              assert.equal(response.transaction.status, 'settled');
+              assert.equal(response.transaction.status, 'settling');
               assert.equal(response.transaction.amount, '5.00');
 
               done();
