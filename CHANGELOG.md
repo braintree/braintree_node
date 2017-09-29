@@ -1,6 +1,5 @@
 ## Unreleased
 * Add Too Many Requests error
-* Fix spec to expect PayPal transaction to settle immediately after successful capture
 
 ## 2.3.0
 * Add AuthorizationAdjustment class and `authorizationAdjustments` to Transaction

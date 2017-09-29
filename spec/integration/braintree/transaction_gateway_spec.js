@@ -2336,7 +2336,7 @@ describe('TransactionGateway', function () {
             specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
-              assert.equal(response.transaction.status, 'settled');
+              assert.equal(response.transaction.status, 'settling');
               assert.equal(response.transaction.amount, '5.00');
 
               done();
