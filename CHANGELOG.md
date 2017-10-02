@@ -1,5 +1,6 @@
 ## Unreleased
 * Add Too Many Requests error
+* Add GrantedPaymentInstrumentUpdate webhook support
 
 ## 2.3.0
 * Add AuthorizationAdjustment class and `authorizationAdjustments` to Transaction
