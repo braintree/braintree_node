@@ -168,6 +168,13 @@ describe('TransactionGateway', function () {
     });
 
     it('skips advanced fraud checking if transaction[options][skip_advanced_fraud_checking] is set to true', function (done) {
+      let advancedFraudGateway = braintree.connect({
+        merchantId: 'advanced_fraud_integration_merchant_id',
+        publicKey: 'advanced_fraud_integration_public_key',
+        privateKey: 'advanced_fraud_integration_private_key',
+        environment: Environment.Development
+      });
+
       let transactionParams = {
         amount: '5.00',
         creditCard: {
@@ -179,7 +186,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.isNull(response.transaction.riskData.id);
@@ -909,6 +916,13 @@ describe('TransactionGateway', function () {
     });
 
     it('handles risk data returned by the gateway', function (done) {
+      let advancedFraudGateway = braintree.connect({
+        merchantId: 'advanced_fraud_integration_merchant_id',
+        publicKey: 'advanced_fraud_integration_public_key',
+        privateKey: 'advanced_fraud_integration_private_key',
+        environment: Environment.Development
+      });
+
       let transactionParams = {
         amount: '10.0',
         creditCard: {
@@ -918,15 +932,23 @@ describe('TransactionGateway', function () {
         deviceSessionId: 'abc123'
       };
 
-      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
-        assert.equal(response.transaction.riskData.decision, 'Not Evaluated');
+        assert.equal(response.transaction.riskData.decision, 'Approve');
+        assert.equal(response.transaction.riskData.deviceDataCaptured, false);
         assert.isDefined(response.transaction.riskData.id);
         done();
       });
     });
 
     it('handles fraud rejection', function (done) {
+      let advancedFraudGateway = braintree.connect({
+        merchantId: 'advanced_fraud_integration_merchant_id',
+        publicKey: 'advanced_fraud_integration_public_key',
+        privateKey: 'advanced_fraud_integration_private_key',
+        environment: Environment.Development
+      });
+
       let transactionParams = {
         amount: '10.0',
         creditCard: {
@@ -935,7 +957,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success);
         assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
         assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud);
