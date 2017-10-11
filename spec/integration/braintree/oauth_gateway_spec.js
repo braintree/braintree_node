@@ -122,6 +122,7 @@ describe('OAuthGateway', function () {
         scope: 'read_write',
         state: 'baz_state',
         landingPage: 'login',
+        loginOnly: 'true',
         user: {
           country: 'USA',
           email: 'foo@example.com',
@@ -192,6 +193,7 @@ describe('OAuthGateway', function () {
       assert.equal(query('scope'), 'read_write');
       assert.equal(query('state'), 'baz_state');
       assert.equal(query('landing_page'), 'login');
+      assert.equal(query('login_only'), 'true');
 
       assert.equal(query('user[country]'), 'USA');
       assert.equal(query('business[name]'), '14 Ladders');
