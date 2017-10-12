@@ -6,7 +6,6 @@ let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers
 let CreditCardDefaults = require('../../../lib/braintree/test/credit_card_defaults').CreditCardDefaults;
 let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
 let Config = require('../../../lib/braintree/config').Config;
-let Environment = require('../../../lib/braintree/environment').Environment;
 
 describe('CreditCardGateway', function () {
   describe('create', function () {
@@ -61,36 +60,24 @@ describe('CreditCardGateway', function () {
     });
 
     it('includes the verification on the credit card with risk data', function (done) {
-      let advancedFraudGateway = braintree.connect({
-        merchantId: 'advanced_fraud_integration_merchant_id',
-        publicKey: 'advanced_fraud_integration_public_key',
-        privateKey: 'advanced_fraud_integration_private_key',
-        environment: Environment.Development
-      });
+      let creditCardParams = {
+        customerId,
+        number: '4111111111111111',
+        expirationDate: '05/2020',
+        options: {
+          verifyCard: 'true'
+        },
+        deviceSessionId: 'abc123'
+      };
 
-      advancedFraudGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
-        let customerId = response.customer.id;
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
 
-        let creditCardParams = {
-          customerId,
-          number: '4111111111111111',
-          expirationDate: '05/2020',
-          options: {
-            verifyCard: 'true'
-          },
-          deviceSessionId: 'abc123'
-        };
+        assert.equal(response.creditCard.verification.riskData.decision, 'Not Evaluated');
+        assert.isDefined(response.creditCard.verification.riskData.id);
 
-        advancedFraudGateway.creditCard.create(creditCardParams, function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-
-          assert.equal(response.creditCard.verification.riskData.decision, 'Approve');
-          assert.equal(response.creditCard.verification.riskData.deviceDataCaptured, false);
-          assert.isDefined(response.creditCard.verification.riskData.id);
-
-          done();
-        });
+        done();
       });
     });
 
