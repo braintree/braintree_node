@@ -1,8 +1,6 @@
 'use strict';
 
 describe('AdvancedSearch', function () {
-  beforeEach(function () {});
-
   describe('textFields', function () {
     let subscription1, subscription2;
 
