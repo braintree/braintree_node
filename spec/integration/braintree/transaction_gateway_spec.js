@@ -3092,9 +3092,10 @@ describe('TransactionGateway', function () {
       let creditCard = null;
       let customer = null;
       let grantingGateway = null;
+      let partnerMerchantGateway = null;
 
       before(function (done) {
-        let partnerMerchantGateway = braintree.connect({
+        partnerMerchantGateway = braintree.connect({
           merchantId: 'integration_merchant_public_id',
           publicKey: 'oauth_app_partner_user_public_key',
           privateKey: 'oauth_app_partner_user_private_key',
@@ -3198,7 +3199,7 @@ describe('TransactionGateway', function () {
         })
       );
 
-      it('allows transactions to be created with a shared payment method, customer, billing and shipping addresses', function (done) {
+      it('allows transactions to be created with a shared payment method token, customer, billing and shipping addresses', function (done) {
         let transactionParams = {
           sharedPaymentMethodToken: creditCard.token,
           sharedCustomerId: customer.id,
@@ -3207,11 +3208,60 @@ describe('TransactionGateway', function () {
           amount: Braintree.Test.TransactionAmounts.Authorize
         };
 
-        return grantingGateway.transaction.sale(transactionParams, function (err, response) {
+        grantingGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isTrue(response.success);
+
+          let facilitatedDetails = response.transaction.facilitatedDetails;
+          let facilitatorDetails = response.transaction.facilitatorDetails;
+
           assert.equal(response.transaction.shipping.firstName, address.firstName);
           assert.equal(response.transaction.billing.firstName, address.firstName);
+          assert.equal(facilitatedDetails.merchantId, 'integration_merchant_id');
+          assert.equal(facilitatedDetails.merchantName, '14ladders');
+          assert.isUndefined(facilitatedDetails.paymentMethodNonce);
+          assert.equal(facilitatorDetails.oauthApplicationClientId, 'client_id$development$integration_client_id');
+          assert.equal(facilitatorDetails.oauthApplicationName, 'PseudoShop');
+
           done();
+        });
+      });
+
+      it('allows transactions to be created with a shared payment method nonce, customer, billing and shipping addresses', function (done) {
+        partnerMerchantGateway.paymentMethodNonce.create(creditCard.token, function (err, result) {
+          if (err) {
+            done(err);
+            return;
+          }
+
+          let transactionParams = {
+            sharedPaymentMethodNonce: result.paymentMethodNonce.nonce,
+            sharedCustomerId: customer.id,
+            sharedShippingAddressId: address.id,
+            sharedBillingAddressId: address.id,
+            amount: Braintree.Test.TransactionAmounts.Authorize
+          };
+
+          grantingGateway.transaction.sale(transactionParams, function (err, response) {
+            if (err) {
+              done(err);
+              return;
+            }
+
+            assert.isTrue(response.success);
+
+            let facilitatedDetails = response.transaction.facilitatedDetails;
+            let facilitatorDetails = response.transaction.facilitatorDetails;
+
+            assert.equal(response.transaction.shipping.firstName, address.firstName);
+            assert.equal(response.transaction.billing.firstName, address.firstName);
+            assert.equal(facilitatedDetails.merchantId, 'integration_merchant_id');
+            assert.equal(facilitatedDetails.merchantName, '14ladders');
+            assert.isUndefined(facilitatedDetails.paymentMethodNonce);
+            assert.equal(facilitatorDetails.oauthApplicationClientId, 'client_id$development$integration_client_id');
+            assert.equal(facilitatorDetails.oauthApplicationName, 'PseudoShop');
+
+            done();
+          });
         });
       });
     });
