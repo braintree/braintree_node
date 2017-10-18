@@ -6,8 +6,7 @@ let braintree = specHelper.braintree;
 let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
 
 describe('SubscriptionGateway', function () {
-  let customerId = null;
-  let creditCardToken = null;
+  let customerId, creditCardToken;
 
   beforeEach(function (done) {
     let customerParams = {
@@ -348,7 +347,7 @@ describe('SubscriptionGateway', function () {
   });
 
   describe('update', function () {
-    let subscription = null;
+    let subscription;
 
     beforeEach(function (done) {
       let subscriptionParams = {
@@ -421,8 +420,7 @@ describe('SubscriptionGateway', function () {
     });
 
     it('handles validation errors', function (done) {
-      let subscriptionParams =
-        {price: 'invalid'};
+      let subscriptionParams = {price: 'invalid'};
 
       specHelper.defaultGateway.subscription.update(subscription.id, subscriptionParams, function (err, response) {
         assert.isNull(err);
@@ -436,7 +434,7 @@ describe('SubscriptionGateway', function () {
   });
 
   describe('retryCharge', function () {
-    let subscription = null;
+    let subscription;
 
     beforeEach(function (done) {
       let subscriptionParams = {

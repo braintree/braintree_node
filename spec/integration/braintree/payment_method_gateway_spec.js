@@ -9,7 +9,7 @@ let ValidationErrorCodes = require('../../../lib/braintree/validation_error_code
 
 describe('PaymentMethodGateway', function () {
   describe('create', function () {
-    let customerId = null;
+    let customerId;
 
     it('works with an unknown payment method nonce', done =>
       specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
@@ -1128,7 +1128,7 @@ describe('PaymentMethodGateway', function () {
 
   describe('find', function () {
     context('credit card', function () {
-      let paymentMethodToken = null;
+      let paymentMethodToken;
 
       before(done =>
         specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
@@ -1949,7 +1949,7 @@ describe('PaymentMethodGateway', function () {
   });
 
   describe('delete', function () {
-    let paymentMethodToken = null;
+    let paymentMethodToken;
 
     context('credit card', function () {
       before(done =>
@@ -2053,8 +2053,7 @@ describe('PaymentMethodGateway', function () {
   });
 
   context('grant and revoke payment methods', function () {
-    let creditCard = null;
-    let grantingGateway = null;
+    let creditCard, grantingGateway;
 
     before(function (done) {
       let partnerMerchantGateway = braintree.connect({

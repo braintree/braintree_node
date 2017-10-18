@@ -160,7 +160,7 @@ describe('OAuthGateway', function () {
 
       let query = function (searchKey) { // eslint-disable-line func-style
         let parts = queryString.split('&');
-        let foundValue = null;
+        let foundValue;
 
         parts.forEach(function (part) {
           let parts = Array.from(part.split('='));
@@ -242,7 +242,7 @@ describe('OAuthGateway', function () {
 
       let query = function (searchKey) { // eslint-disable-line func-style
         let parts = queryString.split('&');
-        let foundValue = null;
+        let foundValue;
 
         parts.forEach(function (part) {
           let parts = Array.from(part.split('='));

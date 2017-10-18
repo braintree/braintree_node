@@ -774,7 +774,7 @@ describe('CustomerGateway', function () {
   });
 
   describe('update', function () {
-    let customerId = null;
+    let customerId;
 
     beforeEach(function (done) {
       let customerParams = {
@@ -1185,7 +1185,7 @@ describe('CustomerGateway', function () {
     );
 
     context('with existing card and billing address', function () {
-      let creditCardToken = null;
+      let creditCardToken;
 
       beforeEach(function (done) {
         let customerParams = {

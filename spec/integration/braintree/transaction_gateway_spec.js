@@ -3088,11 +3088,7 @@ describe('TransactionGateway', function () {
     });
 
     context('shared payment methods', function () {
-      let address = null;
-      let creditCard = null;
-      let customer = null;
-      let grantingGateway = null;
-      let partnerMerchantGateway = null;
+      let address, creditCard, customer, grantingGateway, partnerMerchantGateway;
 
       before(function (done) {
         partnerMerchantGateway = braintree.connect({

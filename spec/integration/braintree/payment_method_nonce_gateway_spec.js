@@ -3,7 +3,7 @@
 let braintree = specHelper.braintree;
 
 describe('PaymentMethodNonceGateway', function () {
-  let paymentMethodToken = null;
+  let paymentMethodToken;
 
   before(done =>
     specHelper.defaultGateway.customer.create({}, function (err, response) {
