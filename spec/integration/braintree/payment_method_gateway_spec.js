@@ -911,7 +911,18 @@ describe('PaymentMethodGateway', function () {
                   orderId: 'merchant-order-id',
                   customField: 'custom merchant field',
                   description: 'merchant description',
-                  amount: '1.23'
+                  amount: '1.23',
+                  shipping: {
+                    company: 'Braintree',
+                    countryName: 'United States of America',
+                    extendedAddress: 'Apt B',
+                    firstName: 'first',
+                    lastName: 'last',
+                    locality: 'Chicago',
+                    postalCode: '60646',
+                    region: 'IL',
+                    streetAddress: '123 Fake St'
+                  }
                 }
               }
             };

@@ -363,7 +363,18 @@ describe('CustomerGateway', function () {
                   orderId: 'merchant-order-id',
                   customField: 'custom merchant field',
                   description: 'merchant description',
-                  amount: '1.23'
+                  amount: '1.23',
+                  shipping: {
+                    company: 'Braintree',
+                    countryName: 'United States of America',
+                    extendedAddress: 'Apt B',
+                    firstName: 'first',
+                    lastName: 'last',
+                    locality: 'Chicago',
+                    postalCode: '60646',
+                    region: 'IL',
+                    streetAddress: '123 Fake St'
+                  }
                 }
               }
             };
@@ -1081,7 +1092,7 @@ describe('CustomerGateway', function () {
         })
       );
 
-      it('vaults a paypal account from a payment method nonce with intent=order and payeeEmail', done =>
+      it('vaults a paypal account from a payment method nonce with intent=order and paypal options', done =>
         specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
           let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
           let authorizationFingerprint = clientToken.authorizationFingerprint;
@@ -1109,7 +1120,18 @@ describe('CustomerGateway', function () {
                 paymentMethodNonce: nonce,
                 options: {
                   paypal: {
-                    payeeEmail: 'payee@example.com'
+                    payeeEmail: 'payee@example.com',
+                    shipping: {
+                      company: 'Braintree',
+                      countryName: 'United States of America',
+                      extendedAddress: 'Apt B',
+                      firstName: 'first',
+                      lastName: 'last',
+                      locality: 'Chicago',
+                      postalCode: '60646',
+                      region: 'IL',
+                      streetAddress: '123 Fake St'
+                    }
                   }
                 }
               };
