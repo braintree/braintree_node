@@ -2,6 +2,7 @@
 * Add Too Many Requests error
 * Add GrantedPaymentInstrumentUpdate webhook support
 * Add ability to create a transaction from a shared nonce
+* Fix spec to expect PayPal transaction to settle immediately after successful capture
 
 ## 2.3.0
 * Add AuthorizationAdjustment class and `authorizationAdjustments` to Transaction
