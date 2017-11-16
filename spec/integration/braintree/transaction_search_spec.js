@@ -459,7 +459,7 @@ describe('TransactionSearch', () =>
     it('emits error events when appropriate', function (done) {
       let search = specHelper.defaultGateway.transaction.search(search => search.amount().is(-10));
 
-      let error = null;
+      let error;
 
       search.on('error', err => {
         error = err;

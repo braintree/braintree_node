@@ -1,3 +1,11 @@
+## 2.4.0
+* Add Too Many Requests error
+* Add GrantedPaymentInstrumentUpdate webhook support
+* Add ability to create a transaction from a shared nonce
+* Fix spec to expect PayPal transaction to settle immediately after successful capture
+* Add `options` -> `paypal` -> `shipping` for creating & updating customers as well as creating payment methods
+* Add Visa Checkout and Masterpass payment instrument types (Thanks @yijielee)
+
 ## 2.3.0
 * Add AuthorizationAdjustment class and `authorizationAdjustments` to Transaction
 * Coinbase is no longer a supported payment method. `PaymentMethodNoLongerSupported` will be returned for Coinbase operations.

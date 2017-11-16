@@ -249,6 +249,13 @@ describe('TransparentRedirectGateway', function () {
       })
     );
 
+    it('handles status 429', done =>
+      specHelper.defaultGateway.transparentRedirect.confirm('http_status=429&hash=irrelevant', function (err) {
+        assert.equal(err.type, braintree.errorTypes.tooManyRequestsError);
+        done();
+      })
+    );
+
     it('handles status 500', done =>
       specHelper.defaultGateway.transparentRedirect.confirm('http_status=500&hash=irrelevant', function (err) {
         assert.equal(err.type, braintree.errorTypes.serverError);

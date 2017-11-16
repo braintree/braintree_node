@@ -525,5 +525,28 @@ describe('WebhookNotificationGateway', function () {
         done();
       });
     });
+
+    it('returns a parsable signature and payload for Granted Payment Instrument Update', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.GrantedPaymentInstrumentUpdate,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.GrantedPaymentInstrumentUpdate);
+
+        let update = webhookNotification.subject.grantedPaymentInstrumentUpdate;
+
+        assert.equal('vczo7jqrpwrsi2px', update.grantOwnerMerchantId);
+        assert.equal('cf0i8wgarszuy6hc', update.grantRecipientMerchantId);
+        assert.equal('ee257d98-de40-47e8-96b3-a6954ea7a9a4', update.paymentMethodNonce.nonce);
+        assert.equal('abc123z', update.token);
+        assert.equal('expiration-month', update.updatedFields[0]);
+        assert.equal('expiration-year', update.updatedFields[1]);
+        done();
+      });
+    });
   });
 });

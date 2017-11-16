@@ -4,7 +4,7 @@ let Config = require('../../../lib/braintree/config').Config;
 
 describe('CustomerSearch', () =>
   describe('search', function () {
-    let lastName = null;
+    let lastName;
 
     before(function (done) {
       lastName = specHelper.randomId();

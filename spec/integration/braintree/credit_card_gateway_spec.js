@@ -9,7 +9,7 @@ let Config = require('../../../lib/braintree/config').Config;
 
 describe('CreditCardGateway', function () {
   describe('create', function () {
-    let customerId = null;
+    let customerId;
 
     before(done =>
       specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
@@ -411,7 +411,7 @@ describe('CreditCardGateway', function () {
     });
 
     context('negative card type indicators', function () {
-      let createResponse = null;
+      let createResponse;
 
       before(function (done) {
         let creditCardParams = {
@@ -445,7 +445,7 @@ describe('CreditCardGateway', function () {
     });
 
     context('unknown card type indicators', function () {
-      let createResponse = null;
+      let createResponse;
 
       before(function (done) {
         let creditCardParams = {
@@ -484,7 +484,7 @@ describe('CreditCardGateway', function () {
   });
 
   describe('delete', function () {
-    let customerToken = null;
+    let customerToken;
 
     before(function (done) {
       let customerParams = {
@@ -567,7 +567,7 @@ describe('CreditCardGateway', function () {
   );
 
   describe('find', function () {
-    let customerToken = null;
+    let customerToken;
 
     before(function (done) {
       let customerParams = {
@@ -611,7 +611,7 @@ describe('CreditCardGateway', function () {
   });
 
   describe('fromNonce', function () {
-    let customerId = null;
+    let customerId;
 
     before(done =>
       specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
@@ -722,7 +722,7 @@ describe('CreditCardGateway', function () {
   });
 
   describe('update', function () {
-    let creditCardToken = null;
+    let creditCardToken;
 
     before(function (done) {
       let customerParams = {

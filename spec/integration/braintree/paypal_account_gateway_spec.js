@@ -110,8 +110,7 @@ describe('PayPalGateway', function () {
   });
 
   describe('update', function () {
-    let paymentMethodToken = null;
-    let customerId = null;
+    let paymentMethodToken, customerId;
 
     beforeEach(function (done) {
       paymentMethodToken = Math.floor(Math.random() * Math.pow(36, 3)).toString(36);
@@ -226,7 +225,7 @@ describe('PayPalGateway', function () {
   });
 
   describe('delete', function () {
-    let paymentMethodToken = null;
+    let paymentMethodToken;
 
     before(done =>
       specHelper.defaultGateway.customer.create({firstName: 'Jane', lastName: 'Doe'}, function (err, response) {

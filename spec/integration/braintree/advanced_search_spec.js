@@ -1,11 +1,8 @@
 'use strict';
 
 describe('AdvancedSearch', function () {
-  beforeEach(function () {});
-
   describe('textFields', function () {
-    let subscription1 = null;
-    let subscription2 = null;
+    let subscription1, subscription2;
 
     before(function (done) {
       let customerParams = {
@@ -165,8 +162,7 @@ describe('AdvancedSearch', function () {
   );
 
   describe('multipleValueFields', function () {
-    let subscription1 = null;
-    let subscription2 = null;
+    let subscription1, subscription2;
 
     before(function (done) {
       let customerParams = {
@@ -229,8 +225,7 @@ describe('AdvancedSearch', function () {
   });
 
   describe('multipleValueOrTextFields', function () {
-    let subscription1 = null;
-    let subscription2 = null;
+    let subscription1, subscription2;
 
     before(function (done) {
       let customerParams = {
@@ -323,8 +318,7 @@ describe('AdvancedSearch', function () {
   });
 
   describe('rangeFields', function () {
-    let subscription1 = null;
-    let subscription2 = null;
+    let subscription1, subscription2;
 
     before(function (done) {
       let customerParams = {

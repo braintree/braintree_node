@@ -337,56 +337,6 @@ describe('TransactionGateway', function () {
         })
       );
 
-      context('in-line capture', function () {
-        it('includes processorSettlementResponse_code and processorSettlementResponseText for settlement declined transactions', function (done) {
-          let transactionParams = {
-            paymentMethodNonce: Nonces.PayPalOneTimePayment,
-            amount: '10.00',
-            options: {
-              submitForSettlement: true
-            }
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isTrue(response.success);
-            let transactionId = response.transaction.id;
-
-            specHelper.defaultGateway.testing.settlementDecline(transactionId, () =>
-              specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
-                assert.equal(transaction.processorSettlementResponseCode, '4001');
-                assert.equal(transaction.processorSettlementResponseText, 'Settlement Declined');
-                done();
-              })
-            );
-          });
-        });
-
-        it('includes processorSettlementResponseCode and processorSettlementResponseText for settlement pending transactions', function (done) {
-          let transactionParams = {
-            paymentMethodNonce: Nonces.PayPalOneTimePayment,
-            amount: '10.00',
-            options: {
-              submitForSettlement: true
-            }
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isTrue(response.success);
-            let transactionId = response.transaction.id;
-
-            specHelper.defaultGateway.testing.settlementPending(transactionId, () =>
-              specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
-                assert.equal(transaction.processorSettlementResponseCode, '4002');
-                assert.equal(transaction.processorSettlementResponseText, 'Settlement Pending');
-                done();
-              })
-            );
-          });
-        });
-      });
-
       context('as a vaulted payment method', () =>
         it('successfully creates a transaction', done =>
           specHelper.defaultGateway.customer.create({}, function (err, response) {
@@ -2336,7 +2286,7 @@ describe('TransactionGateway', function () {
             specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
-              assert.equal(response.transaction.status, 'settling');
+              assert.equal(response.transaction.status, 'settled');
               assert.equal(response.transaction.amount, '5.00');
 
               done();
@@ -3088,13 +3038,10 @@ describe('TransactionGateway', function () {
     });
 
     context('shared payment methods', function () {
-      let address = null;
-      let creditCard = null;
-      let customer = null;
-      let grantingGateway = null;
+      let address, creditCard, customer, grantingGateway, partnerMerchantGateway;
 
       before(function (done) {
-        let partnerMerchantGateway = braintree.connect({
+        partnerMerchantGateway = braintree.connect({
           merchantId: 'integration_merchant_public_id',
           publicKey: 'oauth_app_partner_user_public_key',
           privateKey: 'oauth_app_partner_user_private_key',
@@ -3198,7 +3145,7 @@ describe('TransactionGateway', function () {
         })
       );
 
-      it('allows transactions to be created with a shared payment method, customer, billing and shipping addresses', function (done) {
+      it('allows transactions to be created with a shared payment method token, customer, billing and shipping addresses', function (done) {
         let transactionParams = {
           sharedPaymentMethodToken: creditCard.token,
           sharedCustomerId: customer.id,
@@ -3207,11 +3154,60 @@ describe('TransactionGateway', function () {
           amount: Braintree.Test.TransactionAmounts.Authorize
         };
 
-        return grantingGateway.transaction.sale(transactionParams, function (err, response) {
+        grantingGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isTrue(response.success);
+
+          let facilitatedDetails = response.transaction.facilitatedDetails;
+          let facilitatorDetails = response.transaction.facilitatorDetails;
+
           assert.equal(response.transaction.shipping.firstName, address.firstName);
           assert.equal(response.transaction.billing.firstName, address.firstName);
+          assert.equal(facilitatedDetails.merchantId, 'integration_merchant_id');
+          assert.equal(facilitatedDetails.merchantName, '14ladders');
+          assert.isUndefined(facilitatedDetails.paymentMethodNonce);
+          assert.equal(facilitatorDetails.oauthApplicationClientId, 'client_id$development$integration_client_id');
+          assert.equal(facilitatorDetails.oauthApplicationName, 'PseudoShop');
+
           done();
+        });
+      });
+
+      it('allows transactions to be created with a shared payment method nonce, customer, billing and shipping addresses', function (done) {
+        partnerMerchantGateway.paymentMethodNonce.create(creditCard.token, function (err, result) {
+          if (err) {
+            done(err);
+            return;
+          }
+
+          let transactionParams = {
+            sharedPaymentMethodNonce: result.paymentMethodNonce.nonce,
+            sharedCustomerId: customer.id,
+            sharedShippingAddressId: address.id,
+            sharedBillingAddressId: address.id,
+            amount: Braintree.Test.TransactionAmounts.Authorize
+          };
+
+          grantingGateway.transaction.sale(transactionParams, function (err, response) {
+            if (err) {
+              done(err);
+              return;
+            }
+
+            assert.isTrue(response.success);
+
+            let facilitatedDetails = response.transaction.facilitatedDetails;
+            let facilitatorDetails = response.transaction.facilitatorDetails;
+
+            assert.equal(response.transaction.shipping.firstName, address.firstName);
+            assert.equal(response.transaction.billing.firstName, address.firstName);
+            assert.equal(facilitatedDetails.merchantId, 'integration_merchant_id');
+            assert.equal(facilitatedDetails.merchantName, '14ladders');
+            assert.isUndefined(facilitatedDetails.paymentMethodNonce);
+            assert.equal(facilitatorDetails.oauthApplicationClientId, 'client_id$development$integration_client_id');
+            assert.equal(facilitatorDetails.oauthApplicationName, 'PseudoShop');
+
+            done();
+          });
         });
       });
     });
