@@ -1,4 +1,4 @@
-## Unreleased
+## 2.4.0
 * Add Too Many Requests error
 * Add GrantedPaymentInstrumentUpdate webhook support
 * Add ability to create a transaction from a shared nonce
