@@ -1,7 +1,6 @@
 'use strict';
 
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
-let Digest = require('../../../lib/braintree/digest').Digest;
 
 let braintree = specHelper.braintree;
 
@@ -226,9 +225,6 @@ describe('OAuthGateway', function () {
       assert.equal(query('business[fulfillment_completed_in]'), '7');
       assert.equal(query('business[currency]'), 'USD');
       assert.equal(query('business[website]'), 'http://example.com');
-
-      assert.equal(query('signature').length, 64);
-      assert.equal(query('algorithm'), 'SHA256');
     });
 
     it('builds a connect url without optional parameters', function () {
@@ -324,11 +320,16 @@ describe('OAuthGateway', function () {
       assert.deepEqual(query('payment_methods[]'), ['credit_card', 'paypal']);
     });
 
-    it('generates the correct signature', function () {
-      let url = 'http://localhost:3000/oauth/connect?business%5Bname%5D=We+Like+Spaces&client_id=client_id%24development%24integration_client_id';
-      let signature = Digest.Sha256hexdigest('client_secret$development$integration_client_secret', url);
+    it("doesn't modify the argument", function () {
+      let gateway = braintree.connect({
+        clientId: 'client_id$development$integration_client_id',
+        clientSecret: 'client_secret$development$integration_client_secret'
+      });
+      let options = {paymentMethods: ['credit_card']};
 
-      assert.equal(signature, 'a36bcf10dd982e2e47e0d6a2cb930aea47ade73f954b7d59c58dae6167894d41');
+      gateway.oauth.connectUrl(options);
+
+      assert.deepEqual(options, {paymentMethods: ['credit_card']});
     });
   });
 });

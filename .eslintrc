@@ -5,6 +5,6 @@
   rules:
     new-cap:
       - 2
-      - {"capIsNewExceptions": ["Sha1hexdigest", "Sha256hexdigest"]}
+      - {"capIsNewExceptions": ["Sha1hexdigest"]}
   globals:
     Promise: 0
