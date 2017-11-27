@@ -1,3 +1,6 @@
+## Unreleased
+* Fix spec to expect PayPal transactions to move to settling rather than settled
+
 ## 2.4.0
 * Add Too Many Requests error
 * Add GrantedPaymentInstrumentUpdate webhook support
