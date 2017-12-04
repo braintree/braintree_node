@@ -6,6 +6,7 @@ let WebhookNotification = require('../../../lib/braintree').WebhookNotification;
 let Dispute = require('../../../lib/braintree/dispute').Dispute;
 let Transaction = require('../../../lib/braintree/transaction').Transaction;
 let errorTypes = require('../../../lib/braintree').errorTypes;
+let dateFormat = require('dateformat');
 
 describe('WebhookNotificationGateway', function () {
   describe('verify', function () {
@@ -152,6 +153,7 @@ describe('WebhookNotificationGateway', function () {
         done();
       });
     });
+
     it('returns a parsable signature and payload for merchant account approvals', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubMerchantAccountApproved,
@@ -545,6 +547,158 @@ describe('WebhookNotificationGateway', function () {
         assert.equal('abc123z', update.token);
         assert.equal('expiration-month', update.updatedFields[0]);
         assert.equal('expiration-year', update.updatedFields[1]);
+        done();
+      });
+    });
+  });
+
+  describe('stubbed notification', function () {
+    it('returns a parsable signature with the provided JSON payload', function (done) {
+      const payload = {
+        timestamp: dateFormat(new Date(), dateFormat.masks.isoUtcDateTime, true),
+        kind: WebhookNotification.Kind.Check,
+        subject: {
+          check: true
+        }
+      };
+
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotificationWithJsonPayload(
+        payload
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.Check);
+        done();
+      });
+    });
+
+    it('returns a parsable signature with the provided complex JSON payload', function (done) {
+      const payload = {
+        timestamp: dateFormat(new Date(), dateFormat.masks.isoUtcDateTime, true),
+        kind: WebhookNotification.Kind.SubscriptionChargedSuccessfully,
+        subject: {
+          subscription: {
+            id: 'mySubscription',
+            transactions: [
+              {
+                status: 'submitted_for_settlement',
+                amount: '49.99'
+              }
+            ],
+            addOns: [],
+            discounts: []
+          }
+        },
+        subscription: {
+          id: 'mySubscription',
+          transactions: [
+            {
+              status: 'submitted_for_settlement',
+              amount: '49.99',
+              creditCard: {
+                maskedNumber: 'undefined******undefined',
+                expirationDate: 'undefined/undefined'
+              },
+              paypalAccount: {},
+              coinbaseAccount: {},
+              applePayCard: {},
+              androidPayCard: {},
+              disbursementDetails: {},
+              visaCheckoutCard: {},
+              masterpassCard: {}
+            }
+          ],
+          addOns: [],
+          discounts: []
+        }
+      };
+
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotificationWithJsonPayload(
+        payload
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionChargedSuccessfully);
+        assert.equal(webhookNotification.subscription.id, 'mySubscription');
+        assert.equal(webhookNotification.subscription.transactions.length, 1);
+
+        let transaction = webhookNotification.subscription.transactions.pop();
+
+        assert.equal(transaction.status, 'submitted_for_settlement');
+        assert.equal(transaction.amount, 49.99);
+        done();
+      });
+    });
+
+    it('returns a parsable signature with the provided XML payload', function (done) {
+      const payload = `<timestamp type='datetime'>${dateFormat(new Date(), dateFormat.masks.isoUtcDateTime, true)}</timestamp>
+        <kind>${WebhookNotification.Kind.Check}</kind>
+        <subject>
+          <check type='boolean'>true</check>
+        </subject>`;
+
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotificationWithXMLPayload(
+        payload
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.Check);
+        done();
+      });
+    });
+
+    it('returns a parsable signature with the provided complex XML payload', function (done) {
+      const payload = `<timestamp>${dateFormat(new Date(), dateFormat.masks.isoUtcDateTime, true)}</timestamp>
+      <kind>${WebhookNotification.Kind.SubscriptionChargedSuccessfully}</kind>
+      <subject>
+        <subscription>
+          <id>mySubscription</id>
+          <transactions>
+            <status>submitted_for_settlement</status>
+            <amount>49.99</amount>
+          </transactions>
+        </subscription>
+      </subject>
+      <subscription>
+        <id>mySubscription</id>
+        <transactions>
+          <status>submitted_for_settlement</status>
+          <amount>49.99</amount>
+          <creditCard>
+            <maskedNumber>undefined******undefined</maskedNumber>
+            <expirationDate>undefined/undefined</expirationDate>
+          </creditCard>
+          <paypalAccount />
+          <coinbaseAccount />
+          <applePayCard />
+          <androidPayCard />
+          <disbursementDetails />
+          <visaCheckoutCard />
+          <masterpassCard />
+        </transactions>
+      </subscription>`;
+
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotificationWithXMLPayload(
+        payload
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionChargedSuccessfully);
+        assert.equal(webhookNotification.subscription.id, 'mySubscription');
+        assert.equal(webhookNotification.subscription.transactions.length, 1);
+
+        let transaction = webhookNotification.subscription.transactions.pop();
+
+        assert.equal(transaction.status, 'submitted_for_settlement');
+        assert.equal(transaction.amount, 49.99);
         done();
       });
     });

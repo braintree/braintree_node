@@ -26,7 +26,8 @@
     "semver": "5.1.0",
     "underscore": "1.8.3",
     "xml2js": "0.1.13",
-    "@braintree/wrap-promise": "1.1.1"
+    "@braintree/wrap-promise": "1.1.1",
+    "js2xmlparser": "^3.0.0"
   },
   "devDependencies": {
     "chai": "4.1.0",
