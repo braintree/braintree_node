@@ -187,6 +187,1199 @@ describe('TransactionGateway', function () {
       });
     });
 
+    context('line items', function () {
+      it('allows creation with empty line items and returns none', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: []
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          specHelper.defaultGateway.transactionLineItem.findAll(response.transaction.id, function (err, response) {
+            assert.deepEqual(response, []);
+            done();
+          });
+        });
+      });
+
+      it('allows creation with single line item with minimal fields and returns it', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '45.15',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.0232',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              totalAmount: '45.15'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          specHelper.defaultGateway.transactionLineItem.findAll(response.transaction.id, function (err, response) {
+            assert.equal(response.length, 1);
+            let lineItem = response[0];
+
+            assert.equal(lineItem.quantity, '1.0232');
+            assert.equal(lineItem.name, 'Name #1');
+            assert.equal(lineItem.kind, 'debit');
+            assert.equal(lineItem.unitAmount, '45.1232');
+            assert.equal(lineItem.totalAmount, '45.15');
+            done();
+          });
+        });
+      });
+
+      it('allows creation with single line item and returns it', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '45.15',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.0232',
+              name: 'Name #1',
+              description: 'Description #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitTaxAmount: '1.23',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724',
+              url: 'https://example.com/products/23434'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          specHelper.defaultGateway.transactionLineItem.findAll(response.transaction.id, function (err, response) {
+            assert.equal(response.length, 1);
+            let lineItem = response[0];
+
+            assert.equal(lineItem.quantity, '1.0232');
+            assert.equal(lineItem.name, 'Name #1');
+            assert.equal(lineItem.description, 'Description #1');
+            assert.equal(lineItem.kind, 'debit');
+            assert.equal(lineItem.unitAmount, '45.1232');
+            assert.equal(lineItem.unitTaxAmount, '1.23');
+            assert.equal(lineItem.unitOfMeasure, 'gallon');
+            assert.equal(lineItem.discountAmount, '1.02');
+            assert.equal(lineItem.totalAmount, '45.15');
+            assert.equal(lineItem.productCode, '23434');
+            assert.equal(lineItem.commodityCode, '9SAASSD8724');
+            assert.equal(lineItem.url, 'https://example.com/products/23434');
+            done();
+          });
+        });
+      });
+
+      it('allows creation with multiple line items and returns them', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.0232',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '2.02',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '5',
+              unitOfMeasure: 'gallon',
+              totalAmount: '10.1'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          specHelper.defaultGateway.transactionLineItem.findAll(response.transaction.id, function (err, response) {
+            assert.equal(response.length, 2);
+
+            let lineItem1 = response.find(function (lineItem) {
+              return lineItem.name === 'Name #1';
+            });
+
+            assert.equal(lineItem1.quantity, '1.0232');
+            assert.equal(lineItem1.name, 'Name #1');
+            assert.equal(lineItem1.kind, 'debit');
+            assert.equal(lineItem1.unitAmount, '45.1232');
+            assert.equal(lineItem1.unitOfMeasure, 'gallon');
+            assert.equal(lineItem1.discountAmount, '1.02');
+            assert.equal(lineItem1.totalAmount, '45.15');
+            assert.equal(lineItem1.productCode, '23434');
+            assert.equal(lineItem1.commodityCode, '9SAASSD8724');
+
+            let lineItem2 = response.find(function (lineItem) {
+              return lineItem.name === 'Name #2';
+            });
+
+            assert.equal(lineItem2.quantity, '2.02');
+            assert.equal(lineItem2.name, 'Name #2');
+            assert.equal(lineItem2.kind, 'credit');
+            assert.equal(lineItem2.unitAmount, '5');
+            assert.equal(lineItem2.unitOfMeasure, 'gallon');
+            assert.equal(lineItem2.totalAmount, '10.10');
+            assert.equal(lineItem2.discountAmount, null);
+            assert.equal(lineItem2.productCode, null);
+            assert.equal(lineItem2.commodityCode, null);
+            done();
+          });
+        });
+      });
+
+      it('handles validation error commodity code is too long', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '1234567890123'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('commodityCode')[0].code, ValidationErrorCodes.Transaction.LineItem.CommodityCodeIsTooLong);
+          done();
+        });
+      });
+
+      it('handles validation error description is too long', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              description: 'X'.repeat(128),
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('description')[0].code, ValidationErrorCodes.Transaction.LineItem.DescriptionIsTooLong);
+          done();
+        });
+      });
+
+      it('handles validation error discount amount format is invalid', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '$1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountFormatIsInvalid);
+          done();
+        });
+      });
+
+      it('handles validation error discount amount is too large', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '2147483648',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountIsTooLarge);
+          done();
+        });
+      });
+
+      it('handles validation error discount amount must be greater than zero', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '-2',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountMustBeGreaterThanZero);
+          done();
+        });
+      });
+
+      it('handles validation error kind is invalid', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'sale',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('kind')[0].code, ValidationErrorCodes.Transaction.LineItem.KindIsInvalid);
+          done();
+        });
+      });
+
+      it('handles validation error kind is required', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('kind')[0].code, ValidationErrorCodes.Transaction.LineItem.KindIsRequired);
+          done();
+        });
+      });
+
+      it('handles validation error name is required', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('name')[0].code, ValidationErrorCodes.Transaction.LineItem.NameIsRequired);
+          done();
+        });
+      });
+
+      it('handles validation error name is too long', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'X'.repeat(36),
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('name')[0].code, ValidationErrorCodes.Transaction.LineItem.NameIsTooLong);
+          done();
+        });
+      });
+
+      it('handles validation error product code is too long', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '1234567890123',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('productCode')[0].code, ValidationErrorCodes.Transaction.LineItem.ProductCodeIsTooLong);
+          done();
+        });
+      });
+
+      it('handles validation error quantity format is invalid', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1,2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('quantity')[0].code, ValidationErrorCodes.Transaction.LineItem.QuantityFormatIsInvalid);
+          done();
+        });
+      });
+
+      it('handles validation error quantity is required', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('quantity')[0].code, ValidationErrorCodes.Transaction.LineItem.QuantityIsRequired);
+          done();
+        });
+      });
+
+      it('handles validation error quantity is too large', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '2147483648',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('quantity')[0].code, ValidationErrorCodes.Transaction.LineItem.QuantityIsTooLarge);
+          done();
+        });
+      });
+
+      it('handles validation error total amount format is invalid', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '$45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('totalAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TotalAmountFormatIsInvalid);
+          done();
+        });
+      });
+
+      it('handles validation error total amount is required', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('totalAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TotalAmountIsRequired);
+          done();
+        });
+      });
+
+      it('handles validation error total amount is too large', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '2147483648',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('totalAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TotalAmountIsTooLarge);
+          done();
+        });
+      });
+
+      it('handles validation error total amount must be greater than zero', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '-2',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('totalAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TotalAmountMustBeGreaterThanZero);
+          done();
+        });
+      });
+
+      it('handles validation error unit amount format is invalid', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.01232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitAmountFormatIsInvalid);
+          done();
+        });
+      });
+
+      it('handles validation error unit amount is required', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitAmountIsRequired);
+          done();
+        });
+      });
+
+      it('handles validation error unit amount is too large', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '2147483648',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitAmountIsTooLarge);
+          done();
+        });
+      });
+
+      it('handles validation error unit amount must be greater than zero', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '-2',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitAmountMustBeGreaterThanZero);
+          done();
+        });
+      });
+
+      it('handles validation error unit of measure is too long', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.1232',
+              unitOfMeasure: '1234567890123',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitOfMeasure')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitOfMeasureIsTooLong);
+          done();
+        });
+      });
+
+      it('handles validation error unit tax amount format is invalid', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitTaxAmount: '2.34',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.0122',
+              unitTaxAmount: '2.012',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountFormatIsInvalid);
+          done();
+        });
+      });
+
+      it('handles validation error unit tax amount is too large', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitTaxAmount: '1.23',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.0122',
+              unitTaxAmount: '2147483648',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountIsTooLarge);
+          done();
+        });
+      });
+
+      it('handles validation error unit tax amount must be greater than zero', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            },
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.0122',
+              unitTaxAmount: '-1.23',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountMustBeGreaterThanZero);
+          done();
+        });
+      });
+
+      it('handles validation errors on line items structure', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: {
+            quantity: '2.02',
+            name: 'Name #2',
+            kind: 'credit',
+            unitAmount: '5',
+            unitOfMeasure: 'gallon',
+            totalAmount: '10.1'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').on('lineItems')[0].code, ValidationErrorCodes.Transaction.LineItemsExpected);
+          done();
+        });
+      });
+
+      it('handles invalid arguments on line items structure', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '2.02',
+              name: 'Name #1',
+              kind: 'credit',
+              unitAmount: '5',
+              unitOfMeasure: 'gallon',
+              totalAmount: '10.1'
+            },
+            ['Name #2'],
+            {
+              quantity: '2.02',
+              name: 'Name #3',
+              kind: 'credit',
+              unitAmount: '5',
+              unitOfMeasure: 'gallon',
+              totalAmount: '10.1'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.equal(err.type, 'invalidKeysError');
+          assert.equal(err.message, 'These keys are invalid: lineItems[0]');
+          assert.equal(response, null);
+          done();
+        });
+      });
+
+      it('handles validation errors on too many line items', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: []
+        };
+
+        for (let i = 0; i < 250; i++) {
+          transactionParams.lineItems.push({
+            quantity: '2.02',
+            name: 'Line item ##{i}',
+            kind: 'credit',
+            unitAmount: '5',
+            unitOfMeasure: 'gallon',
+            totalAmount: '10.1'
+          });
+        }
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.errors.for('transaction').on('lineItems')[0].code, ValidationErrorCodes.Transaction.TooManyLineItems);
+          done();
+        });
+      });
+    });
+
     context('with apple pay', () =>
       it('returns ApplePayCard for payment_instrument', done =>
         specHelper.defaultGateway.customer.create({}, function () {

@@ -1,5 +1,6 @@
 ## Unreleased
 * Fix spec to expect PayPal transactions to move to settling rather than settled
+* Add support for transaction line items
 
 ## 2.4.0
 * Add Too Many Requests error
