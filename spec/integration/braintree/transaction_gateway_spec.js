@@ -187,6 +187,172 @@ describe('TransactionGateway', function () {
       });
     });
 
+    context('level 3 summary values', function () {
+      it('allows creation with level 3 summary values provided', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '64.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          discountAmount: '1.00',
+          shippingAmount: '2.00',
+          shipsFromPostalCode: '12345'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.discountAmount, '1.00');
+          assert.equal(response.transaction.shippingAmount, '2.00');
+          assert.equal(response.transaction.shipsFromPostalCode, '12345');
+          done();
+        });
+      });
+
+      it('returns an error for transaction when discount amount format is invalid', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '64.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          discountAmount: '123.456'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').on('discountAmount')[0].code,
+            ValidationErrorCodes.Transaction.DiscountAmountFormatIsInvalid
+          );
+          done();
+        });
+      });
+
+      it('returns an error for transaction when discount amount cannot be negative', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '64.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          discountAmount: '-2.00'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').on('discountAmount')[0].code,
+            ValidationErrorCodes.Transaction.DiscountAmountCannotBeNegative
+          );
+          done();
+        });
+      });
+
+      it('returns an error for transaction when discount amount is too large', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '64.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          discountAmount: '2147483647'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').on('discountAmount')[0].code,
+            ValidationErrorCodes.Transaction.DiscountAmountIsTooLarge
+          );
+          done();
+        });
+      });
+
+      it('returns an error for transaction when shipping amount format is invalid', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '64.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          shippingAmount: '1a00'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').on('shippingAmount')[0].code,
+            ValidationErrorCodes.Transaction.ShippingAmountFormatIsInvalid
+          );
+          done();
+        });
+      });
+
+      it('returns an error for transaction when shipping amount cannot be negative', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '64.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          shippingAmount: '-1.00'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').on('shippingAmount')[0].code,
+            ValidationErrorCodes.Transaction.ShippingAmountCannotBeNegative
+          );
+          done();
+        });
+      });
+
+      it('returns an error for transaction when shipping amount is too large', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '64.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          shippingAmount: '2147483647'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').on('shippingAmount')[0].code,
+            ValidationErrorCodes.Transaction.ShippingAmountIsTooLarge
+          );
+          done();
+        });
+      });
+
+      it('returns an error for transaction when ships from postal code is too long', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '64.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          shipsFromPostalCode: '12345678901'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').on('shipsFromPostalCode')[0].code,
+            ValidationErrorCodes.Transaction.ShipsFromPostalCodeIsTooLong
+          );
+          done();
+        });
+      });
+
+      it('returns an error for transaction when ships from postal code invalid characters', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '64.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          shipsFromPostalCode: '1$345'
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').on('shipsFromPostalCode')[0].code,
+            ValidationErrorCodes.Transaction.ShipsFromPostalCodeInvalidCharacters
+          );
+          done();
+        });
+      });
+    });
+
     context('line items', function () {
       it('allows creation with empty line items and returns none', function (done) {
         let transactionParams = {
@@ -380,7 +546,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('commodityCode')[0].code, ValidationErrorCodes.Transaction.LineItem.CommodityCodeIsTooLong);
           done();
         });
@@ -419,7 +585,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('description')[0].code, ValidationErrorCodes.Transaction.LineItem.DescriptionIsTooLong);
           done();
         });
@@ -457,7 +623,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountFormatIsInvalid);
           done();
         });
@@ -495,7 +661,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountIsTooLarge);
           done();
         });
@@ -533,7 +699,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountMustBeGreaterThanZero);
           done();
         });
@@ -571,7 +737,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('kind')[0].code, ValidationErrorCodes.Transaction.LineItem.KindIsInvalid);
           done();
         });
@@ -608,7 +774,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('kind')[0].code, ValidationErrorCodes.Transaction.LineItem.KindIsRequired);
           done();
         });
@@ -645,7 +811,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('name')[0].code, ValidationErrorCodes.Transaction.LineItem.NameIsRequired);
           done();
         });
@@ -683,7 +849,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('name')[0].code, ValidationErrorCodes.Transaction.LineItem.NameIsTooLong);
           done();
         });
@@ -721,7 +887,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('productCode')[0].code, ValidationErrorCodes.Transaction.LineItem.ProductCodeIsTooLong);
           done();
         });
@@ -759,7 +925,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('quantity')[0].code, ValidationErrorCodes.Transaction.LineItem.QuantityFormatIsInvalid);
           done();
         });
@@ -796,7 +962,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('quantity')[0].code, ValidationErrorCodes.Transaction.LineItem.QuantityIsRequired);
           done();
         });
@@ -834,7 +1000,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('quantity')[0].code, ValidationErrorCodes.Transaction.LineItem.QuantityIsTooLarge);
           done();
         });
@@ -872,7 +1038,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('totalAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TotalAmountFormatIsInvalid);
           done();
         });
@@ -909,7 +1075,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('totalAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TotalAmountIsRequired);
           done();
         });
@@ -947,7 +1113,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('totalAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TotalAmountIsTooLarge);
           done();
         });
@@ -985,7 +1151,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('totalAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TotalAmountMustBeGreaterThanZero);
           done();
         });
@@ -1023,7 +1189,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitAmountFormatIsInvalid);
           done();
         });
@@ -1059,7 +1225,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitAmountIsRequired);
           done();
         });
@@ -1097,7 +1263,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitAmountIsTooLarge);
           done();
         });
@@ -1135,7 +1301,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitAmountMustBeGreaterThanZero);
           done();
         });
@@ -1173,7 +1339,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitOfMeasure')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitOfMeasureIsTooLong);
           done();
         });
@@ -1213,7 +1379,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountFormatIsInvalid);
           done();
         });
@@ -1253,7 +1419,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountIsTooLarge);
           done();
         });
@@ -1292,7 +1458,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountMustBeGreaterThanZero);
           done();
         });
@@ -1314,7 +1480,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').on('lineItems')[0].code, ValidationErrorCodes.Transaction.LineItemsExpected);
           done();
         });
@@ -1373,7 +1539,7 @@ describe('TransactionGateway', function () {
           });
         }
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').on('lineItems')[0].code, ValidationErrorCodes.Transaction.TooManyLineItems);
           done();
         });
@@ -1499,7 +1665,7 @@ describe('TransactionGateway', function () {
 
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
-            assert.isFalse(response.success);
+            assert.isFalse(response.success, 'response had no errors');
 
             assert.equal(
               response.errors.for('transaction').on('base')[0].code,
@@ -2042,7 +2208,7 @@ describe('TransactionGateway', function () {
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isFalse(response.success);
+        assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.transaction.amount, '2000.00');
         assert.equal(response.transaction.status, 'processor_declined');
         assert.equal(response.transaction.additionalProcessorResponse, '2000 : Do Not Honor');
@@ -2079,7 +2245,7 @@ describe('TransactionGateway', function () {
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isFalse(response.success);
+        assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
         assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud);
         done();
@@ -2132,7 +2298,7 @@ describe('TransactionGateway', function () {
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isFalse(response.success);
+        assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.message, 'Amount is required.\nExpiration date is required.');
         assert.equal(
           response.errors.for('transaction').on('amount')[0].code,
@@ -2196,7 +2362,7 @@ describe('TransactionGateway', function () {
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isFalse(response.success);
+        assert.isFalse(response.success, 'response had no errors');
         assert.equal(
           response.errors.for('transaction').for('descriptor').on('name')[0].code,
           ValidationErrorCodes.Descriptor.NameFormatIsInvalid
@@ -2257,7 +2423,7 @@ describe('TransactionGateway', function () {
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isFalse(response.success);
+        assert.isFalse(response.success, 'response had no errors');
         assert.equal(
           response.errors.for('transaction').for('industry').on('checkOutDate')[0].code,
           ValidationErrorCodes.Transaction.IndustryData.Lodging.CheckOutDateMustFollowCheckInDate
@@ -2313,7 +2479,7 @@ describe('TransactionGateway', function () {
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isFalse(response.success);
+        assert.isFalse(response.success, 'response had no errors');
         assert.equal(
           response.errors.for('transaction').for('industry').on('travelPackage')[0].code,
           ValidationErrorCodes.Transaction.IndustryData.TravelCruise.TravelPackageIsInvalid
@@ -2357,7 +2523,7 @@ describe('TransactionGateway', function () {
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').on('serviceFeeAmount')[0].code,
             ValidationErrorCodes.Transaction.ServiceFeeAmountIsTooLarge
@@ -2379,7 +2545,7 @@ describe('TransactionGateway', function () {
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').on('merchantAccountId')[0].code,
             ValidationErrorCodes.Transaction.SubMerchantAccountRequiresServiceFeeAmount
@@ -2432,7 +2598,7 @@ describe('TransactionGateway', function () {
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').on('base')[0].code,
             ValidationErrorCodes.Transaction.CannotHoldInEscrow
@@ -2471,7 +2637,7 @@ describe('TransactionGateway', function () {
         specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
           specHelper.defaultGateway.transaction.releaseFromEscrow(response.transaction.id, function (err, response) {
             assert.isNull(err);
-            assert.isFalse(response.success);
+            assert.isFalse(response.success, 'response had no errors');
             assert.equal(
               response.errors.for('transaction').on('base')[0].code,
               ValidationErrorCodes.Transaction.CannotReleaseFromEscrow
@@ -2503,7 +2669,7 @@ describe('TransactionGateway', function () {
         specHelper.createEscrowedTransaction(transaction =>
           specHelper.defaultGateway.transaction.cancelRelease(transaction.id, function (err, response) {
             assert.isNull(err);
-            assert.isFalse(response.success);
+            assert.isFalse(response.success, 'response had no errors');
             assert.equal(
               response.errors.for('transaction').on('base')[0].code,
               ValidationErrorCodes.Transaction.CannotCancelRelease
@@ -2556,7 +2722,7 @@ describe('TransactionGateway', function () {
         specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
           specHelper.defaultGateway.testing.settle(response.transaction.id, (err, response) =>
             specHelper.defaultGateway.transaction.holdInEscrow(response.transaction.id, function (err, response) {
-              assert.isFalse(response.success);
+              assert.isFalse(response.success, 'response had no errors');
               assert.equal(
                 response.errors.for('transaction').on('base')[0].code,
                 ValidationErrorCodes.Transaction.CannotHoldInEscrow
@@ -2875,7 +3041,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').on('paymentMethodNonce')[0].code,
             ValidationErrorCodes.Transaction.PaymentMethodNonceUnknown
@@ -2944,7 +3110,7 @@ describe('TransactionGateway', function () {
       };
 
       specHelper.defaultGateway.transaction.credit(transactionParams, function (err, response) {
-        assert.isFalse(response.success);
+        assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.message, 'Amount is required.\nExpiration date is required.');
         assert.equal(
           response.errors.for('transaction').on('amount')[0].code,
@@ -3008,7 +3174,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').on('threeDSecureToken')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureTokenIsInvalid
@@ -3037,7 +3203,7 @@ describe('TransactionGateway', function () {
           };
 
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isFalse(response.success);
+            assert.isFalse(response.success, 'response had no errors');
             assert.equal(
               response.errors.for('transaction').on('threeDSecureToken')[0].code,
               ValidationErrorCodes.Transaction.ThreeDSecureTransactionDataDoesntMatchVerify
@@ -3070,7 +3236,7 @@ describe('TransactionGateway', function () {
           };
 
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isFalse(response.success);
+            assert.isFalse(response.success, 'response had no errors');
             assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
             assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.ThreeDSecure);
 
@@ -3118,7 +3284,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').on('merchantAccountId')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureMerchantAccountDoesNotSupportCardType
@@ -3144,7 +3310,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').for('threeDSecurePassThru').on('eciFlag')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsRequired
@@ -3170,7 +3336,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').for('threeDSecurePassThru').on('cavv')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureCavvIsRequired
@@ -3196,7 +3362,7 @@ describe('TransactionGateway', function () {
         };
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').for('threeDSecurePassThru').on('eciFlag')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsInvalid
@@ -3431,7 +3597,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.refund(response.transaction.id, '5.00', function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').on('base')[0].code, '91506');
 
           done();
@@ -3597,7 +3763,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').on('base')[0].code, '91507');
 
           done();
@@ -3803,7 +3969,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').on('amount')[0].code, '91522');
 
           done();
@@ -3836,7 +4002,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').for('descriptor').on('name')[0].code, '92201');
           assert.equal(response.errors.for('transaction').for('descriptor').on('phone')[0].code, '92202');
           assert.equal(response.errors.for('transaction').for('descriptor').on('url')[0].code, '92206');
@@ -3864,7 +4030,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').on('orderId')[0].code, '91501');
 
           done();
@@ -3898,7 +4064,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').on('base')[0].code, '915130');
 
           done();
@@ -3928,7 +4094,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.updateDetails(response.transaction.id, updateParams, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').on('base')[0].code, '915129');
 
           done();
@@ -3997,7 +4163,7 @@ describe('TransactionGateway', function () {
         specHelper.defaultGateway.transaction.void(response.transaction.id, (err, response) =>
           specHelper.defaultGateway.transaction.void(response.transaction.id, function (err, response) {
             assert.isNull(err);
-            assert.isFalse(response.success);
+            assert.isFalse(response.success, 'response had no errors');
             assert.equal(response.errors.for('transaction').on('base')[0].code, '91504');
 
             done();
@@ -4051,7 +4217,7 @@ describe('TransactionGateway', function () {
 
       specHelper.defaultGateway.transaction.credit(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.cloneTransaction(response.transaction.id, {amount: '123.45'}, function (err, response) {
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(
             response.errors.for('transaction').on('base')[0].code,
             '91543'
@@ -4191,7 +4357,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, function (err, response) {
           assert.isNull(err);
-          assert.isFalse(response.success);
+          assert.isFalse(response.success, 'response had no errors');
           assert.equal(response.errors.for('transaction').on('base')[0].code, '91507');
 
           done();
@@ -4220,7 +4386,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.amount, '6.00');
 
           specHelper.defaultGateway.transaction.submitForPartialSettlement(response.transaction.id, '4.00', function (err, response) {
-            assert.isFalse(response.success);
+            assert.isFalse(response.success, 'response had no errors');
             let errorCode = response.errors.for('transaction').on('base')[0].code;
 
             assert.equal(errorCode, ValidationErrorCodes.Transaction.CannotSubmitForPartialSettlement);

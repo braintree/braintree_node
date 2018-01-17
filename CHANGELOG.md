@@ -1,4 +1,5 @@
 ## Unreleased
+* Add support for Level 3 summary parameters, shippingAmount, discountAmount, and shipsFromPostalCode
 * Fix spec to expect PayPal transactions to move to settling rather than settled
 * Add support for transaction line items
 * Add support for tagged evidence in DisputeGateway#addTextEvidence (Beta release)
