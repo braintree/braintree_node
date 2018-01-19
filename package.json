@@ -6,8 +6,8 @@
     "braintree",
     "payments"
   ],
-  "homepage": "http://github.com/braintree/braintree_node",
-  "author": "Braintree <code@braintreepayments.com> (http://www.braintreepayments.com)",
+  "homepage": "https://github.com/braintree/braintree_node",
+  "author": "Braintree <code@braintreepayments.com> (https://www.braintreepayments.com)",
   "main": "index",
   "directories": {
     "lib": "./lib"
