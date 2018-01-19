@@ -391,7 +391,7 @@ describe('Util', function () {
     });
   });
 
-  describe('flattenKeys', () =>
+  describe('flattenKeys', function () {
     it('flattens an objects keys into a flat array', function () {
       let transactionParams = {
         amount: '5.00',
@@ -409,8 +409,46 @@ describe('Util', function () {
       let result = Util.flattenKeys(transactionParams);
 
       assert.deepEqual(result, ['amount', 'creditCard[number]', 'creditCard[expirationDate]', 'options[threeDSecure][required]']);
-    })
-  );
+    });
+
+    it('flattens array keys into a flat array', function () {
+      let transactionParams = {
+        amount: '5.00',
+        lineItems: [
+          {
+            name: 'Name #1',
+            kind: 'debit'
+          },
+          {
+            name: 'Name #2',
+            kind: 'credit'
+          }
+        ]
+      };
+
+      let result = Util.flattenKeys(transactionParams);
+
+      assert.deepEqual(result, ['amount', 'lineItems[name]', 'lineItems[kind]', 'lineItems[name]', 'lineItems[kind]']);
+    });
+  });
+
+  describe('isNumeric', function () {
+    it('returns true for numerics', function () {
+      assert.isTrue(Util.isNumeric(12));
+    });
+
+    it('returns true for numeric strings', function () {
+      assert.isTrue(Util.isNumeric('12'));
+    });
+
+    it('returns false for non-numeric strings', function () {
+      assert.isFalse(Util.isNumeric('blah'));
+    });
+
+    it('returns false for non-numeric objects', function () {
+      assert.isFalse(Util.isNumeric({}));
+    });
+  });
 
   describe('verifyKeys', function () {
     let signature, transactionParams;
@@ -444,6 +482,30 @@ describe('Util', function () {
           number: '5105105105105100',
           expirationDate: '05/12'
         }
+      };
+
+      let error = Util.verifyKeys(signature, transactionParams);
+
+      assert.isUndefined(error);
+    });
+
+    it("doesn't return an error if params are an array subset of signature", function () {
+      let signature = {
+        valid: ['validKey1', 'validKey2', 'amount', 'lineItems[name]', 'lineItems[kind]']
+      };
+
+      let transactionParams = {
+        amount: '5.00',
+        lineItems: [
+          {
+            name: 'Name #1',
+            kind: 'debit'
+          },
+          {
+            name: 'Name #2',
+            kind: 'credit'
+          }
+        ]
       };
 
       let error = Util.verifyKeys(signature, transactionParams);

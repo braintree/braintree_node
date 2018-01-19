@@ -55,7 +55,7 @@ describe('DisputeGateway', function () {
         .then(assert.fail)
         .catch((e) => {
           assert.equal('invalidKeysError', e.type);
-          assert.equal('content cannot be null', e.message);
+          assert.equal('content cannot be null or empty', e.message);
         });
     });
 
@@ -64,7 +64,52 @@ describe('DisputeGateway', function () {
         .then(assert.fail)
         .catch((e) => {
           assert.equal('invalidKeysError', e.type);
-          assert.equal('content cannot be null', e.message);
+          assert.equal('content cannot be null or empty', e.message);
+        });
+    });
+
+    it('null content in evidence request throws invalidKeysError', () => {
+      return disputeGateway.addTextEvidence('dispute_id', {content: null})
+        .then(assert.fail)
+        .catch((e) => {
+          assert.equal('invalidKeysError', e.type);
+          assert.equal('content cannot be null or empty', e.message);
+        });
+    });
+
+    it('empty content in evidence request throws invalidKeysError', () => {
+      return disputeGateway.addTextEvidence('dispute_id', {content: ' '})
+        .then(assert.fail)
+        .catch((e) => {
+          assert.equal('invalidKeysError', e.type);
+          assert.equal('content cannot be null or empty', e.message);
+        });
+    });
+
+    it('non-numeric sequence_number in evidence request throws invalidKeysError', () => {
+      return disputeGateway.addTextEvidence('dispute_id', {content: 'bob', sequenceNumber: 'hello'})
+        .then(assert.fail)
+        .catch((e) => {
+          assert.equal('invalidKeysError', e.type);
+          assert.equal('sequenceNumber must be a number', e.message);
+        });
+    });
+
+    it('non-string tag in evidence request throws invalidKeysError', () => {
+      return disputeGateway.addTextEvidence('dispute_id', {content: 'UPS', sequenceNumber: '0', tag: 4})
+        .then(assert.fail)
+        .catch((e) => {
+          assert.equal('invalidKeysError', e.type);
+          assert.equal('tag must be a string', e.message);
+        });
+    });
+
+    it('empty tag in evidence request throws invalidKeysError', () => {
+      return disputeGateway.addTextEvidence('dispute_id', {content: 'UPS', sequenceNumber: 2, tag: ''})
+        .then(assert.fail)
+        .catch((e) => {
+          assert.equal('invalidKeysError', e.type);
+          assert.equal('tag cannot be empty', e.message);
         });
     });
   });
