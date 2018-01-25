@@ -44,6 +44,23 @@ describe('WebhookNotificationGateway', function () {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionWentPastDue);
         assert.equal(webhookNotification.subscription.id, 'my_id');
         assert.ok(webhookNotification.timestamp != null);
+        assert.notExists(webhookNotification.sourceMerchantId);
+        done();
+      });
+    });
+
+    it('returns a source merchant ID if supplied', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubscriptionWentPastDue,
+        'my_id',
+        'my_source_merchant_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.notExists(err);
+        assert.equal(webhookNotification.sourceMerchantId, 'my_source_merchant_id');
         done();
       });
     });
