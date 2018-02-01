@@ -1,4 +1,6 @@
 ## Unreleased
+* Deprecated LineItem/DiscountAmountMustBeGreaterThanZero error in favor of DiscountAmountCannotBeNegative.
+* Deprecated LineItem/UnitTaxAmountMustBeGreaterThanZero error in favor of UnitTaxAmountCannotBeNegative.
 * Add `sourceMerchantId` to `WebhookNotification`s if present
 * Add support for taxAmount field on transaction lineItems
 

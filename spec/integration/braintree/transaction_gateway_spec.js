@@ -403,6 +403,39 @@ describe('TransactionGateway', function () {
         });
       });
 
+      it('allows creation with single line item with zero amount fields', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '45.15',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.0232',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              totalAmount: '45.15',
+              discountAmount: '0',
+              taxAmount: '0',
+              unitTaxAmount: '0'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          specHelper.defaultGateway.transactionLineItem.findAll(response.transaction.id, function (err, response) {
+            assert.equal(response.length, 1);
+            let lineItem = response[0];
+
+            assert.equal(lineItem.discountAmount, '0.00');
+            assert.equal(lineItem.taxAmount, '0.00');
+            assert.equal(lineItem.unitTaxAmount, '0.00');
+            done();
+          });
+        });
+      });
+
       it('allows creation with single line item and returns it', function (done) {
         let transactionParams = {
           type: 'sale',
@@ -672,7 +705,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('handles validation error discount amount must be greater than zero', function (done) {
+      it('handles validation error discount amount cannot be negative', function (done) {
         let transactionParams = {
           type: 'sale',
           amount: '35.05',
@@ -705,7 +738,7 @@ describe('TransactionGateway', function () {
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success, 'response had no errors');
-          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountMustBeGreaterThanZero);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountCannotBeNegative);
           done();
         });
       });
@@ -1430,7 +1463,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('handles validation error unit tax amount must be greater than zero', function (done) {
+      it('handles validation error unit tax amount cannot be negative', function (done) {
         let transactionParams = {
           type: 'sale',
           amount: '35.05',
@@ -1464,7 +1497,7 @@ describe('TransactionGateway', function () {
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success, 'response had no errors');
-          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountMustBeGreaterThanZero);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountCannotBeNegative);
           done();
         });
       });
@@ -1525,7 +1558,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('handles validation error tax amount must be greater than zero', function (done) {
+      it('handles validation error tax amount cannot be negative', function (done) {
         let transactionParams = {
           type: 'sale',
           amount: '35.05',
@@ -1548,7 +1581,7 @@ describe('TransactionGateway', function () {
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success, 'response had no errors');
-          assert.equal(response.errors.for('transaction').for('lineItems').for('index0').on('taxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TaxAmountMustBeGreaterThanZero);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index0').on('taxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TaxAmountCannotBeNegative);
           done();
         });
       });
