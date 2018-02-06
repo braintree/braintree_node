@@ -30,11 +30,11 @@ describe('TransactionGateway', () =>
         }
       };
 
-      let assertRequestBody = params => assert.isTrue(params.transaction.options.skipAdvancedFraudChecking); // eslint-disable-line func-style
-
-      transactionGateway.sale(transactionParams, assertRequestBody);
-
-      done();
+      transactionGateway.sale(transactionParams, (err, params) => {
+        assert.notExists(err);
+        assert.isTrue(params.transaction.options.skipAdvancedFraudChecking);
+        done();
+      });
     });
 
     it('does not include skip_advanced_fraud_checking in params if its not specified', function (done) {
@@ -50,11 +50,11 @@ describe('TransactionGateway', () =>
         }
       };
 
-      let assertRequestBody = params => assert.notExists(params.transaction.options.skipAdvancedFraudChecking); // eslint-disable-line func-style
-
-      transactionGateway.sale(transactionParams, assertRequestBody);
-
-      done();
+      transactionGateway.sale(transactionParams, (err, params) => {
+        assert.notExists(err);
+        assert.notExists(params.transaction.options.skipAdvancedFraudChecking);
+        done();
+      });
     });
   })
 );
