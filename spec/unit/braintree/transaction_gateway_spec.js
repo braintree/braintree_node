@@ -50,7 +50,7 @@ describe('TransactionGateway', () =>
         }
       };
 
-      let assertRequestBody = params => assert.isFalse(params.transaction.options.skipAdvancedFraudChecking != null); // eslint-disable-line func-style
+      let assertRequestBody = params => assert.notExists(params.transaction.options.skipAdvancedFraudChecking); // eslint-disable-line func-style
 
       transactionGateway.sale(transactionParams, assertRequestBody);
 
