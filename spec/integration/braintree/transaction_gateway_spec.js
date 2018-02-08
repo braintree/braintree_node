@@ -403,6 +403,40 @@ describe('TransactionGateway', function () {
         });
       });
 
+      it('returns line items directly from a transaction', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '45.15',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.0232',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              totalAmount: '45.15'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          let transaction = response.transaction;
+
+          transaction.lineItems(function (err, response) {
+            assert.equal(response.length, 1);
+            let lineItem = response[0];
+
+            assert.equal(lineItem.quantity, '1.0232');
+            assert.equal(lineItem.name, 'Name #1');
+            assert.equal(lineItem.kind, 'debit');
+            assert.equal(lineItem.unitAmount, '45.1232');
+            assert.equal(lineItem.totalAmount, '45.15');
+            done();
+          });
+        });
+      });
+
       it('allows creation with single line item with zero amount fields', function (done) {
         let transactionParams = {
           type: 'sale',
