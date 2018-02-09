@@ -3,7 +3,7 @@
 The Braintree Node library provides integration access to the Braintree Gateway.
 
 ## Please Note
-> **The Payment Card Industry (PCI) Council has [mandated](http://blog.pcisecuritystandards.org/migrating-from-ssl-and-early-tls) that early versions of TLS be retired from service.  All organizations that handle credit card information are required to comply with this standard. As part of this obligation, Braintree is updating its services to require TLS 1.2 for all HTTPS connections. Braintree will also require HTTP/1.1 for all connections. Please see our [technical documentation](https://github.com/paypal/tls-update) for more information.**
+> **The Payment Card Industry (PCI) Council has [mandated](https://blog.pcisecuritystandards.org/migrating-from-ssl-and-early-tls) that early versions of TLS be retired from service.  All organizations that handle credit card information are required to comply with this standard. As part of this obligation, Braintree is updating its services to require TLS 1.2 for all HTTPS connections. Braintree will also require HTTP/1.1 for all connections. Please see our [technical documentation](https://github.com/paypal/tls-update) for more information.**
 
 ## Installation
 
@@ -17,7 +17,7 @@ The Braintree Node library provides integration access to the Braintree Gateway.
 ## Links
 
 * [Documentation](https://developers.braintreepayments.com/node/sdk/server/overview)
-* [Bug Tracker](http://github.com/braintree/braintree_node/issues)
+* [Bug Tracker](https://github.com/braintree/braintree_node/issues)
 
 ## Quick Start
 

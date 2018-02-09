@@ -1,3 +1,10 @@
+## 2.6.0
+* Deprecated `LineItem/DiscountAmountMustBeGreaterThanZero` error in favor of `DiscountAmountCannotBeNegative`.
+* Deprecated `LineItem/UnitTaxAmountMustBeGreaterThanZero` error in favor of `UnitTaxAmountCannotBeNegative`.
+* Add `sourceMerchantId` to `WebhookNotification`s if present
+* Add support for `taxAmount` field on transaction `lineItems`
+* Add `lineItems` method to `Transaction`
+
 ## 2.5.0
 * Add support for Level 3 summary parameters: `shippingAmount`, `discountAmount`, and `shipsFromPostalCode`
 * Fix spec to expect PayPal transactions to move to settling rather than settled

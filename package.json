@@ -1,13 +1,13 @@
 {
   "name": "braintree",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "A library for integrating with Braintree.",
   "keywords": [
     "braintree",
     "payments"
   ],
-  "homepage": "http://github.com/braintree/braintree_node",
-  "author": "Braintree <code@braintreepayments.com> (http://www.braintreepayments.com)",
+  "homepage": "https://github.com/braintree/braintree_node",
+  "author": "Braintree <code@braintreepayments.com> (https://www.braintreepayments.com)",
   "main": "index",
   "directories": {
     "lib": "./lib"

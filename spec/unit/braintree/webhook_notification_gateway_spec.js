@@ -43,7 +43,25 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionWentPastDue);
         assert.equal(webhookNotification.subscription.id, 'my_id');
-        assert.ok(webhookNotification.timestamp != null);
+        assert.exists(webhookNotification.timestamp);
+        assert.notExists(webhookNotification.sourceMerchantId);
+        done();
+      });
+    });
+
+    it('returns a source merchant ID if supplied', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubscriptionWentPastDue,
+        'my_id',
+        'my_source_merchant_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.notExists(err);
+        assert.equal(webhookNotification.sourceMerchantId, 'my_source_merchant_id');
+        assert.exists(webhookNotification.timestamp);
         done();
       });
     });
@@ -60,7 +78,7 @@ describe('WebhookNotificationGateway', function () {
         assert.equal(err, null);
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionWentPastDue);
         assert.equal(webhookNotification.subscription.id, 'my_id');
-        assert.ok(webhookNotification.timestamp != null);
+        assert.exists(webhookNotification.timestamp);
         done();
       });
     });
@@ -163,7 +181,7 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubMerchantAccountApproved);
         assert.equal(webhookNotification.merchantAccount.id, 'my_id');
-        assert.ok(webhookNotification.timestamp != null);
+        assert.exists(webhookNotification.timestamp);
         done();
       });
     });
@@ -181,7 +199,7 @@ describe('WebhookNotificationGateway', function () {
         assert.equal(webhookNotification.merchantAccount.id, 'my_id');
         assert.equal(webhookNotification.errors.for('merchantAccount').on('base')[0].code, ValidationErrorCodes.MerchantAccount.ApplicantDetails.DeclinedOFAC);
         assert.equal(webhookNotification.message, 'Credit score is too low');
-        assert.ok(webhookNotification.timestamp != null);
+        assert.exists(webhookNotification.timestamp);
         done();
       });
     });
@@ -198,7 +216,7 @@ describe('WebhookNotificationGateway', function () {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionDisbursed);
         assert.equal(webhookNotification.transaction.id, 'my_id');
         assert.equal(webhookNotification.transaction.amount, '100');
-        assert.ok(webhookNotification.transaction.disbursementDetails.disbursementDate != null);
+        assert.exists(webhookNotification.transaction.disbursementDetails.disbursementDate);
         done();
       });
     });
@@ -366,7 +384,7 @@ describe('WebhookNotificationGateway', function () {
         assert.equal(webhookNotification.partnerMerchant.clientSideEncryptionKey, 'cse_key');
         assert.equal(webhookNotification.partnerMerchant.merchantPublicId, 'public_id');
         assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123');
-        assert.ok(webhookNotification.timestamp != null);
+        assert.exists(webhookNotification.timestamp);
         done();
       });
     });
@@ -382,7 +400,7 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDisconnected);
         assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123');
-        assert.ok(webhookNotification.timestamp != null);
+        assert.exists(webhookNotification.timestamp);
         done();
       });
     });
@@ -398,7 +416,7 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.PartnerMerchantDeclined);
         assert.equal(webhookNotification.partnerMerchant.partnerMerchantId, 'abc123');
-        assert.ok(webhookNotification.timestamp != null);
+        assert.exists(webhookNotification.timestamp);
         done();
       });
     });
@@ -416,7 +434,7 @@ describe('WebhookNotificationGateway', function () {
         assert.equal(webhookNotification.connectedMerchantStatusTransitioned.merchantPublicId, 'my_id');
         assert.equal(webhookNotification.connectedMerchantStatusTransitioned.status, 'new_status');
         assert.equal(webhookNotification.connectedMerchantStatusTransitioned.oauthApplicationClientId, 'oauth_application_client_id');
-        assert.ok(webhookNotification.timestamp != null);
+        assert.exists(webhookNotification.timestamp);
         done();
       });
     });
@@ -434,7 +452,7 @@ describe('WebhookNotificationGateway', function () {
         assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.merchantPublicId, 'my_id');
         assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.action, 'link');
         assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.oauthApplicationClientId, 'oauth_application_client_id');
-        assert.ok(webhookNotification.timestamp != null);
+        assert.exists(webhookNotification.timestamp);
         done();
       });
     });

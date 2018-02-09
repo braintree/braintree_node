@@ -403,6 +403,73 @@ describe('TransactionGateway', function () {
         });
       });
 
+      it('returns line items directly from a transaction', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '45.15',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.0232',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              totalAmount: '45.15'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          let transaction = response.transaction;
+
+          transaction.lineItems(function (err, response) {
+            assert.equal(response.length, 1);
+            let lineItem = response[0];
+
+            assert.equal(lineItem.quantity, '1.0232');
+            assert.equal(lineItem.name, 'Name #1');
+            assert.equal(lineItem.kind, 'debit');
+            assert.equal(lineItem.unitAmount, '45.1232');
+            assert.equal(lineItem.totalAmount, '45.15');
+            done();
+          });
+        });
+      });
+
+      it('allows creation with single line item with zero amount fields', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '45.15',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.0232',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              totalAmount: '45.15',
+              discountAmount: '0',
+              taxAmount: '0',
+              unitTaxAmount: '0'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isTrue(response.success);
+          specHelper.defaultGateway.transactionLineItem.findAll(response.transaction.id, function (err, response) {
+            assert.equal(response.length, 1);
+            let lineItem = response[0];
+
+            assert.equal(lineItem.discountAmount, '0.00');
+            assert.equal(lineItem.taxAmount, '0.00');
+            assert.equal(lineItem.unitTaxAmount, '0.00');
+            done();
+          });
+        });
+      });
+
       it('allows creation with single line item and returns it', function (done) {
         let transactionParams = {
           type: 'sale',
@@ -418,6 +485,7 @@ describe('TransactionGateway', function () {
               unitTaxAmount: '1.23',
               unitOfMeasure: 'gallon',
               discountAmount: '1.02',
+              taxAmount: '1.24',
               totalAmount: '45.15',
               productCode: '23434',
               commodityCode: '9SAASSD8724',
@@ -440,6 +508,7 @@ describe('TransactionGateway', function () {
             assert.equal(lineItem.unitTaxAmount, '1.23');
             assert.equal(lineItem.unitOfMeasure, 'gallon');
             assert.equal(lineItem.discountAmount, '1.02');
+            assert.equal(lineItem.taxAmount, '1.24');
             assert.equal(lineItem.totalAmount, '45.15');
             assert.equal(lineItem.productCode, '23434');
             assert.equal(lineItem.commodityCode, '9SAASSD8724');
@@ -462,6 +531,7 @@ describe('TransactionGateway', function () {
               unitAmount: '45.1232',
               unitOfMeasure: 'gallon',
               discountAmount: '1.02',
+              taxAmount: '0.11',
               totalAmount: '45.15',
               productCode: '23434',
               commodityCode: '9SAASSD8724'
@@ -492,6 +562,7 @@ describe('TransactionGateway', function () {
             assert.equal(lineItem1.unitAmount, '45.1232');
             assert.equal(lineItem1.unitOfMeasure, 'gallon');
             assert.equal(lineItem1.discountAmount, '1.02');
+            assert.equal(lineItem1.taxAmount, '0.11');
             assert.equal(lineItem1.totalAmount, '45.15');
             assert.equal(lineItem1.productCode, '23434');
             assert.equal(lineItem1.commodityCode, '9SAASSD8724');
@@ -507,6 +578,7 @@ describe('TransactionGateway', function () {
             assert.equal(lineItem2.unitOfMeasure, 'gallon');
             assert.equal(lineItem2.totalAmount, '10.10');
             assert.equal(lineItem2.discountAmount, null);
+            assert.equal(lineItem2.taxAmount, null);
             assert.equal(lineItem2.productCode, null);
             assert.equal(lineItem2.commodityCode, null);
             done();
@@ -667,7 +739,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('handles validation error discount amount must be greater than zero', function (done) {
+      it('handles validation error discount amount cannot be negative', function (done) {
         let transactionParams = {
           type: 'sale',
           amount: '35.05',
@@ -700,7 +772,7 @@ describe('TransactionGateway', function () {
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success, 'response had no errors');
-          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountMustBeGreaterThanZero);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('discountAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.DiscountAmountCannotBeNegative);
           done();
         });
       });
@@ -1425,7 +1497,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('handles validation error unit tax amount must be greater than zero', function (done) {
+      it('handles validation error unit tax amount cannot be negative', function (done) {
         let transactionParams = {
           type: 'sale',
           amount: '35.05',
@@ -1459,7 +1531,91 @@ describe('TransactionGateway', function () {
 
         specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
           assert.isFalse(response.success, 'response had no errors');
-          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountMustBeGreaterThanZero);
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index1').on('unitTaxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.UnitTaxAmountCannotBeNegative);
+          done();
+        });
+      });
+
+      it('handles validation error tax amount format is invalid', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.0122',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              taxAmount: '2.012',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index0').on('taxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TaxAmountFormatIsInvalid);
+          done();
+        });
+      });
+
+      it('handles validation error tax amount is too large', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.0122',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              taxAmount: '2147483648',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index0').on('taxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TaxAmountIsTooLarge);
+          done();
+        });
+      });
+
+      it('handles validation error tax amount cannot be negative', function (done) {
+        let transactionParams = {
+          type: 'sale',
+          amount: '35.05',
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: '1.2322',
+              name: 'Name #2',
+              kind: 'credit',
+              unitAmount: '45.0122',
+              unitOfMeasure: 'gallon',
+              discountAmount: '1.02',
+              taxAmount: '-1.23',
+              totalAmount: '45.15',
+              productCode: '23434',
+              commodityCode: '9SAASSD8724'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(response.errors.for('transaction').for('lineItems').for('index0').on('taxAmount')[0].code, ValidationErrorCodes.Transaction.LineItem.TaxAmountCannotBeNegative);
           done();
         });
       });
