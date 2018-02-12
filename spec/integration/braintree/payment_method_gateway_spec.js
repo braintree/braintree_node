@@ -77,9 +77,9 @@ describe('PaymentMethodGateway', function () {
             assert.isString(response.paymentMethod.expirationYear);
             assert.isTrue(response.paymentMethod.default);
             assert.include(response.paymentMethod.imageUrl, 'android_pay');
-            assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.Visa);
+            assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.Discover);
             assert.equal(response.paymentMethod.sourceCardLast4, '1111');
-            assert.equal(response.paymentMethod.sourceDescription, 'Visa 1111');
+            assert.equal(response.paymentMethod.sourceDescription, 'Discover 1111');
             assert.equal(response.paymentMethod.customerId, customerId);
 
             done();
@@ -1227,7 +1227,7 @@ describe('PaymentMethodGateway', function () {
               assert.isString(androidPayCard.expirationYear);
               assert.isTrue(androidPayCard.default);
               assert.include(androidPayCard.imageUrl, 'android_pay');
-              assert.equal(androidPayCard.sourceCardType, specHelper.braintree.CreditCard.CardType.Visa);
+              assert.equal(androidPayCard.sourceCardType, specHelper.braintree.CreditCard.CardType.Discover);
               assert.equal(androidPayCard.sourceCardLast4, '1111');
 
               done();
