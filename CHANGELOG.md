@@ -1,3 +1,6 @@
+## Unreleased
+* Throw error if signature or payload is null in `WebhookNotificationGateway`.
+
 ## 2.6.0
 * Deprecated `LineItem/DiscountAmountMustBeGreaterThanZero` error in favor of `DiscountAmountCannotBeNegative`.
 * Deprecated `LineItem/UnitTaxAmountMustBeGreaterThanZero` error in favor of `UnitTaxAmountCannotBeNegative`.
