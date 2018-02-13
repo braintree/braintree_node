@@ -32,6 +32,22 @@ describe('WebhookNotificationGateway', function () {
   });
 
   describe('sampleNotification', function () {
+    it('throws an error when signature is empty', function (done) {
+      specHelper.defaultGateway.webhookNotification.parse(null, 'some payload', function (err) {
+        assert.equal(err.type, errorTypes.invalidSignatureError);
+        assert.equal(err.message, 'signature parameter is required');
+        done();
+      });
+    });
+
+    it('throws an error when payload is empty', function (done) {
+      specHelper.defaultGateway.webhookNotification.parse('signature', null, function (err) {
+        assert.equal(err.type, errorTypes.invalidSignatureError);
+        assert.equal(err.message, 'payload parameter is required');
+        done();
+      });
+    });
+
     it('returns a parsable signature and payload', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.SubscriptionWentPastDue,
