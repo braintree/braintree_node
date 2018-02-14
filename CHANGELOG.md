@@ -7,6 +7,7 @@
 * Add `sourceMerchantId` to `WebhookNotification`s if present
 * Add support for `taxAmount` field on transaction `lineItems`
 * Add `lineItems` method to `Transaction`
+* Add support for `profile_id` in Transaction#create options for VenmoAccounts
 
 ## 2.5.0
 * Add support for Level 3 summary parameters: `shippingAmount`, `discountAmount`, and `shipsFromPostalCode`

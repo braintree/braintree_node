@@ -1789,13 +1789,35 @@ describe('TransactionGateway', function () {
       )
     );
 
-    context('with venmo account', () =>
-      it('returns VenmoAccount for payment_instrument', done =>
+    context('with venmo account', function () {
+      it('returns VenmoAccount for payment_instrument', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             paymentMethodNonce: Nonces.VenmoAccount,
             merchantAccountId: specHelper.fakeVenmoAccountMerchantAccountId,
             amount: '100.00'
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            done();
+          });
+        });
+      });
+
+      it('supports profile_id', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.VenmoAccount,
+            merchantAccountId: specHelper.fakeVenmoAccountMerchantAccountId,
+            amount: '100.00',
+            options: {
+              venmo: {
+                profileId: 'integration_venmo_merchant_public_id'
+              }
+            }
           };
 
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
@@ -1807,9 +1829,9 @@ describe('TransactionGateway', function () {
 
             done();
           });
-        })
-      )
-    );
+        });
+      });
+    });
 
     context('Coinbase', () =>
       it('can no longer use Coinbase in a transaction sale', done =>
