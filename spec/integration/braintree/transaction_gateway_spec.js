@@ -187,6 +187,34 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('can serialize response object without gateway property on transaction', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        paymentMethodNonce: 'fake-valid-nonce',
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        var serializedObject, parsedObject;
+
+        try {
+          serializedObject = JSON.stringify(response);
+          parsedObject = JSON.parse(serializedObject);
+        } catch (e) {
+          // should not get here
+          done(e);
+          return;
+        }
+
+        assert.isString(serializedObject);
+        assert.equal(response.transaction.id, parsedObject.transaction.id);
+
+        done();
+      });
+    });
+
     context('level 3 summary values', function () {
       it('allows creation with level 3 summary values provided', function (done) {
         let transactionParams = {

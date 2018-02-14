@@ -1,4 +1,5 @@
-## Unreleased
+## unreleased
+* Fixes issue where some response objects were not serializable (#126)
 * Throw error if signature or payload is null in `WebhookNotificationGateway`.
 
 ## 2.6.0
