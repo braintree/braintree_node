@@ -1,3 +1,8 @@
+## 2.7.0
+* Fixes issue where some response objects were not serializable (#126)
+* Throw error if signature or payload is null in `WebhookNotificationGateway`.
+* Add support for `profile_id` in Transaction#create options for VenmoAccounts.
+
 ## 2.6.0
 * Deprecated `LineItem/DiscountAmountMustBeGreaterThanZero` error in favor of `DiscountAmountCannotBeNegative`.
 * Deprecated `LineItem/UnitTaxAmountMustBeGreaterThanZero` error in favor of `UnitTaxAmountCannotBeNegative`.
