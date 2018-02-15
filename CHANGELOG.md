@@ -1,6 +1,7 @@
-## unreleased
+## 2.7.0
 * Fixes issue where some response objects were not serializable (#126)
 * Throw error if signature or payload is null in `WebhookNotificationGateway`.
+* Add support for `profile_id` in Transaction#create options for VenmoAccounts.
 
 ## 2.6.0
 * Deprecated `LineItem/DiscountAmountMustBeGreaterThanZero` error in favor of `DiscountAmountCannotBeNegative`.
@@ -8,7 +9,6 @@
 * Add `sourceMerchantId` to `WebhookNotification`s if present
 * Add support for `taxAmount` field on transaction `lineItems`
 * Add `lineItems` method to `Transaction`
-* Add support for `profile_id` in Transaction#create options for VenmoAccounts
 
 ## 2.5.0
 * Add support for Level 3 summary parameters: `shippingAmount`, `discountAmount`, and `shipsFromPostalCode`
