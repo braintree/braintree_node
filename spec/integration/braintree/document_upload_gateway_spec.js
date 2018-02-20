@@ -13,7 +13,9 @@ describe('DocumentUploadGateway', () => {
   after(removeLargeFile);
   describe('create', () => {
     it('uploads documents', () => {
-      let file = fs.createReadStream('./spec/fixtures/bt_logo.png');
+      let filePath = './spec/fixtures/bt_logo.png';
+
+      let file = fs.createReadStream(filePath);
       let params = {
         kind: 'evidence_document',
         file: file
@@ -21,6 +23,12 @@ describe('DocumentUploadGateway', () => {
 
       return specHelper.defaultGateway.documentUpload.create(params).then((result) => {
         assert.isTrue(result.success);
+
+        let doc = result.documentUpload;
+
+        assert.equal(2443, doc.size);
+        assert.equal('image/png', doc.contentType);
+        assert.equal('bt_logo.png', doc.name);
       });
     });
 
