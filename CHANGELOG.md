@@ -1,3 +1,6 @@
+## Unreleased
+* Fix binary multipart uploads.
+
 ## 2.7.0
 * Fixes issue where some response objects were not serializable (#126)
 * Throw error if signature or payload is null in `WebhookNotificationGateway`.
