@@ -1,3 +1,7 @@
+## 2.8.0
+* Fix binary multipart uploads.
+* Add support for `association_filter_id` in `Customer#find`
+
 ## 2.7.0
 * Fixes issue where some response objects were not serializable (#126)
 * Throw error if signature or payload is null in `WebhookNotificationGateway`.

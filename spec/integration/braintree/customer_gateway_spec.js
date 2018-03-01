@@ -782,6 +782,89 @@ describe('CustomerGateway', function () {
         done();
       })
     );
+
+    describe('when given an association filter id', function () {
+      it('filters out all filterable associations', function (done) {
+        let customerParams = {
+          firstName: 'John',
+          lastName: 'Smith',
+          customFields: {
+            storeMe: 'custom value'
+          },
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2014',
+            billingAddress: {
+              company: '',
+              streetAddress: '123 E Fake St',
+              locality: 'Chicago',
+              region: 'IL',
+              postalCode: '60607'
+            }
+          }
+        };
+
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+          assert.isNull(err);
+          specHelper.defaultGateway.customer.find(response.customer.id, 'customernoassociations', function (err, customer) {
+            assert.equal(customer.creditCards.length, 0);
+            assert.equal(customer.paymentMethods.length, 0);
+            assert.equal(customer.addresses.length, 0);
+            assert.equal(customer.customFields.length, 0);
+
+            done();
+          });
+        });
+      });
+
+      it('filters out nested filterable associations', function (done) {
+        let customerParams = {
+          firstName: 'John',
+          lastName: 'Smith',
+          customFields: {
+            storeMe: 'custom value'
+          },
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2014',
+            billingAddress: {
+              company: '',
+              streetAddress: '123 E Fake St',
+              locality: 'Chicago',
+              region: 'IL',
+              postalCode: '60607'
+            }
+          }
+        };
+
+        specHelper.defaultGateway.customer.create(customerParams, function (err, customerResponse) {
+          assert.isNull(err);
+          assert.equal(customerResponse.success, true);
+
+          let subscriptionParams = {
+            paymentMethodToken: customerResponse.customer.creditCards[0].token,
+            planId: specHelper.plans.trialless.id,
+            id: specHelper.randomId()
+          };
+
+          specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, subscriptionResponse) {
+            assert.isNull(err);
+            assert.equal(subscriptionResponse.success, true);
+
+            specHelper.defaultGateway.customer.find(customerResponse.customer.id, 'customertoplevelassociations', function (err, customer) {
+              assert.equal(customer.creditCards.length, 1);
+              assert.equal(customer.creditCards[0].subscriptions.length, 0);
+              assert.equal(customer.paymentMethods.length, 1);
+              assert.equal(customer.paymentMethods[0].subscriptions.length, 0);
+              assert.equal(customer.addresses.length, 1);
+              assert.equal(customer.customFields.storeMe, 'custom value');
+
+              done();
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('update', function () {
@@ -1297,7 +1380,7 @@ describe('CustomerGateway', function () {
         });
       });
 
-      it("doesn't serialize nulls as empty objects", function (done) {
+      it('doesn\'t serialize nulls as empty objects', function (done) {
         let customerParams = {
           creditCard: {
             number: '4111111111111111',
