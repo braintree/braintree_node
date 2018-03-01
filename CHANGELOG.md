@@ -1,4 +1,4 @@
-## Unreleased
+## 2.8.0
 * Fix binary multipart uploads.
 * Add support for `association_filter_id` in `Customer#find`
 
