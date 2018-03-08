@@ -629,7 +629,7 @@ describe('CustomerGateway', function () {
       specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
-        assert.isTrue(response.customer.creditCards[0].venmoSdk);
+        assert.isFalse(response.customer.creditCards[0].venmoSdk);
 
         done();
       });

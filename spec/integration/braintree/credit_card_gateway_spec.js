@@ -168,7 +168,7 @@ describe('CreditCardGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.creditCard.maskedNumber, '411111******1111');
-        assert.isTrue(response.creditCard.venmoSdk);
+        assert.isFalse(response.creditCard.venmoSdk);
 
         done();
       });
@@ -207,7 +207,7 @@ describe('CreditCardGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.creditCard.maskedNumber, '510510******5100');
-        assert.isTrue(response.creditCard.venmoSdk);
+        assert.isFalse(response.creditCard.venmoSdk);
 
         done();
       });
