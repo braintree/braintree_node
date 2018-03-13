@@ -212,7 +212,6 @@ describe('ClientTokenGateway', function () {
       assert.equal(err.message, 'These keys are invalid: sepaMandateType');
       done();
     })
-
   );
 
   it('returns an error when an non-existant customer_id is provided', function (done) {
