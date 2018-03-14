@@ -259,8 +259,14 @@ describe('CustomerGateway', function () {
 
       it('creates a customer with a Us Bank Account nonce', done =>
         specHelper.generateValidUsBankAccountNonce(function (token) {
-          let customerParams =
-            {paymentMethodNonce: token};
+          let customerParams = {
+            paymentMethodNonce: token,
+            creditCard: {
+              options: {
+                verificationMerchantAccountId: 'us_bank_merchant_account'
+              }
+            }
+          };
 
           specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
             assert.isNull(err);
@@ -740,8 +746,14 @@ describe('CustomerGateway', function () {
 
     it('returns us bank account for a given customer', done =>
       specHelper.generateValidUsBankAccountNonce(function (token) {
-        let customerParams =
-          {paymentMethodNonce: token};
+        let customerParams = {
+          paymentMethodNonce: token,
+          creditCard: {
+            options: {
+              verificationMerchantAccountId: 'us_bank_merchant_account'
+            }
+          }
+        };
 
         specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);

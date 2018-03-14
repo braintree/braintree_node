@@ -179,7 +179,10 @@ describe('PaymentMethodGateway', function () {
           specHelper.generateValidUsBankAccountNonce(function (nonce) {
             let paymentMethodParams = {
               customerId,
-              paymentMethodNonce: nonce
+              paymentMethodNonce: nonce,
+              options: {
+                verificationMerchantAccountId: 'us_bank_merchant_account'
+              }
             };
 
             specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
@@ -206,7 +209,10 @@ describe('PaymentMethodGateway', function () {
 
           let paymentMethodParams = {
             customerId,
-            paymentMethodNonce: specHelper.generateInvalidUsBankAccountNonce()
+            paymentMethodNonce: specHelper.generateInvalidUsBankAccountNonce(),
+            options: {
+              verificationMerchantAccountId: 'us_bank_merchant_account'
+            }
           };
 
           specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
