@@ -1,6 +1,7 @@
 'use strict';
 
 let fs = require('fs');
+let sinon = require('sinon');
 let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 let Dispute = require('../../../lib/braintree/dispute').Dispute;
 let DocumentUpload = require('../../../lib/braintree/document_upload').DocumentUpload;
@@ -103,6 +104,34 @@ describe('DisputeGateway', () => {
         });
     });
 
+    it('adds file evidence with category', () => {
+      let disputeId, evidenceId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return createEvidenceDocument();
+        })
+        .then((document) => {
+          return disputeGateway.addFileEvidence(
+            disputeId,
+            {
+              documentId: document.id,
+              category: 'GENERAL'
+            }
+          );
+        })
+        .then((response) => {
+          evidenceId = response.evidence.id;
+
+          assert.isTrue(response.success);
+
+          assert.equal(evidenceId, response.evidence.id);
+          assert.equal('GENERAL', response.evidence.category);
+        });
+    });
+
     it('raises error when dispute not found', () => {
       return disputeGateway.addFileEvidence('unknown_dispute_id', 'unknown_document_id')
         .catch((err) => {
@@ -110,6 +139,7 @@ describe('DisputeGateway', () => {
           assert.equal('dispute with id \'unknown_dispute_id\' not found', err.message);
         });
     });
+
     it('raises error when dispute not open', () => {
       let disputeId;
 
@@ -130,6 +160,60 @@ describe('DisputeGateway', () => {
           assert.isFalse(response.success);
           assert.equal(ValidationErrorCodes.Dispute.CanOnlyAddEvidenceToOpenDispute, error.code);
           assert.equal('Evidence can only be attached to disputes that are in an Open state', error.message);
+        });
+    });
+
+    it('raises error when category is not supported', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return dispute;
+        }).then(() => {
+          return createEvidenceDocument();
+        })
+        .then((document) => {
+          return disputeGateway.addFileEvidence(
+            disputeId,
+            {
+              documentId: document.id,
+              category: 'NOTAREALCATEGORY'
+            });
+        })
+        .then((response) => {
+          let error = response.errors.for('dispute').on('evidence')[0];
+
+          assert.isFalse(response.success);
+          assert.equal(ValidationErrorCodes.Dispute.CanOnlyCreateEvidenceWithValidCategory, error.code);
+        });
+    });
+
+    it('returns error when creating file evidence for text-only category', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return dispute;
+        }).then(() => {
+          return createEvidenceDocument();
+        })
+        .then((document) => {
+          return disputeGateway.addFileEvidence(
+            disputeId,
+            {
+              documentId: document.id,
+              category: 'DEVICE_ID'
+            });
+        })
+        .then((response) => {
+          let error = response.errors.for('dispute').on('evidence')[0];
+
+          assert.isFalse(response.success);
+          assert.equal(ValidationErrorCodes.Dispute.EvidenceCategoryTextOnly, error.code);
         });
     });
   });
@@ -153,6 +237,47 @@ describe('DisputeGateway', () => {
           assert.isTrue(/^\w{16,}$/.test(evidence.id));
           assert.isNull(evidence.sentToProcessorAt);
           assert.isNull(evidence.url);
+        });
+    });
+
+    it('warns when tag is used instead of category', () => {
+      let disputeId;
+      let stub = sinon.stub();
+
+      console.warn = stub; // eslint-disable-line no-console
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(disputeId, {tag: 'DEVICE_ID', content: 'M'});
+        })
+        .then((response) => {
+          assert.isTrue(stub.called);
+          assert.equal(stub.firstCall.args[0], '[DEPRECATED] tag as an option is deprecated. Please use category.');
+          let evidence = response.evidence;
+
+          assert.isTrue(response.success);
+          assert.equal('M', evidence.comment);
+          assert.equal('DEVICE_ID', evidence.category);
+        });
+    });
+
+    it('accepts a category', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(disputeId, {category: 'DEVICE_ID', content: 'M'});
+        })
+        .then((response) => {
+          let evidence = response.evidence;
+
+          assert.isTrue(response.success);
+          assert.equal('M', evidence.comment);
+          assert.equal('DEVICE_ID', evidence.category);
         });
     });
 
@@ -208,6 +333,52 @@ describe('DisputeGateway', () => {
           assert.equal('text evidence', evidence.comment);
         });
     });
+
+    it('returns error when creating text evidence for file-only category', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+        })
+        .then(() => {
+          return disputeGateway.addTextEvidence(
+            disputeId,
+            {
+              content: 'foo',
+              category: 'MERCHANT_WEBSITE_OR_APP_ACCESS'
+            });
+        })
+        .then((response) => {
+          let error = response.errors.for('dispute').on('evidence')[0];
+
+          assert.isFalse(response.success);
+          assert.equal(ValidationErrorCodes.Dispute.EvidenceCategoryDocumentOnly, error.code);
+        });
+    });
+
+    it('returns error when creating text evidence with invalid date time format', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+        })
+        .then(() => {
+          return disputeGateway.addTextEvidence(
+            disputeId,
+            {
+              content: 'foo',
+              category: 'DOWNLOAD_DATE_TIME'
+            });
+        })
+        .then((response) => {
+          let error = response.errors.for('dispute').on('evidence')[0];
+
+          assert.isFalse(response.success);
+          assert.equal(ValidationErrorCodes.Dispute.EvidenceContentDateInvalid, error.code);
+        });
+    });
   });
 
   describe('self.finalize', () => {
@@ -249,6 +420,61 @@ describe('DisputeGateway', () => {
         .catch((err) => {
           assert.equal(err.type, 'notFoundError');
           assert.equal(err.message, 'dispute with id \'invalid-id\' not found');
+        });
+    });
+
+    it('returns error with digital goods missing', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+        })
+        .then(() => {
+          return disputeGateway.addTextEvidence(
+            disputeId,
+            {
+              content: 'foo',
+              category: 'DEVICE_ID'
+            });
+        })
+        .then(() => {
+          return disputeGateway.finalize(disputeId);
+        })
+        .then((response) => {
+          let errorCodes = response.errors.for('dispute').on('dispute').map(e => e.code);
+
+          assert.isFalse(response.success);
+          assert.equal(errorCodes.length, 2);
+          assert.include(errorCodes, ValidationErrorCodes.Dispute.DigitalGoodsMissingDownloadDate);
+          assert.include(errorCodes, ValidationErrorCodes.Dispute.DigitalGoodsMissingEvidence);
+        });
+    });
+
+    it('returns error with partial non-disputed transaction information', () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+        })
+        .then(() => {
+          return disputeGateway.addTextEvidence(
+            disputeId,
+            {
+              content: 'foo',
+              category: 'PRIOR_NON_DISPUTED_TRANSACTION_ARN'
+            });
+        })
+        .then(() => {
+          return disputeGateway.finalize(disputeId);
+        })
+        .then((response) => {
+          let errorCodes = response.errors.for('dispute').on('dispute').map(e => e.code);
+
+          assert.isFalse(response.success);
+          assert.equal(errorCodes.length, 1);
+          assert.equal(ValidationErrorCodes.Dispute.NonDisputedPriorTransactionEvidenceMissingDate, errorCodes[0]);
         });
     });
   });

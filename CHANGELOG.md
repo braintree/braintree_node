@@ -2,6 +2,7 @@
 * Add `oauthAccessRevocation` to `WebhookNotification`s
 * Add support for dispute search by `customerId`, `effectiveDate`, and `disbursementDate`
 * Remove `sepaMandateType` and `sepaMandateAcceptanceLocation` params from `ClientTokenGateway`
+* Add support for categorized dispute evidence
 
 ## 2.8.0
 * Fix binary multipart uploads.

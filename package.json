@@ -32,7 +32,8 @@
     "chai": "4.1.0",
     "eslint": "^2.7.0",
     "eslint-config-braintree": "^1.0.2",
-    "mocha": "3.4.2"
+    "mocha": "3.4.2",
+    "sinon": "^4.5.0"
   },
   "license": "MIT",
   "scripts": {
