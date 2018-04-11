@@ -1,4 +1,4 @@
-## Unreleased
+## 2.9.0
 * Add `oauthAccessRevocation` to `WebhookNotification`s
 * Add support for dispute search by `customerId`, `effectiveDate`, and `disbursementDate`
 * Remove `sepaMandateType` and `sepaMandateAcceptanceLocation` params from `ClientTokenGateway`
