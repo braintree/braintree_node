@@ -1,6 +1,7 @@
 'use strict';
 
 let Dispute = require('../../../lib/braintree/dispute').Dispute;
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 
 describe('DisputeSearch', () => {
   describe('callback', () => {
@@ -40,9 +41,61 @@ describe('DisputeSearch', () => {
       });
     });
 
-    it('returns disputes by date range', (done) => {
+    it('returns disputes by customer_id', (done) => {
+      specHelper.defaultGateway.customer.create({
+        firstName: 'Action',
+        lastName: 'Jackson'
+      }, (err, result) => {
+        specHelper.defaultGateway.transaction.sale({
+          amount: '10.00',
+          creditCard: {
+            expirationDate: '12/2020',
+            number: CreditCardNumbers.Dispute.Chargeback
+          },
+          customerId: result.customer.id,
+          options: {submitForSettlement: true}
+        }, (err, result) =>
+          specHelper.defaultGateway.dispute.search(function (search) {
+            return search.customerId().is(result.transaction.customer.id);
+          }, (err, response) => {
+            assert.isNull(err);
+            assert.equal(1, response.length);
+
+            done();
+          })
+        );
+      });
+    });
+
+    it('returns disputes by received date range', (done) => {
       specHelper.defaultGateway.dispute.search(function (search) {
         return search.receivedDate().between(
+          '03/03/2014', '03/05/2014'
+        );
+      }, function (err, response) {
+        assert.isNull(err);
+        assert.equal(1, response.length);
+
+        done();
+      });
+    });
+
+    it('returns disputes by disbursement date range', (done) => {
+      specHelper.defaultGateway.dispute.search(function (search) {
+        return search.disbursementDate().between(
+          '03/03/2014', '03/05/2014'
+        );
+      }, function (err, response) {
+        assert.isNull(err);
+        assert.equal(1, response.length);
+
+        done();
+      });
+    });
+
+    it('returns disputes by effective date range', (done) => {
+      specHelper.defaultGateway.dispute.search(function (search) {
+        return search.effectiveDate().between(
           '03/03/2014', '03/05/2014'
         );
       }, function (err, response) {
@@ -106,9 +159,71 @@ describe('DisputeSearch', () => {
       });
     });
 
-    it('returns disputes by date range', (done) => {
+    it('returns disputes by customer_id', (done) => {
+      specHelper.defaultGateway.customer.create({
+        firstName: 'Action',
+        lastName: 'Jackson'
+      }, (err, result) => {
+        specHelper.defaultGateway.transaction.sale({
+          amount: '10.00',
+          creditCard: {
+            expirationDate: '12/2020',
+            number: CreditCardNumbers.Dispute.Chargeback
+          },
+          customerId: result.customer.id,
+          options: {submitForSettlement: true}
+        }, (err, result) => {
+          let stream = specHelper.defaultGateway.dispute.search(function (search) {
+            return search.customerId().is(result.transaction.customer.id);
+          });
+
+          stream.on('data', dispute => disputes.push(dispute));
+
+          stream.on('end', () => {
+            assert.isNull(err);
+            assert.equal(1, disputes.length);
+
+            done();
+          });
+        });
+      });
+    });
+
+    it('returns disputes by received date range', (done) => {
       let stream = specHelper.defaultGateway.dispute.search(function (search) {
         return search.receivedDate().between(
+          '03/03/2014', '03/05/2014'
+        );
+      });
+
+      stream.on('data', dispute => disputes.push(dispute));
+
+      stream.on('end', () => {
+        assert.equal(1, disputes.length);
+
+        done();
+      });
+    });
+
+    it('returns disputes by disbursement date range', (done) => {
+      let stream = specHelper.defaultGateway.dispute.search(function (search) {
+        return search.disbursementDate().between(
+          '03/03/2014', '03/05/2014'
+        );
+      });
+
+      stream.on('data', dispute => disputes.push(dispute));
+
+      stream.on('end', () => {
+        assert.equal(1, disputes.length);
+
+        done();
+      });
+    });
+
+    it('returns disputes by effective date range', (done) => {
+      let stream = specHelper.defaultGateway.dispute.search(function (search) {
+        return search.effectiveDate().between(
           '03/03/2014', '03/05/2014'
         );
       });

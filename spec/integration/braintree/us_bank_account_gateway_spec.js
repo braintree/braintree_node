@@ -9,7 +9,10 @@ describe('UsBankAccountGateway', function () {
         specHelper.generateValidUsBankAccountNonce(function (nonce) {
           let usBankAccountParams = {
             customerId: response.customer.id,
-            paymentMethodNonce: nonce
+            paymentMethodNonce: nonce,
+            options: {
+              verificationMerchantAccountId: 'us_bank_merchant_account'
+            }
           };
 
           specHelper.defaultGateway.paymentMethod.create(usBankAccountParams, function (err, response) {
@@ -52,7 +55,10 @@ describe('UsBankAccountGateway', function () {
         specHelper.generateValidUsBankAccountNonce(function (nonce) {
           let usBankAccountParams = {
             customerId: response.customer.id,
-            paymentMethodNonce: nonce
+            paymentMethodNonce: nonce,
+            options: {
+              verificationMerchantAccountId: 'us_bank_merchant_account'
+            }
           };
 
           specHelper.defaultGateway.paymentMethod.create(usBankAccountParams, function (err, response) {

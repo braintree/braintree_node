@@ -30,6 +30,7 @@ describe('Dispute', function () {
       createdAt: '2013-04-11',
       id: 'evidence1',
       sentToProcessorAt: null,
+      category: 'GENERAL',
       url: 'url_of_file_evidence'
     }, {
       comment: 'text evidence',
@@ -118,6 +119,7 @@ describe('Dispute', function () {
       assert.equal('2013-04-11', dispute.evidence[0].createdAt);
       assert.equal('evidence1', dispute.evidence[0].id);
       assert.equal(null, dispute.evidence[0].sentToProcessorAt);
+      assert.equal('GENERAL', dispute.evidence[0].category);
       assert.equal('url_of_file_evidence', dispute.evidence[0].url);
       assert.equal('text evidence', dispute.evidence[1].comment);
       assert.equal('2013-04-11', dispute.evidence[1].createdAt);

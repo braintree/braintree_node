@@ -172,6 +172,25 @@ describe('PaymentMethodGateway', function () {
       )
     );
 
+    context('Europe Bank Account', () =>
+      it('vaults an Europe Bank Account from the nonce', done =>
+        specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
+          customerId = response.customer.id;
+
+          let paymentMethodParams = {
+            customerId,
+            paymentMethodNonce: Nonces.Europe
+          };
+
+          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err) {
+            assert.isNotNull(err);
+            assert.equal(err.type, 'serverError');
+            done();
+          });
+        })
+      )
+    );
+
     context('US Bank Account', function () {
       it('vaults a US Bank Account from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
@@ -179,7 +198,10 @@ describe('PaymentMethodGateway', function () {
           specHelper.generateValidUsBankAccountNonce(function (nonce) {
             let paymentMethodParams = {
               customerId,
-              paymentMethodNonce: nonce
+              paymentMethodNonce: nonce,
+              options: {
+                verificationMerchantAccountId: 'us_bank_merchant_account'
+              }
             };
 
             specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
@@ -206,7 +228,10 @@ describe('PaymentMethodGateway', function () {
 
           let paymentMethodParams = {
             customerId,
-            paymentMethodNonce: specHelper.generateInvalidUsBankAccountNonce()
+            paymentMethodNonce: specHelper.generateInvalidUsBankAccountNonce(),
+            options: {
+              verificationMerchantAccountId: 'us_bank_merchant_account'
+            }
           };
 
           specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {

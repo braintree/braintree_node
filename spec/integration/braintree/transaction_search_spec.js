@@ -3,6 +3,7 @@
 let Braintree = require('../../../lib/braintree');
 let _ = require('underscore');
 let Transaction = Braintree.Transaction;
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 let CreditCard = Braintree.CreditCard;
 let Util = require('../../../lib/braintree/util').Util;
 let Writable = require('stream').Writable;
@@ -501,28 +502,29 @@ describe('TransactionSearch', () =>
     });
 
     it('can find transactions by dispute date', function (done) {
-      let yesterday = new Date('March 1, 2014');
-      let tomorrow = new Date('March 2, 2014');
-
-      let search = function (s) { // eslint-disable-line func-style
-        s.id().is('disputedtransaction');
-        s.disputeDate().min(yesterday);
-        return s.disputeDate().max(tomorrow);
+      let transactionParams = {
+        amount: '10.00',
+        creditCard: {
+          number: CreditCardNumbers.Dispute.Chargeback,
+          expirationDate: '03/2018'
+        }
       };
 
-      specHelper.defaultGateway.transaction.search(search, function (err, response) {
-        let transactions = [];
+      let today = new Date();
 
-        response.each(function (err, transaction) {
-          transactions.push(transaction);
-
-          if (transactions.length === 1) {
-            assert.equal(transactions.length, 1);
-            assert.equal(transactions[0].disputes[0].receivedDate, '2014-03-01');
-
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) => {
+        let checkForTransaction = setInterval(function () {
+          specHelper.defaultGateway.transaction.search(function (search) {
+            search.id().is(response.transaction.id);
+            search.disputeDate().min(today);
+            return search.disputeDate().max(today);
+          }, function (err, response) {
+            if (response.length() === 0) { return; }
+            assert.equal(1, response.length());
+            clearInterval(checkForTransaction);
             done();
-          }
-        });
+          });
+        }, 1000);
       });
     });
 

@@ -2970,7 +2970,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
-        assert.isTrue(response.transaction.creditCard.venmoSdk);
+        assert.isFalse(response.transaction.creditCard.venmoSdk);
 
         done();
       });
