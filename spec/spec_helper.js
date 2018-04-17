@@ -198,7 +198,7 @@ let generateNonceForNewPaymentMethod = function (paymentMethodParams, customerId
   });
 };
 
-let generateValidUsBankAccountNonce = callback =>
+let generateValidUsBankAccountNonce = function (accountNumber, callback) {
   specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
     let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
     let url = uri.parse(clientToken.braintree_api.url);
@@ -210,7 +210,7 @@ let generateValidUsBankAccountNonce = callback =>
       path: '/tokens',
       headers: {
         'Content-Type': 'application/json',
-        'Braintree-Version': '2015-11-01',
+        'Braintree-Version': '2016-10-07',
         Authorization: `Bearer ${token}`
       }
     };
@@ -224,9 +224,75 @@ let generateValidUsBankAccountNonce = callback =>
         postal_code: '94112' // eslint-disable-line camelcase
       },
       account_type: 'checking', // eslint-disable-line camelcase
+      ownership_type: 'personal', // eslint-disable-line camelcase
       routing_number: '021000021', // eslint-disable-line camelcase
-      account_number: '567891234', // eslint-disable-line camelcase
-      account_holder_name: 'Dan Schulman', // eslint-disable-line camelcase
+      account_number: accountNumber, // eslint-disable-line camelcase
+      first_name: 'Dan', // eslint-disable-line camelcase
+      last_name: 'Schulman', // eslint-disable-line camelcase
+      ach_mandate: { // eslint-disable-line camelcase
+        text: 'cl mandate text'
+      }
+    };
+
+    let requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload));
+
+    options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString();
+
+    let req = https.request(options);
+
+    req.on('response', response => {
+      let body = '';
+
+      response.on('data', responseBody => {
+        body += responseBody;
+      });
+      response.on('end', () => {
+        let json = JSON.parse(body);
+
+        callback(json.data.id);
+      }
+      );
+      return response.on('error', err => console.log(`Unexpected response error: ${err}`));
+    }
+    );
+
+    req.on('error', err => console.log(`Unexpected request error: ${err}`));
+
+    req.write(requestBody);
+    return req.end();
+  });
+};
+
+let generatePlaidUsBankAccountNonce = callback =>
+  specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+    let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+    let url = uri.parse(clientToken.braintree_api.url);
+    let token = clientToken.braintree_api.access_token;
+    let options = {
+      host: url.hostname,
+      port: url.port,
+      method: 'POST',
+      path: '/tokens',
+      headers: {
+        'Content-Type': 'application/json',
+        'Braintree-Version': '2016-10-07',
+        Authorization: `Bearer ${token}`
+      }
+    };
+
+    let payload = {
+      type: 'plaid_public_token',
+      public_token: 'good', // eslint-disable-line camelcase
+      account_id: 'plaid_account_id', // eslint-disable-line camelcase
+      billing_address: { // eslint-disable-line camelcase
+        street_address: '123 Ave', // eslint-disable-line camelcase
+        region: 'CA',
+        locality: 'San Francisco',
+        postal_code: '94112' // eslint-disable-line camelcase
+      },
+      ownership_type: 'personal', // eslint-disable-line camelcase
+      first_name: 'Dan', // eslint-disable-line camelcase
+      last_name: 'Schulman', // eslint-disable-line camelcase
       ach_mandate: { // eslint-disable-line camelcase
         text: 'cl mandate text'
       }
@@ -554,6 +620,7 @@ global.specHelper = {
   generateNonceForNewPaymentMethod,
   generateValidUsBankAccountNonce,
   generateInvalidUsBankAccountNonce,
+  generatePlaidUsBankAccountNonce,
   generateValidIdealPaymentId,
   createPlanForTests,
   createModificationForTests,

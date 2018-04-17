@@ -5,6 +5,7 @@ let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
 let Config = require('../../../lib/braintree/config').Config;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
+let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
 
 describe('CustomerGateway', function () {
   describe('create', function () {
@@ -258,12 +259,12 @@ describe('CustomerGateway', function () {
       });
 
       it('creates a customer with a Us Bank Account nonce', done =>
-        specHelper.generateValidUsBankAccountNonce(function (token) {
+        specHelper.generateValidUsBankAccountNonce('567891234', function (token) {
           let customerParams = {
             paymentMethodNonce: token,
             creditCard: {
               options: {
-                verificationMerchantAccountId: 'us_bank_merchant_account'
+                verificationMerchantAccountId: MerchantAccountTest.UsBankMerchantAccount
               }
             }
           };
@@ -745,12 +746,12 @@ describe('CustomerGateway', function () {
     });
 
     it('returns us bank account for a given customer', done =>
-      specHelper.generateValidUsBankAccountNonce(function (token) {
+      specHelper.generateValidUsBankAccountNonce('567891234', function (token) {
         let customerParams = {
           paymentMethodNonce: token,
           creditCard: {
             options: {
-              verificationMerchantAccountId: 'us_bank_merchant_account'
+              verificationMerchantAccountId: MerchantAccountTest.UsBankMerchantAccount
             }
           }
         };
