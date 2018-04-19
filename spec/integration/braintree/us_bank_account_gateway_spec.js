@@ -1,7 +1,6 @@
 'use strict';
 
 let Transaction = require('../../../lib/braintree/transaction').Transaction;
-let UsBankAccountVerification = require('../../../lib/braintree/us_bank_account_verification').UsBankAccountVerification;
 
 describe('UsBankAccountGateway', function () {
   describe('find', function () {
@@ -29,12 +28,6 @@ describe('UsBankAccountGateway', function () {
               assert.equal(usBankAccount.achMandate.text, 'cl mandate text');
               assert.isTrue(usBankAccount.achMandate.acceptedAt instanceof Date);
               assert.isTrue(usBankAccount.default);
-              assert.isTrue(usBankAccount.verified);
-
-              assert.equal(usBankAccount.verifications.length, 1);
-              var verification = usBankAccount.verifications[0];
-              assert.equal(verification.verificationMethod, UsBankAccountVerification.VerificationMethod.IndependentCheck)
-              assert.equal(verification.verificationStatus, UsBankAccountVerification.StatusType.IndependentCheck)
 
               done();
             });
