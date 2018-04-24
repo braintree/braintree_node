@@ -473,8 +473,8 @@ describe('DisputeGateway', () => {
           let errorCodes = response.errors.for('dispute').on('dispute').map(e => e.code);
 
           assert.isFalse(response.success);
-          assert.equal(errorCodes.length, 1);
-          assert.equal(ValidationErrorCodes.Dispute.NonDisputedPriorTransactionEvidenceMissingDate, errorCodes[0]);
+          assert.isTrue(errorCodes.length > 0);
+          assert.include(errorCodes, ValidationErrorCodes.Dispute.NonDisputedPriorTransactionEvidenceMissingDate);
         });
     });
   });
