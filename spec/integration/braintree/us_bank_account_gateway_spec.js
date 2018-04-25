@@ -1,17 +1,19 @@
 'use strict';
 
 let Transaction = require('../../../lib/braintree/transaction').Transaction;
+let UsBankAccountVerification = require('../../../lib/braintree/us_bank_account_verification').UsBankAccountVerification;
+let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
 
 describe('UsBankAccountGateway', function () {
   describe('find', function () {
     it('finds the US bank account', done =>
       specHelper.defaultGateway.customer.create({}, (err, response) =>
-        specHelper.generateValidUsBankAccountNonce(function (nonce) {
+        specHelper.generateValidUsBankAccountNonce('567891234', function (nonce) {
           let usBankAccountParams = {
             customerId: response.customer.id,
             paymentMethodNonce: nonce,
             options: {
-              verificationMerchantAccountId: 'us_bank_merchant_account'
+              verificationMerchantAccountId: MerchantAccountTest.UsBankMerchantAccount
             }
           };
 
@@ -28,6 +30,14 @@ describe('UsBankAccountGateway', function () {
               assert.equal(usBankAccount.achMandate.text, 'cl mandate text');
               assert.isTrue(usBankAccount.achMandate.acceptedAt instanceof Date);
               assert.isTrue(usBankAccount.default);
+              assert.isTrue(usBankAccount.verified);
+
+              assert.equal(usBankAccount.verifications.length, 1);
+
+              let verification = usBankAccount.verifications[0];
+
+              assert.equal(verification.verificationMethod, UsBankAccountVerification.VerificationMethod.IndependentCheck);
+              assert.equal(verification.verificationStatus, UsBankAccountVerification.StatusType.IndependentCheck);
 
               done();
             });
@@ -52,18 +62,18 @@ describe('UsBankAccountGateway', function () {
   describe('sale', () =>
     it('transacts on a US bank account', done =>
       specHelper.defaultGateway.customer.create({}, (err, response) =>
-        specHelper.generateValidUsBankAccountNonce(function (nonce) {
+        specHelper.generateValidUsBankAccountNonce('567891234', function (nonce) {
           let usBankAccountParams = {
             customerId: response.customer.id,
             paymentMethodNonce: nonce,
             options: {
-              verificationMerchantAccountId: 'us_bank_merchant_account'
+              verificationMerchantAccountId: MerchantAccountTest.UsBankMerchantAccount
             }
           };
 
           specHelper.defaultGateway.paymentMethod.create(usBankAccountParams, function (err, response) {
             let transactionParams = {
-              merchantAccountId: 'us_bank_merchant_account',
+              merchantAccountId: MerchantAccountTest.UsBankMerchantAccount,
               amount: '10.00'
             };
             let usBankAccountToken = response.paymentMethod.token;

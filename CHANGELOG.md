@@ -1,3 +1,6 @@
+## 2.10.0
+* Bank Account verifications API
+
 ## 2.9.0
 * Add `oauthAccessRevocation` to `WebhookNotification`s
 * Add support for dispute search by `customerId`, `effectiveDate`, and `disbursementDate`

@@ -191,60 +191,6 @@ describe('PaymentMethodGateway', function () {
       )
     );
 
-    context('US Bank Account', function () {
-      it('vaults a US Bank Account from the nonce', done =>
-        specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
-          customerId = response.customer.id;
-          specHelper.generateValidUsBankAccountNonce(function (nonce) {
-            let paymentMethodParams = {
-              customerId,
-              paymentMethodNonce: nonce,
-              options: {
-                verificationMerchantAccountId: 'us_bank_merchant_account'
-              }
-            };
-
-            specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-              let usBankAccount = response.paymentMethod;
-
-              assert.isNull(err);
-              assert.isTrue(response.success);
-              assert.isNotNull(response.paymentMethod.token);
-              assert.equal(usBankAccount.last4, '1234');
-              assert.equal(usBankAccount.accountHolderName, 'Dan Schulman');
-              assert.equal(usBankAccount.routingNumber, '021000021');
-              assert.equal(usBankAccount.accountType, 'checking');
-              assert.match(usBankAccount.bankName, /CHASE/);
-
-              done();
-            });
-          });
-        })
-      );
-
-      it('does not vault a US Bank Account from an invalid nonce', done =>
-        specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
-          customerId = response.customer.id;
-
-          let paymentMethodParams = {
-            customerId,
-            paymentMethodNonce: specHelper.generateInvalidUsBankAccountNonce(),
-            options: {
-              verificationMerchantAccountId: 'us_bank_merchant_account'
-            }
-          };
-
-          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-            assert.isFalse(response.success);
-            assert.equal(response.errors.for('paymentMethod').on('paymentMethodNonce')[0].code,
-              ValidationErrorCodes.PaymentMethod.PaymentMethodNonceUnknown);
-
-            done();
-          });
-        })
-      );
-    });
-
     context('Coinbase', () =>
       it('no longer supports vaulting a Coinbase account from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'Paul', lastName: 'Gross'}, function (err, response) {
