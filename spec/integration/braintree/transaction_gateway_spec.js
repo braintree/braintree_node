@@ -2355,7 +2355,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
-        assert.equal(response.transaction.recurring, false);
+        assert.equal(response.transaction.recurring, true);
 
         done();
       });
