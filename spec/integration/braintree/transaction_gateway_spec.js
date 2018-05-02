@@ -2342,6 +2342,25 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it("allows specifying transactions with transaction source as 'recurring_first'", function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        transactionSource: 'recurring_first'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.recurring, true);
+
+        done();
+      });
+    });
+
     it("allows specifying transactions with transaction source as 'recurring'", function (done) {
       let transactionParams = {
         amount: '5.00',
@@ -2361,6 +2380,25 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it("allows specifying transactions with transaction source as 'merchant'", function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        transactionSource: 'merchant'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.recurring, false);
+
+        done();
+      });
+    });
+
     it("allows specifying transactions with transaction source as 'moto'", function (done) {
       let transactionParams = {
         amount: '5.00',
@@ -2375,6 +2413,28 @@ describe('TransactionGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.transaction.recurring, false);
+
+        done();
+      });
+    });
+
+    it('handles validation error when transaction source invalid', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        transactionSource: 'invalid_value'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('transaction').on('transactionSource')[0].code,
+          ValidationErrorCodes.Transaction.TransactionSourceIsInvalid
+        );
 
         done();
       });
