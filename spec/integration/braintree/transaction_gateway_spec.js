@@ -2418,6 +2418,28 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('handles validation error when transaction source invalid', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        transactionSource: 'invalid_value'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('transaction').on('transactionSource')[0].code,
+          ValidationErrorCodes.Transaction.TransactionSourceIsInvalid
+        );
+
+        done();
+      });
+    });
+
     it('sets card type indicators on the transaction', function (done) {
       let transactionParams = {
         amount: '5.00',
