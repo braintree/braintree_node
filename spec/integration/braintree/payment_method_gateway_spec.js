@@ -845,7 +845,6 @@ describe('PaymentMethodGateway', function () {
               assert.isTrue(response.success);
               assert.isString(response.paymentMethod.email);
               assert.isString(response.paymentMethod.imageUrl);
-              assert.isString(response.paymentMethod.payerId);
               assert.isString(response.paymentMethod.customerId);
               done();
             });
@@ -904,7 +903,6 @@ describe('PaymentMethodGateway', function () {
               assert.isTrue(response.success);
               assert.isString(response.paymentMethod.email);
               assert.isString(response.paymentMethod.imageUrl);
-              assert.isString(response.paymentMethod.payerId);
               assert.isString(response.paymentMethod.customerId);
               done();
             });
@@ -926,7 +924,6 @@ describe('PaymentMethodGateway', function () {
           assert.isTrue(response.success);
           assert.isString(response.paymentMethod.customerId);
           assert.isString(response.paymentMethod.billingAgreementId);
-          assert.isString(response.paymentMethod.payerId);
           done();
         });
       })
