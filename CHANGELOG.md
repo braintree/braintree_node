@@ -1,3 +1,6 @@
+## Unreleased
+* Throw error if invalid Payload on `CustomerGateway.create`
+
 ## 2.10.0
 * Bank Account verifications API
 
