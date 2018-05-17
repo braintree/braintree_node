@@ -1,6 +1,7 @@
 ## Unreleased
 * Throw error if invalid Payload on `CustomerGateway.create`
 * Allow payee ID to be passed in options params for transaction create
+* Add processor respone code and processor response text to authorization adjustments subfield in transaction response.
 
 ## 2.10.0
 * Bank Account verifications API
