@@ -1,7 +1,9 @@
+## Unrelease
+* Add `processor_response_code` and `processor_response_text` to authorization adjustments subfield in transaction response.
+
 ## 2.11.0
 * Throw error if invalid Payload on `CustomerGateway.create`
 * Allow payee ID to be passed in options params for transaction create
-* Add processor respone code and processor response text to authorization adjustments subfield in transaction response.
 * Add `merchant_id` alias to ConnectedMerchantStatusTransitioned and ConnectedMerchantPayPalStatusChanged Auth webhooks
 * Fix webhook testing sample xml for dispute webhooks to include `amount-won` and `amount-disputed`
 * `Config` creation with `AccessToken` should not require `environment`. An `Error` will be logged if optional `environment` does not match with `AccessToken`'s parsed environment
