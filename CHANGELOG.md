@@ -1,8 +1,10 @@
-## Unreleased
+## 2.11.0
 * Throw error if invalid Payload on `CustomerGateway.create`
 * Allow payee ID to be passed in options params for transaction create
 * Add processor respone code and processor response text to authorization adjustments subfield in transaction response.
 * Add `merchant_id` alias to ConnectedMerchantStatusTransitioned and ConnectedMerchantPayPalStatusChanged Auth webhooks
+* Fix webhook testing sample xml for dispute webhooks to include `amount-won` and `amount-disputed`
+* `Config` creation with `AccessToken` should not require `environment`. An `Error` will be logged if optional `environment` does not match with `AccessToken`'s parsed environment
 
 ## 2.10.0
 * Bank Account verifications API

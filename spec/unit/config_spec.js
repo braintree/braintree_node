@@ -3,6 +3,7 @@
 
 let Config = require('../../lib/braintree/config').Config;
 let Environment = require('../../lib/braintree/environment').Environment;
+let sinon = require('sinon');
 
 describe('Config', function () {
   it('can be configured with merchant credentials', function () {
@@ -148,4 +149,25 @@ describe('Config', function () {
       assert.equal(config.timeout, 60000);
     })
   );
+
+  describe('accessToken', function () {
+    it('uses accessToken parsed environment', function () {
+      let config = new Config({
+        accessToken: 'access_token$development$integration_merchant_id$f388b1cc'
+      });
+
+      assert.equal(config.environment, Environment.Development);
+    });
+
+    it('logs an error if config environment is provided and not the same as accessToken environment', () => {
+      sinon.stub(console, 'error');
+
+      new Config({
+        accessToken: 'access_token$development$integration_merchant_id$f388b1cc',
+        environment: 'production'
+      });
+
+      assert.equal(console.error.firstCall.args[0], 'Warning: AccessToken environment does not match environment passed in config'); // eslint-disable-line no-console
+    });
+  });
 });
