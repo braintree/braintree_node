@@ -33,7 +33,7 @@
     "eslint": "^2.7.0",
     "eslint-config-braintree": "^1.0.2",
     "mocha": "3.4.2",
-    "sinon": "^4.5.0"
+    "sinon": "^5.0.7"
   },
   "license": "MIT",
   "scripts": {
