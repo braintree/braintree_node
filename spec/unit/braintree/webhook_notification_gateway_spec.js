@@ -447,7 +447,8 @@ describe('WebhookNotificationGateway', function () {
 
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.OAuthAccessRevoked);
-        assert.equal(webhookNotification.oauthAccessRevocation.merchantId, 'abc123');
+        assert.equal(webhookNotification.oauthAccessRevocation.merchantId, 'my_id');
+        assert.equal(webhookNotification.oauthAccessRevocation.oauthApplicationClientId, 'oauth_application_client_id');
         assert.exists(webhookNotification.timestamp);
         done();
       });
@@ -464,6 +465,7 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.ConnectedMerchantStatusTransitioned);
         assert.equal(webhookNotification.connectedMerchantStatusTransitioned.merchantPublicId, 'my_id');
+        assert.equal(webhookNotification.connectedMerchantStatusTransitioned.merchantId, 'my_id');
         assert.equal(webhookNotification.connectedMerchantStatusTransitioned.status, 'new_status');
         assert.equal(webhookNotification.connectedMerchantStatusTransitioned.oauthApplicationClientId, 'oauth_application_client_id');
         assert.exists(webhookNotification.timestamp);
@@ -482,6 +484,7 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.ConnectedMerchantPayPalStatusChanged);
         assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.merchantPublicId, 'my_id');
+        assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.merchantId, 'my_id');
         assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.action, 'link');
         assert.equal(webhookNotification.connectedMerchantPayPalStatusChanged.oauthApplicationClientId, 'oauth_application_client_id');
         assert.exists(webhookNotification.timestamp);
