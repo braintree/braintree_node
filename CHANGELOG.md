@@ -2,6 +2,7 @@
 * Throw error if invalid Payload on `CustomerGateway.create`
 * Allow payee ID to be passed in options params for transaction create
 * Add `merchant_id` alias to ConnectedMerchantStatusTransitioned and ConnectedMerchantPayPalStatusChanged Auth webhooks
+* Fix webhook testing sample xml for dispute webhooks to include `amount-won` and `amount-disputed`
 
 ## 2.10.0
 * Bank Account verifications API
