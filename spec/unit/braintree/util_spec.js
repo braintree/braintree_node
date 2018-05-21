@@ -53,6 +53,55 @@ describe('Util', function () {
     });
   });
 
+  describe('convertObjectKeysToCamelCase', function () {
+    it('works with underscore keys', function () {
+      let result = Util.convertObjectKeysToCamelCase({
+        top_level: { // eslint-disable-line camelcase
+          nested_one: { // eslint-disable-line camelcase
+            nested_two: 'aValue' // eslint-disable-line camelcase
+          }
+        }
+      });
+
+      assert.equal(result.topLevel.nestedOne.nestedTwo, 'aValue');
+    });
+
+    it('does not affect date values', function () {
+      let result = Util.convertObjectKeysToCamelCase({
+        some_date: // eslint-disable-line camelcase
+          new Date()
+      });
+
+      assert.instanceOf(result.someDate, Date);
+    });
+
+    it('does not affect null', function () {
+      let result = Util.convertObjectKeysToCamelCase({
+        something_null: // eslint-disable-line camelcase
+          null
+      });
+
+      assert.strictEqual(result.somethingNull, null);
+    });
+
+    it('works on array values', function () {
+      let result = Util.convertObjectKeysToCamelCase({
+        top_level: { // eslint-disable-line camelcase
+          things: [
+            {camel_one: 'value1', camel_two: 'value2'}, // eslint-disable-line camelcase
+            {camel_one: 'value3', camel_two: 'value4'}  // eslint-disable-line camelcase
+          ]
+        }
+      });
+
+      assert.isArray(result.topLevel.things);
+      assert.equal(result.topLevel.things[0].camelOne, 'value1');
+      assert.equal(result.topLevel.things[0].camelTwo, 'value2');
+      assert.equal(result.topLevel.things[1].camelOne, 'value3');
+      assert.equal(result.topLevel.things[1].camelTwo, 'value4');
+    });
+  });
+
   describe('convertNodeToObject', function () {
     it('converts a single value', function () {
       let result = Util.convertNodeToObject('foobar');
@@ -312,6 +361,18 @@ describe('Util', function () {
       assert.equal(result, 'oneTwoThree');
     });
 
+    it('converts a string with partial underscores', function () {
+      let result = Util.toCamelCase('oneTwo_three');
+
+      assert.equal(result, 'oneTwoThree');
+    });
+
+    it('converts a string with underscores', function () {
+      let result = Util.toCamelCase('one_two_three');
+
+      assert.equal(result, 'oneTwoThree');
+    });
+
     it('converts a string with hyphens', function () {
       let result = Util.toCamelCase('one-two-three');
 
@@ -482,6 +543,32 @@ describe('Util', function () {
           number: '5105105105105100',
           expirationDate: '05/12'
         }
+      };
+
+      let error = Util.verifyKeys(signature, transactionParams);
+
+      assert.isUndefined(error);
+    });
+
+    it("doesn't return an error if params are camelCased or undescored as long as they are an array subset of signature", function () {
+      let signature = {
+        valid: ['validKey1', 'validKey2', 'amount', 'line_items[name]', 'lineItems[kind]', 'lineItems[longUnderscoredValue]']
+      };
+
+      let transactionParams = {
+        amount: '5.00',
+        lineItems: [ // eslint-disable-line camelcase
+          {
+            name: 'Name #1',
+            kind: 'debit',
+            long_underscoredValue: 'value1' // eslint-disable-line camelcase
+          },
+          {
+            name: 'Name #2',
+            kind: 'credit',
+            longUnderscored_value: 'value2' // eslint-disable-line camelcase
+          }
+        ]
       };
 
       let error = Util.verifyKeys(signature, transactionParams);
