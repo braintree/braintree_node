@@ -1,4 +1,4 @@
-## Unreleased
+## 2.11.0
 * Throw error if invalid Payload on `CustomerGateway.create`
 * Allow payee ID to be passed in options params for transaction create
 * Add `merchant_id` alias to ConnectedMerchantStatusTransitioned and ConnectedMerchantPayPalStatusChanged Auth webhooks
