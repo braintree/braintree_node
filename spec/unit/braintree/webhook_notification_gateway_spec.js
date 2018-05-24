@@ -513,6 +513,27 @@ describe('WebhookNotificationGateway', function () {
       });
     });
 
+    it('builds a sample notification for a unsuccessfully charged subscription', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.SubscriptionChargedUnsuccessfully,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.SubscriptionChargedUnsuccessfully);
+        assert.equal(webhookNotification.subscription.id, 'my_id');
+        assert.equal(webhookNotification.subscription.transactions.length, 1);
+
+        let transaction = webhookNotification.subscription.transactions.pop();
+
+        assert.equal(transaction.status, 'failed');
+        assert.equal(transaction.amount, 49.99);
+        done();
+      });
+    });
+
     it('builds a sample notification for a check notifications', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.Check,
