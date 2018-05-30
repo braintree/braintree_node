@@ -3670,6 +3670,8 @@ describe('TransactionGateway', function () {
         assert.equal(authorizationAdjustment.amount, '-20.00');
         assert.equal(authorizationAdjustment.success, true);
         assert.exists(authorizationAdjustment.timestamp);
+        assert.equal(authorizationAdjustment.processorResponseCode, '1000');
+        assert.equal(authorizationAdjustment.processorResponseText, 'Approved');
 
         done();
       });

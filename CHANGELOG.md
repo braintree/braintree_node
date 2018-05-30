@@ -1,5 +1,6 @@
-## unreleased
+## Unreleased
 * Add subscription charged unsuccessfully sample webhook to webhook testing gateway
+* Add `processor_response_code` and `processor_response_text` to authorization adjustments subfield in transaction response.
 
 ## 2.11.0
 * Throw error if invalid Payload on `CustomerGateway.create`
