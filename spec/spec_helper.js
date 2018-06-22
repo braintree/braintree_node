@@ -31,8 +31,15 @@ let defaultConfig = {
   publicKey: 'integration_public_key',
   privateKey: 'integration_private_key'
 };
-
 let defaultGateway = braintree.connect(defaultConfig);
+
+let advancedFraudConfig = {
+  environment: braintree.Environment.Development,
+  merchantId: 'advanced_fraud_integration_merchant_id',
+  publicKey: 'advanced_fraud_integration_public_key',
+  privateKey: 'advanced_fraud_integration_private_key'
+};
+let advancedFraudGateway = braintree.connect(advancedFraudConfig);
 
 let multiplyString = (string, times) => (new Array(times + 1)).join(string);
 
@@ -591,6 +598,8 @@ ClientApiHttp.initClass();
 
 global.specHelper = {
   addOns,
+  advancedFraudConfig,
+  advancedFraudGateway,
   braintree,
   create3DSVerification,
   generate3DSNonce,

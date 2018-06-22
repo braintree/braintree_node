@@ -179,10 +179,10 @@ describe('TransactionGateway', function () {
         }
       };
 
-      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
-        assert.isNull(response.transaction.riskData.id);
+        assert.isUndefined(response.transaction.riskData);
         done();
       });
     });
@@ -2578,9 +2578,9 @@ describe('TransactionGateway', function () {
         deviceSessionId: 'abc123'
       };
 
-      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
-        assert.equal(response.transaction.riskData.decision, 'Not Evaluated');
+        assert.equal(response.transaction.riskData.decision, 'Approve');
         assert.isDefined(response.transaction.riskData.id);
         done();
       });
