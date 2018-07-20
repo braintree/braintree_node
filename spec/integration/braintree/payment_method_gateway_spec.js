@@ -1112,14 +1112,13 @@ describe('PaymentMethodGateway', function () {
     context('credit card', function () {
       let paymentMethodToken;
 
-      it('finds the card', function () {
-
+      it('finds the card', function (done) {
         specHelper.defaultGateway.customer.create({}, function (err, response) {
           let paymentMethodParams = {
             customerId: response.customer.id,
             number: '4111111111111111',
-            expirationDate:'06/2022',
-            cvv:'100'
+            expirationDate: '06/2022',
+            cvv: '100'
           };
 
           specHelper.defaultGateway.credit_card.create(paymentMethodParams, function (err, response) {
