@@ -1112,47 +1112,28 @@ describe('PaymentMethodGateway', function () {
     context('credit card', function () {
       let paymentMethodToken;
 
-      before(done =>
-        specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
-          let customerId = response.customer.id;
+      it('finds the card', function () {
 
-          paymentMethodToken = specHelper.randomId();
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          let paymentMethodParams = {
+            customerId: response.customer.id,
+            number: '4111111111111111',
+            expirationDate:'06/2022',
+            cvv:'100'
+          };
 
-          specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
-            let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-            let authorizationFingerprint = clientToken.authorizationFingerprint;
-            let params = {
-              authorizationFingerprint,
-              creditCard: {
-                token: paymentMethodToken,
-                number: '4111111111111111',
-                expirationDate: '01/2020'
-              }
-            };
+          specHelper.defaultGateway.credit_card.create(paymentMethodParams, function (err, response) {
+            paymentMethodToken = response.token;
 
-            let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+            specHelper.defaultGateway.paymentMethod.find(paymentMethodToken, function (err, creditCard) {
+              assert.isNull(err);
+              assert.equal(creditCard.maskedNumber, '411111******1111');
 
-            return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode, body) {
-              let nonce = JSON.parse(body).creditCards[0].nonce;
-              let paymentMethodParams = {
-                customerId,
-                paymentMethodNonce: nonce
-              };
-
-              specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, () => done());
+              done();
             });
           });
-        })
-      );
-
-      it('finds the card', done =>
-        specHelper.defaultGateway.paymentMethod.find(paymentMethodToken, function (err, creditCard) {
-          assert.isNull(err);
-          assert.equal(creditCard.maskedNumber, '411111******1111');
-
-          done();
-        })
-      );
+        });
+      });
     });
 
     context('paypal account', () =>
