@@ -1121,7 +1121,7 @@ describe('PaymentMethodGateway', function () {
             cvv: '100'
           };
 
-          specHelper.defaultGateway.credit_card.create(paymentMethodParams, function (err, response) {
+          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
             paymentMethodToken = response.token;
 
             specHelper.defaultGateway.paymentMethod.find(paymentMethodToken, function (err, creditCard) {
