@@ -1115,14 +1115,14 @@ describe('PaymentMethodGateway', function () {
       it('finds the card', function (done) {
         specHelper.defaultGateway.customer.create({}, function (err, response) {
           let paymentMethodParams = {
+            paymentMethodNonce: 'fake-valid-visa-nonce',
             customerId: response.customer.id,
             number: '4111111111111111',
-            expirationDate: '06/2022',
             cvv: '100'
           };
 
           specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-            paymentMethodToken = response.token;
+            paymentMethodToken = response.paymentMethod.token;
 
             specHelper.defaultGateway.paymentMethod.find(paymentMethodToken, function (err, creditCard) {
               assert.isNull(err);
