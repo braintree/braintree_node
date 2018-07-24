@@ -69,7 +69,8 @@ describe('Samsung Pay', function () {
         billingAddress: {
           streetAddress: '123 Fake St',
           locality: 'Chicago',
-          region: 'IL'
+          region: 'IL',
+          postalCode: '60607'
         }
       };
 
