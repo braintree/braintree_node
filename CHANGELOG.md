@@ -1,3 +1,10 @@
+## 2.12.0
+* Add subscription charged unsuccessfully sample webhook to webhook testing gateway
+* Add `processor_response_code` and `processor_response_text` to authorization adjustments subfield in transaction response.
+* Add `Dispute` to top level `braintree` object
+* Add Samsung Pay support
+* Add processor respone code and processor response text to authorization adjustments subfield in transaction response.
+
 ## 2.11.0
 * Throw error if invalid Payload on `CustomerGateway.create`
 * Allow payee ID to be passed in options params for transaction create

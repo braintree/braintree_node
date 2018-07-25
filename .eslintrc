@@ -8,3 +8,4 @@
       - {"capIsNewExceptions": ["Sha1hexdigest"]}
   globals:
     Promise: 0
+    Symbol: 0
