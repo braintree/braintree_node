@@ -8,10 +8,12 @@ let DocumentUpload = require('../../../lib/braintree/document_upload').DocumentU
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
 describe('DisputeGateway', () => {
-  let disputeGateway;
+  let disputeGateway,
+    transactionGateway;
 
   beforeEach(() => {
     disputeGateway = specHelper.defaultGateway.dispute;
+    transactionGateway = specHelper.defaultGateway.transaction;
   });
 
   function createEvidenceDocument() {
@@ -35,7 +37,7 @@ describe('DisputeGateway', () => {
       }
     };
 
-    return specHelper.defaultGateway.transaction.sale(transactionParams).then((result) => {
+    return transactionGateway.sale(transactionParams).then((result) => {
       return result.transaction.disputes[0];
     });
   }
@@ -55,6 +57,11 @@ describe('DisputeGateway', () => {
         })
         .then((result) => {
           assert.equal(Dispute.Status.Accepted, result.dispute.status);
+
+          return transactionGateway.find(result.dispute.transaction.id);
+        })
+        .then((result) => {
+          assert.equal(Dispute.Status.Accepted, result.disputes[0].status);
         });
     });
 

@@ -1,5 +1,6 @@
 ## unreleased
 * Add missing UsBankAccountVerification export
+* Fix dispute results in transactions not showing the correct status sometime
 
 ## 2.12.0
 * Add subscription charged unsuccessfully sample webhook to webhook testing gateway
