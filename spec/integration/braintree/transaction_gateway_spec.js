@@ -36,6 +36,29 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('charges an elo card', function (done) {
+      let transactionParams = {
+        merchantAccountId: 'adyen_ma',
+        amount: '5.00',
+        creditCard: {
+          number: '5066991111111118',
+          expirationDate: '10/20',
+          cvv: '737'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.creditCard.maskedNumber, '506699******1118');
+        assert.isNull(response.transaction.voiceReferralNumber);
+
+        done();
+      });
+    });
+
     it('charges a card using an access token', function (done) {
       let oauthGateway = braintree.connect({
         clientId: 'client_id$development$integration_client_id',
