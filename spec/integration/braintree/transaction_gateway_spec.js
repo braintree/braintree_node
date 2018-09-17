@@ -1753,6 +1753,271 @@ describe('TransactionGateway', function () {
       });
     });
 
+    context('network transaction id', function () {
+      it('support visa', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '05/12'
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.isNotNull(response.transaction.networkTransactionId);
+            done();
+          });
+        });
+      });
+
+      it('does not support non-visa', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '5555555555554444',
+              expirationDate: '05/12'
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.isNull(response.transaction.networkTransactionId);
+            done();
+          });
+        });
+      });
+    });
+
+    context('external vault', function () {
+      it('supports status with visa', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '05/12'
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.WillVault
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.isNotNull(response.transaction.networkTransactionId);
+            done();
+          });
+        });
+      });
+
+      it('supports status with non-visa', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '5555555555554444',
+              expirationDate: '05/12'
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.WillVault
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.isNull(response.transaction.networkTransactionId);
+            done();
+          });
+        });
+      });
+
+      it('supports null previousNetworkTransactionId with non-visa', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '5555555555554444',
+              expirationDate: '05/12'
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.Vaulted,
+              previousNetworkTransactionId: null
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.isNull(response.transaction.networkTransactionId);
+            done();
+          });
+        });
+      });
+
+      it('supports previousNetworkTransactionId', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '05/12'
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.Vaulted,
+              previousNetworkTransactionId: '123456789012345'
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.isNotNull(response.transaction.networkTransactionId);
+            done();
+          });
+        });
+      });
+
+      it('supports status vaulted without previousNetworkTransactionId', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.0',
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '05/12'
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.Vaulted
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.isNotNull(response.transaction.networkTransactionId);
+            done();
+          });
+        });
+      });
+
+      it('handles validation error unsupported payment instrument type', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            paymentMethodNonce: Nonces.ApplyPayVisa,
+            externalVault: {
+              status: Transaction.ExternalVault.Vaulted,
+              previousNetworkTransactionId: '123456789012345'
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success);
+            assert.equal(response.errors.for('transaction').on('externalVault')[0].code, ValidationErrorCodes.Transaction.PaymentInstrumentWithExternalVaultIsInvalid);
+            done();
+          });
+        });
+      });
+
+      it('handles validation error status is invalid', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '05/12'
+            },
+            externalVault: {
+              status: 'bad value'
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success);
+            assert.equal(response.errors.for('transaction').for('externalVault').on('status')[0].code, ValidationErrorCodes.Transaction.ExternalVault.StatusIsInvalid);
+            done();
+          });
+        });
+      });
+
+      it('handles validation error status with previous network transaction id is invalid', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '05/12'
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.WillVault,
+              previousNetworkTransactionId: '123456789012345'
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success);
+            assert.equal(response.errors.for('transaction').for('externalVault').on('status')[0].code, ValidationErrorCodes.Transaction.ExternalVault.StatusWithPreviousNetworkTransactionIdIsInvalid);
+            done();
+          });
+        });
+      });
+
+      it('handles validation error previous network transaction id is invalid', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '05/12'
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.WillVault,
+              previousNetworkTransactionId: 'bad value'
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success);
+            assert.equal(response.errors.for('transaction').for('externalVault').on('previousNetworkTransactionId')[0].code, ValidationErrorCodes.Transaction.ExternalVault.PreviousNetworkTransactionIdIsInvalid);
+            done();
+          });
+        });
+      });
+
+      it('handles validation error card type is invalid', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '5555555555554444',
+              expirationDate: '05/12'
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.Vaulted,
+              previousNetworkTransactionId: '123456789012345'
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success);
+            assert.equal(response.errors.for('transaction').for('externalVault').on('previousNetworkTransactionId')[0].code, ValidationErrorCodes.Transaction.ExternalVault.CardTypeIsInvalid);
+            done();
+          });
+        });
+      });
+    });
+
     context('with apple pay', () =>
       it('returns ApplePayCard for payment_instrument', done =>
         specHelper.defaultGateway.customer.create({}, function () {

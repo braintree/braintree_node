@@ -2,7 +2,7 @@
 * Add missing UsBankAccountVerification export
 * Fix dispute results in transactions not showing the correct status sometime
 * Fix issue with request lib when used with testing tools (#147)
-
+* Add `externalVault` option to transaction sale
 
 ## 2.12.0
 * Add subscription charged unsuccessfully sample webhook to webhook testing gateway
