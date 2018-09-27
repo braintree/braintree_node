@@ -622,5 +622,24 @@ describe('WebhookNotificationGateway', function () {
         done();
       });
     });
+
+    it('returns a parsable signature and payload for Local Payment Completed', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.LocalPaymentCompleted,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.LocalPaymentCompleted);
+
+        let localPaymentCompleted = webhookNotification.subject.localPayment;
+
+        assert.equal('a-payment-id', localPaymentCompleted.paymentId);
+        assert.equal('a-payer-id', localPaymentCompleted.payerId);
+        done();
+      });
+    });
   });
 });

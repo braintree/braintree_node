@@ -4,6 +4,7 @@
 * Fix issue with request lib when used with testing tools (#147)
 * Add `externalVault` option to transaction sale
 * Visa transactions will now contain a `networkTransactionIdentifier` in the response
+* Add `LocalPaymentCompleted` webhook notification support
 
 ## 2.12.0
 * Add subscription charged unsuccessfully sample webhook to webhook testing gateway
