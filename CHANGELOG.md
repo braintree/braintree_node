@@ -1,4 +1,4 @@
-## unreleased
+## 2.13.0
 * Add missing UsBankAccountVerification export
 * Fix dispute results in transactions not showing the correct status sometime
 * Fix issue with request lib when used with testing tools (#147)
