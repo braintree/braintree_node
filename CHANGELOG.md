@@ -1,3 +1,11 @@
+## 2.13.0
+* Add missing UsBankAccountVerification export
+* Fix dispute results in transactions not showing the correct status sometime
+* Fix issue with request lib when used with testing tools (#147)
+* Add `externalVault` option to transaction sale
+* Visa transactions will now contain a `networkTransactionIdentifier` in the response
+* Add `LocalPaymentCompleted` webhook notification support
+
 ## 2.12.0
 * Add subscription charged unsuccessfully sample webhook to webhook testing gateway
 * Add `processor_response_code` and `processor_response_text` to authorization adjustments subfield in transaction response.
@@ -11,6 +19,7 @@
 * Add `merchant_id` alias to ConnectedMerchantStatusTransitioned and ConnectedMerchantPayPalStatusChanged Auth webhooks
 * Fix webhook testing sample xml for dispute webhooks to include `amount-won` and `amount-disputed`
 * `Config` creation with `AccessToken` should not require `environment`. An `Error` will be logged if optional `environment` does not match with `AccessToken`'s parsed environment
+* Add processor respone code and processor response text to authorization adjustments subfield in transaction response.
 
 ## 2.10.0
 * Bank Account verifications API

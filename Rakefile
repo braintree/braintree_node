@@ -12,14 +12,19 @@ namespace :test do
     sh "npm run test:integration"
   end
 
-  # To run a specific it/context append ".only" like `it.only`
+  # To run a specific it/context: rake test:focused[spec/integration/braintree/credit_card_gateway_spec.js,create]
   desc "Run tests in a specific file: rake test:focused[spec/integration/braintree/credit_card_gateway_spec.js]"
-  task :focused, [:filename] => [:npm_install] do |t, args|
+  task :focused, [:filename, :spec_grep] => [:npm_install] do |t, args|
     filename = args[:filename]
+    spec_grep = args[:spec_grep]
 
     command = local_mocha
     if filename.include? "integration"
       command += " --slow 2000"
+    end
+
+    unless spec_grep.nil?
+      command += " -g #{spec_grep}"
     end
     sh "#{command} #{filename}"
   end

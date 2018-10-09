@@ -528,6 +528,28 @@ describe('TransactionSearch', () =>
       });
     });
 
+    it('searches on credit card type elo', function (done) {
+      let transactionParams = {
+        amount: '10.00',
+        merchantAccountId: 'adyen_ma',
+        creditCard: {
+          number: '5066991111111118',
+          expirationDate: '10/2020',
+          cvv: '737'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.search(function (search) {
+          search.creditCardCardType().is('Elo');
+          return search.id().is(response.transaction.id);
+        }, function (err, response) {
+          assert.equal(1, response.length());
+          done();
+        })
+      );
+    });
+
     it('searches on payment instrument type credit_card', function (done) {
       let random = specHelper.randomId();
       let transactionParams = {
