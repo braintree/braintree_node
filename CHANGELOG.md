@@ -1,3 +1,6 @@
+## Unreleased
+* Fix `transaction.lineItems` method when returned from transaction searches (#146)
+
 ## 2.13.0
 * Add missing UsBankAccountVerification export
 * Fix dispute results in transactions not showing the correct status sometime

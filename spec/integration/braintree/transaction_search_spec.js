@@ -679,6 +679,40 @@ describe('TransactionSearch', () =>
         done();
       })
     );
+
+    it('can call lineitems method on transaction object', (done) => {
+      let li = [
+        {
+          quantity: '1.0232',
+          name: 'Name #1',
+          kind: 'debit',
+          unitAmount: '45.1232',
+          totalAmount: '45.15'
+        }
+      ];
+      let random = specHelper.randomId();
+      let transactionParams = {
+        amount: '10.00',
+        orderId: random,
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '01/2015'
+        },
+        lineItems: li
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, () =>
+        specHelper.defaultGateway.transaction.search(search => search.orderId().is(random), function (err, response) {
+          response.each(function (err, transaction) {
+            transaction.lineItems((err, lineItems) => {
+              assert.equal(li[0].name, lineItems[0].name);
+              assert.equal(li[0].totalAmount, lineItems[0].totalAmount);
+              done();
+            });
+          });
+        })
+      );
+    });
   })
 );
 
