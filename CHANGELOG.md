@@ -1,4 +1,4 @@
-## Unreleased
+## 2.13.1
 * Fix `transaction.lineItems` method when returned from transaction searches (#146)
 
 ## 2.13.0
