@@ -31,6 +31,8 @@ describe('TransactionGateway', function () {
         assert.equal(response.transaction.amount, '5.00');
         assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
         assert.isNull(response.transaction.voiceReferralNumber);
+        assert.equal(response.transaction.processorResponseCode, '1000');
+        assert.equal(response.transaction.processorResponseType, 'approved');
 
         done();
       });
@@ -2837,7 +2839,7 @@ describe('TransactionGateway', function () {
       });
     });
 
-    it('handles processor declines', function (done) {
+    it('handles processor soft declines', function (done) {
       let transactionParams = {
         amount: '2000.00',
         creditCard: {
@@ -2850,7 +2852,30 @@ describe('TransactionGateway', function () {
         assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.transaction.amount, '2000.00');
         assert.equal(response.transaction.status, 'processor_declined');
+        assert.equal(response.transaction.processorResponseCode, '2000');
+        assert.equal(response.transaction.processorResponseType, 'soft_declined');
         assert.equal(response.transaction.additionalProcessorResponse, '2000 : Do Not Honor');
+
+        done();
+      });
+    });
+
+    it('handles processor hard declines', function (done) {
+      let transactionParams = {
+        amount: '2015.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(response.transaction.amount, '2015.00');
+        assert.equal(response.transaction.status, 'processor_declined');
+        assert.equal(response.transaction.processorResponseCode, '2015');
+        assert.equal(response.transaction.processorResponseType, 'hard_declined');
+        assert.equal(response.transaction.additionalProcessorResponse, '2015 : Transaction Not Allowed');
 
         done();
       });
@@ -3960,6 +3985,41 @@ describe('TransactionGateway', function () {
         assert.exists(authorizationAdjustment.timestamp);
         assert.equal(authorizationAdjustment.processorResponseCode, '1000');
         assert.equal(authorizationAdjustment.processorResponseText, 'Approved');
+        assert.equal(authorizationAdjustment.processorResponseType, 'approved');
+
+        done();
+      });
+    });
+
+    it('exposes authorizationAdjustments soft declined', function (done) {
+      let transactionId = 'authadjustmenttransactionsoftdeclined';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        let authorizationAdjustment = transaction.authorizationAdjustments[0];
+
+        assert.equal(authorizationAdjustment.amount, '-20.00');
+        assert.equal(authorizationAdjustment.success, false);
+        assert.exists(authorizationAdjustment.timestamp);
+        assert.equal(authorizationAdjustment.processorResponseCode, '3000');
+        assert.equal(authorizationAdjustment.processorResponseText, 'Processor Network Unavailable - Try Again');
+        assert.equal(authorizationAdjustment.processorResponseType, 'soft_declined');
+
+        done();
+      });
+    });
+
+    it('exposes authorizationAdjustments hard declined', function (done) {
+      let transactionId = 'authadjustmenttransactionharddeclined';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        let authorizationAdjustment = transaction.authorizationAdjustments[0];
+
+        assert.equal(authorizationAdjustment.amount, '-20.00');
+        assert.equal(authorizationAdjustment.success, false);
+        assert.exists(authorizationAdjustment.timestamp);
+        assert.equal(authorizationAdjustment.processorResponseCode, '2015');
+        assert.equal(authorizationAdjustment.processorResponseText, 'Transaction Not Allowed');
+        assert.equal(authorizationAdjustment.processorResponseType, 'hard_declined');
 
         done();
       });
