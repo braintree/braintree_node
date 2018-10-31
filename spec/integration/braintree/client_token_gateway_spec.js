@@ -204,16 +204,6 @@ describe('ClientTokenGateway', function () {
     })
   );
 
-  it('returns an error when an sepa parameter is supplied', done =>
-    specHelper.defaultGateway.clientToken.generate({
-      sepaMandateType: 'business'
-    }, function (err) {
-      assert.equal(err.type, 'invalidKeysError');
-      assert.equal(err.message, 'These keys are invalid: sepaMandateType');
-      done();
-    })
-  );
-
   it('returns an error when an non-existant customer_id is provided', function (done) {
     specHelper.defaultGateway.clientToken.generate({
       customerId: 3
