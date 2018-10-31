@@ -3162,7 +3162,7 @@ describe('TransactionGateway', function () {
       });
     });
 
-    it('handles lodging industry data validations', function (done) {
+    it('handles travel cruise industry data validations', function (done) {
       let transactionParams = {
         amount: '10.0',
         creditCard: {
@@ -3186,6 +3186,116 @@ describe('TransactionGateway', function () {
         assert.equal(
           response.errors.for('transaction').for('industry').on('travelPackage')[0].code,
           ValidationErrorCodes.Transaction.IndustryData.TravelCruise.TravelPackageIsInvalid
+        );
+
+        done();
+      });
+    });
+
+    it('successfully creates a transaction with travel flight industry data', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        paymentMethodNonce: Nonces.PayPalOneTimePayment,
+        options: {
+          submitForSettlement: true
+        },
+        industry: {
+          industryType: Transaction.IndustryData.TravelAndFlight,
+          data: {
+            passengerFirstName: 'John',
+            passengerLastName: 'Doe',
+            passengerMiddleInitial: 'M',
+            passengerTitle: 'Mr.',
+            issuedDate: '2018-01-01',
+            travelAgencyName: 'Expedia',
+            travelAgencyCode: '12345678',
+            ticketNumber: 'ticket-number',
+            issuingCarrierCode: 'AA',
+            customerCode: 'customer-code',
+            fareAmount: '70.00',
+            feeAmount: '10.00',
+            taxAmount: '20.00',
+            restrictedTicket: false,
+            legs: [
+              {
+                conjunctionTicket: 'CJ0001',
+                exchangeTicket: 'ET0001',
+                couponNumber: '1',
+                serviceClass: 'Y',
+                carrierCode: 'AA',
+                fareBasisCode: 'W',
+                flightNumber: 'AA100',
+                departureDate: '2018-01-02',
+                departureAirportCode: 'MDW',
+                departureTime: '08:00',
+                arrivalAirportCode: 'ATX',
+                arrivalTime: '10:00',
+                stopoverPermitted: false,
+                fareAmount: '35.00',
+                feeAmount: '5.00',
+                taxAmount: '10.00',
+                endorsementOrRestrictions: 'NOT REFUNDABLE'
+              },
+              {
+                conjunctionTicket: 'CJ0002',
+                exchangeTicket: 'ET0002',
+                couponNumber: '1',
+                serviceClass: 'Y',
+                carrierCode: 'AA',
+                fareBasisCode: 'W',
+                flightNumber: 'AA200',
+                departureDate: '2018-01-03',
+                departureAirportCode: 'ATX',
+                departureTime: '12:00',
+                arrivalAirportCode: 'MDW',
+                arrivalTime: '14:00',
+                stopoverPermitted: false,
+                fareAmount: '35.00',
+                feeAmount: '5.00',
+                taxAmount: '10.00',
+                endorsementOrRestrictions: 'NOT REFUNDABLE'
+              }
+            ]
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isTrue(response.success);
+
+        done();
+      });
+    });
+
+    it('fails with a validation error when travel flight industry data is invalid', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        paymentMethodNonce: Nonces.PayPalOneTimePayment,
+        options: {
+          submitForSettlement: true
+        },
+        industry: {
+          industryType: Transaction.IndustryData.TravelAndFlight,
+          data: {
+            fareAmount: '-1.23',
+            legs: [
+              {
+                fareAmount: '-1.23'
+              }
+            ]
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(
+          response.errors.for('transaction').for('industry').on('fareAmount')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.TravelFlight.FareAmountCannotBeNegative
+        );
+        assert.equal(
+          response.errors.for('transaction').for('industry').for('legs').for('index0').on('fareAmount')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.Leg.TravelFlight.FareAmountCannotBeNegative
         );
 
         done();
