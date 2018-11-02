@@ -33,7 +33,7 @@ describe('TransactionGateway', function () {
         assert.isNull(response.transaction.voiceReferralNumber);
         assert.equal(response.transaction.processorResponseCode, '1000');
         assert.equal(response.transaction.processorResponseType, 'approved');
-        assert.isNotNull(response.transaction.authorizationExpiresAt);
+        assert.exists(response.transaction.authorizationExpiresAt);
 
         done();
       });
