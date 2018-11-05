@@ -1217,6 +1217,10 @@ describe('CustomerGateway', function () {
                 options: {
                   paypal: {
                     payeeEmail: 'payee@example.com',
+                    orderId: 'merchant-order-id',
+                    customField: 'custom merchant field',
+                    description: 'merchant description',
+                    amount: '1.23',
                     shipping: {
                       company: 'Braintree',
                       countryName: 'United States of America',
