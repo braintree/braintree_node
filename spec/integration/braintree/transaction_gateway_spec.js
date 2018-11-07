@@ -3642,6 +3642,99 @@ describe('TransactionGateway', function () {
         })
       );
     });
+
+    context('Subscription', function () {
+      it('charges a past due subscription', function (done) {
+        let customerId, creditCardToken;
+        let customerParams = {
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          }
+        };
+
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+          customerId = response.customer.id;
+          creditCardToken = response.customer.creditCards[0].token;
+
+          let subscriptionId;
+          let subscriptionParams = {
+            paymentMethodToken: creditCardToken,
+            planId: specHelper.plans.trialless.id
+          };
+
+          specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+            subscriptionId = response.subscription.id
+            specHelper.makePastDue(response.subscription, function(err, response) {
+              let transactionParams = {
+                amount: '5.00',
+                paymentMethodToken: creditCardToken,
+                customerId: customerId,
+                subscriptionId: subscriptionId
+              };
+
+              specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.equal(response.transaction.type, 'sale');
+                assert.equal(response.transaction.amount, '5.00');
+                assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+                assert.isNull(response.transaction.voiceReferralNumber);
+                assert.equal(response.transaction.processorResponseCode, '1000');
+                assert.equal(response.transaction.processorResponseType, 'approved');
+                assert.exists(response.transaction.authorizationExpiresAt);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      it('validates merchant account uses with subscription', function (done) {
+        let customerId, creditCardToken;
+        let customerParams = {
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          }
+        };
+
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+          customerId = response.customer.id;
+          creditCardToken = response.customer.creditCards[0].token;
+
+          let subscriptionId;
+          let subscriptionParams = {
+            paymentMethodToken: creditCardToken,
+            planId: specHelper.plans.trialless.id
+          };
+
+          specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+            subscriptionId = response.subscription.id
+            specHelper.makePastDue(response.subscription, function(err, response) {
+              let transactionParams = {
+                amount: '5.00',
+                paymentMethodToken: creditCardToken,
+                customerId: customerId,
+                subscriptionId: subscriptionId,
+                merchantAccountId: '14LaddersWellsAuthRedundancy'
+              };
+
+              specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                assert.isFalse(response.success);
+                assert.equal(
+                  response.errors.for('transaction').on('base')[0].code,
+                  ValidationErrorCodes.Transaction.MerchantAccountIdDoesNotMatchSubscription
+                );
+
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('credit', function () {
