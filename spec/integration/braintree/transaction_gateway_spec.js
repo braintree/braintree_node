@@ -3664,8 +3664,8 @@ describe('TransactionGateway', function () {
           };
 
           specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
-            subscriptionId = response.subscription.id
-            specHelper.makePastDue(response.subscription, function(err, response) {
+            subscriptionId = response.subscription.id;
+            specHelper.makePastDue(response.subscription, function () {
               let transactionParams = {
                 amount: '5.00',
                 paymentMethodToken: creditCardToken,
@@ -3711,8 +3711,8 @@ describe('TransactionGateway', function () {
           };
 
           specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
-            subscriptionId = response.subscription.id
-            specHelper.makePastDue(response.subscription, function(err, response) {
+            subscriptionId = response.subscription.id;
+            specHelper.makePastDue(response.subscription, function () {
               let transactionParams = {
                 amount: '5.00',
                 paymentMethodToken: creditCardToken,
