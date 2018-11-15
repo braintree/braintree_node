@@ -611,7 +611,7 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.GrantedPaymentInstrumentUpdate);
 
-        let update = webhookNotification.subject.grantedPaymentInstrumentUpdate;
+        let update = webhookNotification.grantedPaymentInstrumentUpdate;
 
         assert.equal('vczo7jqrpwrsi2px', update.grantOwnerMerchantId);
         assert.equal('cf0i8wgarszuy6hc', update.grantRecipientMerchantId);
