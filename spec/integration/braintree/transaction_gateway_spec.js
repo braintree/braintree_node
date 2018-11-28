@@ -2382,59 +2382,71 @@ describe('TransactionGateway', function () {
         });
 
         it('successfully creates a transaction with a payee id in the options params', function (done) {
-          let nonce = Nonces.PayPalOneTimePayment;
+          let paymentMethodParams = {
+            paypalAccount: {
+              consent_code: 'PAYPAL_CONSENT_CODE' // eslint-disable-line camelcase
+            }
+          };
 
-          specHelper.defaultGateway.customer.create({}, function () {
-            let transactionParams = {
-              paymentMethodNonce: nonce,
-              amount: '100.00',
-              paypalAccount: {},
-              options: {
-                payeeId: 'fake-payee-id'
-              }
-            };
+          specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
+            specHelper.defaultGateway.customer.create({}, function () {
+              let transactionParams = {
+                paymentMethodNonce: nonce,
+                amount: '100.00',
+                paypalAccount: {},
+                options: {
+                  payeeId: 'fake-payee-id'
+                }
+              };
 
-            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-              assert.isNull(err);
-              assert.isTrue(response.success);
-              assert.equal(response.transaction.type, 'sale');
-              assert.isNull(response.transaction.paypalAccount.token);
-              assert.isString(response.transaction.paypalAccount.payerEmail);
-              assert.isString(response.transaction.paypalAccount.authorizationId);
-              assert.isString(response.transaction.paypalAccount.debugId);
-              assert.equal(response.transaction.paypalAccount.payeeId, 'fake-payee-id');
+              specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.equal(response.transaction.type, 'sale');
+                assert.isNull(response.transaction.paypalAccount.token);
+                assert.isString(response.transaction.paypalAccount.payerEmail);
+                assert.isString(response.transaction.paypalAccount.authorizationId);
+                assert.isString(response.transaction.paypalAccount.debugId);
+                assert.equal(response.transaction.paypalAccount.payeeId, 'fake-payee-id');
 
-              done();
+                done();
+              });
             });
           });
         });
 
         it('successfully creates a transaction with a payee id in transaction.options.paypal', function (done) {
-          let nonce = Nonces.PayPalOneTimePayment;
+          let paymentMethodParams = {
+            paypalAccount: {
+              consent_code: 'PAYPAL_CONSENT_CODE' // eslint-disable-line camelcase
+            }
+          };
 
-          specHelper.defaultGateway.customer.create({}, function () {
-            let transactionParams = {
-              paymentMethodNonce: nonce,
-              amount: '100.00',
-              paypalAccount: {},
-              options: {
-                paypal: {
-                  payeeId: 'fake-payee-id'
+          specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
+            specHelper.defaultGateway.customer.create({}, function () {
+              let transactionParams = {
+                paymentMethodNonce: nonce,
+                amount: '100.00',
+                paypalAccount: {},
+                options: {
+                  paypal: {
+                    payeeId: 'fake-payee-id'
+                  }
                 }
-              }
-            };
+              };
 
-            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-              assert.isNull(err);
-              assert.isTrue(response.success);
-              assert.equal(response.transaction.type, 'sale');
-              assert.isNull(response.transaction.paypalAccount.token);
-              assert.isString(response.transaction.paypalAccount.payerEmail);
-              assert.isString(response.transaction.paypalAccount.authorizationId);
-              assert.isString(response.transaction.paypalAccount.debugId);
-              assert.equal(response.transaction.paypalAccount.payeeId, 'fake-payee-id');
+              specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.equal(response.transaction.type, 'sale');
+                assert.isNull(response.transaction.paypalAccount.token);
+                assert.isString(response.transaction.paypalAccount.payerEmail);
+                assert.isString(response.transaction.paypalAccount.authorizationId);
+                assert.isString(response.transaction.paypalAccount.debugId);
+                assert.equal(response.transaction.paypalAccount.payeeId, 'fake-payee-id');
 
-              done();
+                done();
+              });
             });
           });
         });
