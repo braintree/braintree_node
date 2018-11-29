@@ -2175,6 +2175,31 @@ describe('TransactionGateway', function () {
       )
     );
 
+    it('successfully creates a paypal transaction with local payment webhook content', done =>
+      specHelper.defaultGateway.customer.create({}, function () {
+        let transactionParams = {
+          amount: '100.00',
+          options: {
+            submitForSettlement: true
+          },
+          paypalAccount: {
+            payerId: 'PAYER-123',
+            paymentId: 'PAY-1234'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.PayPalAccount);
+          assert.equal(response.transaction.paypalAccount.payerId, 'PAYER-123');
+          assert.equal(response.transaction.paypalAccount.paymentId, 'PAY-1234');
+
+          done();
+        });
+      })
+    );
+
     context('with a paypal acount', function () {
       it('returns PayPalAccount for payment_instrument', done =>
         specHelper.defaultGateway.customer.create({}, function () {
