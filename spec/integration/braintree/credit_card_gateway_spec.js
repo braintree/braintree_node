@@ -77,6 +77,7 @@ describe('CreditCardGateway', function () {
           assert.isTrue(response.success);
 
           assert.equal(response.creditCard.verification.riskData.decision, 'Approve');
+          assert.isDefined(response.creditCard.verification.riskData.fraudServiceProvider);
           assert.isDefined(response.creditCard.verification.riskData.id);
 
           done();
