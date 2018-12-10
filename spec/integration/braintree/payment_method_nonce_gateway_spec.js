@@ -76,6 +76,8 @@ describe('PaymentMethodNonceGateway', function () {
           assert.equal(info.enrolled, 'Y');
           assert.equal(info.status, 'authenticate_successful');
 
+          assert.equal(paymentMethodNonce.details.bin, '411111');
+
           done();
         });
       });

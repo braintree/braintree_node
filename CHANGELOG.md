@@ -1,3 +1,6 @@
+## unreleased
+* Add `bin` field to `paymentMethodNonceDetails`
+
 ## 2.14.0
 * Add `processor_response_type` to `Transaction`, `AuthorizationAdjustment`, and `CreditCardVerification`.
 * Add `authorizationExpiresAt` to `Transaction`
