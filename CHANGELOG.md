@@ -1,3 +1,11 @@
+## 2.14.0
+* Add `processor_response_type` to `Transaction`, `AuthorizationAdjustment`, and `CreditCardVerification`.
+* Add `authorizationExpiresAt` to `Transaction`
+* Fix `webhookNotification.grantedPaymentInstrumentUpdate` typo to be the correct name
+* Allow PayPal payment ID and payer ID to be passed during transaction create
+* Add `fraudServiceProvider` field in `riskData`
+* Add `travel_flight` support to industry-specific data
+
 ## 2.13.1
 * Fix `transaction.lineItems` method when returned from transaction searches (#146)
 

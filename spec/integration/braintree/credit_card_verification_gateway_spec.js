@@ -58,6 +58,12 @@ describe('CreditCardVerificationGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
 
+        let verification = response.verification;
+
+        assert.equal(verification.processorResponseCode, '1000');
+        assert.equal(verification.processorResponseText, 'Approved');
+        assert.equal(verification.processorResponseType, 'approved');
+
         done();
       });
     });
@@ -73,6 +79,12 @@ describe('CreditCardVerificationGateway', function () {
 
       specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
         assert.isFalse(response.success);
+
+        let verification = response.verification;
+
+        assert.equal(verification.processorResponseCode, '2000');
+        assert.equal(verification.processorResponseText, 'Do Not Honor');
+        assert.equal(verification.processorResponseType, 'soft_declined');
 
         done();
       });

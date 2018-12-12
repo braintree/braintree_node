@@ -172,25 +172,6 @@ describe('PaymentMethodGateway', function () {
       )
     );
 
-    context('Europe Bank Account', () =>
-      it('vaults an Europe Bank Account from the nonce', done =>
-        specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
-          customerId = response.customer.id;
-
-          let paymentMethodParams = {
-            customerId,
-            paymentMethodNonce: Nonces.Europe
-          };
-
-          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err) {
-            assert.isNotNull(err);
-            assert.equal(err.type, 'serverError');
-            done();
-          });
-        })
-      )
-    );
-
     context('Coinbase', () =>
       it('no longer supports vaulting a Coinbase account from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'Paul', lastName: 'Gross'}, function (err, response) {

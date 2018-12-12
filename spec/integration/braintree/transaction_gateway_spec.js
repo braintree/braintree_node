@@ -31,6 +31,9 @@ describe('TransactionGateway', function () {
         assert.equal(response.transaction.amount, '5.00');
         assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
         assert.isNull(response.transaction.voiceReferralNumber);
+        assert.equal(response.transaction.processorResponseCode, '1000');
+        assert.equal(response.transaction.processorResponseType, 'approved');
+        assert.exists(response.transaction.authorizationExpiresAt);
 
         done();
       });
@@ -2172,6 +2175,31 @@ describe('TransactionGateway', function () {
       )
     );
 
+    it('successfully creates a paypal transaction with local payment webhook content', done =>
+      specHelper.defaultGateway.customer.create({}, function () {
+        let transactionParams = {
+          amount: '100.00',
+          options: {
+            submitForSettlement: true
+          },
+          paypalAccount: {
+            payerId: 'PAYER-123',
+            paymentId: 'PAY-1234'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.PayPalAccount);
+          assert.equal(response.transaction.paypalAccount.payerId, 'PAYER-123');
+          assert.equal(response.transaction.paypalAccount.paymentId, 'PAY-1234');
+
+          done();
+        });
+      })
+    );
+
     context('with a paypal acount', function () {
       it('returns PayPalAccount for payment_instrument', done =>
         specHelper.defaultGateway.customer.create({}, function () {
@@ -2379,59 +2407,71 @@ describe('TransactionGateway', function () {
         });
 
         it('successfully creates a transaction with a payee id in the options params', function (done) {
-          let nonce = Nonces.PayPalOneTimePayment;
+          let paymentMethodParams = {
+            paypalAccount: {
+              consent_code: 'PAYPAL_CONSENT_CODE' // eslint-disable-line camelcase
+            }
+          };
 
-          specHelper.defaultGateway.customer.create({}, function () {
-            let transactionParams = {
-              paymentMethodNonce: nonce,
-              amount: '100.00',
-              paypalAccount: {},
-              options: {
-                payeeId: 'fake-payee-id'
-              }
-            };
+          specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
+            specHelper.defaultGateway.customer.create({}, function () {
+              let transactionParams = {
+                paymentMethodNonce: nonce,
+                amount: '100.00',
+                paypalAccount: {},
+                options: {
+                  payeeId: 'fake-payee-id'
+                }
+              };
 
-            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-              assert.isNull(err);
-              assert.isTrue(response.success);
-              assert.equal(response.transaction.type, 'sale');
-              assert.isNull(response.transaction.paypalAccount.token);
-              assert.isString(response.transaction.paypalAccount.payerEmail);
-              assert.isString(response.transaction.paypalAccount.authorizationId);
-              assert.isString(response.transaction.paypalAccount.debugId);
-              assert.equal(response.transaction.paypalAccount.payeeId, 'fake-payee-id');
+              specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.equal(response.transaction.type, 'sale');
+                assert.isNull(response.transaction.paypalAccount.token);
+                assert.isString(response.transaction.paypalAccount.payerEmail);
+                assert.isString(response.transaction.paypalAccount.authorizationId);
+                assert.isString(response.transaction.paypalAccount.debugId);
+                assert.equal(response.transaction.paypalAccount.payeeId, 'fake-payee-id');
 
-              done();
+                done();
+              });
             });
           });
         });
 
         it('successfully creates a transaction with a payee id in transaction.options.paypal', function (done) {
-          let nonce = Nonces.PayPalOneTimePayment;
+          let paymentMethodParams = {
+            paypalAccount: {
+              consent_code: 'PAYPAL_CONSENT_CODE' // eslint-disable-line camelcase
+            }
+          };
 
-          specHelper.defaultGateway.customer.create({}, function () {
-            let transactionParams = {
-              paymentMethodNonce: nonce,
-              amount: '100.00',
-              paypalAccount: {},
-              options: {
-                paypal: {
-                  payeeId: 'fake-payee-id'
+          specHelper.generateNonceForNewPaymentMethod(paymentMethodParams, null, function (nonce) {
+            specHelper.defaultGateway.customer.create({}, function () {
+              let transactionParams = {
+                paymentMethodNonce: nonce,
+                amount: '100.00',
+                paypalAccount: {},
+                options: {
+                  paypal: {
+                    payeeId: 'fake-payee-id'
+                  }
                 }
-              }
-            };
+              };
 
-            specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-              assert.isNull(err);
-              assert.isTrue(response.success);
-              assert.equal(response.transaction.type, 'sale');
-              assert.isNull(response.transaction.paypalAccount.token);
-              assert.isString(response.transaction.paypalAccount.payerEmail);
-              assert.isString(response.transaction.paypalAccount.authorizationId);
-              assert.isString(response.transaction.paypalAccount.debugId);
-              assert.equal(response.transaction.paypalAccount.payeeId, 'fake-payee-id');
+              specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.equal(response.transaction.type, 'sale');
+                assert.isNull(response.transaction.paypalAccount.token);
+                assert.isString(response.transaction.paypalAccount.payerEmail);
+                assert.isString(response.transaction.paypalAccount.authorizationId);
+                assert.isString(response.transaction.paypalAccount.debugId);
+                assert.equal(response.transaction.paypalAccount.payeeId, 'fake-payee-id');
 
-              done();
+                done();
+              });
             });
           });
         });
@@ -2837,7 +2877,7 @@ describe('TransactionGateway', function () {
       });
     });
 
-    it('handles processor declines', function (done) {
+    it('handles processor soft declines', function (done) {
       let transactionParams = {
         amount: '2000.00',
         creditCard: {
@@ -2850,7 +2890,30 @@ describe('TransactionGateway', function () {
         assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.transaction.amount, '2000.00');
         assert.equal(response.transaction.status, 'processor_declined');
+        assert.equal(response.transaction.processorResponseCode, '2000');
+        assert.equal(response.transaction.processorResponseType, 'soft_declined');
         assert.equal(response.transaction.additionalProcessorResponse, '2000 : Do Not Honor');
+
+        done();
+      });
+    });
+
+    it('handles processor hard declines', function (done) {
+      let transactionParams = {
+        amount: '2015.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(response.transaction.amount, '2015.00');
+        assert.equal(response.transaction.status, 'processor_declined');
+        assert.equal(response.transaction.processorResponseCode, '2015');
+        assert.equal(response.transaction.processorResponseType, 'hard_declined');
+        assert.equal(response.transaction.additionalProcessorResponse, '2015 : Transaction Not Allowed');
 
         done();
       });
@@ -2869,6 +2932,7 @@ describe('TransactionGateway', function () {
       specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.transaction.riskData.decision, 'Approve');
+        assert.isDefined(response.transaction.riskData.fraudServiceProvider);
         assert.isDefined(response.transaction.riskData.id);
         done();
       });
@@ -3098,7 +3162,7 @@ describe('TransactionGateway', function () {
       });
     });
 
-    it('handles lodging industry data validations', function (done) {
+    it('handles travel cruise industry data validations', function (done) {
       let transactionParams = {
         amount: '10.0',
         creditCard: {
@@ -3122,6 +3186,116 @@ describe('TransactionGateway', function () {
         assert.equal(
           response.errors.for('transaction').for('industry').on('travelPackage')[0].code,
           ValidationErrorCodes.Transaction.IndustryData.TravelCruise.TravelPackageIsInvalid
+        );
+
+        done();
+      });
+    });
+
+    it('successfully creates a transaction with travel flight industry data', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        paymentMethodNonce: Nonces.PayPalOneTimePayment,
+        options: {
+          submitForSettlement: true
+        },
+        industry: {
+          industryType: Transaction.IndustryData.TravelAndFlight,
+          data: {
+            passengerFirstName: 'John',
+            passengerLastName: 'Doe',
+            passengerMiddleInitial: 'M',
+            passengerTitle: 'Mr.',
+            issuedDate: '2018-01-01',
+            travelAgencyName: 'Expedia',
+            travelAgencyCode: '12345678',
+            ticketNumber: 'ticket-number',
+            issuingCarrierCode: 'AA',
+            customerCode: 'customer-code',
+            fareAmount: '70.00',
+            feeAmount: '10.00',
+            taxAmount: '20.00',
+            restrictedTicket: false,
+            legs: [
+              {
+                conjunctionTicket: 'CJ0001',
+                exchangeTicket: 'ET0001',
+                couponNumber: '1',
+                serviceClass: 'Y',
+                carrierCode: 'AA',
+                fareBasisCode: 'W',
+                flightNumber: 'AA100',
+                departureDate: '2018-01-02',
+                departureAirportCode: 'MDW',
+                departureTime: '08:00',
+                arrivalAirportCode: 'ATX',
+                arrivalTime: '10:00',
+                stopoverPermitted: false,
+                fareAmount: '35.00',
+                feeAmount: '5.00',
+                taxAmount: '10.00',
+                endorsementOrRestrictions: 'NOT REFUNDABLE'
+              },
+              {
+                conjunctionTicket: 'CJ0002',
+                exchangeTicket: 'ET0002',
+                couponNumber: '1',
+                serviceClass: 'Y',
+                carrierCode: 'AA',
+                fareBasisCode: 'W',
+                flightNumber: 'AA200',
+                departureDate: '2018-01-03',
+                departureAirportCode: 'ATX',
+                departureTime: '12:00',
+                arrivalAirportCode: 'MDW',
+                arrivalTime: '14:00',
+                stopoverPermitted: false,
+                fareAmount: '35.00',
+                feeAmount: '5.00',
+                taxAmount: '10.00',
+                endorsementOrRestrictions: 'NOT REFUNDABLE'
+              }
+            ]
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isTrue(response.success);
+
+        done();
+      });
+    });
+
+    it('fails with a validation error when travel flight industry data is invalid', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        paymentMethodNonce: Nonces.PayPalOneTimePayment,
+        options: {
+          submitForSettlement: true
+        },
+        industry: {
+          industryType: Transaction.IndustryData.TravelAndFlight,
+          data: {
+            fareAmount: '-1.23',
+            legs: [
+              {
+                fareAmount: '-1.23'
+              }
+            ]
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(
+          response.errors.for('transaction').for('industry').on('fareAmount')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.TravelFlight.FareAmountCannotBeNegative
+        );
+        assert.equal(
+          response.errors.for('transaction').for('industry').for('legs').for('index0').on('fareAmount')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.Leg.TravelFlight.FareAmountCannotBeNegative
         );
 
         done();
@@ -3616,6 +3790,99 @@ describe('TransactionGateway', function () {
         })
       );
     });
+
+    context('Subscription', function () {
+      it('charges a past due subscription', function (done) {
+        let customerId, creditCardToken;
+        let customerParams = {
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          }
+        };
+
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+          customerId = response.customer.id;
+          creditCardToken = response.customer.creditCards[0].token;
+
+          let subscriptionId;
+          let subscriptionParams = {
+            paymentMethodToken: creditCardToken,
+            planId: specHelper.plans.trialless.id
+          };
+
+          specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+            subscriptionId = response.subscription.id;
+            specHelper.makePastDue(response.subscription, function () {
+              let transactionParams = {
+                amount: '5.00',
+                paymentMethodToken: creditCardToken,
+                customerId: customerId,
+                subscriptionId: subscriptionId
+              };
+
+              specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.equal(response.transaction.type, 'sale');
+                assert.equal(response.transaction.amount, '5.00');
+                assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+                assert.isNull(response.transaction.voiceReferralNumber);
+                assert.equal(response.transaction.processorResponseCode, '1000');
+                assert.equal(response.transaction.processorResponseType, 'approved');
+                assert.exists(response.transaction.authorizationExpiresAt);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      it('validates merchant account uses with subscription', function (done) {
+        let customerId, creditCardToken;
+        let customerParams = {
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/12'
+          }
+        };
+
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+          customerId = response.customer.id;
+          creditCardToken = response.customer.creditCards[0].token;
+
+          let subscriptionId;
+          let subscriptionParams = {
+            paymentMethodToken: creditCardToken,
+            planId: specHelper.plans.trialless.id
+          };
+
+          specHelper.defaultGateway.subscription.create(subscriptionParams, function (err, response) {
+            subscriptionId = response.subscription.id;
+            specHelper.makePastDue(response.subscription, function () {
+              let transactionParams = {
+                amount: '5.00',
+                paymentMethodToken: creditCardToken,
+                customerId: customerId,
+                subscriptionId: subscriptionId,
+                merchantAccountId: '14LaddersWellsAuthRedundancy'
+              };
+
+              specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+                assert.isFalse(response.success);
+                assert.equal(
+                  response.errors.for('transaction').on('base')[0].code,
+                  ValidationErrorCodes.Transaction.MerchantAccountIdDoesNotMatchSubscription
+                );
+
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('credit', function () {
@@ -3960,6 +4227,41 @@ describe('TransactionGateway', function () {
         assert.exists(authorizationAdjustment.timestamp);
         assert.equal(authorizationAdjustment.processorResponseCode, '1000');
         assert.equal(authorizationAdjustment.processorResponseText, 'Approved');
+        assert.equal(authorizationAdjustment.processorResponseType, 'approved');
+
+        done();
+      });
+    });
+
+    it('exposes authorizationAdjustments soft declined', function (done) {
+      let transactionId = 'authadjustmenttransactionsoftdeclined';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        let authorizationAdjustment = transaction.authorizationAdjustments[0];
+
+        assert.equal(authorizationAdjustment.amount, '-20.00');
+        assert.equal(authorizationAdjustment.success, false);
+        assert.exists(authorizationAdjustment.timestamp);
+        assert.equal(authorizationAdjustment.processorResponseCode, '3000');
+        assert.equal(authorizationAdjustment.processorResponseText, 'Processor Network Unavailable - Try Again');
+        assert.equal(authorizationAdjustment.processorResponseType, 'soft_declined');
+
+        done();
+      });
+    });
+
+    it('exposes authorizationAdjustments hard declined', function (done) {
+      let transactionId = 'authadjustmenttransactionharddeclined';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        let authorizationAdjustment = transaction.authorizationAdjustments[0];
+
+        assert.equal(authorizationAdjustment.amount, '-20.00');
+        assert.equal(authorizationAdjustment.success, false);
+        assert.exists(authorizationAdjustment.timestamp);
+        assert.equal(authorizationAdjustment.processorResponseCode, '2015');
+        assert.equal(authorizationAdjustment.processorResponseText, 'Transaction Not Allowed');
+        assert.equal(authorizationAdjustment.processorResponseType, 'hard_declined');
 
         done();
       });
