@@ -1,4 +1,4 @@
-## unreleased
+## 2.14.0
 * Add `processor_response_type` to `Transaction`, `AuthorizationAdjustment`, and `CreditCardVerification`.
 * Add `authorizationExpiresAt` to `Transaction`
 * Fix `webhookNotification.grantedPaymentInstrumentUpdate` typo to be the correct name
