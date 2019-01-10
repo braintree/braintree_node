@@ -1,6 +1,7 @@
 ## unreleased
 * Add `bin` field to `paymentMethodNonceDetails`
 * Add Error indicating pdf uploads too long for dispute evidence.
+* Add `GrantedPaymentMethodRevoked` webhook response objects
 
 ## 2.14.0
 * Add `processor_response_type` to `Transaction`, `AuthorizationAdjustment`, and `CreditCardVerification`.

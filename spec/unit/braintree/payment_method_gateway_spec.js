@@ -1,6 +1,7 @@
 'use strict';
 
 let PaymentMethodGateway = require('../../../lib/braintree/payment_method_gateway').PaymentMethodGateway;
+let PaymentMethodParser = require('../../../lib/braintree/payment_method_parser').PaymentMethodParser;
 let errorTypes = require('../../../lib/braintree/error_types').errorTypes;
 
 describe('PaymentMethodGateway', function () {
@@ -14,7 +15,7 @@ describe('PaymentMethodGateway', function () {
         }
       };
 
-      let paymentMethod = PaymentMethodGateway.parsePaymentMethod(response);
+      let paymentMethod = PaymentMethodParser.parsePaymentMethod(response);
 
       assert.equal(paymentMethod.token, 1234);
       assert.isTrue(paymentMethod.default);
