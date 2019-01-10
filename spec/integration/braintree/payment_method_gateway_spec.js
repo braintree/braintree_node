@@ -1999,7 +1999,7 @@ describe('PaymentMethodGateway', function () {
     let creditCard, grantingGateway;
 
     before(function (done) {
-      let partnerMerchantGateway = braintree.connect({
+      let partnerMerchantGateway = new braintree.BraintreeGateway({
         merchantId: 'integration_merchant_public_id',
         publicKey: 'oauth_app_partner_user_public_key',
         privateKey: 'oauth_app_partner_user_private_key',
@@ -2029,7 +2029,7 @@ describe('PaymentMethodGateway', function () {
         return partnerMerchantGateway.creditCard.create(creditCardParams, function (err, response) {
           creditCard = response.creditCard;
 
-          let oauthGateway = braintree.connect({
+          let oauthGateway = new braintree.BraintreeGateway({
             clientId: 'client_id$development$integration_client_id',
             clientSecret: 'client_secret$development$integration_client_secret',
             environment: Environment.Development
@@ -2041,7 +2041,7 @@ describe('PaymentMethodGateway', function () {
           };
 
           specHelper.createToken(oauthGateway, accessTokenParams, function (err, response) {
-            grantingGateway = braintree.connect({
+            grantingGateway = new braintree.BraintreeGateway({
               accessToken: response.credentials.accessToken,
               environment: Environment.Development
             });

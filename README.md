@@ -24,7 +24,11 @@ The Braintree Node library provides integration access to the Braintree Gateway.
 ```javascript
 var braintree = require('braintree');
 
-var gateway = braintree.connect({
+// previously, gateways were created by calling `braintree.connect`, but as no
+// connection takes place in the method call, we've opted to document how
+// to instantiate a Braintree Gateway directly. `connect` can still be used,
+// but it is deprecated and will be removed in the next major version
+var gateway = new braintree.BraintreeGateway({
   environment: braintree.Environment.Sandbox,
   merchantId: 'your_merchant_id',
   publicKey: 'your_public_key',
@@ -58,7 +62,7 @@ You can also use Promises instead of callbacks.
 ```javascript
 var braintree = require('braintree');
 
-var gateway = braintree.connect({
+var gateway = new braintree.BraintreeGateway({
   environment: braintree.Environment.Sandbox,
   merchantId: 'your_merchant_id',
   publicKey: 'your_public_key',

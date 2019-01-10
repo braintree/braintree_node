@@ -13,7 +13,7 @@ describe('TransparentRedirectGateway', () =>
         publicKey: 'integration_public_key',
         privateKey: 'integration_private_key'
       };
-      let gateway = new TransparentRedirectGateway(braintree.connect(config));
+      let gateway = new TransparentRedirectGateway(new braintree.BraintreeGateway(config));
 
       assert.equal(gateway.url, 'https://api.sandbox.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests');
     });
@@ -25,7 +25,7 @@ describe('TransparentRedirectGateway', () =>
         publicKey: 'integration_public_key',
         privateKey: 'integration_private_key'
       };
-      let gateway = new TransparentRedirectGateway(braintree.connect(config));
+      let gateway = new TransparentRedirectGateway(new braintree.BraintreeGateway(config));
 
       assert.equal(gateway.url, 'https://api.braintreegateway.com/merchants/integration_merchant_id/transparent_redirect_requests');
     });
@@ -37,7 +37,7 @@ describe('TransparentRedirectGateway', () =>
         publicKey: 'integration_public_key',
         privateKey: 'integration_private_key'
       };
-      let gateway = new TransparentRedirectGateway(braintree.connect(config));
+      let gateway = new TransparentRedirectGateway(new braintree.BraintreeGateway(config));
 
       assert.equal(gateway.url, `http://localhost:${gateway.gateway.config.environment.port}/merchants/integration_merchant_id/transparent_redirect_requests`);
     });

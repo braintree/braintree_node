@@ -7,7 +7,7 @@ let braintree = specHelper.braintree;
 describe('OAuthGateway', function () {
   describe('createTokenFromCode', function () {
     it('creates token from code using oauth credentials', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
@@ -29,7 +29,7 @@ describe('OAuthGateway', function () {
     });
 
     it('returns validation errors when using a bad grant code', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
@@ -53,7 +53,7 @@ describe('OAuthGateway', function () {
 
   describe('createTokenFromRefreshToken', () =>
     it('creates an access token from a refresh token', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
@@ -79,7 +79,7 @@ describe('OAuthGateway', function () {
 
   describe('revokeAccessToken', () =>
     it('revokes an access token', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
@@ -91,7 +91,7 @@ describe('OAuthGateway', function () {
             assert.isTrue(response.success);
             assert.isTrue(response.result.success);
 
-            gateway = braintree.connect({
+            gateway = new braintree.BraintreeGateway({
               accessToken: accessTokenResponse.credentials.accessToken
             });
 
@@ -110,7 +110,7 @@ describe('OAuthGateway', function () {
   describe('connectUrl', function () {
     it('builds a connect url', function () {
       let queryString;
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
@@ -229,7 +229,7 @@ describe('OAuthGateway', function () {
 
     it('builds a connect url without optional parameters', function () {
       let queryString;
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
@@ -262,7 +262,7 @@ describe('OAuthGateway', function () {
 
     it('encodes connect url query parameters containing special characters not encoded by encodeURIComponent', function () {
       let queryString;
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
@@ -287,7 +287,7 @@ describe('OAuthGateway', function () {
 
     it('builds a connect url with multiple payment methods', function () {
       let queryString;
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
@@ -321,7 +321,7 @@ describe('OAuthGateway', function () {
     });
 
     it("doesn't modify the argument", function () {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });

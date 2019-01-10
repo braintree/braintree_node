@@ -633,13 +633,13 @@ describe('MerchantAccountGateway', function () {
   describe('all', function () {
     context('using a callback', function () {
       it('returns all merchant accounts', function (done) {
-        let gateway = braintree.connect({
+        let gateway = new braintree.BraintreeGateway({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
         specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
-          gateway = braintree.connect({
+          gateway = new braintree.BraintreeGateway({
             accessToken: response.credentials.accessToken
           });
 
@@ -651,13 +651,13 @@ describe('MerchantAccountGateway', function () {
       });
 
       it('handles a response containing a single merchant account', function (done) {
-        let gateway = braintree.connect({
+        let gateway = new braintree.BraintreeGateway({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
         return gateway.merchant.create({email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['credit_card', 'paypal']}, function (err, response) {
-          gateway = braintree.connect({
+          gateway = new braintree.BraintreeGateway({
             accessToken: response.credentials.accessToken
           });
 
@@ -673,13 +673,13 @@ describe('MerchantAccountGateway', function () {
       });
 
       it('returns a merchant account with correct attributes', function (done) {
-        let gateway = braintree.connect({
+        let gateway = new braintree.BraintreeGateway({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
         return gateway.merchant.create({email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['credit_card', 'paypal']}, function (err, response) {
-          gateway = braintree.connect({
+          gateway = new braintree.BraintreeGateway({
             accessToken: response.credentials.accessToken
           });
 
@@ -697,13 +697,13 @@ describe('MerchantAccountGateway', function () {
       });
 
       it('gracefully handles errors', function (done) {
-        let gateway = braintree.connect({
+        let gateway = new braintree.BraintreeGateway({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
         specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
-          gateway = braintree.connect({
+          gateway = new braintree.BraintreeGateway({
             accessToken: response.credentials.accessToken
           });
 
@@ -720,13 +720,13 @@ describe('MerchantAccountGateway', function () {
 
     context('using a stream', function () {
       it('returns a stream if no callback is provided', function (done) {
-        let gateway = braintree.connect({
+        let gateway = new braintree.BraintreeGateway({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
         specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
-          gateway = braintree.connect({
+          gateway = new braintree.BraintreeGateway({
             accessToken: response.credentials.accessToken
           });
 
@@ -743,13 +743,13 @@ describe('MerchantAccountGateway', function () {
       });
 
       it('returns a merchant account with correct attributes', function (done) {
-        let gateway = braintree.connect({
+        let gateway = new braintree.BraintreeGateway({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
         return gateway.merchant.create({email: 'name@email.com', countryCodeAlpha3: 'USA', paymentMethods: ['credit_card', 'paypal']}, function (err, response) {
-          gateway = braintree.connect({
+          gateway = new braintree.BraintreeGateway({
             accessToken: response.credentials.accessToken
           });
           let merchantAccounts = [];
@@ -770,13 +770,13 @@ describe('MerchantAccountGateway', function () {
       });
 
       it('gracefully handles errors', function (done) {
-        let gateway = braintree.connect({
+        let gateway = new braintree.BraintreeGateway({
           clientId: 'client_id$development$integration_client_id',
           clientSecret: 'client_secret$development$integration_client_secret'
         });
 
         specHelper.createToken(gateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
-          gateway = braintree.connect({
+          gateway = new braintree.BraintreeGateway({
             accessToken: response.credentials.accessToken
           });
 
@@ -803,7 +803,7 @@ describe('MerchantAccountGateway', function () {
 
   describe('createForCurrency', function () {
     it('creates a new merchant account for currency', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
@@ -816,7 +816,7 @@ describe('MerchantAccountGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        gateway = braintree.connect({
+        gateway = new braintree.BraintreeGateway({
           accessToken: response.credentials.accessToken
         });
 
@@ -833,7 +833,7 @@ describe('MerchantAccountGateway', function () {
     });
 
     it('returns error if merchant account exists for currency', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
@@ -846,7 +846,7 @@ describe('MerchantAccountGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        gateway = braintree.connect({
+        gateway = new braintree.BraintreeGateway({
           accessToken: response.credentials.accessToken
         });
 
@@ -866,7 +866,7 @@ describe('MerchantAccountGateway', function () {
     });
 
     it('returns error if currency is not provided', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
@@ -879,7 +879,7 @@ describe('MerchantAccountGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        gateway = braintree.connect({
+        gateway = new braintree.BraintreeGateway({
           accessToken: response.credentials.accessToken
         });
 
@@ -899,7 +899,7 @@ describe('MerchantAccountGateway', function () {
     });
 
     it('returns error if currency is invalid', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
@@ -912,7 +912,7 @@ describe('MerchantAccountGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        gateway = braintree.connect({
+        gateway = new braintree.BraintreeGateway({
           accessToken: response.credentials.accessToken
         });
 
@@ -933,7 +933,7 @@ describe('MerchantAccountGateway', function () {
     });
 
     it('returns error if merchant account exists for id', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
@@ -946,7 +946,7 @@ describe('MerchantAccountGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        gateway = braintree.connect({
+        gateway = new braintree.BraintreeGateway({
           accessToken: response.credentials.accessToken
         });
 
