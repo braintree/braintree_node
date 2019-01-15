@@ -83,6 +83,19 @@ describe('PaymentMethodNonceGateway', function () {
       });
     });
 
+    it('returns venmo account details', function (done) {
+      specHelper.defaultGateway.paymentMethodNonce.find('fake-venmo-account-nonce', function (err, paymentMethodNonce) {
+        assert.isNull(err);
+        let details = paymentMethodNonce.details;
+
+        assert.equal('Venmo-Joe-1', details.venmoUserId);
+        assert.equal('venmojoe', details.username);
+        assert.equal('99', details.lastTwo);
+
+        done();
+      });
+    });
+
     it("returns undefined threeDSecureInfo if there's none present", done =>
       specHelper.defaultGateway.customer.create({}, function (err, response) {
         let customerId = response.customer.id;
