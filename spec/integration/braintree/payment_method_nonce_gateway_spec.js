@@ -88,9 +88,9 @@ describe('PaymentMethodNonceGateway', function () {
         assert.isNull(err);
         let details = paymentMethodNonce.details;
 
-        assert.equal('Venmo-Joe-1', details.venmoUserId);
-        assert.equal('venmojoe', details.username);
-        assert.equal('99', details.lastTwo);
+        assert.equal(details.venmoUserId, 'Venmo-Joe-1');
+        assert.equal(details.username, 'venmojoe');
+        assert.equal(details.lastTwo, '99');
 
         done();
       });
