@@ -4,6 +4,7 @@ let fs = require('fs');
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
 let LARGE_FILE_PATH = './spec/fixtures/large_file.png';
+let TOO_LONG_FILE_PATH = './spec/fixtures/too_long.pdf';
 
 function removeLargeFile(done) {
   fs.unlink(LARGE_FILE_PATH, done);
@@ -97,6 +98,21 @@ describe('DocumentUploadGateway', () => {
 
         assert.isFalse(response.success);
         assert.equal(ValidationErrorCodes.DocumentUpload.FileIsTooLarge, error.code);
+      });
+    });
+
+    it('returns error when pdf file is > 50 pages', () => {
+      let file = fs.createReadStream(TOO_LONG_FILE_PATH);
+      let params = {
+        kind: 'evidence_document',
+        file: file
+      };
+
+      return specHelper.defaultGateway.documentUpload.create(params).then((response) => {
+        let error = response.errors.for('documentUpload').on('file')[0];
+
+        assert.isFalse(response.success);
+        assert.equal(ValidationErrorCodes.DocumentUpload.FileIsTooLong, error.code);
       });
     });
 

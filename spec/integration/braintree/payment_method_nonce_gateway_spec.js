@@ -76,8 +76,23 @@ describe('PaymentMethodNonceGateway', function () {
           assert.equal(info.enrolled, 'Y');
           assert.equal(info.status, 'authenticate_successful');
 
+          assert.equal(paymentMethodNonce.details.bin, '411111');
+
           done();
         });
+      });
+    });
+
+    it('returns venmo account details', function (done) {
+      specHelper.defaultGateway.paymentMethodNonce.find('fake-venmo-account-nonce', function (err, paymentMethodNonce) {
+        assert.isNull(err);
+        let details = paymentMethodNonce.details;
+
+        assert.equal(details.venmoUserId, 'Venmo-Joe-1');
+        assert.equal(details.username, 'venmojoe');
+        assert.equal(details.lastTwo, '99');
+
+        done();
       });
     });
 

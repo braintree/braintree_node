@@ -1,11 +1,15 @@
 'use strict';
 /* eslint-disable camelcase */
 
+let Buffer = require('buffer').Buffer;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let WebhookNotification = require('../../../lib/braintree').WebhookNotification;
 let Dispute = require('../../../lib/braintree/dispute').Dispute;
 let Transaction = require('../../../lib/braintree/transaction').Transaction;
 let errorTypes = require('../../../lib/braintree').errorTypes;
+let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
+let PayPalAccount = require('../../../lib/braintree/paypal_account').PayPalAccount;
+let VenmoAccount = require('../../../lib/braintree/venmo_account').VenmoAccount;
 
 describe('WebhookNotificationGateway', function () {
   describe('verify', function () {
@@ -619,6 +623,131 @@ describe('WebhookNotificationGateway', function () {
         assert.equal('abc123z', update.token);
         assert.equal('expiration-month', update.updatedFields[0]);
         assert.equal('expiration-year', update.updatedFields[1]);
+        done();
+      });
+    });
+
+    it('returns a parseable signature and payload for Granted Payment Method Revoked credit cards', function (done) {
+      let xmlPayload = `<notification>
+        <source-merchant-id>12345</source-merchant-id>
+        <timestamp type="datetime">2018-10-10T22:46:41Z</timestamp>
+        <kind>granted_payment_method_revoked</kind>
+        <subject>
+          <credit-card>
+            <bin>555555</bin>
+            <card-type>MasterCard</card-type>
+            <cardholder-name>Amber Ankunding</cardholder-name>
+            <commercial>Unknown</commercial>
+            <country-of-issuance>Unknown</country-of-issuance>
+            <created-at type="datetime">2018-10-10T22:46:41Z</created-at>
+            <customer-id>credit_card_customer_id</customer-id>
+            <customer-location>US</customer-location>
+            <debit>Unknown</debit>
+            <default type="boolean">true</default>
+            <durbin-regulated>Unknown</durbin-regulated>
+            <expiration-month>06</expiration-month>
+            <expiration-year>2020</expiration-year>
+            <expired type="boolean">false</expired>
+            <global-id>cGF5bWVudG1ldGhvZF8zcHQ2d2hz</global-id>
+            <healthcare>Unknown</healthcare>
+            <image-url>https://assets.braintreegateway.com/payment_method_logo/mastercard.png?environment=test</image-url>
+            <issuing-bank>Unknown</issuing-bank>
+            <last-4>4444</last-4>
+            <payroll>Unknown</payroll>
+            <prepaid>Unknown</prepaid>
+            <product-id>Unknown</product-id>
+            <subscriptions type="array"/>
+            <token>credit_card_token</token>
+            <unique-number-identifier>08199d188e37460163207f714faf074a</unique-number-identifier>
+            <updated-at type="datetime">2018-10-10T22:46:41Z</updated-at>
+            <venmo-sdk type="boolean">false</venmo-sdk>
+            <verifications type="array"/>
+          </credit-card>
+        </subject>
+      </notification>`;
+      let bt_payload = new Buffer(xmlPayload).toString('base64') + '\n';
+      let bt_signature = specHelper.defaultGateway.webhookTesting.sampleSignature(bt_payload);
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.GrantedPaymentMethodRevoked);
+
+        let metadata = webhookNotification.revokedPaymentMethodMetadata;
+
+        assert.equal('credit_card_customer_id', metadata.customerId);
+        assert.equal('credit_card_token', metadata.token);
+        assert(metadata.revokedPaymentMethod instanceof CreditCard);
+        done();
+      });
+    });
+
+    it('returns a parseable signature and payload for Granted Payment Method Revoked paypal accounts', function (done) {
+      let xmlPayload = `<notification>
+        <source-merchant-id>12345</source-merchant-id>
+        <timestamp type="datetime">2018-10-10T22:46:41Z</timestamp>
+        <kind>granted_payment_method_revoked</kind>
+        <subject>
+          <paypal-account>
+            <billing-agreement-id>billing_agreement_id</billing-agreement-id>
+            <created-at type="dateTime">2018-10-11T21:10:33Z</created-at>
+            <customer-id>paypal_customer_id</customer-id>
+            <default type="boolean">true</default>
+            <email>johndoe@example.com</email>
+            <global-id>cGF5bWVudG1ldGhvZF9wYXlwYWxfdG9rZW4</global-id>
+            <image-url>https://assets.braintreegateway.com/payment_method_logo/mastercard.png?environment=test</image-url>
+            <subscriptions type="array"></subscriptions>
+            <token>paypal_token</token>
+            <updated-at type="dateTime">2018-10-11T21:10:33Z</updated-at>
+            <payer-id>a6a8e1a4</payer-id>
+          </paypal-account>
+        </subject>
+      </notification>`;
+
+      let bt_payload = new Buffer(xmlPayload).toString('base64') + '\n';
+      let bt_signature = specHelper.defaultGateway.webhookTesting.sampleSignature(bt_payload);
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.GrantedPaymentMethodRevoked);
+
+        let metadata = webhookNotification.revokedPaymentMethodMetadata;
+
+        assert.equal('paypal_customer_id', metadata.customerId);
+        assert.equal('paypal_token', metadata.token);
+        assert(metadata.revokedPaymentMethod instanceof PayPalAccount);
+        done();
+      });
+    });
+
+    it('returns a parseable signature and payload for Granted Payment Method Revoked venmo accounts', function (done) {
+      let xmlPayload = `<notification>
+        <source-merchant-id>12345</source-merchant-id>
+        <timestamp type="datetime">2018-10-10T22:46:41Z</timestamp>
+        <kind>granted_payment_method_revoked</kind>
+        <subject>
+          <venmo-account>
+            <default type="boolean">true</default>
+            <image-url>https://assets.braintreegateway.com/payment_method_logo/mastercard.png?environment=test</image-url>
+            <token>venmo_token</token>
+            <source-description>Venmo Account: venmojoe</source-description>
+            <username>venmojoe</username>
+            <venmo-user-id>456</venmo-user-id>
+            <subscriptions type="array"/>
+            <customer-id>venmo_customer_id</customer-id>
+            <global-id>cGF5bWVudG1ldGhvZF92ZW5tb2FjY291bnQ</global-id>
+          </venmo-account>
+        </subject>
+      </notification>`;
+
+      let bt_payload = new Buffer(xmlPayload).toString('base64') + '\n';
+      let bt_signature = specHelper.defaultGateway.webhookTesting.sampleSignature(bt_payload);
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.GrantedPaymentMethodRevoked);
+
+        let metadata = webhookNotification.revokedPaymentMethodMetadata;
+
+        assert.equal('venmo_customer_id', metadata.customerId);
+        assert.equal('venmo_token', metadata.token);
+        assert(metadata.revokedPaymentMethod instanceof VenmoAccount);
         done();
       });
     });

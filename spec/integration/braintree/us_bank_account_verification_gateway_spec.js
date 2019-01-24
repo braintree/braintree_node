@@ -15,7 +15,7 @@ describe('UsBankAccountVerificationGateway', function () {
       privateKey: 'integration2_private_key'
     };
 
-    let gateway = braintree.connect(config);
+    let gateway = new braintree.BraintreeGateway(config);
 
     it('successfully confirms settled micro deposit amounts', function (done) {
       let customerParams = {};

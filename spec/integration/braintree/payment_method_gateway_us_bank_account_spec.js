@@ -73,7 +73,7 @@ describe('PaymentMethodGateway', function () {
       privateKey: 'integration2_private_key'
     };
 
-    let gateway = braintree.connect(config);
+    let gateway = new braintree.BraintreeGateway(config);
 
     describe('create', function () {
       it('vaults an unverified bank account', function (done) {
@@ -117,7 +117,7 @@ describe('PaymentMethodGateway', function () {
           privateKey: 'integration2_private_key'
         };
 
-        let gateway = braintree.connect(config);
+        let gateway = new braintree.BraintreeGateway(config);
 
         gateway.customer.create({}, function (err, response) {
           let customerId = response.customer.id;
@@ -162,7 +162,7 @@ describe('PaymentMethodGateway', function () {
           privateKey: 'integration2_private_key'
         };
 
-        let gateway = braintree.connect(config);
+        let gateway = new braintree.BraintreeGateway(config);
 
         gateway.customer.create({}, function (err, response) {
           let customerId = response.customer.id;

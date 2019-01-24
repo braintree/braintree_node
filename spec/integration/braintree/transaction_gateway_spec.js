@@ -63,13 +63,13 @@ describe('TransactionGateway', function () {
     });
 
     it('charges a card using an access token', function (done) {
-      let oauthGateway = braintree.connect({
+      let oauthGateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
       specHelper.createToken(oauthGateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
-        let gateway = braintree.connect({
+        let gateway = new braintree.BraintreeGateway({
           accessToken: response.credentials.accessToken
         });
 
@@ -5241,7 +5241,7 @@ describe('TransactionGateway', function () {
       let address, creditCard, customer, grantingGateway, partnerMerchantGateway;
 
       before(function (done) {
-        partnerMerchantGateway = braintree.connect({
+        partnerMerchantGateway = new braintree.BraintreeGateway({
           merchantId: 'integration_merchant_public_id',
           publicKey: 'oauth_app_partner_user_public_key',
           privateKey: 'oauth_app_partner_user_private_key',
@@ -5283,7 +5283,7 @@ describe('TransactionGateway', function () {
             return partnerMerchantGateway.creditCard.create(creditCardParams, function (err, response) {
               creditCard = response.creditCard;
 
-              let oauthGateway = braintree.connect({
+              let oauthGateway = new braintree.BraintreeGateway({
                 clientId: 'client_id$development$integration_client_id',
                 clientSecret: 'client_secret$development$integration_client_secret',
                 environment: Environment.Development
@@ -5295,7 +5295,7 @@ describe('TransactionGateway', function () {
               };
 
               specHelper.createToken(oauthGateway, accessTokenParams, function (err, response) {
-                grantingGateway = braintree.connect({
+                grantingGateway = new braintree.BraintreeGateway({
                   accessToken: response.credentials.accessToken,
                   environment: Environment.Development
                 });

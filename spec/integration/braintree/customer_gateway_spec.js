@@ -21,13 +21,13 @@ describe('CustomerGateway', function () {
     );
 
     it('creates a customer using an access token', function (done) {
-      let oauthGateway = braintree.connect({
+      let oauthGateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
 
       specHelper.createToken(oauthGateway, {merchantPublicId: 'integration_merchant_id', scope: 'read_write'}, function (err, response) {
-        let gateway = braintree.connect({
+        let gateway = new braintree.BraintreeGateway({
           accessToken: response.credentials.accessToken
         });
 

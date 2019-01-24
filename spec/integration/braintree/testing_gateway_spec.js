@@ -113,7 +113,7 @@ describe('TestingGateway', () =>
         privateKey: 'integration_private_key'
       };
 
-      let gateway = braintree.connect(gatewayConfig);
+      let gateway = new braintree.BraintreeGateway(gatewayConfig);
 
       gateway.testing.settlementConfirm('transaction_id', function (err) {
         assert.equal(err.type, braintree.errorTypes.testOperationPerformedInProductionError);

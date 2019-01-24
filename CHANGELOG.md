@@ -1,3 +1,10 @@
+## 2.15.0
+* Add `bin` field to `paymentMethodNonceDetails`
+* Add Error indicating pdf uploads too long for dispute evidence.
+* Add `GrantedPaymentMethodRevoked` webhook response objects
+* Add ability to instantiate a new Braintree Gateway directly
+* Add `GraphQL` to main module (`require('braintree').GraphQL`)
+
 ## 2.14.0
 * Add `processor_response_type` to `Transaction`, `AuthorizationAdjustment`, and `CreditCardVerification`.
 * Add `authorizationExpiresAt` to `Transaction`

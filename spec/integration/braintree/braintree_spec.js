@@ -5,7 +5,7 @@ let braintree = specHelper.braintree;
 describe('Braintree', () =>
   describe('AuthenticationError', () =>
     it('is returned with invalid credentials', function (done) {
-      let gateway = specHelper.braintree.connect({
+      let gateway = new specHelper.braintree.BraintreeGateway({
         environment: specHelper.braintree.Environment.Development,
         merchantId: 'invalid',
         publicKey: 'invalid',

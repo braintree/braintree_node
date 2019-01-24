@@ -31,7 +31,7 @@ let defaultConfig = {
   publicKey: 'integration_public_key',
   privateKey: 'integration_private_key'
 };
-let defaultGateway = braintree.connect(defaultConfig);
+let defaultGateway = new braintree.BraintreeGateway(defaultConfig);
 
 let advancedFraudConfig = {
   environment: braintree.Environment.Development,
@@ -39,7 +39,7 @@ let advancedFraudConfig = {
   publicKey: 'advanced_fraud_integration_public_key',
   privateKey: 'advanced_fraud_integration_private_key'
 };
-let advancedFraudGateway = braintree.connect(advancedFraudConfig);
+let advancedFraudGateway = new braintree.BraintreeGateway(advancedFraudConfig);
 
 let multiplyString = (string, times) => (new Array(times + 1)).join(string);
 

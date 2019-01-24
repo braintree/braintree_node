@@ -7,7 +7,7 @@ let braintree = specHelper.braintree;
 describe('MerchantGateway', function () {
   describe('create', () =>
     it('creates a merchant', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',
         clientSecret: 'client_secret$development$integration_client_secret'
       });
@@ -40,7 +40,7 @@ describe('MerchantGateway', function () {
   );
 
   it('returns an error when using invalid payment methods', function (done) {
-    let gateway = braintree.connect({
+    let gateway = new braintree.BraintreeGateway({
       clientId: 'client_id$development$integration_client_id',
       clientSecret: 'client_secret$development$integration_client_secret'
     });
@@ -60,7 +60,7 @@ describe('MerchantGateway', function () {
 
   describe('create_multi_currency', function () {
     it('creates a multi-currency merchant', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
@@ -113,7 +113,7 @@ describe('MerchantGateway', function () {
     });
 
     it('creates a paypal-only merchant', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
@@ -170,7 +170,7 @@ describe('MerchantGateway', function () {
     });
 
     it('allows creation of non-US merchant if onboarding application is internal', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
@@ -219,7 +219,7 @@ describe('MerchantGateway', function () {
     });
 
     it('defaults to USD for non-US merchant if onboarding application is internal and country currency not supported', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
@@ -268,7 +268,7 @@ describe('MerchantGateway', function () {
     });
 
     it('returns error if invalid currency is passed', function (done) {
-      let gateway = braintree.connect({
+      let gateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$signup_client_id',
         clientSecret: 'client_secret$development$signup_client_secret'
       });
