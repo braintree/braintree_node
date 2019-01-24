@@ -1,4 +1,4 @@
-## unreleased
+## 2.15.0
 * Add `bin` field to `paymentMethodNonceDetails`
 * Add Error indicating pdf uploads too long for dispute evidence.
 * Add `GrantedPaymentMethodRevoked` webhook response objects
