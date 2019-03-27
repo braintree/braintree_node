@@ -6,6 +6,7 @@ let Config = require('../../../lib/braintree/config').Config;
 let Environment = require('../../../lib/braintree/environment').Environment;
 let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 
 describe('PaymentMethodGateway', function () {
   describe('create', function () {
@@ -319,6 +320,92 @@ describe('PaymentMethodGateway', function () {
                 assert.equal(response.verification.processorResponseCode, '2000');
                 assert.equal(response.verification.processorResponseText, 'Do Not Honor');
                 assert.equal(response.verification.merchantAccountId, specHelper.nonDefaultMerchantAccountId);
+
+                done();
+              });
+            });
+          });
+        })
+      );
+
+      it('supports accountType credit', done =>
+        specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
+          customerId = response.customer.id;
+
+          specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+            let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
+
+            let params = {
+              authorizationFingerprint,
+              creditCard: {
+                number: CreditCardNumbers.CardTypeIndicators.Hiper,
+                expirationDate: '01/2020'
+              }
+            };
+
+            let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+
+            return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode, body) {
+              let nonce = JSON.parse(body).creditCards[0].nonce;
+
+              let creditCardParams = {
+                customerId,
+                paymentMethodNonce: nonce,
+                options: {
+                  verifyCard: 'true',
+                  verificationMerchantAccountId: 'hiper_brl',
+                  verificationAccountType: 'credit'
+                }
+              };
+
+              specHelper.defaultGateway.paymentMethod.create(creditCardParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.equal(response.paymentMethod.verification.creditCard.accountType, 'credit');
+
+                done();
+              });
+            });
+          });
+        })
+      );
+
+      it('supports accountType debit', done =>
+        specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
+          customerId = response.customer.id;
+
+          specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+            let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
+
+            let params = {
+              authorizationFingerprint,
+              creditCard: {
+                number: CreditCardNumbers.CardTypeIndicators.Hiper,
+                expirationDate: '01/2020'
+              }
+            };
+
+            let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+
+            return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode, body) {
+              let nonce = JSON.parse(body).creditCards[0].nonce;
+
+              let creditCardParams = {
+                customerId,
+                paymentMethodNonce: nonce,
+                options: {
+                  verifyCard: 'true',
+                  verificationMerchantAccountId: 'hiper_brl',
+                  verificationAccountType: 'debit'
+                }
+              };
+
+              specHelper.defaultGateway.paymentMethod.create(creditCardParams, function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+                assert.equal(response.paymentMethod.verification.creditCard.accountType, 'debit');
 
                 done();
               });
@@ -1244,6 +1331,92 @@ describe('PaymentMethodGateway', function () {
               assert.equal(updatedCreditCard.bin, '555555');
               assert.equal(updatedCreditCard.last4, '4444');
               assert.equal(updatedCreditCard.expirationDate, '06/2013');
+
+              done();
+            });
+          });
+        })
+      );
+
+      it('support accountType debit', done =>
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          let customerId = response.customer.id;
+
+          let creditCardParams = {
+            cardholderName: 'Original Holder',
+            customerId,
+            cvv: '123',
+            number: '4012888888881881',
+            expirationDate: '05/2012'
+          };
+
+          specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+            assert.isTrue(response.success);
+
+            let creditCard = response.creditCard;
+
+            let updateParams = {
+              cardholderName: 'New Holder',
+              cvv: '456',
+              number: CreditCardNumbers.CardTypeIndicators.Hiper,
+              expirationDate: '06/2013',
+              options: {
+                verifyCard: true,
+                verificationMerchantAccountId: 'hiper_brl',
+                verificationAccountType: 'debit'
+              }
+            };
+
+            specHelper.defaultGateway.paymentMethod.update(creditCard.token, updateParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.paymentMethod.token, creditCard.token);
+              let updatedCreditCard = response.paymentMethod;
+
+              assert.equal(updatedCreditCard.verification.creditCard.accountType, 'debit');
+
+              done();
+            });
+          });
+        })
+      );
+
+      it('support accountType credit', done =>
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          let customerId = response.customer.id;
+
+          let creditCardParams = {
+            cardholderName: 'Original Holder',
+            customerId,
+            cvv: '123',
+            number: '4012888888881881',
+            expirationDate: '05/2012'
+          };
+
+          specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+            assert.isTrue(response.success);
+
+            let creditCard = response.creditCard;
+
+            let updateParams = {
+              cardholderName: 'New Holder',
+              cvv: '456',
+              number: CreditCardNumbers.CardTypeIndicators.Hiper,
+              expirationDate: '06/2013',
+              options: {
+                verifyCard: true,
+                verificationMerchantAccountId: 'hiper_brl',
+                verificationAccountType: 'credit'
+              }
+            };
+
+            specHelper.defaultGateway.paymentMethod.update(creditCard.token, updateParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.paymentMethod.token, creditCard.token);
+              let updatedCreditCard = response.paymentMethod;
+
+              assert.equal(updatedCreditCard.verification.creditCard.accountType, 'credit');
 
               done();
             });

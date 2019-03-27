@@ -1,5 +1,6 @@
 ## unreleased
 * Deprecate `GrantedPaymentInstrumentUpdate` and add `GrantorUpdatedGrantedPaymentMethod` and `RecipientUpdatedGrantedPaymentMethod`
+* Add `accountType` to `Transaction`, `PaymentMethod`, and `CreditCardVerification`.
 
 ## 2.15.0
 * Add `bin` field to `paymentMethodNonceDetails`
