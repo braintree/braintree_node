@@ -62,6 +62,110 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('charges with account_type debit', function (done) {
+      let transactionParams = {
+        merchantAccountId: 'hiper_brl',
+        amount: '5.00',
+        creditCard: {
+          number: CreditCardNumbers.CardTypeIndicators.Hiper,
+          expirationDate: '10/20',
+          cvv: '737'
+        },
+        options: {
+          submitForSettlement: true,
+          creditCard: {
+            accountType: 'debit'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.creditCard.accountType, 'debit');
+
+        done();
+      });
+    });
+
+    it('handles error AccountTypeIsInvalid', function (done) {
+      let transactionParams = {
+        merchantAccountId: 'hiper_brl',
+        amount: '5.00',
+        creditCard: {
+          number: CreditCardNumbers.CardTypeIndicators.Hiper,
+          expirationDate: '10/20',
+          cvv: '737'
+        },
+        options: {
+          submitForSettlement: true,
+          creditCard: {
+            accountType: 'ach'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(response.errors.for('transaction').for('options').for('creditCard').on('accountType')[0].code, ValidationErrorCodes.Transaction.Options.CreditCard.AccountTypeIsInvalid);
+
+        done();
+      });
+    });
+
+    it('handles error AccountTypeNotSupported', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '10/20',
+          cvv: '737'
+        },
+        options: {
+          submitForSettlement: true,
+          creditCard: {
+            accountType: 'debit'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(response.errors.for('transaction').for('options').for('creditCard').on('accountType')[0].code, ValidationErrorCodes.Transaction.Options.CreditCard.AccountTypeNotSupported);
+
+        done();
+      });
+    });
+
+    it('handles error AccountTypeDebitDoesNotSupportAuths', function (done) {
+      let transactionParams = {
+        merchantAccountId: 'hiper_brl',
+        amount: '5.00',
+        creditCard: {
+          number: CreditCardNumbers.CardTypeIndicators.Hiper,
+          expirationDate: '10/20',
+          cvv: '737'
+        },
+        options: {
+          submitForSettlement: false,
+          creditCard: {
+            accountType: 'debit'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(response.errors.for('transaction').for('options').for('creditCard').on('accountType')[0].code, ValidationErrorCodes.Transaction.Options.CreditCard.AccountTypeDebitDoesNotSupportAuths);
+
+        done();
+      });
+    });
+
     it('charges a card using an access token', function (done) {
       let oauthGateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',

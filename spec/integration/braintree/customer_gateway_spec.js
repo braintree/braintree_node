@@ -6,6 +6,7 @@ let Config = require('../../../lib/braintree/config').Config;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
 let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 
 describe('CustomerGateway', function () {
   describe('create', function () {
@@ -665,6 +666,64 @@ describe('CustomerGateway', function () {
 
           done();
         }); });
+    });
+
+    describe('create', function () {
+      it('support account_type debit', function (done) {
+        let name = specHelper.randomId() + ' Smith';
+
+        specHelper.defaultGateway.customer.create({
+          creditCard: {
+            cardholderName: name,
+            number: CreditCardNumbers.CardTypeIndicators.Hiper,
+            expirationDate: '05/12',
+            options: {
+              verifyCard: true,
+              verificationAccountType: 'debit',
+              verificationMerchantAccountId: 'hiper_brl'
+            }
+          }
+        }, () =>
+          specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(name)
+            , (err, response) =>
+            response.first(function (err2, verification) {
+              assert.isNull(err2);
+              assert.equal(verification.creditCard.cardholderName, name);
+              assert.equal(verification.creditCard.accountType, 'debit');
+
+              done();
+            })
+          )
+        );
+      });
+
+      it('support account_type credit', function (done) {
+        let name = specHelper.randomId() + ' Smith';
+
+        specHelper.defaultGateway.customer.create({
+          creditCard: {
+            cardholderName: name,
+            number: CreditCardNumbers.CardTypeIndicators.Hiper,
+            expirationDate: '05/12',
+            options: {
+              verifyCard: true,
+              verificationAccountType: 'credit',
+              verificationMerchantAccountId: 'hiper_brl'
+            }
+          }
+        }, () =>
+          specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(name)
+            , (err, response) =>
+            response.first(function (err2, verification) {
+              assert.isNull(err2);
+              assert.equal(verification.creditCard.cardholderName, name);
+              assert.equal(verification.creditCard.accountType, 'credit');
+
+              done();
+            })
+          )
+        );
+      });
     });
   });
 

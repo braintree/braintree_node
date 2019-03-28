@@ -2,6 +2,7 @@
 
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
+let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 
 describe('CreditCardVerificationGateway', function () {
   describe('find', function () {
@@ -106,6 +107,107 @@ describe('CreditCardVerificationGateway', function () {
         assert.equal(
           response.errors.for('verification').for('options').on('amount')[0].code,
           ValidationErrorCodes.Verification.Options.AmountCannotBeNegative
+        );
+
+        done();
+      });
+    });
+
+    it('supports accountType debit', function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: 'John Smith',
+          number: CreditCardNumbers.CardTypeIndicators.Hiper,
+          expirationDate: '05/2014'
+        },
+        options: {
+          merchantAccountId: 'hiper_brl',
+          accountType: 'debit'
+        }
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+
+        let verification = response.verification;
+
+        assert.equal(verification.processorResponseText, 'Approved');
+        assert.equal(verification.creditCard.accountType, 'debit');
+
+        done();
+      });
+    });
+
+    it('supports accountType credit', function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: 'John Smith',
+          number: CreditCardNumbers.CardTypeIndicators.Hiper,
+          expirationDate: '05/2014'
+        },
+        options: {
+          merchantAccountId: 'hiper_brl',
+          accountType: 'credit'
+        }
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+
+        let verification = response.verification;
+
+        assert.equal(verification.processorResponseText, 'Approved');
+        assert.equal(verification.creditCard.accountType, 'credit');
+
+        done();
+      });
+    });
+
+    it('handles error AccountTypeIsInvalid', function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: 'John Smith',
+          number: CreditCardNumbers.CardTypeIndicators.Hiper,
+          expirationDate: '05/2014'
+        },
+        options: {
+          merchantAccountId: 'hiper_brl',
+          accountType: 'ach'
+        }
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('verification').for('options').on('accountType')[0].code,
+          ValidationErrorCodes.Verification.Options.AccountTypeIsInvalid
+        );
+
+        done();
+      });
+    });
+
+    it('handles error AccountTypeNotSupported', function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: 'John Smith',
+          number: '4000111111111115',
+          expirationDate: '05/2014'
+        },
+        options: {
+          accountType: 'debit'
+        }
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('verification').for('options').on('accountType')[0].code,
+          ValidationErrorCodes.Verification.Options.AccountTypeNotSupported
         );
 
         done();

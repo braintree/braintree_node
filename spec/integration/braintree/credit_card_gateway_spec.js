@@ -6,6 +6,7 @@ let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers
 let CreditCardDefaults = require('../../../lib/braintree/test/credit_card_defaults').CreditCardDefaults;
 let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
 let Config = require('../../../lib/braintree/config').Config;
+let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
 describe('CreditCardGateway', function () {
   describe('create', function () {
@@ -130,6 +131,117 @@ describe('CreditCardGateway', function () {
         assert.equal(response.creditCard.billingAddress.locality, 'Chicago');
         assert.equal(response.creditCard.billingAddress.region, 'IL');
         assert.equal(response.creditCard.billingAddress.postalCode, '60607');
+
+        done();
+      });
+    });
+
+    it('supports accountType debit', function (done) {
+      let creditCardParams = {
+        customerId,
+        number: CreditCardNumbers.CardTypeIndicators.Hiper,
+        expirationDate: '05/2012',
+        options: {
+          verifyCard: true,
+          verificationMerchantAccountId: 'hiper_brl',
+          verificationAccountType: 'debit'
+        }
+      };
+
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.creditCard.verification.creditCard.accountType, 'debit');
+
+        done();
+      });
+    });
+
+    it('supports accountType credit', function (done) {
+      let creditCardParams = {
+        customerId,
+        number: CreditCardNumbers.CardTypeIndicators.Hiper,
+        expirationDate: '05/2012',
+        options: {
+          verifyCard: true,
+          verificationMerchantAccountId: 'hiper_brl',
+          verificationAccountType: 'credit'
+        }
+      };
+
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.creditCard.verification.creditCard.accountType, 'credit');
+
+        done();
+      });
+    });
+
+    it('handles VerificationAccountTypeIsInvald', function (done) {
+      let creditCardParams = {
+        customerId,
+        number: CreditCardNumbers.CardTypeIndicators.Hiper,
+        expirationDate: '05/2012',
+        options: {
+          verifyCard: true,
+          verificationMerchantAccountId: 'hiper_brl',
+          verificationAccountType: 'ach'
+        }
+      };
+
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('creditCard').for('options').on('verificationAccountType')[0].code,
+          ValidationErrorCodes.CreditCard.VerificationAccountTypeIsInvald
+        );
+
+        done();
+      });
+    });
+
+    it('handles VerificationAccountTypeNotSupported', function (done) {
+      let creditCardParams = {
+        customerId,
+        number: '5105105105105100',
+        expirationDate: '05/2012',
+        options: {
+          verifyCard: true,
+          verificationAccountType: 'credit'
+        }
+      };
+
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('creditCard').for('options').on('verificationAccountType')[0].code,
+          ValidationErrorCodes.CreditCard.VerificationAccountTypeNotSupported
+        );
+
+        done();
+      });
+    });
+
+    it('verifies card if verifyCard is set to true', function (done) {
+      let creditCardParams = {
+        customerId,
+        number: '4000111111111115',
+        expirationDate: '05/2012',
+        options: {
+          verifyCard: 'true'
+        }
+      };
+
+      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+
+        assert.equal(response.verification.status, 'processor_declined');
+        assert.equal(response.verification.processorResponseCode, '2000');
+        assert.equal(response.verification.processorResponseText, 'Do Not Honor');
 
         done();
       });
