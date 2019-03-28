@@ -1,4 +1,4 @@
-## unreleased
+## 2.16.0
 * Deprecate `GrantedPaymentInstrumentUpdate` and add `GrantorUpdatedGrantedPaymentMethod` and `RecipientUpdatedGrantedPaymentMethod`
 * Add `accountType` to `Transaction`, `PaymentMethod`, and `CreditCardVerification`.
 
