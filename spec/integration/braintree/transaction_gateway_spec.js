@@ -4178,7 +4178,7 @@ describe('TransactionGateway', function () {
 
       it('returns an error for transaction with threeDSecurePassThru when the merchant account does not support that card type', function (done) {
         let transactionParams = {
-          merchantAccountId: 'adyen_ma',
+          merchantAccountId: 'heartland_ma',
           amount: '5.00',
           creditCard: {
             number: '5105105105105100',
