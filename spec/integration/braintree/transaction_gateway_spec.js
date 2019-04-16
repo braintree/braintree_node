@@ -4440,6 +4440,8 @@ describe('TransactionGateway', function () {
         assert.isString(transaction.paypalAccount.refundId);
         assert.isString(transaction.paypalAccount.transactionFeeAmount);
         assert.isString(transaction.paypalAccount.transactionFeeCurrencyIsoCode);
+        assert.isString(transaction.paypalAccount.refundFromTransactionFeeAmount);
+        assert.isString(transaction.paypalAccount.refundFromTransactionFeeCurrencyIsoCode);
         done();
       })
     );
