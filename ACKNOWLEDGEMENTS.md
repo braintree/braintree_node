@@ -12,3 +12,4 @@ The Braintree SDK uses code from the following libraries:
 * [chai](https://github.com/chaijs/chai), MIT License
 * [eslint](https://github.com/eslint/eslint), MIT License
 * [mocha](https://github.com/mochajs/mocha), MIT License
+* [sinon](https://github.com/sinonjs/sinon), BSD License

@@ -34,7 +34,7 @@
     "eslint": "^2.13.1",
     "eslint-config-braintree": "^1.0.2",
     "mocha": "^5.2.0",
-    "sinon": "^5.0.7"
+    "sinon": "^7.3.1"
   },
   "license": "MIT",
   "scripts": {
