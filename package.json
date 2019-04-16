@@ -30,7 +30,7 @@
     "@braintree/wrap-promise": "1.1.1"
   },
   "devDependencies": {
-    "chai": "4.1.0",
+    "chai": "^4.2.0",
     "eslint": "^2.13.1",
     "eslint-config-braintree": "^1.0.2",
     "mocha": "3.4.2",
