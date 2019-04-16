@@ -17,7 +17,8 @@
     "url": "https://github.com/braintree/braintree_node.git"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=4.7",
+    "npm": ">=5"
   },
   "dependencies": {
     "dateformat": "1.0.1-1.2.3",
