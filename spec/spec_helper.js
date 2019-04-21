@@ -348,77 +348,6 @@ let generateInvalidUsBankAccountNonce = function () {
   return nonce;
 };
 
-let generateValidIdealPaymentId = function (amount, callback) {
-  if (!callback) {
-    callback = amount;
-    amount = '100.0';
-  }
-
-  specHelper.defaultGateway.clientToken.generate({
-    merchantAccountId: 'ideal_merchant_account'
-  }, function (err, result) {
-    let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-    let clientApi = new ClientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line no-use-before-define
-
-    clientApi.get('/client_api/v1/configuration', {
-      authorizationFingerprint: clientToken.authorizationFingerprint,
-      configVersion: 3
-    }, function (statusCode, body) {
-      let routeId = JSON.parse(body).ideal.routeId;
-
-      let url = uri.parse(clientToken.braintree_api.url);
-      let token = clientToken.braintree_api.access_token;
-      let options = {
-        host: url.hostname,
-        port: url.port,
-        method: 'POST',
-        path: '/ideal-payments',
-        headers: {
-          'Content-Type': 'application/json',
-          'Braintree-Version': '2015-11-01',
-          Authorization: `Bearer ${token}`
-        }
-      };
-
-      /* eslint-disable camelcase */
-      let payload = {
-        issuer: 'RABONL2u',
-        order_id: 'ABC123',
-        amount: amount,
-        currency: 'EUR',
-        route_id: routeId,
-        redirect_url: 'https://braintree-api.com'
-      };
-      /* eslint-enable camelcase */
-
-      let requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload));
-
-      options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString();
-
-      let req = https.request(options);
-
-      req.on('response', response => {
-        let body = '';
-
-        response.on('data', responseBody => {
-          body += responseBody;
-        });
-        response.on('end', () => {
-          let json = JSON.parse(body);
-
-          callback(json.data.id);
-        });
-        return response.on('error', err => console.log(`Unexpected response error: ${err}`));
-      });
-
-      req.on('error', err => console.log(`Unexpected request error: ${err}`));
-
-      req.write(requestBody);
-      return req.end();
-    });
-  });
-};
-
 let createTransactionToRefund = function (callback) {
   let transactionParams = {
     amount: '5.00',
@@ -630,7 +559,6 @@ global.specHelper = {
   generateValidUsBankAccountNonce,
   generateInvalidUsBankAccountNonce,
   generatePlaidUsBankAccountNonce,
-  generateValidIdealPaymentId,
   createPlanForTests,
   createModificationForTests,
   createGrant,

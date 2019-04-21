@@ -3867,34 +3867,6 @@ describe('TransactionGateway', function () {
       });
     });
 
-    context('Ideal payment ID', function () {
-      it('transacts on an Ideal payment ID', done =>
-        specHelper.generateValidIdealPaymentId(function (idealPaymentId) {
-          let transactionParams = {
-            merchantAccountId: 'ideal_merchant_account',
-            orderId: 'ABC123',
-            amount: '100.00',
-            paymentMethodNonce: idealPaymentId,
-            options: {
-              submitForSettlement: true
-            }
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isTrue(response.success);
-            assert.equal(response.transaction.status, Transaction.Status.Settled);
-            assert.match(response.transaction.idealPaymentDetails.idealPaymentId, /^idealpayment_\w{6,}$/);
-            assert.match(response.transaction.idealPaymentDetails.idealTransactionId, /^\d{16,}$/);
-            assert.isTrue(response.transaction.idealPaymentDetails.imageUrl.startsWith('https://'));
-            assert.isNotNull(response.transaction.idealPaymentDetails.maskedIban);
-            assert.isNotNull(response.transaction.idealPaymentDetails.bic);
-
-            done();
-          });
-        })
-      );
-    });
-
     context('Subscription', function () {
       it('charges a past due subscription', function (done) {
         let customerId, creditCardToken;
