@@ -739,6 +739,26 @@ describe('WebhookNotificationGateway', function () {
       });
     });
 
+    it('returns a parseable signature and payload for Payment Method Revoked By Customer webhook', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.PaymentMethodRevokedByCustomer,
+        'my_payment_method_token'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.PaymentMethodRevokedByCustomer);
+
+        let metadata = webhookNotification.revokedPaymentMethodMetadata;
+
+        assert.equal('my_payment_method_token', metadata.token);
+        assert(metadata.revokedPaymentMethod instanceof PayPalAccount);
+        assert.exists(metadata.revokedPaymentMethod.revokedAt);
+        done();
+      });
+    });
+
     it('returns a parsable signature and payload for Local Payment Completed', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.LocalPaymentCompleted,

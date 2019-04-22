@@ -1,6 +1,8 @@
 ## Unreleased
 * Add `refundFromTransactionFeeAmount` field to paypalAccount
 * Add `refundFromTransactionFeeCurrencyIsoCode` field to paypalAccount
+* Add `revokedAt` field to paypalAccount
+* Add support for `PaymentMethodRevokedByCustomer` webhook
 
 ## 2.16.0
 * Deprecate `GrantedPaymentInstrumentUpdate` and add `GrantorUpdatedGrantedPaymentMethod` and `RecipientUpdatedGrantedPaymentMethod`
