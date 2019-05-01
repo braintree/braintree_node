@@ -175,8 +175,8 @@ describe('Util', function () {
           'page-size': {'#': '50', '@': {type: 'integer'}},
           'total-items': {'#': '1', '@': {type: 'integer'}},
           transaction: [
-             {id: '22yyyy'},
-             {id: '22xxxx'}
+            {id: '22yyyy'},
+            {id: '22xxxx'}
           ]
         }
       });
@@ -187,8 +187,8 @@ describe('Util', function () {
           pageSize: 50,
           totalItems: 1,
           transaction: [
-             {id: '22yyyy'},
-             {id: '22xxxx'}
+            {id: '22yyyy'},
+            {id: '22xxxx'}
           ]
         }
       }

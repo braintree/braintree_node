@@ -25,6 +25,7 @@ describe('CustomerSearch', () =>
     it('can return a single result', function (done) {
       let search = function (search) { // eslint-disable-line func-style
         search.firstName().is('Bob');
+
         return search.lastName().is(lastName);
       };
 
@@ -100,6 +101,7 @@ describe('CustomerSearch', () =>
 
           let search = function (search) { // eslint-disable-line func-style
             search.paymentMethodTokenWithDuplicates().is(token);
+
             return search.ids().in([joeId, jimId]);
           };
 
@@ -266,9 +268,11 @@ describe('CustomerSearch', () =>
                   value = range[operator];
                   result1.push(search[criteria]()[operator](value));
                 }
+
                 return result1;
               })());
             }
+
             return result;
           })();
         };
@@ -326,6 +330,7 @@ describe('CustomerSearch', () =>
             specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
               let search = function (searchResult) { // eslint-disable-line func-style
                 searchResult.paypalAccountEmail().is(response.paymentMethod.email);
+
                 return searchResult.id().is(customerId);
               };
 

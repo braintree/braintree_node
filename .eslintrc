@@ -1,11 +1,27 @@
----
-  extends: braintree/server
-  parserOptions:
-    ecmaVersion: 6
-  rules:
-    new-cap:
-      - 2
-      - {"capIsNewExceptions": ["Sha1hexdigest"]}
-  globals:
-    Promise: 0
-    Symbol: 0
+{
+  "extends": "braintree/server",
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "rules": {
+    "new-cap": [
+      2,
+      {
+        "capIsNewExceptions": [
+          "Sha1hexdigest"
+        ]
+      }
+    ],
+    "max-len": 0,
+    "no-mixed-operators": [
+      "error",
+      {
+        "allowSamePrecedence": true
+      }
+    ]
+  },
+  "globals": {
+    "Promise": "readonly",
+    "Symbol": "readonly"
+  }
+}

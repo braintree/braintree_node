@@ -382,7 +382,8 @@ describe('CreditCardGateway', function () {
             assert.equal(response.creditCard.maskedNumber, '411111******1111');
 
             done();
-          }); });
+          });
+        });
       });
     });
 

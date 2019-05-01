@@ -143,7 +143,8 @@ describe('PayPalGateway', function () {
               paymentMethodToken = response.paymentMethod.token;
 
               done();
-            }); });
+            });
+          });
         });
       });
     });
@@ -255,7 +256,8 @@ describe('PayPalGateway', function () {
               paymentMethodToken = response.paymentMethod.token;
 
               done();
-            }); });
+            });
+          });
         });
       })
     );

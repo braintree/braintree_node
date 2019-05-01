@@ -31,8 +31,8 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^2.13.1",
-    "eslint-config-braintree": "^1.0.2",
+    "eslint": "^4.19.1",
+    "eslint-config-braintree": "^2.0.0",
     "mocha": "^5.2.0",
     "sinon": "^7.3.1"
   },

@@ -229,9 +229,11 @@ describe('TransactionSearch', () =>
                       value = range[operator];
                       result1.push(search[criteria]()[operator](value));
                     }
+
                     return result1;
                   })());
                 }
+
                 return result;
               })();
             };
@@ -269,6 +271,7 @@ describe('TransactionSearch', () =>
             let search = function (search) { // eslint-disable-line func-style
               search.paypalPayerEmail().is(transaction.paypal.payerEmail);
               search.paypalPaymentId().is(transaction.paypal.paymentId);
+
               return search.paypalAuthorizationId().is(transaction.paypal.authorizationId);
             };
 
@@ -360,7 +363,7 @@ describe('TransactionSearch', () =>
       );
     });
 
-    it('allows stream style interation of results', function (done) {
+    it('allows stream style integration of results', function (done) {
       let random = specHelper.randomId();
       let transactionParams = {
         amount: '10.00',
@@ -419,6 +422,7 @@ describe('TransactionSearch', () =>
     it('allows piping results to a writable stream', function (done) {
       if (!Util.supportsStreams2()) {
         done();
+
         return;
       }
 
@@ -440,6 +444,7 @@ describe('TransactionSearch', () =>
 
           ws._write = function (chunk, enc, next) {
             transactions.push(chunk);
+
             return next();
           };
 
@@ -482,6 +487,7 @@ describe('TransactionSearch', () =>
       let search = function (s) { // eslint-disable-line func-style
         s.id().is('deposittransaction');
         s.disbursementDate().min(yesterday);
+
         return s.disbursementDate().max(tomorrow);
       };
 
@@ -517,6 +523,7 @@ describe('TransactionSearch', () =>
           specHelper.defaultGateway.transaction.search(function (search) {
             search.id().is(response.transaction.id);
             search.disputeDate().min(today);
+
             return search.disputeDate().max(today);
           }, function (err, response) {
             if (response.length() === 0) { return; }
@@ -542,6 +549,7 @@ describe('TransactionSearch', () =>
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search(function (search) {
           search.creditCardCardType().is('Elo');
+
           return search.id().is(response.transaction.id);
         }, function (err, response) {
           assert.equal(1, response.length());
@@ -564,6 +572,7 @@ describe('TransactionSearch', () =>
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search(function (search) {
           search.paymentInstrumentType().is('CreditCardDetail');
+
           return search.id().is(response.transaction.id);
         }, function (err, response) {
           assert.equal(1, response.length());
@@ -581,6 +590,7 @@ describe('TransactionSearch', () =>
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search(function (search) {
           search.id().is(response.transaction.id);
+
           return search.paymentInstrumentType().is('PayPalDetail');
         }, function (err, response) {
           assert.equal(1, response.length());
@@ -598,6 +608,7 @@ describe('TransactionSearch', () =>
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search(function (search) {
           search.id().is(response.transaction.id);
+
           return search.paymentInstrumentType().is('ApplePayDetail');
         }, function (err, response) {
           assert.equal(1, response.length());
@@ -620,6 +631,7 @@ describe('TransactionSearch', () =>
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search(function (search) {
           search.merchantAccountId().is(response.transaction.merchantAccountId);
+
           return search.id().is(response.transaction.id);
         }, function (err, response) {
           assert.equal(1, response.length());
@@ -642,6 +654,7 @@ describe('TransactionSearch', () =>
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search(function (search) {
           search.merchantAccountId().in(response.transaction.merchantAccountId, 'invalid_merchant_acct_id');
+
           return search.id().is(response.transaction.id);
         }, function (err, response) {
           assert.equal(1, response.length());
@@ -664,6 +677,7 @@ describe('TransactionSearch', () =>
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.search(function (search) {
           search.merchantAccountId().is('invalid_merchant_acct_id');
+
           return search.id().is(response.transaction.id);
         }, function (err, response) {
           assert.equal(0, response.length());
@@ -724,5 +738,6 @@ function __range__(left, right, inclusive) {
   for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) {
     range.push(i);
   }
+
   return range;
 }

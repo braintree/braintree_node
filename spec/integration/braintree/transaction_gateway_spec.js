@@ -335,6 +335,7 @@ describe('TransactionGateway', function () {
         } catch (e) {
           // should not get here
           done(e);
+
           return;
         }
 
@@ -3714,7 +3715,8 @@ describe('TransactionGateway', function () {
             assert.isTrue(response.success);
 
             done();
-          }); });
+          });
+        });
       });
     });
 
@@ -3743,7 +3745,8 @@ describe('TransactionGateway', function () {
             assert.isTrue(response.success);
 
             done();
-          }); });
+          });
+        });
       });
     });
 
@@ -3767,7 +3770,8 @@ describe('TransactionGateway', function () {
           assert.isTrue(response.success);
 
           done();
-        }); });
+        });
+      });
     });
 
     it('works with an unknown payment instrument', function (done) {
@@ -5454,6 +5458,7 @@ describe('TransactionGateway', function () {
         partnerMerchantGateway.paymentMethodNonce.create(creditCard.token, function (err, result) {
           if (err) {
             done(err);
+
             return;
           }
 
@@ -5468,6 +5473,7 @@ describe('TransactionGateway', function () {
           grantingGateway.transaction.sale(transactionParams, function (err, response) {
             if (err) {
               done(err);
+
               return;
             }
 

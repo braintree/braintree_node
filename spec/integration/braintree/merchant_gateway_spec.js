@@ -96,13 +96,13 @@ describe('MerchantGateway', function () {
 
         assert.equal(merchantAccounts.length, 2);
 
-        let usdMerchantAccount = (merchantAccounts.filter(x => x.id === 'USD'))[0];
+        let usdMerchantAccount = merchantAccounts.filter(x => x.id === 'USD')[0];
 
         assert.isNotNull(usdMerchantAccount);
         assert.equal(usdMerchantAccount.default, true);
         assert.equal(usdMerchantAccount.currencyIsoCode, 'USD');
 
-        let gbpMerchantAccount = (merchantAccounts.filter(x => x.id === 'GBP'))[0];
+        let gbpMerchantAccount = merchantAccounts.filter(x => x.id === 'GBP')[0];
 
         assert.isNotNull(gbpMerchantAccount);
         assert.equal(gbpMerchantAccount.default, false);
@@ -153,13 +153,13 @@ describe('MerchantGateway', function () {
 
         assert.equal(merchantAccounts.length, 2);
 
-        let usdMerchantAccount = (merchantAccounts.filter(x => x.id === 'USD'))[0];
+        let usdMerchantAccount = merchantAccounts.filter(x => x.id === 'USD')[0];
 
         assert.isNotNull(usdMerchantAccount);
         assert.equal(usdMerchantAccount.default, true);
         assert.equal(usdMerchantAccount.currencyIsoCode, 'USD');
 
-        let gbpMerchantAccount = (merchantAccounts.filter(x => x.id === 'GBP'))[0];
+        let gbpMerchantAccount = merchantAccounts.filter(x => x.id === 'GBP')[0];
 
         assert.isNotNull(gbpMerchantAccount);
         assert.equal(gbpMerchantAccount.default, false);

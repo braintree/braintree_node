@@ -289,10 +289,11 @@ describe('UsBankAccountVerificationGateway', function () {
               search.id().is(createdVerification.id);
               search.paymentMethodToken().is(usBankAccount.token);
               search.routingNumber().is(usBankAccount.routingNumber);
+
               return search;
             }
 
-            , function (err, response) {
+              , function (err, response) {
               assert.isNull(err);
               assert.equal(response.length(), 1);
 
@@ -347,10 +348,11 @@ describe('UsBankAccountVerificationGateway', function () {
 
               specHelper.defaultGateway.usBankAccountVerification.search(function (search) {
                 search.customerId().is(customerId);
+
                 return search.accountNumber().endsWith('1234');
               }
 
-              , function (err, response) {
+                , function (err, response) {
                 assert.isNull(err);
                 assert.equal(response.length(), 2);
 
