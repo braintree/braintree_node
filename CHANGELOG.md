@@ -1,6 +1,7 @@
 ## Unreleased
 * Add `refundFromTransactionFeeAmount` field to paypalAccount
 * Add `refundFromTransactionFeeCurrencyIsoCode` field to paypalAccount
+* Add `LocalPaymentDetails` to transactions
 * Add `revokedAt` field to paypalAccount
 * Add support for `PaymentMethodRevokedByCustomer` webhook
 

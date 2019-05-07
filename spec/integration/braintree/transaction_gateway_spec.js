@@ -2305,6 +2305,31 @@ describe('TransactionGateway', function () {
       })
     );
 
+    context('with a local payment', function () {
+      it('returns LocalPayment for payment_instrument', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.LocalPayment,
+            amount: '100.00',
+            options: {
+              submitForSettlement: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.LocalPayment);
+            assert.isString(response.transaction.localPayment.payerId);
+            assert.isString(response.transaction.localPayment.paymentId);
+            assert.isString(response.transaction.localPayment.fundingSource);
+
+            done();
+          });
+        })
+      );
+    });
+
     context('with a paypal acount', function () {
       it('returns PayPalAccount for payment_instrument', done =>
         specHelper.defaultGateway.customer.create({}, function () {

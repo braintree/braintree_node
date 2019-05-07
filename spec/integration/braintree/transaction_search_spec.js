@@ -599,6 +599,27 @@ describe('TransactionSearch', () =>
       );
     });
 
+    it('searches on payment instrument type local payment', function (done) {
+      let transactionParams = {
+        amount: Braintree.Test.TransactionAmounts.Authorize,
+        options: {
+          submitForSettlement: true
+        },
+        paymentMethodNonce: Braintree.Test.Nonces.LocalPayment
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.search(function (search) {
+          search.id().is(response.transaction.id);
+
+          return search.paymentInstrumentType().is('LocalPaymentDetail');
+        }, function (err, response) {
+          assert.equal(1, response.length());
+          done();
+        })
+      );
+    });
+
     it('searches on payment instrument type apple pay', function (done) {
       let transactionParams = {
         amount: Braintree.Test.TransactionAmounts.Authorize,
