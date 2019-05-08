@@ -774,6 +774,11 @@ describe('WebhookNotificationGateway', function () {
 
         assert.equal('a-payment-id', localPaymentCompleted.paymentId);
         assert.equal('a-payer-id', localPaymentCompleted.payerId);
+        assert.equal('ee257d98-de40-47e8-96b3-a6954ea7a9a4', localPaymentCompleted.paymentMethodNonce);
+        assert.exists(localPaymentCompleted.transaction);
+        assert.equal('1', localPaymentCompleted.transaction.id);
+        assert.equal('authorizing', localPaymentCompleted.transaction.status);
+        assert.equal('order1234', localPaymentCompleted.transaction.orderId);
         done();
       });
     });

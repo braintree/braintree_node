@@ -4,6 +4,8 @@
 * Add `LocalPaymentDetails` to transactions
 * Add `revokedAt` field to paypalAccount
 * Add support for `PaymentMethodRevokedByCustomer` webhook
+* Add `payment_method_nonce` field to `LocalPaymentCompleted` webhook
+* Add `transaction` field to `LocalPaymentCompleted` webhook
 
 ## 2.16.0
 * Deprecate `GrantedPaymentInstrumentUpdate` and add `GrantorUpdatedGrantedPaymentMethod` and `RecipientUpdatedGrantedPaymentMethod`
