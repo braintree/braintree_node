@@ -1,3 +1,6 @@
+## unreleased
+* Fix transaction search freeze for range fields based over duration
+
 ## 2.16.0
 * Deprecate `GrantedPaymentInstrumentUpdate` and add `GrantorUpdatedGrantedPaymentMethod` and `RecipientUpdatedGrantedPaymentMethod`
 * Add `accountType` to `Transaction`, `PaymentMethod`, and `CreditCardVerification`.
@@ -377,6 +380,3 @@
 ## 0.5.0
 
 * Update to be compatible with Node 0.6.6 and replace o3-xml with xml2js (special thanks to [thepatrick](https://github.com/thepatrick))
-
-## unreleased
-* Fix transaction search freeze for range fields based over duration
