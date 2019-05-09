@@ -379,4 +379,4 @@
 * Update to be compatible with Node 0.6.6 and replace o3-xml with xml2js (special thanks to [thepatrick](https://github.com/thepatrick))
 
 ## unreleased
-* Fixing transaction search freezing for range fields based over duration  
+* Fix transaction search freeze for range fields based over duration
