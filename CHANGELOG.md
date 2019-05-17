@@ -1,4 +1,6 @@
 ## Unreleased
+* Update @braintree/wrap-promise to v2.0.0
+  - Errors thrown inside developer provided callback functions will log in the console instead of killing the node process [wrap-promise#4](https://github.com/braintree/wrap-promise/issues/4)
 * Add `refundFromTransactionFeeAmount` field to paypalAccount
 * Add `refundFromTransactionFeeCurrencyIsoCode` field to paypalAccount
 * Add `LocalPaymentDetails` to transactions
