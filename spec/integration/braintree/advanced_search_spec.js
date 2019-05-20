@@ -139,9 +139,10 @@ describe('AdvancedSearch', function () {
               specHelper.defaultGateway.transaction.refund(transaction1.id, () =>
                 specHelper.defaultGateway.transaction.search(function (search) {
                   search.id().is(transaction1.id);
+
                   return search.refund().is(true);
                 }
-                , function (err, response) {
+                  , function (err, response) {
                   assert.isTrue(response.success);
                   assert.equal(response.length(), 1);
 

@@ -9,12 +9,12 @@ describe('CreditCardVerification', () =>
   describe('search', function () {
     it('can return empty results', done =>
       specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(specHelper.randomId() + ' Smith')
-      , function (err, response) {
-        assert.isNull(err);
-        assert.equal(response.length(), 0);
+        , function (err, response) {
+          assert.isNull(err);
+          assert.equal(response.length(), 0);
 
-        done();
-      })
+          done();
+        })
     );
 
     it('handles responses with a single result', function (done) {
@@ -60,11 +60,13 @@ describe('CreditCardVerification', () =>
           search.customerEmail().is(customerEmail);
           search.customerId().is(customerId);
           search.paymentMethodToken().is(paymentMethodToken);
+
           return search.status().is(CreditCardVerification.StatusType.Verified);
         }
 
-        , function (err, response) {
+          , function (err, response) {
           assert.equal(response.length(), 1);
+
           return response.first(function (err, verification) {
             let createdAt = verification.createdAt;
             let verificationId = verification.id;
@@ -80,11 +82,13 @@ describe('CreditCardVerification', () =>
             specHelper.defaultGateway.creditCardVerification.search(function (search) {
               search.createdAt().is(createdAt);
               search.id().is(verificationId);
+
               return search.ids().in(verificationId);
             }
 
-            , function (err, response) {
+              , function (err, response) {
               assert.equal(response.length(), 1);
+
               return response.first(function (err, verification) {
                 assert.equal(verification.createdAt, createdAt);
                 assert.equal(verification.id, verificationId);
@@ -169,9 +173,10 @@ describe('CreditCardVerification', () =>
             search.creditCardNumber().is(creditCardNumber);
             search.creditCardExpirationDate().is(expirationDate);
             search.creditCardCardType().in(CreditCard.CardType.Visa);
+
             return search.customerEmail().is(email);
           }
-          , function (err, response) {
+            , function (err, response) {
             let verifications = [];
 
             return response.each(function (err, verification) {
@@ -204,22 +209,22 @@ describe('CreditCardVerification', () =>
         }
       }, () =>
         specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(name)
-        , (err, response) =>
-          response.first(function (err, verification) {
-            assert.isNull(err);
-            assert.equal(verification.creditCard.cardholderName, name);
-            assert.equal(verification.creditCard.prepaid, CreditCard.Prepaid.Unknown);
-            assert.equal(verification.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown);
-            assert.equal(verification.creditCard.commercial, CreditCard.Commercial.Unknown);
-            assert.equal(verification.creditCard.healthcare, CreditCard.Healthcare.Unknown);
-            assert.equal(verification.creditCard.debit, CreditCard.Debit.Unknown);
-            assert.equal(verification.creditCard.payroll, CreditCard.Payroll.Unknown);
-            assert.equal(verification.creditCard.countryOfIssuance, CreditCard.CountryOfIssuance.Unknown);
-            assert.equal(verification.creditCard.issuingBank, CreditCard.IssuingBank.Unknown);
-            assert.equal(verification.creditCard.productId, CreditCard.ProductId.Unknown);
+          , (err, response) =>
+            response.first(function (err, verification) {
+              assert.isNull(err);
+              assert.equal(verification.creditCard.cardholderName, name);
+              assert.equal(verification.creditCard.prepaid, CreditCard.Prepaid.Unknown);
+              assert.equal(verification.creditCard.durbinRegulated, CreditCard.DurbinRegulated.Unknown);
+              assert.equal(verification.creditCard.commercial, CreditCard.Commercial.Unknown);
+              assert.equal(verification.creditCard.healthcare, CreditCard.Healthcare.Unknown);
+              assert.equal(verification.creditCard.debit, CreditCard.Debit.Unknown);
+              assert.equal(verification.creditCard.payroll, CreditCard.Payroll.Unknown);
+              assert.equal(verification.creditCard.countryOfIssuance, CreditCard.CountryOfIssuance.Unknown);
+              assert.equal(verification.creditCard.issuingBank, CreditCard.IssuingBank.Unknown);
+              assert.equal(verification.creditCard.productId, CreditCard.ProductId.Unknown);
 
-            done();
-          })
+              done();
+            })
         )
       );
     });

@@ -52,6 +52,7 @@ describe('AddressGateway', function () {
 
               result.push(code);
             }
+
             return result;
           })();
 
@@ -204,6 +205,7 @@ describe('AddressGateway', function () {
 
                 result.push(code);
               }
+
               return result;
             })();
 

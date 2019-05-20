@@ -29,6 +29,7 @@ describe('DisbursementGateway', () =>
       specHelper.defaultGateway.disbursement.transactions(disbursement, function (err, transactions) {
         assert.isNull(err);
         assert.equal(transactions.length(), 1);
+
         return transactions.first(function (err, transaction) {
           assert.isNull(err);
           assert.equal(transaction.id, 'sub_merchant_transaction');

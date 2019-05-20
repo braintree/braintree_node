@@ -1,3 +1,14 @@
+## 2.17.0
+* Update @braintree/wrap-promise to v2.0.0
+  - Errors thrown inside developer provided callback functions will log in the console instead of killing the node process [wrap-promise#4](https://github.com/braintree/wrap-promise/issues/4)
+* Add `refundFromTransactionFeeAmount` field to paypalAccount
+* Add `refundFromTransactionFeeCurrencyIsoCode` field to paypalAccount
+* Add `LocalPaymentDetails` to transactions
+* Add `revokedAt` field to paypalAccount
+* Add support for `PaymentMethodRevokedByCustomer` webhook
+* Add `payment_method_nonce` field to `LocalPaymentCompleted` webhook
+* Add `transaction` field to `LocalPaymentCompleted` webhook
+
 ## 2.16.0
 * Deprecate `GrantedPaymentInstrumentUpdate` and add `GrantorUpdatedGrantedPaymentMethod` and `RecipientUpdatedGrantedPaymentMethod`
 * Add `accountType` to `Transaction`, `PaymentMethod`, and `CreditCardVerification`.

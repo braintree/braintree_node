@@ -162,7 +162,8 @@ describe('CustomerGateway', function () {
               assert.equal(response.customer.paymentMethods[0].bin, '411111');
 
               done();
-            }); });
+            });
+          });
         });
       });
 
@@ -285,7 +286,8 @@ describe('CustomerGateway', function () {
             assert.equal(response.customer.paymentMethods[0], usBankAccount);
 
             done();
-          }); })
+          });
+        })
       );
 
       it('cannot create a customer with a Coinbase account payment method nonce', function (done) {
@@ -665,7 +667,8 @@ describe('CustomerGateway', function () {
           assert.equal(response.customer.creditCards[0].bin, '411111');
 
           done();
-        }); });
+        });
+      });
     });
 
     describe('create', function () {
@@ -686,13 +689,13 @@ describe('CustomerGateway', function () {
         }, () =>
           specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(name)
             , (err, response) =>
-            response.first(function (err2, verification) {
-              assert.isNull(err2);
-              assert.equal(verification.creditCard.cardholderName, name);
-              assert.equal(verification.creditCard.accountType, 'debit');
+              response.first(function (err2, verification) {
+                assert.isNull(err2);
+                assert.equal(verification.creditCard.cardholderName, name);
+                assert.equal(verification.creditCard.accountType, 'debit');
 
-              done();
-            })
+                done();
+              })
           )
         );
       });
@@ -714,13 +717,13 @@ describe('CustomerGateway', function () {
         }, () =>
           specHelper.defaultGateway.creditCardVerification.search(search => search.creditCardCardholderName().is(name)
             , (err, response) =>
-            response.first(function (err2, verification) {
-              assert.isNull(err2);
-              assert.equal(verification.creditCard.cardholderName, name);
-              assert.equal(verification.creditCard.accountType, 'credit');
+              response.first(function (err2, verification) {
+                assert.isNull(err2);
+                assert.equal(verification.creditCard.cardholderName, name);
+                assert.equal(verification.creditCard.accountType, 'credit');
 
-              done();
-            })
+                done();
+              })
           )
         );
       });

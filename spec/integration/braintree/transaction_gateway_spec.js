@@ -335,6 +335,7 @@ describe('TransactionGateway', function () {
         } catch (e) {
           // should not get here
           done(e);
+
           return;
         }
 
@@ -2304,6 +2305,31 @@ describe('TransactionGateway', function () {
       })
     );
 
+    context('with a local payment', function () {
+      it('returns LocalPayment for payment_instrument', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.LocalPayment,
+            amount: '100.00',
+            options: {
+              submitForSettlement: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.LocalPayment);
+            assert.isString(response.transaction.localPayment.payerId);
+            assert.isString(response.transaction.localPayment.paymentId);
+            assert.isString(response.transaction.localPayment.fundingSource);
+
+            done();
+          });
+        })
+      );
+    });
+
     context('with a paypal acount', function () {
       it('returns PayPalAccount for payment_instrument', done =>
         specHelper.defaultGateway.customer.create({}, function () {
@@ -3714,7 +3740,8 @@ describe('TransactionGateway', function () {
             assert.isTrue(response.success);
 
             done();
-          }); });
+          });
+        });
       });
     });
 
@@ -3743,7 +3770,8 @@ describe('TransactionGateway', function () {
             assert.isTrue(response.success);
 
             done();
-          }); });
+          });
+        });
       });
     });
 
@@ -3767,7 +3795,8 @@ describe('TransactionGateway', function () {
           assert.isTrue(response.success);
 
           done();
-        }); });
+        });
+      });
     });
 
     it('works with an unknown payment instrument', function (done) {
@@ -3865,34 +3894,6 @@ describe('TransactionGateway', function () {
           done();
         });
       });
-    });
-
-    context('Ideal payment ID', function () {
-      it('transacts on an Ideal payment ID', done =>
-        specHelper.generateValidIdealPaymentId(function (idealPaymentId) {
-          let transactionParams = {
-            merchantAccountId: 'ideal_merchant_account',
-            orderId: 'ABC123',
-            amount: '100.00',
-            paymentMethodNonce: idealPaymentId,
-            options: {
-              submitForSettlement: true
-            }
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isTrue(response.success);
-            assert.equal(response.transaction.status, Transaction.Status.Settled);
-            assert.match(response.transaction.idealPaymentDetails.idealPaymentId, /^idealpayment_\w{6,}$/);
-            assert.match(response.transaction.idealPaymentDetails.idealTransactionId, /^\d{16,}$/);
-            assert.isTrue(response.transaction.idealPaymentDetails.imageUrl.startsWith('https://'));
-            assert.isNotNull(response.transaction.idealPaymentDetails.maskedIban);
-            assert.isNotNull(response.transaction.idealPaymentDetails.bic);
-
-            done();
-          });
-        })
-      );
     });
 
     context('Subscription', function () {
@@ -4178,7 +4179,7 @@ describe('TransactionGateway', function () {
 
       it('returns an error for transaction with threeDSecurePassThru when the merchant account does not support that card type', function (done) {
         let transactionParams = {
-          merchantAccountId: 'adyen_ma',
+          merchantAccountId: 'heartland_ma',
           amount: '5.00',
           creditCard: {
             number: '5105105105105100',
@@ -4440,6 +4441,8 @@ describe('TransactionGateway', function () {
         assert.isString(transaction.paypalAccount.refundId);
         assert.isString(transaction.paypalAccount.transactionFeeAmount);
         assert.isString(transaction.paypalAccount.transactionFeeCurrencyIsoCode);
+        assert.isString(transaction.paypalAccount.refundFromTransactionFeeAmount);
+        assert.isString(transaction.paypalAccount.refundFromTransactionFeeCurrencyIsoCode);
         done();
       })
     );
@@ -5480,6 +5483,7 @@ describe('TransactionGateway', function () {
         partnerMerchantGateway.paymentMethodNonce.create(creditCard.token, function (err, result) {
           if (err) {
             done(err);
+
             return;
           }
 
@@ -5494,6 +5498,7 @@ describe('TransactionGateway', function () {
           grantingGateway.transaction.sale(transactionParams, function (err, response) {
             if (err) {
               done(err);
+
               return;
             }
 

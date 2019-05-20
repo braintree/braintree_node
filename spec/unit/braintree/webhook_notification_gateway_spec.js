@@ -568,42 +568,6 @@ describe('WebhookNotificationGateway', function () {
       });
     });
 
-    it('returns a parsable signature and payload for iDEAL payment complete', function (done) {
-      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
-        WebhookNotification.Kind.IdealPaymentComplete,
-        'my_id'
-      );
-      let bt_signature = notification.bt_signature;
-      let bt_payload = notification.bt_payload;
-
-      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
-        assert.equal(webhookNotification.kind, WebhookNotification.Kind.IdealPaymentComplete);
-        assert.equal('my_id', webhookNotification.idealPayment.id);
-        assert.equal('COMPLETE', webhookNotification.idealPayment.status);
-        assert.equal('ORDERABC', webhookNotification.idealPayment.orderId);
-        assert.equal('1234567890', webhookNotification.idealPayment.idealTransactionId);
-        done();
-      });
-    });
-
-    it('returns a parsable signature and payload for iDEAL payment failed', function (done) {
-      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
-        WebhookNotification.Kind.IdealPaymentFailed,
-        'my_id'
-      );
-      let bt_signature = notification.bt_signature;
-      let bt_payload = notification.bt_payload;
-
-      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
-        assert.equal(webhookNotification.kind, WebhookNotification.Kind.IdealPaymentFailed);
-        assert.equal('my_id', webhookNotification.idealPayment.id);
-        assert.equal('FAILED', webhookNotification.idealPayment.status);
-        assert.equal('ORDERABC', webhookNotification.idealPayment.orderId);
-        assert.equal('1234567890', webhookNotification.idealPayment.idealTransactionId);
-        done();
-      });
-    });
-
     it('returns a parsable signature and payload for Grantor Updated Granted Payment Method', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.GrantorUpdatedGrantedPaymentMethod,
@@ -775,6 +739,26 @@ describe('WebhookNotificationGateway', function () {
       });
     });
 
+    it('returns a parseable signature and payload for Payment Method Revoked By Customer webhook', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.PaymentMethodRevokedByCustomer,
+        'my_payment_method_token'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.PaymentMethodRevokedByCustomer);
+
+        let metadata = webhookNotification.revokedPaymentMethodMetadata;
+
+        assert.equal('my_payment_method_token', metadata.token);
+        assert(metadata.revokedPaymentMethod instanceof PayPalAccount);
+        assert.exists(metadata.revokedPaymentMethod.revokedAt);
+        done();
+      });
+    });
+
     it('returns a parsable signature and payload for Local Payment Completed', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.LocalPaymentCompleted,
@@ -790,6 +774,11 @@ describe('WebhookNotificationGateway', function () {
 
         assert.equal('a-payment-id', localPaymentCompleted.paymentId);
         assert.equal('a-payer-id', localPaymentCompleted.payerId);
+        assert.equal('ee257d98-de40-47e8-96b3-a6954ea7a9a4', localPaymentCompleted.paymentMethodNonce);
+        assert.exists(localPaymentCompleted.transaction);
+        assert.equal('1', localPaymentCompleted.transaction.id);
+        assert.equal('authorizing', localPaymentCompleted.transaction.status);
+        assert.equal('order1234', localPaymentCompleted.transaction.orderId);
         done();
       });
     });

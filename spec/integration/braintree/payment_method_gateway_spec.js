@@ -1280,20 +1280,20 @@ describe('PaymentMethodGateway', function () {
   });
 
   it('handles not finding the paypal account', done =>
-     specHelper.defaultGateway.paymentMethod.find('NON_EXISTENT_TOKEN', function (err) {
-       assert.equal(err.type, braintree.errorTypes.notFoundError);
+    specHelper.defaultGateway.paymentMethod.find('NON_EXISTENT_TOKEN', function (err) {
+      assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-       done();
-     })
-   );
+      done();
+    })
+  );
 
   it('handles whitespace', done =>
-      specHelper.defaultGateway.paymentMethod.find(' ', function (err) {
-        assert.equal(err.type, braintree.errorTypes.notFoundError);
+    specHelper.defaultGateway.paymentMethod.find(' ', function (err) {
+      assert.equal(err.type, braintree.errorTypes.notFoundError);
 
-        done();
-      })
-   );
+      done();
+    })
+  );
 
   describe('update', function () {
     context('credit card', function () {
@@ -2031,6 +2031,7 @@ describe('PaymentMethodGateway', function () {
                 };
 
                 myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+
                 return myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', params, function (statusCode, body) {
                   let secondNonce = JSON.parse(body).paypalAccounts[0].nonce;
 

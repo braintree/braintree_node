@@ -19,35 +19,35 @@ describe('CredentialsParser', function () {
       let parser = new CredentialsParser();
 
       assert.throws(() => parser.parseClientCredentials('client_id$development$integration_client_id', 'client_secret$qa$integration_client_secret')
-      , 'Mismatched credential environments');
+        , 'Mismatched credential environments');
     });
 
     it('raises error on null clientId', function () {
       let parser = new CredentialsParser();
 
       assert.throws(() => parser.parseClientCredentials(null, 'client_secret$qa$integration_client_secret')
-      , 'Missing clientId');
+        , 'Missing clientId');
     });
 
     it('raises error on null clientSecret', function () {
       let parser = new CredentialsParser();
 
       assert.throws(() => parser.parseClientCredentials('client_id$development$integration_client_id', null)
-      , 'Missing clientSecret');
+        , 'Missing clientSecret');
     });
 
     it('raises error on invalid clientId', function () {
       let parser = new CredentialsParser();
 
       assert.throws(() => parser.parseClientCredentials('client_secret$qa$integration_client_secret', 'client_secret$qa$integration_client_secret')
-      , 'Value passed for clientId is not a client id');
+        , 'Value passed for clientId is not a client id');
     });
 
     it('raises error on invalid clientSecret', function () {
       let parser = new CredentialsParser();
 
       assert.throws(() => parser.parseClientCredentials('client_id$development$integration_client_id', 'client_id$development$integration_client_id')
-      , 'Value passed for clientSecret is not a client secret');
+        , 'Value passed for clientSecret is not a client secret');
     });
   });
 
@@ -65,14 +65,14 @@ describe('CredentialsParser', function () {
       let parser = new CredentialsParser();
 
       assert.throws(() => parser.parseAccessToken(null)
-      , 'Missing access token');
+        , 'Missing access token');
     });
 
     it('raises error on invalid accessToken', function () {
       let parser = new CredentialsParser();
 
       assert.throws(() => parser.parseAccessToken('client_id$development$integration_client_id')
-      , 'Value passed for accessToken is not a valid access token');
+        , 'Value passed for accessToken is not a valid access token');
     });
   });
 });

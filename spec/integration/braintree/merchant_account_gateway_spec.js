@@ -417,7 +417,7 @@ describe('MerchantAccountGateway', function () {
         );
         assert.equal(
           response.errors.for('merchantAccount').for('individual').for('address').on('streetAddress')[0].code,
-           ValidationErrorCodes.MerchantAccount.Individual.Address.StreetAddressIsInvalid
+          ValidationErrorCodes.MerchantAccount.Individual.Address.StreetAddressIsInvalid
         );
         assert.equal(
           response.errors.for('merchantAccount').for('individual').for('address').on('postalCode')[0].code,
@@ -446,7 +446,7 @@ describe('MerchantAccountGateway', function () {
         );
         assert.equal(
           response.errors.for('merchantAccount').for('business').for('address').on('streetAddress')[0].code,
-           ValidationErrorCodes.MerchantAccount.Business.Address.StreetAddressIsInvalid
+          ValidationErrorCodes.MerchantAccount.Business.Address.StreetAddressIsInvalid
         );
         assert.equal(
           response.errors.for('merchantAccount').for('business').for('address').on('postalCode')[0].code,
