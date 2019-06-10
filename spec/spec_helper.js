@@ -61,24 +61,21 @@ let escrowTransaction = (transactionId, callback) =>
     `${defaultGateway.config.baseMerchantPath()}/transactions/${transactionId}/escrow`,
     null,
     callback
-  )
-;
+  );
 
 let makePastDue = (subscription, callback) =>
   defaultGateway.http.put(
     `${defaultGateway.config.baseMerchantPath()}/subscriptions/${subscription.id}/make_past_due?days_past_due=1`,
     null,
     callback
-  )
-;
+  );
 
 let settlePayPalTransaction = (transactionId, callback) =>
   defaultGateway.http.put(
     `${defaultGateway.config.baseMerchantPath()}/transactions/${transactionId}/settle`,
     null,
     callback
-  )
-;
+  );
 
 let create3DSVerification = function (merchantAccountId, params, callback) {
   let responseCallback = function (err, response) {
@@ -138,6 +135,7 @@ let simulateTrFormPost = function (url, trData, inputFormData, callback) {
   request.on('response', response => callback(null, response.headers.location.split('?', 2)[1]));
 
   request.write(requestBody);
+
   return request.end();
 };
 
@@ -159,10 +157,10 @@ let dateToMdy = function (date) {
 
 let settlementDate = function (date) {
   if (daylightSavings()) { // eslint-disable-line no-use-before-define
-    return new Date(date.getTime() - 4 * 60 * 60 * 1000);
+    return new Date(date.getTime() - (4 * 60 * 60 * 1000));
   }
 
-  return new Date(date.getTime() - 5 * 60 * 60 * 1000);
+  return new Date(date.getTime() - (5 * 60 * 60 * 1000));
 };
 
 let daylightSavings = function () {
@@ -259,6 +257,7 @@ let generateValidUsBankAccountNonce = function (accountNumber, callback) {
         callback(json.data.id);
       }
       );
+
       return response.on('error', err => console.log(`Unexpected response error: ${err}`));
     }
     );
@@ -266,6 +265,7 @@ let generateValidUsBankAccountNonce = function (accountNumber, callback) {
     req.on('error', err => console.log(`Unexpected request error: ${err}`));
 
     req.write(requestBody);
+
     return req.end();
   });
 };
@@ -323,6 +323,7 @@ let generatePlaidUsBankAccountNonce = callback =>
         callback(json.data.id);
       }
       );
+
       return response.on('error', err => console.log(`Unexpected response error: ${err}`));
     }
     );
@@ -330,9 +331,9 @@ let generatePlaidUsBankAccountNonce = callback =>
     req.on('error', err => console.log(`Unexpected request error: ${err}`));
 
     req.write(requestBody);
+
     return req.end();
-  })
-;
+  });
 
 let generateInvalidUsBankAccountNonce = function () {
   let nonceCharacters = 'bcdfghjkmnpqrstvwxyz23456789'.split('');
@@ -346,77 +347,6 @@ let generateInvalidUsBankAccountNonce = function () {
   nonce += '_xxx';
 
   return nonce;
-};
-
-let generateValidIdealPaymentId = function (amount, callback) {
-  if (!callback) {
-    callback = amount;
-    amount = '100.0';
-  }
-
-  specHelper.defaultGateway.clientToken.generate({
-    merchantAccountId: 'ideal_merchant_account'
-  }, function (err, result) {
-    let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-    let clientApi = new ClientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line no-use-before-define
-
-    clientApi.get('/client_api/v1/configuration', {
-      authorizationFingerprint: clientToken.authorizationFingerprint,
-      configVersion: 3
-    }, function (statusCode, body) {
-      let routeId = JSON.parse(body).ideal.routeId;
-
-      let url = uri.parse(clientToken.braintree_api.url);
-      let token = clientToken.braintree_api.access_token;
-      let options = {
-        host: url.hostname,
-        port: url.port,
-        method: 'POST',
-        path: '/ideal-payments',
-        headers: {
-          'Content-Type': 'application/json',
-          'Braintree-Version': '2015-11-01',
-          Authorization: `Bearer ${token}`
-        }
-      };
-
-      /* eslint-disable camelcase */
-      let payload = {
-        issuer: 'RABONL2u',
-        order_id: 'ABC123',
-        amount: amount,
-        currency: 'EUR',
-        route_id: routeId,
-        redirect_url: 'https://braintree-api.com'
-      };
-      /* eslint-enable camelcase */
-
-      let requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload));
-
-      options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString();
-
-      let req = https.request(options);
-
-      req.on('response', response => {
-        let body = '';
-
-        response.on('data', responseBody => {
-          body += responseBody;
-        });
-        response.on('end', () => {
-          let json = JSON.parse(body);
-
-          callback(json.data.id);
-        });
-        return response.on('error', err => console.log(`Unexpected response error: ${err}`));
-      });
-
-      req.on('error', err => console.log(`Unexpected request error: ${err}`));
-
-      req.write(requestBody);
-      return req.end();
-    });
-  });
 };
 
 let createTransactionToRefund = function (callback) {
@@ -494,26 +424,23 @@ let decodeClientToken = function (encodedClientToken) {
 };
 
 let createPlanForTests = (attributes, callback) =>
-  specHelper.defaultGateway.http.post(`${defaultGateway.config.baseMerchantPath()}/plans/create_plan_for_tests`, {plan: attributes}, () => callback())
-;
+  specHelper.defaultGateway.http.post(`${defaultGateway.config.baseMerchantPath()}/plans/create_plan_for_tests`, {plan: attributes}, () => callback());
 
 let createModificationForTests = (attributes, callback) =>
-  specHelper.defaultGateway.http.post(`${defaultGateway.config.baseMerchantPath()}/modifications/create_modification_for_tests`, {modification: attributes}, () => callback())
-;
+  specHelper.defaultGateway.http.post(`${defaultGateway.config.baseMerchantPath()}/modifications/create_modification_for_tests`, {modification: attributes}, () => callback());
 
 let createToken = (gateway, attributes, callback) =>
-  specHelper.createGrant(gateway, attributes, (err, code) => gateway.oauth.createTokenFromCode({code}, callback))
-;
+  specHelper.createGrant(gateway, attributes, (err, code) => gateway.oauth.createTokenFromCode({code}, callback));
 
 let createGrant = (gateway, attributes, callback) =>
   gateway.http.post('/oauth_testing/grants', attributes, function (err, response) {
     if (err) {
       callback(err, null);
+
       return;
     }
     callback(null, response.grant.code);
-  })
-;
+  });
 
 class ClientApiHttp {
   static initClass() {
@@ -583,6 +510,7 @@ class ClientApiHttp {
         body += responseBody;
       });
       response.on('end', () => callback(response.statusCode, body));
+
       return response.on('error', err => callback(`Unexpected response error: ${err}`));
     }
     );
@@ -591,6 +519,7 @@ class ClientApiHttp {
     theRequest.on('error', err => callback(`Unexpected request error: ${err}`));
 
     if (body) { theRequest.write(requestBody); }
+
     return theRequest.end();
   }
 }
@@ -630,7 +559,6 @@ global.specHelper = {
   generateValidUsBankAccountNonce,
   generateInvalidUsBankAccountNonce,
   generatePlaidUsBankAccountNonce,
-  generateValidIdealPaymentId,
   createPlanForTests,
   createModificationForTests,
   createGrant,

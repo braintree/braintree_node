@@ -65,7 +65,8 @@ describe('SubscriptionGateway', function () {
           assert.isTrue(response.success);
           assert.equal(response.subscription.transactions[0].creditCard.maskedNumber, '411111******1111');
           done();
-        }); });
+        });
+      });
     });
 
     it('creates a subscription with a vaulted paypal account nonce', function (done) {
@@ -86,7 +87,8 @@ describe('SubscriptionGateway', function () {
           assert.isTrue(response.success);
           assert.isString(response.subscription.transactions[0].paypalAccount.payerEmail);
           done();
-        }); });
+        });
+      });
     });
 
     it('creates a subscription with a vaulted paypal account token', done =>
@@ -398,7 +400,8 @@ describe('SubscriptionGateway', function () {
             assert.equal(creditCard.maskedNumber, '411111******1111');
             done();
           });
-        }); });
+        });
+      });
     });
 
     it('updates the description', function (done) {
@@ -461,15 +464,15 @@ describe('SubscriptionGateway', function () {
     );
 
     it('allows specifying submitForSettlemnt', done =>
-       specHelper.defaultGateway.subscription.retryCharge(subscription.id, '6.00', true, function (err, response) {
-         assert.isNull(err);
-         assert.isTrue(response.success);
-         assert.equal(response.transaction.amount, '6.00');
-         assert.equal(response.transaction.type, 'sale');
-         assert.equal(response.transaction.status, 'submitted_for_settlement');
+      specHelper.defaultGateway.subscription.retryCharge(subscription.id, '6.00', true, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.amount, '6.00');
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.status, 'submitted_for_settlement');
 
-         done();
-       })
+        done();
+      })
     );
 
     it('allows specifying submitForSettlement and amount', done =>

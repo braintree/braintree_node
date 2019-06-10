@@ -39,8 +39,8 @@ describe('SubscriptionSearch', () =>
 
           let planPrice = Number(specHelper.plans.trialless.price);
           let today = new Date();
-          let yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-          let tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+          let yesterday = new Date(today.getTime() - (24 * 60 * 60 * 1000));
+          let tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000));
           let billingCyclesRemaining = Number(response.subscription.numberOfBillingCycles) - 1;
 
           let rangeCriteria = {
@@ -122,9 +122,11 @@ describe('SubscriptionSearch', () =>
                     value = range[operator];
                     result1.push(search[criteria]()[operator](value));
                   }
+
                   return result1;
                 })());
               }
+
               return result;
             })();
           };
@@ -178,8 +180,8 @@ describe('SubscriptionSearch', () =>
 
           let planPrice = Number(specHelper.plans.trialless.price);
           let today = new Date();
-          let tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-          let dayAfterTomorrow = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
+          let tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000));
+          let dayAfterTomorrow = new Date(today.getTime() + (2 * 24 * 60 * 60 * 1000));
           let billingCyclesRemaining = Number(response.subscription.numberOfBillingCycles) - 1;
 
           let rangeCriteria = {
@@ -261,9 +263,11 @@ describe('SubscriptionSearch', () =>
                     value = range[operator];
                     result1.push(search[criteria]()[operator](value));
                   }
+
                   return result1;
                 })());
               }
+
               return result;
             })();
           };
@@ -350,8 +354,10 @@ describe('SubscriptionSearch', () =>
 
                 result.push(search[criteria]().in(value));
               }
+
               return result;
             })()
+
           ;
 
           specHelper.defaultGateway.subscription.search(search, function (err, response) {
@@ -399,8 +405,10 @@ describe('SubscriptionSearch', () =>
 
                 result.push(search[criteria]().in(value));
               }
+
               return result;
             })()
+
           ;
 
           specHelper.defaultGateway.subscription.search(search, function (err, response) {
@@ -448,8 +456,10 @@ describe('SubscriptionSearch', () =>
 
                 result.push(search[criteria]().in(value));
               }
+
               return result;
             })()
+
           ;
 
           specHelper.defaultGateway.subscription.search(search, function (err, response) {

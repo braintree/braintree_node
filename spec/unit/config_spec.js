@@ -40,7 +40,7 @@ describe('Config', function () {
         environment: 'development'
       });
     }
-    , 'Missing merchantId')
+      , 'Missing merchantId')
   );
 
   it('raises an exception if merchantId is empty', () =>
@@ -52,7 +52,7 @@ describe('Config', function () {
         environment: 'development'
       });
     }
-    , 'Missing merchantId')
+      , 'Missing merchantId')
   );
 
   it('raises an exception if publicKey is null', () =>
@@ -63,7 +63,7 @@ describe('Config', function () {
         environment: 'development'
       });
     }
-    , 'Missing publicKey')
+      , 'Missing publicKey')
   );
 
   it('raises an exception if publicKey is empty', () =>
@@ -75,7 +75,7 @@ describe('Config', function () {
         environment: 'development'
       });
     }
-    , 'Missing publicKey')
+      , 'Missing publicKey')
   );
 
   it('raises an exception if privateKey is null', () =>
@@ -86,7 +86,7 @@ describe('Config', function () {
         environment: 'development'
       });
     }
-    , 'Missing privateKey')
+      , 'Missing privateKey')
   );
 
   it('raises an exception if privateKey is empty', () =>
@@ -98,7 +98,7 @@ describe('Config', function () {
         environment: 'development'
       });
     }
-    , 'Missing privateKey')
+      , 'Missing privateKey')
   );
 
   it('raises an exception if environment is null', () =>
@@ -109,7 +109,7 @@ describe('Config', function () {
         privateKey: 'privateKey'
       });
     }
-    , 'Missing environment')
+      , 'Missing environment')
   );
 
   it('raises an exception if environment is empty', () =>
@@ -121,7 +121,7 @@ describe('Config', function () {
         environment: ''
       });
     }
-    , 'Missing environment')
+      , 'Missing environment')
   );
 
   describe('baseMerchantUrl', () =>
