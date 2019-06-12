@@ -4456,6 +4456,11 @@ describe('TransactionGateway', function () {
           assert.isTrue(info.liabilityShiftPossible);
           assert.equal(info.enrolled, 'Y');
           assert.equal(info.status, 'authenticate_successful');
+          assert.equal(info.cavv, 'somebase64value');
+          assert.equal(info.xid, 'xidvalue');
+          assert.equal(info.eciFlag, '07');
+          assert.equal(info.threeDSecureVersion, '1.0.2');
+          assert.equal(info.dsTransactionId, 'dstxnid');
           done();
         })
       );
