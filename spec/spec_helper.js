@@ -548,6 +548,7 @@ global.specHelper = {
   nonDefaultMerchantAccountId: 'sandbox_credit_card_non_default',
   nonDefaultSubMerchantAccountId: 'sandbox_sub_merchant_account',
   threeDSecureMerchantAccountId: 'three_d_secure_merchant_account',
+  adyenMerchantAccountId: 'adyen_ma',
   fakeAmexDirectMerchantAccountId: 'fake_amex_direct_usd',
   fakeVenmoAccountMerchantAccountId: 'fake_first_data_venmo_account',
   clientApiHttp: ClientApiHttp,

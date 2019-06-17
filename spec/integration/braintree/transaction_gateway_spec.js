@@ -4165,7 +4165,12 @@ describe('TransactionGateway', function () {
           threeDSecurePassThru: {
             eciFlag: '02',
             cavv: 'some_cavv',
-            xid: 'some_xid'
+            xid: 'some_xid',
+            threeDSecureVersion: '1.0.2',
+            authenticationResponse: 'Y',
+            directoryResponse: 'Y',
+            cavvAlgorithm: '2',
+            dsTransactionId: 'some_ds_transaction_id'
           }
         };
 
@@ -4275,6 +4280,117 @@ describe('TransactionGateway', function () {
           assert.equal(
             response.errors.for('transaction').for('threeDSecurePassThru').on('eciFlag')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsInvalid
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru three_d_secure_version is invalid', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '06',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            threeDSecureVersion: 'invalid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('threeDSecureVersion')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureThreeDSecureVersionIsInvalid
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru authentication_response is invalid', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.adyenMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '06',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            authenticationResponse: 'invalid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.isNotEmpty(response.errors.for('transaction').for('threeDSecurePassThru').on('authenticationResponse'), 'Response should contain error on authenticationResponse');
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('authenticationResponse')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureAuthenticationResponseIsInvalid
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru directory_response is invalid', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.adyenMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '06',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            directoryResponse: 'invalid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.isNotEmpty(response.errors.for('transaction').for('threeDSecurePassThru').on('directoryResponse'), 'Response should contain error on directoryResponse');
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('directoryResponse')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureDirectoryResponseIsInvalid
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru cavv_algorithm is invalid', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.adyenMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '06',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            cavvAlgorithm: 'invalid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.isNotEmpty(response.errors.for('transaction').for('threeDSecurePassThru').on('cavvAlgorithm'), 'Response should contain error on cavvAlgorithm');
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('cavvAlgorithm')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureCavvAlgorithmIsInvalid
           );
 
           done();

@@ -1,5 +1,6 @@
 ## Unreleased
 * Add `xid`, `cavv`, `eciFlag`, `dsTransactionId`, and `threeDSecureVersion` to `ThreeDSecureInfo`
+* Add `threeDSecureVersion`, `authenticationResponse`, `directoryResponse`, `cavvAlgorithm` and `dsTransactionId` to 3DS pass thru fields
 
 ## 2.17.0
 * Update @braintree/wrap-promise to v2.0.0
