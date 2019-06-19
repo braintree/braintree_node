@@ -1,4 +1,11 @@
 ## Unreleased
+* Add `captureId` field to localPayment
+* Add `refundId` field to localPayment
+* Add `debugId` field to localPayment
+* Add `transactionFeeAmount` field to localPayment
+* Add `transactionFeeCurrencyIsoCode` field to localPayment
+* Add `refundFromTransactionFeeAmount` field to localPayment
+* Add `refundFromTransactionFeeCurrencyIsoCode` field to localPayment
 * Add `xid`, `cavv`, `eciFlag`, `dsTransactionId`, and `threeDSecureVersion` to `ThreeDSecureInfo`
 * Add `threeDSecureVersion`, `authenticationResponse`, `directoryResponse`, `cavvAlgorithm` and `dsTransactionId` to 3DS pass thru fields
 
