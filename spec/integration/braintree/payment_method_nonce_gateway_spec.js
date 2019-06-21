@@ -75,10 +75,6 @@ describe('PaymentMethodNonceGateway', function () {
           assert.isTrue(info.liabilityShiftPossible);
           assert.equal(info.enrolled, 'Y');
           assert.equal(info.status, 'authenticate_successful');
-          assert.equal(info.cavv, 'test_cavv');
-          assert.equal(info.xid, 'test_xid');
-          assert.equal(info.eciFlag, 'test_eci');
-          assert.equal(info.threeDSecureVersion, '1.0.2');
 
           assert.equal(paymentMethodNonce.details.bin, '411111');
 
