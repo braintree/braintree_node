@@ -3251,7 +3251,7 @@ describe('TransactionGateway', function () {
 
     it('handles lodging industry data', function (done) {
       let transactionParams = {
-        amount: '10.0',
+        amount: '1000.00',
         creditCard: {
           number: '5105105105105100',
           expirationDate: '05/16'
@@ -3261,8 +3261,23 @@ describe('TransactionGateway', function () {
           data: {
             folioNumber: 'aaa',
             checkInDate: '2014-07-07',
-            checkOutDate: '2014-08-08',
-            roomRate: '239.00'
+            checkOutDate: '2014-07-11',
+            roomRate: '170.00',
+            roomTax: '30.00',
+            noShow: false,
+            advancedDeposit: false,
+            fireSafe: true,
+            propertyPhone: '1112223345',
+            additionalCharges: [
+              {
+                kind: Transaction.AdditionalCharge.Telephone,
+                amount: '50.00'
+              },
+              {
+                kind: Transaction.AdditionalCharge.Other,
+                amount: '150.00'
+              }
+            ]
           }
         }
       };
@@ -3287,7 +3302,13 @@ describe('TransactionGateway', function () {
             folioNumber: 'aaa',
             checkInDate: '2014-07-07',
             checkOutDate: '2014-06-06',
-            roomRate: '239.00'
+            roomRate: 'abcdef',
+            additionalCharges: [
+              {
+                kind: 'unknown',
+                amount: '20.00'
+              }
+            ]
           }
         }
       };
@@ -3297,6 +3318,14 @@ describe('TransactionGateway', function () {
         assert.equal(
           response.errors.for('transaction').for('industry').on('checkOutDate')[0].code,
           ValidationErrorCodes.Transaction.IndustryData.Lodging.CheckOutDateMustFollowCheckInDate
+        );
+        assert.equal(
+          response.errors.for('transaction').for('industry').on('roomRate')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.Lodging.RoomRateFormatIsInvalid
+        );
+        assert.equal(
+          response.errors.for('transaction').for('industry').for('additionalCharges').for('index0').on('kind')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.AdditionalCharge.KindIsInvalid
         );
 
         done();

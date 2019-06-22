@@ -8,6 +8,12 @@
 * Add `refundFromTransactionFeeCurrencyIsoCode` field to localPayment
 * Add `threeDSecureVersion`, `authenticationResponse`, `directoryResponse`, `cavvAlgorithm` and `dsTransactionId` to 3DS pass thru fields
 * Add `payerInfo` field to paymentMethodNonce
+* Add `roomTax` support on transaction sale
+* Add `noShow` support on transaction sale
+* Add `advancedDeposit` support on transaction sale
+* Add `fireSafe` support on transaction sale
+* Add `propertyPhone` support on transaction sale
+* Add `additionalCharges` support on transaction sale
 
 ## 2.17.0
 * Update @braintree/wrap-promise to v2.0.0
