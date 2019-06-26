@@ -1,3 +1,6 @@
+## Unreleased
+* Add `PostalCodeIsRequiredForCardBrandAndProcessor` to validation errors
+
 ## 2.18.0
 * Add `captureId` field to localPayment
 * Add `refundId` field to localPayment
@@ -14,7 +17,6 @@
 * Add `fireSafe` support on transaction sale
 * Add `propertyPhone` support on transaction sale
 * Add `additionalCharges` support on transaction sale
-* Add `PostalCodeIsRequiredForCardBrandAndProcessor` to validation errors
 
 ## 2.17.0
 * Update @braintree/wrap-promise to v2.0.0
