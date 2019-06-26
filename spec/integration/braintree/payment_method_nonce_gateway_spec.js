@@ -83,6 +83,20 @@ describe('PaymentMethodNonceGateway', function () {
       });
     });
 
+    it('returns paypal account details', function (done) {
+      specHelper.defaultGateway.paymentMethodNonce.find('fake-google-pay-paypal-nonce', function (err, paymentMethodNonce) {
+        assert.isNull(err);
+        let details = paymentMethodNonce.details;
+
+        assert.isNotNull(details.payerInfo.firstName);
+        assert.isNotNull(details.payerInfo.lastName);
+        assert.isNotNull(details.payerInfo.email);
+        assert.isNotNull(details.payerInfo.payerId);
+
+        done();
+      });
+    });
+
     it('returns venmo account details', function (done) {
       specHelper.defaultGateway.paymentMethodNonce.find('fake-venmo-account-nonce', function (err, paymentMethodNonce) {
         assert.isNull(err);

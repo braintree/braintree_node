@@ -2306,7 +2306,7 @@ describe('TransactionGateway', function () {
     );
 
     context('with a local payment', function () {
-      it('returns LocalPayment for payment_instrument', done =>
+      it('returns relevant local payment transaction details for a sale', done =>
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             paymentMethodNonce: Nonces.LocalPayment,
@@ -2323,6 +2323,43 @@ describe('TransactionGateway', function () {
             assert.isString(response.transaction.localPayment.payerId);
             assert.isString(response.transaction.localPayment.paymentId);
             assert.isString(response.transaction.localPayment.fundingSource);
+            assert.isString(response.transaction.localPayment.captureId);
+            assert.isString(response.transaction.localPayment.debugId);
+            assert.isNotNull(response.transaction.localPayment.transactionFeeAmount);
+            assert.isString(response.transaction.localPayment.transactionFeeCurrencyIsoCode);
+
+            done();
+          });
+        })
+      );
+
+      it('returns relevant local payment transaction details for a refund', done =>
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.LocalPayment,
+            amount: '100.00',
+            options: {
+              submitForSettlement: true
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            specHelper.defaultGateway.transaction.refund(response.transaction.id, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+
+              assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.LocalPayment);
+              assert.isString(response.transaction.localPayment.payerId);
+              assert.isString(response.transaction.localPayment.paymentId);
+              assert.isString(response.transaction.localPayment.fundingSource);
+              assert.isString(response.transaction.localPayment.refundId);
+              assert.isString(response.transaction.localPayment.debugId);
+              assert.isNotNull(response.transaction.localPayment.refundFromTransactionFeeAmount);
+              assert.isString(response.transaction.localPayment.refundFromTransactionFeeCurrencyIsoCode);
+            });
 
             done();
           });
@@ -3214,7 +3251,7 @@ describe('TransactionGateway', function () {
 
     it('handles lodging industry data', function (done) {
       let transactionParams = {
-        amount: '10.0',
+        amount: '1000.00',
         creditCard: {
           number: '5105105105105100',
           expirationDate: '05/16'
@@ -3224,8 +3261,23 @@ describe('TransactionGateway', function () {
           data: {
             folioNumber: 'aaa',
             checkInDate: '2014-07-07',
-            checkOutDate: '2014-08-08',
-            roomRate: '239.00'
+            checkOutDate: '2014-07-11',
+            roomRate: '170.00',
+            roomTax: '30.00',
+            noShow: false,
+            advancedDeposit: false,
+            fireSafe: true,
+            propertyPhone: '1112223345',
+            additionalCharges: [
+              {
+                kind: Transaction.AdditionalCharge.Telephone,
+                amount: '50.00'
+              },
+              {
+                kind: Transaction.AdditionalCharge.Other,
+                amount: '150.00'
+              }
+            ]
           }
         }
       };
@@ -3250,7 +3302,13 @@ describe('TransactionGateway', function () {
             folioNumber: 'aaa',
             checkInDate: '2014-07-07',
             checkOutDate: '2014-06-06',
-            roomRate: '239.00'
+            roomRate: 'abcdef',
+            additionalCharges: [
+              {
+                kind: 'unknown',
+                amount: '20.00'
+              }
+            ]
           }
         }
       };
@@ -3260,6 +3318,14 @@ describe('TransactionGateway', function () {
         assert.equal(
           response.errors.for('transaction').for('industry').on('checkOutDate')[0].code,
           ValidationErrorCodes.Transaction.IndustryData.Lodging.CheckOutDateMustFollowCheckInDate
+        );
+        assert.equal(
+          response.errors.for('transaction').for('industry').on('roomRate')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.Lodging.RoomRateFormatIsInvalid
+        );
+        assert.equal(
+          response.errors.for('transaction').for('industry').for('additionalCharges').for('index0').on('kind')[0].code,
+          ValidationErrorCodes.Transaction.IndustryData.AdditionalCharge.KindIsInvalid
         );
 
         done();
@@ -4165,7 +4231,12 @@ describe('TransactionGateway', function () {
           threeDSecurePassThru: {
             eciFlag: '02',
             cavv: 'some_cavv',
-            xid: 'some_xid'
+            xid: 'some_xid',
+            threeDSecureVersion: '1.0.2',
+            authenticationResponse: 'Y',
+            directoryResponse: 'Y',
+            cavvAlgorithm: '2',
+            dsTransactionId: 'some_ds_transaction_id'
           }
         };
 
@@ -4275,6 +4346,117 @@ describe('TransactionGateway', function () {
           assert.equal(
             response.errors.for('transaction').for('threeDSecurePassThru').on('eciFlag')[0].code,
             ValidationErrorCodes.Transaction.ThreeDSecureEciFlagIsInvalid
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru three_d_secure_version is invalid', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '06',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            threeDSecureVersion: 'invalid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('threeDSecureVersion')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureThreeDSecureVersionIsInvalid
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru authentication_response is invalid', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.adyenMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '06',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            authenticationResponse: 'invalid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.isNotEmpty(response.errors.for('transaction').for('threeDSecurePassThru').on('authenticationResponse'), 'Response should contain error on authenticationResponse');
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('authenticationResponse')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureAuthenticationResponseIsInvalid
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru directory_response is invalid', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.adyenMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '06',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            directoryResponse: 'invalid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.isNotEmpty(response.errors.for('transaction').for('threeDSecurePassThru').on('directoryResponse'), 'Response should contain error on directoryResponse');
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('directoryResponse')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureDirectoryResponseIsInvalid
+          );
+
+          done();
+        });
+      });
+
+      it('returns an error for transaction when the threeDSecurePassThru cavv_algorithm is invalid', function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.adyenMerchantAccountId,
+          amount: '5.00',
+          creditCard: {
+            number: '5105105105105100',
+            expirationDate: '05/2009'
+          },
+          threeDSecurePassThru: {
+            eciFlag: '06',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            cavvAlgorithm: 'invalid'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.isNotEmpty(response.errors.for('transaction').for('threeDSecurePassThru').on('cavvAlgorithm'), 'Response should contain error on cavvAlgorithm');
+          assert.equal(
+            response.errors.for('transaction').for('threeDSecurePassThru').on('cavvAlgorithm')[0].code,
+            ValidationErrorCodes.Transaction.ThreeDSecureCavvAlgorithmIsInvalid
           );
 
           done();

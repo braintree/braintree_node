@@ -1,3 +1,20 @@
+## 2.18.0
+* Add `captureId` field to localPayment
+* Add `refundId` field to localPayment
+* Add `debugId` field to localPayment
+* Add `transactionFeeAmount` field to localPayment
+* Add `transactionFeeCurrencyIsoCode` field to localPayment
+* Add `refundFromTransactionFeeAmount` field to localPayment
+* Add `refundFromTransactionFeeCurrencyIsoCode` field to localPayment
+* Add `threeDSecureVersion`, `authenticationResponse`, `directoryResponse`, `cavvAlgorithm` and `dsTransactionId` to 3DS pass thru fields
+* Add `payerInfo` field to paymentMethodNonce
+* Add `roomTax` support on transaction sale
+* Add `noShow` support on transaction sale
+* Add `advancedDeposit` support on transaction sale
+* Add `fireSafe` support on transaction sale
+* Add `propertyPhone` support on transaction sale
+* Add `additionalCharges` support on transaction sale
+
 ## 2.17.0
 * Update @braintree/wrap-promise to v2.0.0
   - Errors thrown inside developer provided callback functions will log in the console instead of killing the node process [wrap-promise#4](https://github.com/braintree/wrap-promise/issues/4)
