@@ -1,4 +1,4 @@
-## Unreleased
+## 2.18.0
 * Add `captureId` field to localPayment
 * Add `refundId` field to localPayment
 * Add `debugId` field to localPayment
