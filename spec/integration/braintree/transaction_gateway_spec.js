@@ -2126,6 +2126,43 @@ describe('TransactionGateway', function () {
       });
     });
 
+    context('with paypal here', function () {
+      it('sets PayPalHere attributes on the transaction for auth captures', done =>
+        specHelper.defaultGateway.transaction.find('paypal_here_auth_capture_id', function (err, transaction) {
+          assert.equal(transaction.paymentInstrumentType, PaymentInstrumentTypes.PayPalHere);
+
+          assert.isNotNull(transaction.paypalHereDetails);
+          assert.isNotNull(transaction.paypalHereDetails.authorizationId);
+          assert.isNotNull(transaction.paypalHereDetails.captureId);
+          assert.isNotNull(transaction.paypalHereDetails.invoiceId);
+          assert.isNotNull(transaction.paypalHereDetails.last4);
+          assert.isNotNull(transaction.paypalHereDetails.paymentType);
+          assert.isNotNull(transaction.paypalHereDetails.transactionFeeAmount);
+          assert.isNotNull(transaction.paypalHereDetails.transactionFeeCurrencyIsoCode);
+          assert.isNotNull(transaction.paypalHereDetails.transactionInitiationDate);
+          assert.isNotNull(transaction.paypalHereDetails.transactionUpdatedDate);
+
+          done();
+        })
+      );
+      it('sets PayPalHere attributes on the transaciton for sales', done =>
+        specHelper.defaultGateway.transaction.find('paypal_here_sale_id', function (err, transaction) {
+          assert.isNotNull(transaction.paypalhereDetails);
+          assert.isNotNull(transaction.paypalHereDetails.paymentId);
+
+          done();
+        })
+      );
+      it('sets PayPayHere attributes on the transaction for refunds', done =>
+        specHelper.defaultGateway.transaction.find('paypal_here_refund_id', function (err, transaction) {
+          assert.isNotNull(transaction.paypalHereDetails);
+          assert.isNotNull(transaction.paypalHereDetails.refundId);
+
+          done();
+        })
+      );
+    });
+
     context('with apple pay', () =>
       it('returns ApplePayCard for payment_instrument', done =>
         specHelper.defaultGateway.customer.create({}, function () {

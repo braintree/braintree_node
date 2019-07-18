@@ -1,5 +1,6 @@
 ## Unreleased
 * Add `PostalCodeIsRequiredForCardBrandAndProcessor` to validation errors
+* Add `PayPalHereDetails` to Transaction 
 
 ## 2.18.0
 * Add `captureId` field to localPayment
