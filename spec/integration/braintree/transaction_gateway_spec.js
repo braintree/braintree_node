@@ -1861,6 +1861,32 @@ describe('TransactionGateway', function () {
       });
     });
 
+    context('network response code/text', function () {
+      it('returns network response code/text', function (done) {
+        let transactionParams = {
+          amount: '5.00',
+          creditCard: {
+            number: '4111111111111111',
+            expirationDate: '05/12'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, 'sale');
+          assert.equal(response.transaction.amount, '5.00');
+          assert.equal(response.transaction.processorResponseCode, '1000');
+          assert.equal(response.transaction.processorResponseType, 'approved');
+          assert.exists(response.transaction.authorizationExpiresAt);
+          assert.equal(response.transaction.networkResponseCode, 'XX');
+          assert.equal(response.transaction.networkResponseText, 'sample network response text');
+
+          done();
+        });
+      });
+    });
+
     context('network transaction id', function () {
       it('support visa', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
