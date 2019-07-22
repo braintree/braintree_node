@@ -79,6 +79,7 @@ describe('PaymentMethodNonceGateway', function () {
           assert.equal(info.xid, 'test_xid');
           assert.equal(info.eciFlag, 'test_eci');
           assert.equal(info.threeDSecureVersion, '1.0.2');
+          assert.isNull(info.dsTransactionId);
 
           assert.equal(paymentMethodNonce.details.bin, '411111');
 
