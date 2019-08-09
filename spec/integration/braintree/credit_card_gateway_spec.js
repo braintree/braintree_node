@@ -1,6 +1,7 @@
 'use strict';
 
 let braintree = specHelper.braintree;
+let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
 let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
 let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
 let CreditCardDefaults = require('../../../lib/braintree/test/credit_card_defaults').CreditCardDefaults;
@@ -81,6 +82,37 @@ describe('CreditCardGateway', function () {
           assert.isDefined(response.creditCard.verification.riskData.fraudServiceProvider);
           assert.isDefined(response.creditCard.verification.riskData.id);
 
+          done();
+        });
+      });
+    });
+
+    it('creates from a three d secure nonce', function (done) {
+      specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
+        customerId = response.customer.id;
+        let creditCardParams = {
+          customerId: customerId,
+          paymentMethodNonce: Nonces.ThreeDSecureVisaFullAuthentication,
+          options: {
+            verifyCard: 'true'
+          }
+        };
+
+        specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let info = response.creditCard.verification.threeDSecureInfo;
+
+          assert.isTrue(info.liabilityShifted);
+          assert.isTrue(info.liabilityShiftPossible);
+          assert.equal(info.enrolled, 'Y');
+          assert.equal(info.status, 'authenticate_successful');
+          assert.equal(info.cavv, 'cavv_value');
+          assert.equal(info.xid, 'xid_value');
+          assert.equal(info.eciFlag, '05');
+          assert.equal(info.threeDSecureVersion, '1.0.2');
+          assert.isNull(info.dsTransactionId);
           done();
         });
       });
