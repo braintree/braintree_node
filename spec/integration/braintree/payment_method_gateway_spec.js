@@ -32,6 +32,38 @@ describe('PaymentMethodGateway', function () {
       })
     );
 
+    it('works with a three d secure payment method nonce', done =>
+      specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
+        customerId = response.customer.id;
+
+        let paymentMethodParams = {
+          customerId,
+          paymentMethodNonce: Nonces.ThreeDSecureVisaFullAuthentication,
+          options: {
+            verifyCard: 'true'
+          }
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let info = response.paymentMethod.verification.threeDSecureInfo;
+
+          assert.isTrue(info.liabilityShifted);
+          assert.isTrue(info.liabilityShiftPossible);
+          assert.equal(info.enrolled, 'Y');
+          assert.equal(info.status, 'authenticate_successful');
+          assert.equal(info.cavv, 'cavv_value');
+          assert.equal(info.xid, 'xid_value');
+          assert.equal(info.eciFlag, '05');
+          assert.equal(info.threeDSecureVersion, '1.0.2');
+          assert.isNull(info.dsTransactionId);
+          done();
+        });
+      })
+    );
+
     context('Apple Pay', () =>
       it('vaults an Apple Pay card from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {

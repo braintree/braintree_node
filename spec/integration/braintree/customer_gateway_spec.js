@@ -167,6 +167,36 @@ describe('CustomerGateway', function () {
         });
       });
 
+      it('creates a customer with a Three D Seure payment method nonce', function (done) {
+        let customerParams =
+          {
+            paymentMethodNonce: Nonces.ThreeDSecureVisaFullAuthentication,
+            creditCard: {
+              options: {
+                verifyCard: true
+              }
+            }
+          };
+
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let info = response.customer.paymentMethods[0].verification.threeDSecureInfo;
+
+          assert.isTrue(info.liabilityShifted);
+          assert.isTrue(info.liabilityShiftPossible);
+          assert.equal(info.enrolled, 'Y');
+          assert.equal(info.status, 'authenticate_successful');
+          assert.equal(info.cavv, 'cavv_value');
+          assert.equal(info.xid, 'xid_value');
+          assert.equal(info.eciFlag, '05');
+          assert.equal(info.threeDSecureVersion, '1.0.2');
+          assert.isNull(info.dsTransactionId);
+          done();
+        });
+      });
+
       it('creates a customer with an Apple Pay payment method nonce', function (done) {
         let customerParams =
           {paymentMethodNonce: Nonces.ApplePayAmEx};

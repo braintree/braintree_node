@@ -1,3 +1,10 @@
+## 2.19.0
+* Add `PostalCodeIsRequiredForCardBrandAndProcessor` to validation errors
+* Add `PayPalHereDetails` to Transaction
+* Add `xid`, `cavv`, `eciFlag`, `dsTransactionId`, and `threeDSecureVersion` to `ThreeDSecureInfo`
+* Add `ThreeDSecureInfo` to `CreditCardVerification`
+* Add `GraphQLClient` to `BraintreeGateway` class
+
 ## 2.18.0
 * Add `captureId` field to localPayment
 * Add `refundId` field to localPayment
