@@ -1,6 +1,3 @@
-## unreleased
-* rename `forwardedComments` to `processorComments`
-
 ## 2.19.0
 * Add `PostalCodeIsRequiredForCardBrandAndProcessor` to validation errors
 * Add `PayPalHereDetails` to Transaction
