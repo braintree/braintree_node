@@ -12,7 +12,7 @@ describe('Dispute', function () {
     currencyIsoCode: 'USD',
     dateOpened: '2013-04-01',
     dateWon: '2013-04-02',
-    forwardedComments: 'Forwarded comments',
+    processorComments: 'Forwarded comments',
     id: '123456',
     kind: 'chargeback',
     merchantAccountId: 'abc123',
@@ -108,7 +108,7 @@ describe('Dispute', function () {
       assert.equal(0.00, dispute.amountWon);
       assert.equal('CB123456', dispute.caseNumber);
       assert.equal('2013-04-10', dispute.createdAt);
-      assert.equal('Forwarded comments', dispute.forwardedComments);
+      assert.equal('Forwarded comments', dispute.processorComments);
       assert.equal('abc123', dispute.merchantAccountId);
       assert.equal('original_dispute_id', dispute.originalDisputeId);
       assert.equal('83', dispute.reasonCode);
