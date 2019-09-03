@@ -1,3 +1,6 @@
+## 2.19.1
+* Update dependencies in package-lock
+
 ## 2.19.0
 * Add `PostalCodeIsRequiredForCardBrandAndProcessor` to validation errors
 * Add `PayPalHereDetails` to Transaction
