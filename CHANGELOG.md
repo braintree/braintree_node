@@ -1,3 +1,6 @@
+## Unreleased
+* Add `TokenIssuance` gateway rejection reason
+
 ## 2.19.1
 * Update dependencies in package-lock
 
