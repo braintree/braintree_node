@@ -2318,6 +2318,21 @@ describe('TransactionGateway', function () {
           });
         });
       });
+
+      it('handles token issuance rejection', function (done) {
+        let transactionParams = {
+          amount: '10.0',
+          paymentMethodNonce: Nonces.VenmoAccountTokenIssuanceError,
+          merchantAccountId: specHelper.fakeVenmoAccountMerchantAccountId
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
+          assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.TokenIssuance);
+          done();
+        });
+      });
     });
 
     context('Coinbase', () =>
