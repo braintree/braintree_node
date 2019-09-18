@@ -1907,12 +1907,31 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('does not support non-visa', function (done) {
+      it('supports mastercard', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             amount: '10.00',
             creditCard: {
               number: '5555555555554444',
+              expirationDate: '05/12'
+            }
+          };
+
+          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.isNotNull(response.transaction.networkTransactionId);
+            done();
+          });
+        });
+      });
+
+      it('does not support amex', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: '10.00',
+            creditCard: {
+              number: '371260714673002',
               expirationDate: '05/12'
             }
           };
@@ -1950,12 +1969,12 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('supports status with non-visa', function (done) {
+      it('supports status with amex', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             amount: '10.00',
             creditCard: {
-              number: '5555555555554444',
+              number: '371260714673002',
               expirationDate: '05/12'
             },
             externalVault: {
@@ -1977,7 +1996,7 @@ describe('TransactionGateway', function () {
           let transactionParams = {
             amount: '10.00',
             creditCard: {
-              number: '5555555555554444',
+              number: '371260714673002',
               expirationDate: '05/12'
             },
             externalVault: {
@@ -2105,35 +2124,12 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('handles validation error previous network transaction id is invalid', function (done) {
-        specHelper.defaultGateway.customer.create({}, function () {
-          let transactionParams = {
-            amount: '10.00',
-            creditCard: {
-              number: '4111111111111111',
-              expirationDate: '05/12'
-            },
-            externalVault: {
-              status: Transaction.ExternalVault.WillVault,
-              previousNetworkTransactionId: 'bad value'
-            }
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isFalse(response.success);
-            assert.equal(response.errors.for('transaction').for('externalVault').on('previousNetworkTransactionId')[0].code, ValidationErrorCodes.Transaction.ExternalVault.PreviousNetworkTransactionIdIsInvalid);
-            done();
-          });
-        });
-      });
-
       it('handles validation error card type is invalid', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             amount: '10.00',
             creditCard: {
-              number: '5555555555554444',
+              number: '371260714673002',
               expirationDate: '05/12'
             },
             externalVault: {
@@ -2316,6 +2312,21 @@ describe('TransactionGateway', function () {
 
             done();
           });
+        });
+      });
+
+      it('handles token issuance rejection', function (done) {
+        let transactionParams = {
+          amount: '10.0',
+          paymentMethodNonce: Nonces.VenmoAccountTokenIssuanceError,
+          merchantAccountId: specHelper.fakeVenmoAccountMerchantAccountId
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isFalse(response.success, 'response had no errors');
+          assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
+          assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.TokenIssuance);
+          done();
         });
       });
     });
