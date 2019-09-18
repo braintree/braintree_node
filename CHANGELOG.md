@@ -1,4 +1,4 @@
-## Unreleased
+## 2.20.0
 * Add Venmo `TokenIssuance` gateway rejection reason
 
 ## 2.19.0
