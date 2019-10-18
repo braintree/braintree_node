@@ -1,3 +1,6 @@
+## Unreleased
+* Add `ProcessorDoesNotSupportMotoForCardType` to validation errors
+
 ## 2.20.0
 * Add Venmo `TokenIssuance` gateway rejection reason
 
