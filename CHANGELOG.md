@@ -1,4 +1,5 @@
 ## Unreleased
+* Add `AmountNotSupportedByProcessor` validation error to Transaction
 * Add `ProcessorDoesNotSupportMotoForCardType` to validation errors
 
 ## 2.20.0
