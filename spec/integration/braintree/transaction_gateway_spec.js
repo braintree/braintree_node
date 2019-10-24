@@ -166,6 +166,26 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('handles error AmountNotSupportedByProcessor', function (done) {
+      let transactionParams = {
+        merchantAccountId: 'hiper_brl',
+        amount: '0.20',
+        creditCard: {
+          number: CreditCardNumbers.CardTypeIndicators.Hiper,
+          expirationDate: '10/20',
+          cvv: '737'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(response.errors.for('transaction').on('amount')[0].code, ValidationErrorCodes.Transaction.AmountNotSupportedByProcessor);
+
+        done();
+      });
+    });
+
     it('charges a card using an access token', function (done) {
       let oauthGateway = new braintree.BraintreeGateway({
         clientId: 'client_id$development$integration_client_id',

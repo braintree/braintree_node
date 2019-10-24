@@ -1,3 +1,8 @@
+## 2.21.0
+* Add `AmountNotSupportedByProcessor` validation error to Transaction
+* Add `ProcessorDoesNotSupportMotoForCardType` to validation errors
+* Fix issue where `SettlementBatchSummary` did not include some custom fields
+
 ## 2.20.0
 * Add Venmo `TokenIssuance` gateway rejection reason
 
