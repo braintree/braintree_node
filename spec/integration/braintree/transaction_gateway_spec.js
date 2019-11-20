@@ -2241,6 +2241,7 @@ describe('TransactionGateway', function () {
             assert.isString(response.transaction.androidPayCard.googleTransactionId);
             assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover);
             assert.equal(response.transaction.androidPayCard.last4, '1117');
+            assert.isFalse(response.transaction.androidPayCard.isNetworkTokenized);
 
             done();
           });
@@ -2263,6 +2264,7 @@ describe('TransactionGateway', function () {
             assert.isString(response.transaction.androidPayCard.googleTransactionId);
             assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.MasterCard);
             assert.equal(response.transaction.androidPayCard.last4, '4444');
+            assert.isTrue(response.transaction.androidPayCard.isNetworkTokenized);
 
             done();
           });

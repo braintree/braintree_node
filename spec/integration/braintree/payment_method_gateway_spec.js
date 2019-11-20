@@ -110,6 +110,7 @@ describe('PaymentMethodGateway', function () {
             assert.isString(response.paymentMethod.expirationYear);
             assert.isTrue(response.paymentMethod.default);
             assert.include(response.paymentMethod.imageUrl, 'android_pay');
+            assert.isFalse(response.paymentMethod.isNetworkTokenized);
             assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.Discover);
             assert.equal(response.paymentMethod.sourceCardLast4, '1111');
             assert.equal(response.paymentMethod.sourceDescription, 'Discover 1111');
@@ -140,6 +141,7 @@ describe('PaymentMethodGateway', function () {
             assert.isString(response.paymentMethod.expirationYear);
             assert.isTrue(response.paymentMethod.default);
             assert.include(response.paymentMethod.imageUrl, 'android_pay');
+            assert.isTrue(response.paymentMethod.isNetworkTokenized);
             assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.MasterCard);
             assert.equal(response.paymentMethod.sourceCardLast4, '4444');
             assert.equal(response.paymentMethod.sourceDescription, 'MasterCard 4444');
