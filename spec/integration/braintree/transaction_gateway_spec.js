@@ -4574,6 +4574,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.find(response.transaction.id, function (err, transaction) {
           assert.equal(transaction.amount, '5.00');
+          assert.isDefined(transaction.graphQLId);
 
           done();
         })

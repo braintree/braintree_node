@@ -496,6 +496,7 @@ describe('DisputeGateway', () => {
         assert.equal('open_dispute', dispute.id);
         assert.equal(Dispute.Status.Open, dispute.status);
         assert.equal('open_disputed_transaction', dispute.transaction.id);
+        assert.isDefined(dispute.graphQLId);
       });
     });
 

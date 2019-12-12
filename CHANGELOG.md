@@ -1,3 +1,6 @@
+## unreleased
+* Add GraphQL ID to `CreditCardVerification`, `Customer`, `Dispute`, and `Transaction`
+
 ## 2.21.0
 * Add `AmountNotSupportedByProcessor` validation error to Transaction
 * Add `ProcessorDoesNotSupportMotoForCardType` to validation errors
