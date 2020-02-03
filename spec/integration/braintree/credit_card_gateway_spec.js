@@ -674,7 +674,7 @@ describe('CreditCardGateway', function () {
       let customerParams = {
         creditCard: {
           number: '5105105105105100',
-          expirationDate: '01/2015'
+          expirationDate: `01/${new Date().getFullYear() - 3}`
         }
       };
 
@@ -692,18 +692,19 @@ describe('CreditCardGateway', function () {
 
   describe('expiringBetween', () =>
     it('returns card expiring between the given dates', function (done) {
+      const year = new Date().getFullYear() - 3;
       let customerParams = {
         creditCard: {
           number: '5105105105105100',
-          expirationDate: '05/2016'
+          expirationDate: `05/${year}`
         }
       };
 
       specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         let testCard = response.customer.creditCards[0];
 
-        let before = new Date('2016-04-31');
-        let after = new Date('2016-10-01');
+        let before = new Date(`${year}-04-31`);
+        let after = new Date(`${year}-10-01`);
 
         specHelper.defaultGateway.creditCard.expiringBetween(before, after, function (err, result) {
           assert.isNull(err);
