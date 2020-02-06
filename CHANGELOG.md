@@ -1,4 +1,5 @@
 ## unreleased
+* Add `RefundAuthHardDeclined` and `RefundAuthSoftDeclined` to validation errors
 * Add GraphQL ID to `CreditCardVerification`, `Customer`, `Dispute`, and `Transaction`
 
 ## 2.21.0

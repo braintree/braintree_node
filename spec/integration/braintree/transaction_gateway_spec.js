@@ -4836,6 +4836,56 @@ describe('TransactionGateway', function () {
         })
       );
     });
+
+    it('handles refunds that soft decline', function (done) {
+      let transactionParams = {
+        amount: '9000.00',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, result) =>
+        specHelper.defaultGateway.testing.settle(result.transaction.id, () =>
+          specHelper.defaultGateway.transaction.refund(result.transaction.id, '2046.00', function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success, 'response had no errors');
+            assert.equal(response.errors.for('transaction').on('base')[0].code, '915201');
+
+            done();
+          })
+        )
+      );
+    });
+
+    it('handles refunds that hard decline', function (done) {
+      let transactionParams = {
+        amount: '9000.00',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, result) =>
+        specHelper.defaultGateway.testing.settle(result.transaction.id, () =>
+          specHelper.defaultGateway.transaction.refund(result.transaction.id, '2009.00', function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success, 'response had no errors');
+            assert.equal(response.errors.for('transaction').on('base')[0].code, '915200');
+
+            done();
+          })
+        )
+      );
+    });
   });
 
   describe('submitForSettlement', function () {
