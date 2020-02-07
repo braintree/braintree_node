@@ -1,6 +1,5 @@
 'use strict';
 
-let braintree = specHelper.braintree;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let Transaction = require('../../../lib/braintree/transaction').Transaction;
 let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
@@ -111,18 +110,11 @@ describe('TransactionGateway', function () {
   });
 
   describe('compliant merchant', function () {
-    let config = {
-      environment: braintree.Environment.Development,
-      merchantId: 'integration2_merchant_id',
-      publicKey: 'integration2_public_key',
-      privateKey: 'integration2_private_key'
-    };
-
-    let gateway = new braintree.BraintreeGateway(config);
+    let gateway = specHelper.merchant2Gateway;
 
     context('plaid verified', function () {
       it('transacts successfully', function (done) {
-        specHelper.generatePlaidUsBankAccountNonce(function (nonce) {
+        specHelper.generatePlaidUsBankAccountNonce(gateway, function (nonce) {
           let transactionParams = {
             merchantAccountId: MerchantAccountTest.AnotherUsBankMerchantAccount,
             amount: '10.00',
@@ -153,7 +145,7 @@ describe('TransactionGateway', function () {
 
     context('not plaid verified', () => {
       it('rejects transaction on unverified nonce', function (done) {
-        specHelper.generateValidUsBankAccountNonce('567891234', function (nonce) {
+        specHelper.generateValidUsBankAccountNonce('567891234', gateway, function (nonce) {
           let transactionParams = {
             merchantAccountId: MerchantAccountTest.AnotherUsBankMerchantAccount,
             amount: '10.00',
@@ -177,7 +169,7 @@ describe('TransactionGateway', function () {
       });
 
       it('rejects transaction on unverified token', done => {
-        specHelper.generateValidUsBankAccountNonce('567891234', function (nonce) {
+        specHelper.generateValidUsBankAccountNonce('567891234', gateway, function (nonce) {
           gateway.customer.create({}, (err, response) => {
             let customerId = response.customer.id;
 
