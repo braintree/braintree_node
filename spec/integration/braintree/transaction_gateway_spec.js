@@ -5001,6 +5001,32 @@ describe('TransactionGateway', function () {
       );
     });
 
+    it('allows submitting with level 2 parameters', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) => {
+        let submitForSettlementParams = {
+          purchaseOrderNumber: 'ABC123',
+          taxAmount: '1.34',
+          taxExempt: true
+        };
+
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+
+          done();
+        });
+      });
+    });
+
     it('allows submitting with a descriptor', function (done) {
       let transactionParams = {
         amount: '5.00',
