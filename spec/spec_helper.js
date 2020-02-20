@@ -33,6 +33,14 @@ let defaultConfig = {
 };
 let defaultGateway = new braintree.BraintreeGateway(defaultConfig);
 
+let merchant2Config = {
+  environment: braintree.Environment.Development,
+  merchantId: 'integration2_merchant_id',
+  publicKey: 'integration2_public_key',
+  privateKey: 'integration2_private_key'
+};
+let merchant2Gateway = new braintree.BraintreeGateway(merchant2Config);
+
 let advancedFraudConfig = {
   environment: braintree.Environment.Development,
   merchantId: 'advanced_fraud_integration_merchant_id',
@@ -203,8 +211,13 @@ let generateNonceForNewPaymentMethod = function (paymentMethodParams, customerId
   });
 };
 
-let generateValidUsBankAccountNonce = function (accountNumber, callback) {
-  specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+let generateValidUsBankAccountNonce = function (accountNumber, gw, callback) {
+  if (typeof gw === 'function') {
+    callback = gw;
+    gw = null;
+  }
+  gw = gw || specHelper.defaultGateway;
+  gw.clientToken.generate({}, function (err, result) {
     let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
     let url = uri.parse(clientToken.braintree_api.url);
     let token = clientToken.braintree_api.access_token;
@@ -270,8 +283,13 @@ let generateValidUsBankAccountNonce = function (accountNumber, callback) {
   });
 };
 
-let generatePlaidUsBankAccountNonce = callback =>
-  specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
+let generatePlaidUsBankAccountNonce = function (gw, callback) {
+  if (typeof gw === 'function') {
+    callback = gw;
+    gw = null;
+  }
+  gw = gw || specHelper.defaultGateway;
+  gw.clientToken.generate({}, function (err, result) {
     let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
     let url = uri.parse(clientToken.braintree_api.url);
     let token = clientToken.braintree_api.access_token;
@@ -334,6 +352,7 @@ let generatePlaidUsBankAccountNonce = callback =>
 
     return req.end();
   });
+};
 
 let generateInvalidUsBankAccountNonce = function () {
   let nonceCharacters = 'bcdfghjkmnpqrstvwxyz23456789'.split('');
@@ -536,6 +555,7 @@ global.specHelper = {
   settlementDate,
   defaultConfig,
   defaultGateway,
+  merchant2Gateway,
   doesNotInclude,
   escrowTransaction,
   makePastDue,

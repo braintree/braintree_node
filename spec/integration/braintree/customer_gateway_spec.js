@@ -784,6 +784,7 @@ describe('CustomerGateway', function () {
           assert.isNull(err);
           assert.equal(customer.firstName, 'John');
           assert.equal(customer.lastName, 'Smith');
+          assert.isDefined(customer.graphQLId);
           let billingAddress = customer.creditCards[0].billingAddress;
 
           assert.equal(billingAddress.streetAddress, '123 E Fake St');

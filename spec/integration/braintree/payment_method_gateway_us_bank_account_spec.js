@@ -1,6 +1,5 @@
 'use strict';
 
-let braintree = specHelper.braintree;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let UsBankAccountVerification = require('../../../lib/braintree/us_bank_account_verification').UsBankAccountVerification;
 let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
@@ -66,21 +65,14 @@ describe('PaymentMethodGateway', function () {
   });
 
   describe('compliant merchant', function () {
-    let config = {
-      environment: braintree.Environment.Development,
-      merchantId: 'integration2_merchant_id',
-      publicKey: 'integration2_public_key',
-      privateKey: 'integration2_private_key'
-    };
-
-    let gateway = new braintree.BraintreeGateway(config);
+    let gateway = specHelper.merchant2Gateway;
 
     describe('create', function () {
       it('vaults an unverified bank account', function (done) {
         gateway.customer.create({}, function (err, response) {
           let customerId = response.customer.id;
 
-          specHelper.generateValidUsBankAccountNonce('567891234', function (nonce) {
+          specHelper.generateValidUsBankAccountNonce('567891234', gateway, function (nonce) {
             let paymentMethodParams = {
               customerId,
               paymentMethodNonce: nonce,
@@ -110,19 +102,12 @@ describe('PaymentMethodGateway', function () {
       });
 
       it('vaults an verified bank account', function (done) {
-        let config = {
-          environment: braintree.Environment.Development,
-          merchantId: 'integration2_merchant_id',
-          publicKey: 'integration2_public_key',
-          privateKey: 'integration2_private_key'
-        };
-
-        let gateway = new braintree.BraintreeGateway(config);
+        let gateway = specHelper.merchant2Gateway;
 
         gateway.customer.create({}, function (err, response) {
           let customerId = response.customer.id;
 
-          specHelper.generateValidUsBankAccountNonce('567891234', function (nonce) {
+          specHelper.generateValidUsBankAccountNonce('567891234', gateway, function (nonce) {
             let paymentMethodParams = {
               customerId,
               paymentMethodNonce: nonce,
@@ -155,19 +140,12 @@ describe('PaymentMethodGateway', function () {
       });
 
       it('rejects an invalid verification method', function (done) {
-        let config = {
-          environment: braintree.Environment.Development,
-          merchantId: 'integration2_merchant_id',
-          publicKey: 'integration2_public_key',
-          privateKey: 'integration2_private_key'
-        };
-
-        let gateway = new braintree.BraintreeGateway(config);
+        let gateway = specHelper.merchant2Gateway;
 
         gateway.customer.create({}, function (err, response) {
           let customerId = response.customer.id;
 
-          specHelper.generateValidUsBankAccountNonce('567891234', function (nonce) {
+          specHelper.generateValidUsBankAccountNonce('567891234', gateway, function (nonce) {
             let paymentMethodParams = {
               customerId,
               paymentMethodNonce: nonce,

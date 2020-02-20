@@ -110,6 +110,7 @@ describe('PaymentMethodGateway', function () {
             assert.isString(response.paymentMethod.expirationYear);
             assert.isTrue(response.paymentMethod.default);
             assert.include(response.paymentMethod.imageUrl, 'android_pay');
+            assert.isFalse(response.paymentMethod.isNetworkTokenized);
             assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.Discover);
             assert.equal(response.paymentMethod.sourceCardLast4, '1111');
             assert.equal(response.paymentMethod.sourceDescription, 'Discover 1111');
@@ -140,6 +141,7 @@ describe('PaymentMethodGateway', function () {
             assert.isString(response.paymentMethod.expirationYear);
             assert.isTrue(response.paymentMethod.default);
             assert.include(response.paymentMethod.imageUrl, 'android_pay');
+            assert.isTrue(response.paymentMethod.isNetworkTokenized);
             assert.equal(response.paymentMethod.sourceCardType, specHelper.braintree.CreditCard.CardType.MasterCard);
             assert.equal(response.paymentMethod.sourceCardLast4, '4444');
             assert.equal(response.paymentMethod.sourceDescription, 'MasterCard 4444');
@@ -1024,25 +1026,6 @@ describe('PaymentMethodGateway', function () {
           assert.isTrue(response.success);
           assert.isString(response.paymentMethod.customerId);
           assert.isString(response.paymentMethod.billingAgreementId);
-          done();
-        });
-      })
-    );
-
-    it('creates a paypal account from a paypal refresh token without upgrade', done =>
-      specHelper.defaultGateway.customer.create({}, function (err, response) {
-        customerId = response.customer.id;
-        let paypalAccountParams = {
-          customerId,
-          paypalRefreshToken: 'PAYPAL_REFRESH_TOKEN',
-          paypalVaultWithoutUpgrade: true
-        };
-
-        specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.isString(response.paymentMethod.customerId);
-          assert.isNull(response.paymentMethod.billingAgreementId);
           done();
         });
       })

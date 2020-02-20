@@ -35,7 +35,7 @@ describe('DisputeSearch', () => {
         ]);
       }, function (err, response) {
         assert.isNull(err);
-        assert.equal(2, response.length);
+        assert(response.length >= 2);
 
         done();
       });
@@ -153,7 +153,7 @@ describe('DisputeSearch', () => {
       stream.on('data', dispute => disputes.push(dispute));
 
       stream.on('end', () => {
-        assert.equal(2, disputes.length);
+        assert(disputes.length >= 2);
 
         done();
       });

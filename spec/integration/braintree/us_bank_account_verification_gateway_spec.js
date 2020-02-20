@@ -8,14 +8,7 @@ let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account'
 
 describe('UsBankAccountVerificationGateway', function () {
   describe('confirmMicroTransferAmounts', function () {
-    let config = {
-      environment: braintree.Environment.Development,
-      merchantId: 'integration2_merchant_id',
-      publicKey: 'integration2_public_key',
-      privateKey: 'integration2_private_key'
-    };
-
-    let gateway = new braintree.BraintreeGateway(config);
+    let gateway = specHelper.merchant2Gateway;
 
     it('successfully confirms settled micro deposit amounts', function (done) {
       let customerParams = {};
@@ -23,7 +16,7 @@ describe('UsBankAccountVerificationGateway', function () {
       gateway.customer.create(customerParams, (err, response) => {
         let customerId = response.customer.id;
 
-        specHelper.generateValidUsBankAccountNonce('1000000000', function (nonce) {
+        specHelper.generateValidUsBankAccountNonce('1000000000', gateway, function (nonce) {
           let paymentMethodParams = {
             customerId,
             paymentMethodNonce: nonce,
@@ -66,7 +59,7 @@ describe('UsBankAccountVerificationGateway', function () {
       gateway.customer.create(customerParams, (err, response) => {
         let customerId = response.customer.id;
 
-        specHelper.generateValidUsBankAccountNonce('1000000001', function (nonce) {
+        specHelper.generateValidUsBankAccountNonce('1000000001', gateway, function (nonce) {
           let paymentMethodParams = {
             customerId,
             paymentMethodNonce: nonce,
@@ -109,7 +102,7 @@ describe('UsBankAccountVerificationGateway', function () {
       gateway.customer.create(customerParams, (err, response) => {
         let customerId = response.customer.id;
 
-        specHelper.generateValidUsBankAccountNonce('1000000000', function (nonce) {
+        specHelper.generateValidUsBankAccountNonce('1000000000', gateway, function (nonce) {
           let paymentMethodParams = {
             customerId,
             paymentMethodNonce: nonce,
@@ -152,7 +145,7 @@ describe('UsBankAccountVerificationGateway', function () {
       gateway.customer.create(customerParams, (err, response) => {
         let customerId = response.customer.id;
 
-        specHelper.generateValidUsBankAccountNonce('1000000000', function (nonce) {
+        specHelper.generateValidUsBankAccountNonce('1000000000', gateway, function (nonce) {
           let paymentMethodParams = {
             customerId,
             paymentMethodNonce: nonce,

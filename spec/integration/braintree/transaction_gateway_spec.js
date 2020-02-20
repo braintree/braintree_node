@@ -2241,6 +2241,7 @@ describe('TransactionGateway', function () {
             assert.isString(response.transaction.androidPayCard.googleTransactionId);
             assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.Discover);
             assert.equal(response.transaction.androidPayCard.last4, '1117');
+            assert.isFalse(response.transaction.androidPayCard.isNetworkTokenized);
 
             done();
           });
@@ -2263,6 +2264,7 @@ describe('TransactionGateway', function () {
             assert.isString(response.transaction.androidPayCard.googleTransactionId);
             assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.MasterCard);
             assert.equal(response.transaction.androidPayCard.last4, '4444');
+            assert.isTrue(response.transaction.androidPayCard.isNetworkTokenized);
 
             done();
           });
@@ -4572,6 +4574,7 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
         specHelper.defaultGateway.transaction.find(response.transaction.id, function (err, transaction) {
           assert.equal(transaction.amount, '5.00');
+          assert.isDefined(transaction.graphQLId);
 
           done();
         })
@@ -4833,6 +4836,56 @@ describe('TransactionGateway', function () {
         })
       );
     });
+
+    it('handles refunds that soft decline', function (done) {
+      let transactionParams = {
+        amount: '9000.00',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, result) =>
+        specHelper.defaultGateway.testing.settle(result.transaction.id, () =>
+          specHelper.defaultGateway.transaction.refund(result.transaction.id, '2046.00', function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success, 'response had no errors');
+            assert.equal(response.errors.for('transaction').on('base')[0].code, '915201');
+
+            done();
+          })
+        )
+      );
+    });
+
+    it('handles refunds that hard decline', function (done) {
+      let transactionParams = {
+        amount: '9000.00',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/12'
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, result) =>
+        specHelper.defaultGateway.testing.settle(result.transaction.id, () =>
+          specHelper.defaultGateway.transaction.refund(result.transaction.id, '2009.00', function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success, 'response had no errors');
+            assert.equal(response.errors.for('transaction').on('base')[0].code, '915200');
+
+            done();
+          })
+        )
+      );
+    });
   });
 
   describe('submitForSettlement', function () {
@@ -4946,6 +4999,68 @@ describe('TransactionGateway', function () {
           done();
         })
       );
+    });
+
+    it('allows submitting with level 2 parameters', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) => {
+        let submitForSettlementParams = {
+          purchaseOrderNumber: 'ABC123',
+          taxAmount: '1.34',
+          taxExempt: true
+        };
+
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+
+          done();
+        });
+      });
+    });
+
+    it('allows submitting with level 3 parameters', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) => {
+        let submitForSettlementParams = {
+          purchaseOrderNumber: 'ABC123',
+          discountAmount: '1.34',
+          shippingAmount: '2.11',
+          shipsFromPostalCode: '90210',
+          lineItems: [
+            {
+              quantity: '1.0232',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              totalAmount: '45.15'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+
+          done();
+        });
+      });
     });
 
     it('allows submitting with a descriptor', function (done) {

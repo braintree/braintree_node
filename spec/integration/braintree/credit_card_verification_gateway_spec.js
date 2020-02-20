@@ -22,6 +22,7 @@ describe('CreditCardVerificationGateway', function () {
         specHelper.defaultGateway.creditCardVerification.find(response.verification.id, function (err, verification) {
           assert.isNull(err);
           assert.equal(verification.creditCard.cardholderName, 'John Smith');
+          assert.isDefined(verification.graphQLId);
 
           done();
         })
