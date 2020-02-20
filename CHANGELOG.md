@@ -2,6 +2,7 @@
 * Add `RefundAuthHardDeclined` and `RefundAuthSoftDeclined` to validation errors
 * Add GraphQL ID to `CreditCardVerification`, `Customer`, `Dispute`, and `Transaction`
 * Add level 2 processing options `purchaseOrderNumber`, `taxAmount`, and `taxExempt` on transaction submitForSettlement
+* Add level 3 processing options `discountAmount`, `shippingAmount`, `shipsFromPostalCode`, and `lineItems` on transaction submitForSettlement
 
 ## 2.21.0
 * Add `AmountNotSupportedByProcessor` validation error to Transaction

@@ -5027,6 +5027,42 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('allows submitting with level 3 parameters', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) => {
+        let submitForSettlementParams = {
+          purchaseOrderNumber: 'ABC123',
+          discountAmount: '1.34',
+          shippingAmount: '2.11',
+          shipsFromPostalCode: '90210',
+          lineItems: [
+            {
+              quantity: '1.0232',
+              name: 'Name #1',
+              kind: 'debit',
+              unitAmount: '45.1232',
+              totalAmount: '45.15'
+            }
+          ]
+        };
+
+        specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.status, 'submitted_for_settlement');
+
+          done();
+        });
+      });
+    });
+
     it('allows submitting with a descriptor', function (done) {
       let transactionParams = {
         amount: '5.00',
