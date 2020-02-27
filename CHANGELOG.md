@@ -1,5 +1,7 @@
 ## unreleased
 * Add `threeDSecureAuthenticationId` support on transaction sale
+* Add ThreeDSecure test payment method nonces
+* Add test `AuthenticationId`s Unreleased
 
 ## 2.22.0
 * Add `RefundAuthHardDeclined` and `RefundAuthSoftDeclined` to validation errors
