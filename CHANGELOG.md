@@ -1,3 +1,6 @@
+## unreleased
+* Add `threeDSecureAuthenticationId` support on transaction sale
+
 ## 2.22.0
 * Add `RefundAuthHardDeclined` and `RefundAuthSoftDeclined` to validation errors
 * Add GraphQL ID to `CreditCardVerification`, `Customer`, `Dispute`, and `Transaction`
