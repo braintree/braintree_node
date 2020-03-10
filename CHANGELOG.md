@@ -3,6 +3,7 @@
 * Add ThreeDSecure test payment method nonces
 * Add test `AuthenticationId`s Unreleased
 * Add `DisputeAccepted`, `DisputeDisputed`, and `DisputeExpired` webhook constants
+* Add `Authentication Insight` support to payment method nonce create
 
 ## 2.22.0
 * Add `RefundAuthHardDeclined` and `RefundAuthSoftDeclined` to validation errors

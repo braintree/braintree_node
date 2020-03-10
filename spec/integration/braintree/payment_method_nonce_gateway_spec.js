@@ -4,6 +4,11 @@ let braintree = specHelper.braintree;
 
 describe('PaymentMethodNonceGateway', function () {
   let paymentMethodToken;
+  const INDIAN_PAYMENT_TOKEN = 'india_visa_credit';
+  const EUROPEAN_PAYMENT_TOKEN = 'european_visa_credit';
+  const INDIAN_MERCHANT_TOKEN = 'india_three_d_secure_merchant_account';
+  const EUROPEAN_MERCHANT_TOKEN = 'european_three_d_secure_merchant_account';
+  const AMOUNT_THRESHOLD_FOR_RBI = 2000;
 
   before(done =>
     specHelper.defaultGateway.customer.create({}, function (err, response) {
@@ -51,6 +56,94 @@ describe('PaymentMethodNonceGateway', function () {
         done();
       })
     );
+
+    describe('invalid params', function () {
+      it('raises an exception if the hash includes invalid params', function (done) {
+        let params = {
+          paymentMethodNonce: {
+            merchantAccountId: INDIAN_PAYMENT_TOKEN,
+            authenticationInsight: true,
+            invalidFooKey: 'foo'
+          }
+        };
+
+        specHelper.defaultGateway.paymentMethodNonce.create(paymentMethodToken, params, function (err) {
+          assert.equal(err.type, braintree.errorTypes.invalidKeysError);
+
+          done();
+        });
+      });
+    });
+
+    describe('regulationEnvironment', function () {
+      it('can return unregulated', function (done) {
+        let params = getPaymentMethodNonceParams(EUROPEAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI);
+
+        specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
+          let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
+
+          assert.equal('unregulated', authenticationInsight.regulationEnvironment);
+          done();
+        });
+      });
+
+      it('can return psd2', function (done) {
+        let params = getPaymentMethodNonceParams(EUROPEAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI);
+
+        specHelper.defaultGateway.paymentMethodNonce.create(EUROPEAN_PAYMENT_TOKEN, params, function (err, response) {
+          let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
+
+          assert.equal('psd2', authenticationInsight.regulationEnvironment);
+          done();
+        });
+      });
+
+      it('can return rbi', function (done) {
+        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI);
+
+        specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
+          let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
+
+          assert.equal('rbi', authenticationInsight.regulationEnvironment);
+          done();
+        });
+      });
+    });
+
+    describe('scaIndicator', function () {
+      it('can return unavailable without an amount', function (done) {
+        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, null);
+
+        specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
+          let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
+
+          assert.equal('unavailable', authenticationInsight.scaIndicator);
+          done();
+        });
+      });
+
+      it('can return sca_required with amount over the threshold', function (done) {
+        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI + 1);
+
+        specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
+          let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
+
+          assert.equal('sca_required', authenticationInsight.scaIndicator);
+          done();
+        });
+      });
+
+      it('can return sca_optional with amount within threshold', function (done) {
+        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI);
+
+        specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
+          let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
+
+          assert.equal('sca_optional', authenticationInsight.scaIndicator);
+          done();
+        });
+      });
+    });
   });
 
   describe('find', function () {
@@ -144,4 +237,14 @@ describe('PaymentMethodNonceGateway', function () {
       })
     );
   });
+
+  function getPaymentMethodNonceParams(merchantToken, amount) {
+    return {
+      paymentMethodNonce: {
+        merchantAccountId: merchantToken,
+        authenticationInsight: true,
+        amount: amount
+      }
+    };
+  }
 });
