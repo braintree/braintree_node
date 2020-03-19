@@ -335,6 +335,57 @@ describe('WebhookNotificationGateway', function () {
       });
     });
 
+    it('returns a parsable signature and payload for dispute accepted', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.DisputeAccepted,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeAccepted);
+        assert.equal(Dispute.Status.Accepted, webhookNotification.dispute.status);
+        assert.equal(Dispute.Kind.Chargeback, webhookNotification.dispute.kind);
+        assert.equal('2014-03-28', webhookNotification.dispute.dateOpened);
+        done();
+      });
+    });
+
+    it('returns a parsable signature and payload for dispute disputed', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.DisputeDisputed,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeDisputed);
+        assert.equal(Dispute.Status.Disputed, webhookNotification.dispute.status);
+        assert.equal(Dispute.Kind.Chargeback, webhookNotification.dispute.kind);
+        assert.equal('2014-03-28', webhookNotification.dispute.dateOpened);
+        done();
+      });
+    });
+
+    it('returns a parsable signature and payload for dispute expired', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.DisputeExpired,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.DisputeExpired);
+        assert.equal(Dispute.Status.Expired, webhookNotification.dispute.status);
+        assert.equal(Dispute.Kind.Chargeback, webhookNotification.dispute.kind);
+        assert.equal('2014-03-28', webhookNotification.dispute.dateOpened);
+        done();
+      });
+    });
+
     it('returns a parsable signature and payload for a disbursed webhook', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.Disbursement,
