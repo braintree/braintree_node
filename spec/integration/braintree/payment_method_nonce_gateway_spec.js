@@ -77,7 +77,7 @@ describe('PaymentMethodNonceGateway', function () {
 
     describe('regulationEnvironment', function () {
       it('can return unregulated', function (done) {
-        let params = getPaymentMethodNonceParams(EUROPEAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI);
+        let params = getPaymentMethodNonceParams(EUROPEAN_MERCHANT_TOKEN, {amount: AMOUNT_THRESHOLD_FOR_RBI});
 
         specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
           let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
@@ -88,7 +88,7 @@ describe('PaymentMethodNonceGateway', function () {
       });
 
       it('can return psd2', function (done) {
-        let params = getPaymentMethodNonceParams(EUROPEAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI);
+        let params = getPaymentMethodNonceParams(EUROPEAN_MERCHANT_TOKEN, {amount: AMOUNT_THRESHOLD_FOR_RBI});
 
         specHelper.defaultGateway.paymentMethodNonce.create(EUROPEAN_PAYMENT_TOKEN, params, function (err, response) {
           let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
@@ -99,7 +99,7 @@ describe('PaymentMethodNonceGateway', function () {
       });
 
       it('can return rbi', function (done) {
-        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI);
+        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, {amount: AMOUNT_THRESHOLD_FOR_RBI});
 
         specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
           let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
@@ -112,7 +112,7 @@ describe('PaymentMethodNonceGateway', function () {
 
     describe('scaIndicator', function () {
       it('can return unavailable without an amount', function (done) {
-        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, null);
+        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, {});
 
         specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
           let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
@@ -123,7 +123,7 @@ describe('PaymentMethodNonceGateway', function () {
       });
 
       it('can return sca_required with amount over the threshold', function (done) {
-        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI + 1);
+        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, {amount: AMOUNT_THRESHOLD_FOR_RBI + 1});
 
         specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
           let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
@@ -134,7 +134,7 @@ describe('PaymentMethodNonceGateway', function () {
       });
 
       it('can return sca_optional with amount within threshold', function (done) {
-        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, AMOUNT_THRESHOLD_FOR_RBI);
+        let params = getPaymentMethodNonceParams(INDIAN_MERCHANT_TOKEN, {amount: AMOUNT_THRESHOLD_FOR_RBI, recurringCustomerConsent: true, recurringMaxAmount: AMOUNT_THRESHOLD_FOR_RBI});
 
         specHelper.defaultGateway.paymentMethodNonce.create(INDIAN_PAYMENT_TOKEN, params, function (err, response) {
           let authenticationInsight = response.paymentMethodNonce.authenticationInsight;
@@ -238,12 +238,16 @@ describe('PaymentMethodNonceGateway', function () {
     );
   });
 
-  function getPaymentMethodNonceParams(merchantToken, amount) {
+  function getPaymentMethodNonceParams(merchantToken, options) {
     return {
       paymentMethodNonce: {
         merchantAccountId: merchantToken,
         authenticationInsight: true,
-        amount: amount
+        authenticationInsightOptions: {
+          amount: options.amount,
+          recurringCustomerConsent: options.recurringCustomerConsent,
+          recurringMaxAmount: options.recurringMaxAmount
+        }
       }
     };
   }

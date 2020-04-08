@@ -4,6 +4,7 @@
 * Add test `AuthenticationId`s Unreleased
 * Add `DisputeAccepted`, `DisputeDisputed`, and `DisputeExpired` webhook constants
 * Add `Authentication Insight` support to payment method nonce create
+* Add `recurringCustomerConsent` and `recurringMaxAmount` to `authenticationInsightOptions` for `PaymentMethodNonce.create`
 
 ## 2.22.0
 * Add `RefundAuthHardDeclined` and `RefundAuthSoftDeclined` to validation errors
