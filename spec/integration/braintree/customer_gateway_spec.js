@@ -167,6 +167,67 @@ describe('CustomerGateway', function () {
         });
       });
 
+      it('throws validation error when a param is missing in three_d_secure params', function (done) {
+        let customerParams =
+          {
+            paymentMethodNonce: Nonces.Transactable,
+            creditCard: {
+              threeDSecurePassThru: {
+                eciFlag: '02',
+                cavv: 'some_cavv',
+                xid: 'some_xid',
+                authenticationResponse: 'Y',
+                directoryResponse: 'Y',
+                cavvAlgorithm: '2',
+                dsTransactionId: 'some_ds_transaction_id'
+              },
+              options: {
+                verifyCard: true
+              }
+            }
+          };
+
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+
+          assert.equal(
+            response.errors.deepErrors()[0].code,
+            ValidationErrorCodes.Verification.ThreeDSecurePassThru.ThreeDSecureVersionIsRequired
+          );
+          done();
+        });
+      });
+
+      it('creates a customer with a Three D Secure payment method with pass thru params', function (done) {
+        let customerParams =
+          {
+            paymentMethodNonce: Nonces.Transactable,
+            creditCard: {
+              threeDSecurePassThru: {
+                eciFlag: '02',
+                cavv: 'some_cavv',
+                xid: 'some_xid',
+                threeDSecureVersion: '1.0.2',
+                authenticationResponse: 'Y',
+                directoryResponse: 'Y',
+                cavvAlgorithm: '2',
+                dsTransactionId: 'some_ds_transaction_id'
+              },
+              options: {
+                verifyCard: true
+              }
+            }
+          };
+
+        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          done();
+        });
+      });
+
       it('creates a customer with a Three D Seure payment method nonce', function (done) {
         let customerParams =
           {
@@ -984,6 +1045,71 @@ describe('CustomerGateway', function () {
 
       specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         customerId = response.customer.id;
+        done();
+      });
+    });
+
+    it('throws validation error when updating card with invalid pass thru params', function (done) {
+      let customerParams = {
+        firstName: 'New First Name',
+        lastName: 'New Last Name',
+        paymentMethodNonce: Nonces.Transactable,
+        creditCard: {
+          threeDSecurePassThru: {
+            eciFlag: '02',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            authenticationResponse: 'Y',
+            directoryResponse: 'Y',
+            cavvAlgorithm: '2',
+            dsTransactionId: 'some_ds_transaction_id'
+          },
+          options: {
+            verifyCard: 'true'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.deepErrors()[0].code,
+          ValidationErrorCodes.Verification.ThreeDSecurePassThru.ThreeDSecureVersionIsRequired
+        );
+
+        done();
+      });
+    });
+
+    it('updates the customer with three_d_secure pass thru params', function (done) {
+      let customerParams = {
+        firstName: 'New First Name',
+        lastName: 'New Last Name',
+        paymentMethodNonce: Nonces.Transactable,
+        creditCard: {
+          threeDSecurePassThru: {
+            eciFlag: '02',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            authenticationResponse: 'Y',
+            threeDSecureVersion: '2.2.1',
+            directoryResponse: 'Y',
+            cavvAlgorithm: '2',
+            dsTransactionId: 'some_ds_transaction_id'
+          },
+          options: {
+            verifyCard: 'true'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.customer.update(customerId, customerParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.customer.firstName, 'New First Name');
+        assert.equal(response.customer.lastName, 'New Last Name');
+
         done();
       });
     });
