@@ -150,6 +150,19 @@ describe('Config', function () {
     })
   );
 
+  describe('keepAlive', () =>
+    it('defaults enabled', function () {
+      let config = new Config({
+        merchantId: 'merchantId',
+        publicKey: 'publicKey',
+        privateKey: 'privateKey',
+        environment: 'development'
+      });
+
+      assert.equal(config.keepAliveConfig.keepAlive, true);
+    })
+  );
+
   describe('accessToken', function () {
     it('uses accessToken parsed environment', function () {
       let config = new Config({
