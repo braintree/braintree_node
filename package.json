@@ -1,5 +1,5 @@
 {
-  "name": "@boxed/braintree",
+  "name": "braintree",
   "version": "3.7.0",
   "description": "A library for server-side integrating with Braintree.",
   "keywords": [
