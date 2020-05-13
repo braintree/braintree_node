@@ -4,6 +4,7 @@ let fs = require('fs');
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
 let LARGE_FILE_PATH = './spec/fixtures/large_file.png';
+let EMPTY_FILE_PATH = './spec/fixtures/empty_file.png';
 let TOO_LONG_FILE_PATH = './spec/fixtures/too_long.pdf';
 
 function removeLargeFile(done) {
@@ -98,6 +99,25 @@ describe('DocumentUploadGateway', () => {
 
         assert.isFalse(response.success);
         assert.equal(ValidationErrorCodes.DocumentUpload.FileIsTooLarge, error.code);
+      });
+    });
+
+    it('returns error when file is empty', () => {
+      let writeFile = fs.openSync(EMPTY_FILE_PATH, 'w');
+
+      fs.closeSync(writeFile);
+
+      let file = fs.createReadStream(EMPTY_FILE_PATH);
+      let params = {
+        kind: 'evidence_document',
+        file: file
+      };
+
+      return specHelper.defaultGateway.documentUpload.create(params).then((response) => {
+        let error = response.errors.for('documentUpload').on('file')[0];
+
+        assert.isFalse(response.success);
+        assert.equal(ValidationErrorCodes.DocumentUpload.FileIsEmpty, error.code);
       });
     });
 

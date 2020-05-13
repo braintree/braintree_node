@@ -64,6 +64,74 @@ describe('PaymentMethodGateway', function () {
       })
     );
 
+    it('adds validation error in pass thru when a param is missing', done =>
+
+      specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
+        customerId = response.customer.id;
+
+        let paymentMethodParams = {
+          customerId,
+          paymentMethodNonce: Nonces.Transactable,
+          threeDSecurePassThru: {
+            eciFlag: '02',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            threeDSecureVersion: 'xx',
+            authenticationResponse: 'Y',
+            directoryResponse: 'Y',
+            cavvAlgorithm: '2',
+            dsTransactionId: 'some_ds_transaction_id'
+          },
+          options: {
+            verifyCard: 'true'
+          }
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+
+          assert.equal(
+            response.errors.deepErrors()[0].code,
+            ValidationErrorCodes.Verification.ThreeDSecurePassThru.ThreeDSecureVersionIsInvalid
+          );
+          done();
+        });
+      })
+    );
+
+    it('works with a three_d_secure pass thru params in payment method nonce', done =>
+
+      specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
+        customerId = response.customer.id;
+
+        let paymentMethodParams = {
+          customerId,
+          paymentMethodNonce: Nonces.Transactable,
+          threeDSecurePassThru: {
+            eciFlag: '02',
+            cavv: 'some_cavv',
+            xid: 'some_xid',
+            threeDSecureVersion: '1.0.2',
+            authenticationResponse: 'Y',
+            directoryResponse: 'Y',
+            cavvAlgorithm: '2',
+            dsTransactionId: 'some_ds_transaction_id'
+          },
+          options: {
+            verifyCard: 'true'
+          }
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          done();
+        });
+      })
+    );
+
     context('Apple Pay', () =>
       it('vaults an Apple Pay card from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
@@ -1312,6 +1380,109 @@ describe('PaymentMethodGateway', function () {
 
   describe('update', function () {
     context('credit card', function () {
+      it('throws validation error when updating card with invalid pass thru params', done =>
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          let customerId = response.customer.id;
+
+          let creditCardParams = {
+            cardholderName: 'Original Holder',
+            customerId,
+            cvv: '123',
+            number: '4012888888881881',
+            expirationDate: '05/2012'
+          };
+
+          specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+            assert.isTrue(response.success);
+
+            let creditCard = response.creditCard;
+
+            let updateParams = {
+              cardholderName: 'New Holder',
+              cvv: '456',
+              number: '5555555555554444',
+              expirationDate: '06/2013',
+              threeDSecurePassThru: {
+                eciFlag: '02',
+                cavv: 'some_cavv',
+                xid: 'some_xid',
+                authenticationResponse: 'Y',
+                threeDSecureVersion: 'xx',
+                directoryResponse: 'Y',
+                cavvAlgorithm: '2',
+                dsTransactionId: 'some_ds_transaction_id'
+              },
+              options: {
+                verifyCard: true
+              }
+            };
+
+            specHelper.defaultGateway.paymentMethod.update(creditCard.token, updateParams, function (err, response) {
+              assert.isNull(err);
+              assert.isFalse(response.success);
+              assert.equal(
+                response.errors.deepErrors()[0].code,
+                ValidationErrorCodes.Verification.ThreeDSecurePassThru.ThreeDSecureVersionIsInvalid
+              );
+              done();
+            });
+          });
+        })
+      );
+
+      it('updates the payment method with three_d_secure pass thru params', done =>
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          let customerId = response.customer.id;
+
+          let creditCardParams = {
+            cardholderName: 'Original Holder',
+            customerId,
+            cvv: '123',
+            number: '4012888888881881',
+            expirationDate: '05/2012'
+          };
+
+          specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
+            assert.isTrue(response.success);
+
+            let creditCard = response.creditCard;
+            let updateParams = {
+              cardholderName: 'New Holder',
+              cvv: '456',
+              number: '5555555555554444',
+              expirationDate: '06/2013',
+              threeDSecurePassThru: {
+                eciFlag: '02',
+                cavv: 'some_cavv',
+                xid: 'some_xid',
+                authenticationResponse: 'Y',
+                threeDSecureVersion: '1.2.2',
+                directoryResponse: 'Y',
+                cavvAlgorithm: '2',
+                dsTransactionId: 'some_ds_transaction_id'
+              },
+              options: {
+                verifyCard: true
+              }
+            };
+
+            specHelper.defaultGateway.paymentMethod.update(creditCard.token, updateParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.paymentMethod.token, creditCard.token);
+              let updatedCreditCard = response.paymentMethod;
+
+              assert.equal(updatedCreditCard.cardholderName, 'New Holder');
+              assert.equal(updatedCreditCard.bin, '555555');
+              assert.equal(updatedCreditCard.last4, '4444');
+              assert.equal(updatedCreditCard.expirationDate, '06/2013');
+
+              done();
+            });
+          });
+        })
+      );
+
       it('updates the credit card', done =>
         specHelper.defaultGateway.customer.create({}, function (err, response) {
           let customerId = response.customer.id;
