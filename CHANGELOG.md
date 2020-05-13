@@ -1,4 +1,4 @@
-## unreleased
+## 2.23.0
 * Add `threeDSecurePassThru` parameters to `Customer.create`, `PaymentMethod.create`, `CreditCard.create`, `Customer.update`, `PaymentMethod.update` and `CreditCard.update`
 * Add `threeDSecureAuthenticationId` support on transaction sale
 * Add ThreeDSecure test payment method nonces
