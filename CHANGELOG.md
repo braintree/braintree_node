@@ -1,3 +1,6 @@
+## Unreleased
+* Add `retrievalReferenceNumber` to `Transaction`
+
 ## 2.23.0
 * Add `threeDSecurePassThru` parameters to `Customer.create`, `PaymentMethod.create`, `CreditCard.create`, `Customer.update`, `PaymentMethod.update` and `CreditCard.update`
 * Add `threeDSecureAuthenticationId` support on transaction sale
@@ -7,7 +10,6 @@
 * Add `Authentication Insight` support to payment method nonce create
 * Add `recurringCustomerConsent` and `recurringMaxAmount` to `authenticationInsightOptions` for `PaymentMethodNonce.create`
 * Add `FileIsEmpty` error code
-* Add `retrievalReferenceNumber` to `Transaction`
 
 ## 2.22.0
 * Add `RefundAuthHardDeclined` and `RefundAuthSoftDeclined` to validation errors
