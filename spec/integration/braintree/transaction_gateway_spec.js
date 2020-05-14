@@ -3140,6 +3140,22 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('deserializes the retrieval reference number', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNotNull(response.transaction.retrievalReferenceNumber);
+
+        done();
+      });
+    });
+
     it('handles processor soft declines', function (done) {
       let transactionParams = {
         amount: '2000.00',

@@ -7,6 +7,7 @@
 * Add `Authentication Insight` support to payment method nonce create
 * Add `recurringCustomerConsent` and `recurringMaxAmount` to `authenticationInsightOptions` for `PaymentMethodNonce.create`
 * Add `FileIsEmpty` error code
+* Add `retrievalReferenceNumber` to `Transaction`
 
 ## 2.22.0
 * Add `RefundAuthHardDeclined` and `RefundAuthSoftDeclined` to validation errors
