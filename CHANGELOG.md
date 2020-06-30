@@ -1,4 +1,5 @@
 ## Unreleased
+* Add `networkTransactionId` to `CreditCardVerification`
 * Add `retrievalReferenceNumber` to `Transaction`
 
 ## 2.23.0
