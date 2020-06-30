@@ -142,7 +142,7 @@ describe('AdvancedSearch', function () {
 
                   return search.refund().is(true);
                 }
-                  , function (err, response) {
+                , function (err, response) {
                   assert.isTrue(response.success);
                   assert.equal(response.length(), 1);
 

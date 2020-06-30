@@ -49,7 +49,7 @@ let advancedFraudConfig = {
 };
 let advancedFraudGateway = new braintree.BraintreeGateway(advancedFraudConfig);
 
-let multiplyString = (string, times) => (new Array(times + 1)).join(string);
+let multiplyString = (string, times) => new Array(times + 1).join(string);
 
 let plans = {
   trialless: {id: 'integration_trialless_plan', price: '12.34'},

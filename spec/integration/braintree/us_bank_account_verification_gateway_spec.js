@@ -286,7 +286,7 @@ describe('UsBankAccountVerificationGateway', function () {
               return search;
             }
 
-              , function (err, response) {
+            , function (err, response) {
               assert.isNull(err);
               assert.equal(response.length(), 1);
 
@@ -345,7 +345,7 @@ describe('UsBankAccountVerificationGateway', function () {
                 return search.accountNumber().endsWith('1234');
               }
 
-                , function (err, response) {
+              , function (err, response) {
                 assert.isNull(err);
                 assert.equal(response.length(), 2);
 
