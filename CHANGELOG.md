@@ -1,3 +1,8 @@
+# Changelog
+
+## WIP: next major version
+* Remove iDEAL support
+
 ## Unreleased
 * Add `networkTransactionId` to `CreditCardVerification`
 * Add `retrievalReferenceNumber` to `Transaction`
