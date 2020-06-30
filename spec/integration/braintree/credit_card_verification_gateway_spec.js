@@ -255,6 +255,7 @@ describe('CreditCardVerificationGateway', function () {
           assert.isNull(err);
           assert.isTrue(response.success);
           let verification = response.verification;
+
           assert.isNotNull(verification.networkTransactionId);
           done();
         });
@@ -273,6 +274,7 @@ describe('CreditCardVerificationGateway', function () {
             assert.isNull(err);
             assert.isTrue(response.success);
             let verification = response.verification;
+
             assert.isNotNull(verification.networkTransactionId);
             done();
           });
@@ -292,6 +294,7 @@ describe('CreditCardVerificationGateway', function () {
             assert.isNull(err);
             assert.isTrue(response.success);
             let verification = response.verification;
+
             assert.isNull(verification.networkTransactionId);
             done();
           });
