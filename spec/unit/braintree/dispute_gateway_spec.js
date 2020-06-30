@@ -1,5 +1,6 @@
 'use strict';
 
+const sinon = require('sinon');
 let DisputeGateway = require('../../../lib/braintree/dispute_gateway').DisputeGateway;
 
 describe('DisputeGateway', function () {
@@ -32,6 +33,14 @@ describe('DisputeGateway', function () {
   });
 
   describe('addTextEvidence', () => {
+    beforeEach(() => {
+      sinon.spy(console, 'warn');
+    });
+
+    afterEach(() => {
+      console.warn.restore(); // eslint-disable-line no-console
+    });
+
     it('null Dispute ID throws NotFoundError', () => {
       return disputeGateway.addTextEvidence(null, 'text evidence')
         .then(assert.fail)

@@ -703,7 +703,7 @@ describe('WebhookNotificationGateway', function () {
           </credit-card>
         </subject>
       </notification>`;
-      let bt_payload = new Buffer(xmlPayload).toString('base64') + '\n';
+      let bt_payload = Buffer.from(xmlPayload).toString('base64') + '\n';
       let bt_signature = specHelper.defaultGateway.webhookTesting.sampleSignature(bt_payload);
 
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
@@ -740,7 +740,7 @@ describe('WebhookNotificationGateway', function () {
         </subject>
       </notification>`;
 
-      let bt_payload = new Buffer(xmlPayload).toString('base64') + '\n';
+      const bt_payload = Buffer.from(xmlPayload).toString('base64') + '\n';
       let bt_signature = specHelper.defaultGateway.webhookTesting.sampleSignature(bt_payload);
 
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
@@ -775,7 +775,7 @@ describe('WebhookNotificationGateway', function () {
         </subject>
       </notification>`;
 
-      let bt_payload = new Buffer(xmlPayload).toString('base64') + '\n';
+      const bt_payload = Buffer.from(xmlPayload).toString('base64') + '\n';
       let bt_signature = specHelper.defaultGateway.webhookTesting.sampleSignature(bt_payload);
 
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {

@@ -37,7 +37,7 @@ describe('ClientTokenGateway', function () {
   it('defaults to version 2', function (done) {
     specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
       let encodedClientToken = result.clientToken;
-      let decodedClientToken = new Buffer(encodedClientToken, 'base64').toString('utf8');
+      const decodedClientToken = Buffer.from(encodedClientToken, 'base64').toString('utf8');
       let clientToken = JSON.parse(decodedClientToken);
 
       assert.equal(clientToken.version, 2);

@@ -9,10 +9,9 @@ let Util = require('../lib/braintree/util').Util;
 let Config = require('../lib/braintree/config').Config;
 let querystring = require('../vendor/querystring.node.js.511d6a2/querystring');
 let chai = require('chai');
-let Buffer = require('buffer').Buffer;
 let xml2js = require('xml2js');
 
-chai.Assertion.includeStack = true;
+chai.config.includeStack = true;
 
 global.assert = chai.assert;
 
@@ -436,7 +435,7 @@ let createEscrowedTransaction = function (callback) {
 };
 
 let decodeClientToken = function (encodedClientToken) {
-  let decodedClientToken = new Buffer(encodedClientToken, 'base64').toString('utf8');
+  let decodedClientToken = Buffer.from(encodedClientToken, 'base64').toString('utf8');
   let unescapedClientToken = decodedClientToken.replace('\\u0026', '&');
 
   return unescapedClientToken;
