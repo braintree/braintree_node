@@ -1,7 +1,8 @@
 # Changelog
 
 ## WIP: next major version
-* Remove iDEAL support
+* Remove deprecated iDEAL support
+* Remove deprecated `connect` method
 
 ## Unreleased
 * Add `networkTransactionId` to `CreditCardVerification`
