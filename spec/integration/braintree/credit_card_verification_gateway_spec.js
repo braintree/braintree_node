@@ -280,26 +280,6 @@ describe('CreditCardVerificationGateway', function () {
           });
         });
       });
-
-      it('does not support amex', function (done) {
-        specHelper.defaultGateway.customer.create({}, function () {
-          let params = {
-            creditCard: {
-              number: '371260714673002',
-              expirationDate: '05/12'
-            }
-          };
-
-          specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
-            assert.isNull(err);
-            assert.isTrue(response.success);
-            let verification = response.verification;
-
-            assert.isNull(verification.networkTransactionId);
-            done();
-          });
-        });
-      });
     });
   });
 });
