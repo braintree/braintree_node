@@ -1,5 +1,18 @@
 ## Unreleased
 * Add `retrievalReferenceNumber` to `Transaction`
+* Add `productSku` to `Transaction`
+* Add `phoneNumber` and `shippingMethod` to `Address`
+* Add `customerDeviceId`, `customerLocationZip`, and `customerTenure` to `RiskData`
+* Add validation errors:
+  * `Transaction.ShippingMethodIsInvalid`
+  * `Transaction.ShippingPhoneNumberIsInvalid`
+  * `Transaction.BillingPhoneNumberIsInvalid`
+  * `RiskData.CustomerBrowserIsTooLong`
+  * `RiskData.CustomerDeviceIdIsTooLong`
+  * `RiskData.CustomerLocationZipInvalidCharacters`
+  * `RiskData.CustomerLocationZipIsInvalid`
+  * `RiskData.CustomerLocationZipIsTooLong`
+  * `RiskData.CustomerTenureIsTooLong`
 
 ## 2.23.0
 * Add `threeDSecurePassThru` parameters to `Customer.create`, `PaymentMethod.create`, `CreditCard.create`, `Customer.update`, `PaymentMethod.update` and `CreditCard.update`
