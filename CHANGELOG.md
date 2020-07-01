@@ -3,6 +3,7 @@
 ## WIP: next major version
 * Remove deprecated iDEAL support
 * Remove deprecated `connect` method
+* Config class now throws an error when token environment does not match passed environment
 
 ## Unreleased
 * Add `networkTransactionId` to `CreditCardVerification`
