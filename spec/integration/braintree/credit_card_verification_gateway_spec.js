@@ -242,7 +242,7 @@ describe('CreditCardVerificationGateway', function () {
     });
 
     context('network transaction id', function () {
-      it('support visa', function (done) {
+      it('supports visa', function (done) {
         let params = {
           creditCard: {
             cardholderName: 'John Smith',
