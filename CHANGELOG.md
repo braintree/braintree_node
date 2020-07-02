@@ -1,4 +1,5 @@
 ## Unreleased
+* Add `networkTransactionId` to `CreditCardVerification`
 * Add `retrievalReferenceNumber` to `Transaction`
 * Add `productSku` to `Transaction`
 * Add `phoneNumber` and `shippingMethod` to `Address`
