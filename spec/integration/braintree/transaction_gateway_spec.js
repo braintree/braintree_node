@@ -162,6 +162,24 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('handles an error when product sku is invalid', function (done) {
+      let transactionParams = {
+        type: 'sale',
+        amount: '64.05',
+        paymentMethodNonce: Nonces.AbstractTransactable,
+        productSku: 'product$ku!'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(
+          response.errors.for('transaction').on('productSku')[0].code,
+          ValidationErrorCodes.Transaction.ProductSkuIsInvalid
+        );
+        done();
+      });
+    });
+
     it('charges an elo card', function (done) {
       let transactionParams = {
         merchantAccountId: 'adyen_ma',
