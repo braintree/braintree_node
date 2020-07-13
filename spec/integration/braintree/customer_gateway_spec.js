@@ -381,23 +381,6 @@ describe('CustomerGateway', function () {
         })
       );
 
-      it('cannot create a customer with a Coinbase account payment method nonce', function (done) {
-        let customerParams =
-          {paymentMethodNonce: Nonces.Coinbase};
-
-        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
-          assert.isNull(err);
-          assert.isFalse(response.success);
-
-          assert.equal(
-            response.errors.for('coinbaseAccount').on('base')[0].code,
-            ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
-          );
-
-          done();
-        });
-      });
-
       it('creates a customer with a paypal account payment method nonce', function (done) {
         let customerParams =
           {paymentMethodNonce: Nonces.PayPalFuturePayment};

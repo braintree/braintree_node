@@ -2494,29 +2494,6 @@ describe('TransactionGateway', function () {
       });
     });
 
-    context('Coinbase', () =>
-      it('can no longer use Coinbase in a transaction sale', done =>
-        specHelper.defaultGateway.customer.create({}, function () {
-          let transactionParams = {
-            paymentMethodNonce: Nonces.Coinbase,
-            amount: '100.00'
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isFalse(response.success, 'response had no errors');
-
-            assert.equal(
-              response.errors.for('transaction').on('base')[0].code,
-              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
-            );
-
-            done();
-          });
-        })
-      )
-    );
-
     it('successfully creates a paypal transaction with local payment webhook content', done =>
       specHelper.defaultGateway.customer.create({}, function () {
         let transactionParams = {

@@ -1,7 +1,7 @@
 # Changelog
 
 ## WIP: next major version
-* Remove deprecated iDEAL support
+* Remove deprecated iDEAL, coinbase support
 * Remove deprecated `connect` method
 * Config class now throws an error when token environment does not match passed environment
 * Remove `GrantedPaymentInstrumentUpdate` (deprecated in 2.16.0)

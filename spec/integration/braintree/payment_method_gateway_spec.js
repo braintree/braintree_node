@@ -275,31 +275,6 @@ describe('PaymentMethodGateway', function () {
       )
     );
 
-    context('Coinbase', () =>
-      it('no longer supports vaulting a Coinbase account from the nonce', done =>
-        specHelper.defaultGateway.customer.create({firstName: 'Paul', lastName: 'Gross'}, function (err, response) {
-          customerId = response.customer.id;
-
-          let paymentMethodParams = {
-            customerId,
-            paymentMethodNonce: Nonces.Coinbase
-          };
-
-          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-            assert.isNull(err);
-            assert.isFalse(response.success);
-
-            assert.equal(
-              response.errors.for('coinbaseAccount').on('base')[0].code,
-              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
-            );
-
-            done();
-          });
-        })
-      )
-    );
-
     context('with a credit card payment method nonce', function () {
       it('creates a credit card from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
@@ -2016,31 +1991,6 @@ describe('PaymentMethodGateway', function () {
         );
       });
     });
-
-    context('coinbase', () =>
-
-      it('can no longer create a Coinbase payment method token', done =>
-        specHelper.defaultGateway.customer.create({}, function (err, response) {
-          let customerId = response.customer.id;
-
-          let paymentMethodParams = {
-            customerId,
-            paymentMethodNonce: Nonces.Coinbase
-          };
-
-          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-            assert.isFalse(response.success);
-
-            assert.equal(
-              response.errors.for('coinbaseAccount').on('base')[0].code,
-              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
-            );
-
-            done();
-          });
-        })
-      )
-    );
 
     context('paypal accounts', function () {
       it("updates a paypal account's token", done =>
