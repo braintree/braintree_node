@@ -6,6 +6,7 @@
 * Config class now throws an error when token environment does not match passed environment
 * Remove `GrantedPaymentInstrumentUpdate` (deprecated in 2.16.0)
 * Remove `InvalidTransparentRedirectHashError`
+* Remove `SEPA` test nonce and validation error codes
 
 ## Unreleased
 * Add `networkTransactionId` to `CreditCardVerification`
