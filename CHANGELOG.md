@@ -5,6 +5,7 @@
 * Remove deprecated `connect` method
 * Config class now throws an error when token environment does not match passed environment
 * Remove `GrantedPaymentInstrumentUpdate` (deprecated in 2.16.0)
+* Remove `InvalidTransparentRedirectHashError`
 
 ## Unreleased
 * Add `networkTransactionId` to `CreditCardVerification`
