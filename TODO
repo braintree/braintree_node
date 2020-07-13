@@ -1,0 +1,30 @@
+emove
+ - Transparent Redirect
+ - iDeal
+ - Sepa (EU bank account, iban bank account)
+ - coinbase
+ - any other TODOs in the code?
+ - next major version notes
+ - find anything deprecated
+ - down for maintenance = service unavailable
+ - gateway and request timeout
+ - double check transaction search timeout exception
+ - remove forged query exception (specific to TR)
+
+ Update
+ - Language support:
+	- drop everything below node 10
+	- add images for testing in 12, 14
+	- ESM module updates???
+	- ES6?
+	- Docs: promise code snippets?
+ - CI updates
+   - add dockerfiles images
+   - audit clb repo
+ - Fix any remaining warnings if possible?
+
+Final sweep
+  - README, add deprecation policy
+
+Nice to haves:
+  - Issue #130: exception if result.success? === false vs response object
