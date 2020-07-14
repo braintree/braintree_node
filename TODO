@@ -3,13 +3,14 @@ emove
  - X iDeal
  - X Sepa (EU bank account, iban bank account)
  - X coinbase
- - any other TODOs in the code?
- - next major version notes
+ - X any other TODOs in the code?
+ - X next major version notes
  - find anything deprecated
  - down for maintenance = service unavailable
  - gateway and request timeout
  - double check transaction search timeout exception
  - remove forged query exception (specific to TR)
+ - run all the tests and fix anythig that's failing after updates
 
  Update
  - Language support:

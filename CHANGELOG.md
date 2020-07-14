@@ -6,7 +6,19 @@
 * Config class now throws an error when token environment does not match passed environment
 * Remove `GrantedPaymentInstrumentUpdate` (deprecated in 2.16.0)
 * Remove `InvalidTransparentRedirectHashError`
-* Remove `SEPA` test nonce and validation error codes
+* Remove `SEPA` test nonce
+* Remove deprecated `tag` parameter from dispute calls
+* Remove deprecated validation error codes:
+  * `DiscountAmountMustBeGreaterThanZero`
+  * `UnitTaxAmountMustBeGreaterThanZero`
+  * `SEPABankAccount` error codes
+  * `SEPAMandate` error codes
+  * `AmountDoesNotMatchIdealPaymentAmount`
+  * `IdealPaymentNotComplete`
+  * `IdealPaymentsCannotBeVaulted`
+  * `MerchantAccountDoesNotMatchIdealPaymentMerchantAccount`
+  * `OrderIdDoesNotMatchIdealPaymentOrderId`
+  * `OrderIdIsRequiredWithIdealPayment`
 
 ## Unreleased
 * Add `networkTransactionId` to `CreditCardVerification`

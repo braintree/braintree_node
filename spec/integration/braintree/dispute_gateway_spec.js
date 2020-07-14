@@ -1,4 +1,4 @@
-'use strict';
+ 'usestrict';
 
 let fs = require('fs');
 let sinon = require('sinon');
@@ -244,29 +244,6 @@ describe('DisputeGateway', () => {
           assert.isTrue(/^\w{16,}$/.test(evidence.id));
           assert.isNull(evidence.sentToProcessorAt);
           assert.isNull(evidence.url);
-        });
-    });
-
-    it('warns when tag is used instead of category', () => {
-      let disputeId;
-      let stub = sinon.stub();
-
-      console.warn = stub; // eslint-disable-line no-console
-
-      return createSampleDispute()
-        .then((dispute) => {
-          disputeId = dispute.id;
-
-          return disputeGateway.addTextEvidence(disputeId, {tag: 'DEVICE_ID', content: 'M'});
-        })
-        .then((response) => {
-          assert.isTrue(stub.called);
-          assert.equal(stub.firstCall.args[0], '[DEPRECATED] tag as an option is deprecated. Please use category.');
-          let evidence = response.evidence;
-
-          assert.isTrue(response.success);
-          assert.equal('M', evidence.comment);
-          assert.equal('DEVICE_ID', evidence.category);
         });
     });
 
