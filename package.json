@@ -21,7 +21,7 @@
     "npm": ">=5"
   },
   "dependencies": {
-    "@braintree/wrap-promise": "2.0.0",
+    "@braintree/wrap-promise": "2.1.0",
     "dateformat": "^3.0.3",
     "depd": "~1.1.0",
     "readable-stream": "1.1.10",

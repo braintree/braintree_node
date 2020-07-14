@@ -1,4 +1,5 @@
 ## Unreleased
+* Update @braintree/wrap-promise to v2.1.0
 * Add `networkTransactionId` to `CreditCardVerification`
 * Add `retrievalReferenceNumber` to `Transaction`
 * Add `productSku` to `Transaction`
