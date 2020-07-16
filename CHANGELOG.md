@@ -1,6 +1,8 @@
 # Changelog
 
 ## WIP: next major version
+* Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
+Breaking Changes:
 * Remove deprecated iDEAL, coinbase support
 * Remove deprecated `connect` method
 * Config class now throws an error when token environment does not match passed environment
@@ -11,14 +13,32 @@
 * Remove deprecated validation error codes:
   * `DiscountAmountMustBeGreaterThanZero`
   * `UnitTaxAmountMustBeGreaterThanZero`
-  * `SEPABankAccount` error codes
-  * `SEPAMandate` error codes
+  * `SEPABankAccount`:
+    * `IBANIsRequired`
+    * `BICIsRequired`
+    * `AccountHolderNameIsRequired`
+  * `SEPAMandate`:
+    * `AccountHolderNameIsRequired`
+    * `BICIsRequired`
+    * `IBANIsRequired`
+    * `TypeIsRequired`
+    * `IBANInvalidCharacter`
+    * `BICInvalidCharacter`
+    * `BICLengthIsInvalid`
+    * `BICUnsupportedCountry`
+    * `IBANUnsupportedCountry`
+    * `IBANInvalidFormat`
+    * `BillingAddressConflict`
+    * `BillingAddressIdIsInvalid`
+    * `TypeIsInvalid`
   * `AmountDoesNotMatchIdealPaymentAmount`
   * `IdealPaymentNotComplete`
   * `IdealPaymentsCannotBeVaulted`
   * `MerchantAccountDoesNotMatchIdealPaymentMerchantAccount`
   * `OrderIdDoesNotMatchIdealPaymentOrderId`
   * `OrderIdIsRequiredWithIdealPayment`
+* Rename `DownForMaintenanceError` to `ServiceUnavailableError`
+* Transaction searches throw `UnexpectedError` instead of `DownForMaintenanceError` when search response yields unexpected results
 
 ## Unreleased
 * Add `networkTransactionId` to `CreditCardVerification`

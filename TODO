@@ -5,7 +5,7 @@ emove
  - X coinbase
  - X any other TODOs in the code?
  - X next major version notes
- - find anything deprecated
+ - X find anything deprecated
  - down for maintenance = service unavailable
  - gateway and request timeout
  - double check transaction search timeout exception

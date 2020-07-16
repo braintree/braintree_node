@@ -474,7 +474,7 @@ describe('TransactionSearch', () =>
       search.on('data', function () {});
 
       return search.on('end', function () {
-        assert.equal(error.type, braintree.errorTypes.downForMaintenanceError);
+        assert.equal(error.type, braintree.errorTypes.unexpectedError);
 
         done();
       });
@@ -707,9 +707,9 @@ describe('TransactionSearch', () =>
       );
     });
 
-    it('raises Down For Maintenance Error for search timeouts', done =>
+    it('raises Unexpected Error for search timeouts', done =>
       specHelper.defaultGateway.transaction.search(search => search.amount().is(-10), function (err) {
-        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError);
+        assert.equal(err.type, braintree.errorTypes.unexpectedError);
 
         done();
       })
