@@ -1,15 +1,15 @@
 emove
- - Transparent Redirect
+ - X Transparent Redirect
  - X iDeal
  - X Sepa (EU bank account, iban bank account)
  - X coinbase
  - X any other TODOs in the code?
  - X next major version notes
  - X find anything deprecated
- - down for maintenance = service unavailable
- - gateway and request timeout
- - double check transaction search timeout exception
- - remove forged query exception (specific to TR)
+ - X down for maintenance = service unavailable
+ - X gateway and request timeout
+ - X double check transaction search timeout exception
+ - X remove forged query exception (specific to TR)
  - run all the tests and fix anythig that's failing after updates
 
  Update
@@ -27,5 +27,3 @@ emove
 Final sweep
   - README, add deprecation policy
 
-Nice to haves:
-  - Issue #130: exception if result.success? === false vs response object
