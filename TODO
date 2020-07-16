@@ -14,7 +14,7 @@ emove
 
  Update
  - Language support:
-	- drop everything below node 10
+	- X drop everything below node 10
 	- add images for testing in 12, 14
 	- ESM module updates???
 	- ES6?
