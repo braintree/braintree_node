@@ -5428,7 +5428,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         },
         options: {
@@ -5493,7 +5493,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         },
         options: {
@@ -5519,7 +5519,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         },
         options: {
@@ -5554,7 +5554,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         },
         options: {
@@ -5614,7 +5614,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         }
       };
