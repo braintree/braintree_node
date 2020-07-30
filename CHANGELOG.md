@@ -16,6 +16,8 @@
   * `RiskData.CustomerLocationZipIsInvalid`
   * `RiskData.CustomerLocationZipIsTooLong`
   * `RiskData.CustomerTenureIsTooLong`
+* Add `processedWithNetworkToken` to `Transaction`
+* Add `isNetworkTokenized` to `CreditCard`
 
 ## 2.23.0
 * Add `threeDSecurePassThru` parameters to `Customer.create`, `PaymentMethod.create`, `CreditCard.create`, `Customer.update`, `PaymentMethod.update` and `CreditCard.update`

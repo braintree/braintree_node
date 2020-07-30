@@ -6111,4 +6111,44 @@ describe('TransactionGateway', function () {
       });
     });
   });
+
+  describe('card on file network tokenization', function () {
+    it('creates a network tokenized transaction with a vaulted credit card token', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        paymentMethodToken: 'network_tokenized_credit_card'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.processorResponseCode, '1000');
+        assert.equal(response.transaction.processorResponseType, 'approved');
+        assert.isTrue(response.transaction.processedWithNetworkToken);
+
+        done();
+      });
+    });
+
+    it('creates a non-network tokenized transaction with a nonce', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        paymentMethodNonce: Nonces.AbstractTransactable
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.processorResponseCode, '1000');
+        assert.equal(response.transaction.processorResponseType, 'approved');
+        assert.isFalse(response.transaction.processedWithNetworkToken);
+
+        done();
+      });
+    });
+  });
 });
