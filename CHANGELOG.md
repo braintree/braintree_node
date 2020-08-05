@@ -1,4 +1,5 @@
 ## Unreleased
+* Add * `GatewayRejectionReason.RiskThreshold` to `Transaction`
 * Update @braintree/wrap-promise to v2.1.0
 * Add `networkTransactionId` to `CreditCardVerification`
 * Add `retrievalReferenceNumber` to `Transaction`

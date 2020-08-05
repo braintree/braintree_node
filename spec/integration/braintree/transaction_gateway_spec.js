@@ -3375,6 +3375,37 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('handles risk_threshold rejection (test credit card number)', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: CreditCardNumbers.CardTypeIndicators.RiskThresholds,
+          expirationDate: '05/16'
+        }
+      };
+
+      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
+        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.RiskThreshold);
+        done();
+      });
+    });
+
+    it('handles risk_threshold rejection (test nonce)', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        paymentMethodNonce: Nonces.GatewayRejectedRiskThresholds
+      };
+
+      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
+        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.RiskThreshold);
+        done();
+      });
+    });
+
     it('allows fraud params', function (done) {
       let transactionParams = {
         amount: '10.0',
