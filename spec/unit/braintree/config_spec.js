@@ -1,8 +1,8 @@
 'use strict';
 /* eslint-disable no-new */
 
-let Config = require('../../lib/braintree/config').Config;
-let Environment = require('../../lib/braintree/environment').Environment;
+let Config = require('../../../lib/braintree/config').Config;
+let Environment = require('../../../lib/braintree/environment').Environment;
 let sinon = require('sinon');
 
 describe('Config', function () {

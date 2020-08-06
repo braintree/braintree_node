@@ -240,5 +240,46 @@ describe('CreditCardVerificationGateway', function () {
         done();
       });
     });
+
+    context('network transaction id', function () {
+      it('supports visa', function (done) {
+        let params = {
+          creditCard: {
+            cardholderName: 'John Smith',
+            number: '4111111111111111',
+            expirationDate: '05/2014'
+          }
+        };
+
+        specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          let verification = response.verification;
+
+          assert.isNotNull(verification.networkTransactionId);
+          done();
+        });
+      });
+
+      it('supports mastercard', function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let params = {
+            creditCard: {
+              number: '5555555555554444',
+              expirationDate: '05/12'
+            }
+          };
+
+          specHelper.defaultGateway.creditCardVerification.create(params, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            let verification = response.verification;
+
+            assert.isNotNull(verification.networkTransactionId);
+            done();
+          });
+        });
+      });
+    });
   });
 });

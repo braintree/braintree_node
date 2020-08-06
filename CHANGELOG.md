@@ -1,3 +1,25 @@
+## 2.24.0
+* Add * `GatewayRejectionReason.RiskThreshold` to `Transaction`
+* Update @braintree/wrap-promise to v2.1.0
+* Add `networkTransactionId` to `CreditCardVerification`
+* Add `retrievalReferenceNumber` to `Transaction`
+* Add `productSku` to `Transaction`
+* Add `phoneNumber` and `shippingMethod` to `Address`
+* Add `customerDeviceId`, `customerLocationZip`, and `customerTenure` to `RiskData`
+* Add validation errors:
+  * `Transaction.ProductSkuIsInvalid`
+  * `Transaction.ShippingMethodIsInvalid`
+  * `Transaction.ShippingPhoneNumberIsInvalid`
+  * `Transaction.BillingPhoneNumberIsInvalid`
+  * `RiskData.CustomerBrowserIsTooLong`
+  * `RiskData.CustomerDeviceIdIsTooLong`
+  * `RiskData.CustomerLocationZipInvalidCharacters`
+  * `RiskData.CustomerLocationZipIsInvalid`
+  * `RiskData.CustomerLocationZipIsTooLong`
+  * `RiskData.CustomerTenureIsTooLong`
+* Add `processedWithNetworkToken` to `Transaction`
+* Add `isNetworkTokenized` to `CreditCard`
+
 ## 2.23.0
 * Add `threeDSecurePassThru` parameters to `Customer.create`, `PaymentMethod.create`, `CreditCard.create`, `Customer.update`, `PaymentMethod.update` and `CreditCard.update`
 * Add `threeDSecureAuthenticationId` support on transaction sale

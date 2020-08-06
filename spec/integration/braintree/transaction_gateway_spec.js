@@ -39,6 +39,147 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('charges a card with billing and shipping address specified', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        billing: {
+          streetAddress: '123 Fake St',
+          extendedAddress: 'Suite 403',
+          locality: 'Chicago',
+          region: 'IL',
+          postalCode: '60607',
+          phoneNumber: '122-555-1237',
+          countryName: 'United States of America'
+        },
+        shipping: {
+          streetAddress: '456 W Main St',
+          extendedAddress: 'Apt 2F',
+          locality: 'Bartlett',
+          region: 'IL',
+          phoneNumber: '122-555-1236',
+          postalCode: '60103',
+          countryName: 'Mexico',
+          shippingMethod: 'electronic'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+        assert.isNull(response.transaction.voiceReferralNumber);
+        assert.equal(response.transaction.processorResponseCode, '1000');
+        assert.equal(response.transaction.processorResponseType, 'approved');
+        assert.exists(response.transaction.authorizationExpiresAt);
+
+        done();
+      });
+    });
+
+    it('handles an error when shipping phone number is invalid', function (done) {
+      let transactionParams = {
+        type: 'sale',
+        amount: '64.05',
+        paymentMethodNonce: Nonces.AbstractTransactable,
+        shipping: {
+          streetAddress: '456 W Main St',
+          extendedAddress: 'Apt 2F',
+          locality: 'Bartlett',
+          region: 'IL',
+          phoneNumber: '123-234-3456=098765',
+          postalCode: '60103',
+          countryName: 'Mexico',
+          shippingMethod: 'electronic'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(
+          response.errors.for('transaction').for('shipping').on('phoneNumber')[0].code,
+          ValidationErrorCodes.Transaction.ShippingPhoneNumberIsInvalid
+        );
+        done();
+      });
+    });
+
+    it('handles an error when shipping method is invalid', function (done) {
+      let transactionParams = {
+        type: 'sale',
+        amount: '64.05',
+        paymentMethodNonce: Nonces.AbstractTransactable,
+        shipping: {
+          streetAddress: '456 W Main St',
+          extendedAddress: 'Apt 2F',
+          locality: 'Bartlett',
+          region: 'IL',
+          phoneNumber: '122-555-1236',
+          postalCode: '60103',
+          countryName: 'Mexico',
+          shippingMethod: 'urgent'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(
+          response.errors.for('transaction').for('shipping').on('shippingMethod')[0].code,
+          ValidationErrorCodes.Transaction.ShippingMethodIsInvalid
+        );
+        done();
+      });
+    });
+
+    it('handles an error when billing phone number is invalid', function (done) {
+      let transactionParams = {
+        type: 'sale',
+        amount: '64.05',
+        paymentMethodNonce: Nonces.AbstractTransactable,
+        billing: {
+          streetAddress: '456 W Main St',
+          extendedAddress: 'Apt 2F',
+          locality: 'Bartlett',
+          region: 'IL',
+          phoneNumber: '123-234-3456=098765',
+          postalCode: '60103',
+          countryName: 'Mexico'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(
+          response.errors.for('transaction').for('billing').on('phoneNumber')[0].code,
+          ValidationErrorCodes.Transaction.BillingPhoneNumberIsInvalid
+        );
+        done();
+      });
+    });
+
+    it('handles an error when product sku is invalid', function (done) {
+      let transactionParams = {
+        type: 'sale',
+        amount: '64.05',
+        paymentMethodNonce: Nonces.AbstractTransactable,
+        productSku: 'product$ku!'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(
+          response.errors.for('transaction').on('productSku')[0].code,
+          ValidationErrorCodes.Transaction.ProductSkuIsInvalid
+        );
+        done();
+      });
+    });
+
     it('charges an elo card', function (done) {
       let transactionParams = {
         merchantAccountId: 'adyen_ma',
@@ -3140,6 +3281,22 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('deserializes the retrieval reference number', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNotNull(response.transaction.retrievalReferenceNumber);
+
+        done();
+      });
+    });
+
     it('handles processor soft declines', function (done) {
       let transactionParams = {
         amount: '2000.00',
@@ -3210,10 +3367,41 @@ describe('TransactionGateway', function () {
         }
       };
 
-      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
         assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud);
+        done();
+      });
+    });
+
+    it('handles risk_threshold rejection (test credit card number)', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: CreditCardNumbers.CardTypeIndicators.RiskThresholds,
+          expirationDate: '05/16'
+        }
+      };
+
+      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
+        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.RiskThreshold);
+        done();
+      });
+    });
+
+    it('handles risk_threshold rejection (test nonce)', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        paymentMethodNonce: Nonces.GatewayRejectedRiskThresholds
+      };
+
+      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
+        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.RiskThreshold);
         done();
       });
     });
@@ -3245,13 +3433,50 @@ describe('TransactionGateway', function () {
         },
         riskData: {
           customerBrowser: 'Edge',
-          customerIp: '127.0.0.0'
+          customerDeviceId: 'customer_device_id_012',
+          customerIp: '127.0.0.0',
+          customerLocationZip: '91244',
+          customerTenure: 20
         }
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
+        done();
+      });
+    });
+
+    it('handles risk data validation errors', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        },
+        riskData: {
+          customerBrowser: 'Edge' + '1'.repeat(400),
+          customerDeviceId: 'customer_device_id_012' + '3'.repeat(300),
+          customerIp: '127.0.0.0',
+          customerLocationZip: '912$4',
+          customerTenure: '20'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(
+          response.errors.for('transaction').for('riskData').on('customerBrowser')[0].code,
+          ValidationErrorCodes.RiskData.CustomerBrowserIsTooLong
+        );
+        assert.equal(
+          response.errors.for('transaction').for('riskData').on('customerDeviceId')[0].code,
+          ValidationErrorCodes.RiskData.CustomerDeviceIdIsTooLong
+        );
+        assert.equal(
+          response.errors.for('transaction').for('riskData').on('customerLocationZip')[0].code,
+          ValidationErrorCodes.RiskData.CustomerLocationZipInvalidCharacters
+        );
         done();
       });
     });
@@ -5234,7 +5459,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         },
         options: {
@@ -5299,7 +5524,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         },
         options: {
@@ -5325,7 +5550,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         },
         options: {
@@ -5360,7 +5585,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         },
         options: {
@@ -5420,7 +5645,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '5105105105105100',
+          number: '4111111111111111',
           expirationDate: '05/12'
         }
       };
@@ -5914,6 +6139,46 @@ describe('TransactionGateway', function () {
             done();
           });
         });
+      });
+    });
+  });
+
+  describe('card on file network tokenization', function () {
+    it('creates a network tokenized transaction with a vaulted credit card token', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        paymentMethodToken: 'network_tokenized_credit_card'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.processorResponseCode, '1000');
+        assert.equal(response.transaction.processorResponseType, 'approved');
+        assert.isTrue(response.transaction.processedWithNetworkToken);
+
+        done();
+      });
+    });
+
+    it('creates a non-network tokenized transaction with a nonce', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        paymentMethodNonce: Nonces.AbstractTransactable
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.processorResponseCode, '1000');
+        assert.equal(response.transaction.processorResponseType, 'approved');
+        assert.isFalse(response.transaction.processedWithNetworkToken);
+
+        done();
       });
     });
   });
