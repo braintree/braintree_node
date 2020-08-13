@@ -221,34 +221,6 @@ describe('PaymentMethodGateway', function () {
       );
     });
 
-    context('Amex Express Checkout', () =>
-      it('vaults an Amex Express Checkout Card from the nonce', done =>
-        specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
-          customerId = response.customer.id;
-
-          let paymentMethodParams = {
-            customerId,
-            paymentMethodNonce: Nonces.AmexExpressCheckout
-          };
-
-          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-            assert.isNull(err);
-            assert.isTrue(response.success);
-            assert.isNotNull(response.paymentMethod.token);
-            assert.isString(response.paymentMethod.expirationMonth);
-            assert.isString(response.paymentMethod.expirationYear);
-            assert.isTrue(response.paymentMethod.default);
-            assert.include(response.paymentMethod.imageUrl, '.png');
-            assert.match(response.paymentMethod.sourceDescription, /^AmEx \d{4}$/);
-            assert.match(response.paymentMethod.cardMemberNumber, /^\d{4}$/);
-            assert.equal(response.paymentMethod.customerId, customerId);
-
-            done();
-          });
-        })
-      )
-    );
-
     context('Venmo Account', () =>
       it('vaults an Venmo Account from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {

@@ -313,25 +313,6 @@ describe('CustomerGateway', function () {
         });
       });
 
-      it('creates a customer with an Amex Express Checkout card nonce', function (done) {
-        let customerParams =
-          {paymentMethodNonce: Nonces.AmexExpressCheckout};
-
-        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.isNotNull(response.customer.amexExpressCheckoutCards[0]);
-          let amexExpressCheckoutCard = response.customer.amexExpressCheckoutCards[0];
-
-          assert.isNotNull(amexExpressCheckoutCard.token);
-          assert.equal(amexExpressCheckoutCard.cardType, specHelper.braintree.CreditCard.CardType.AmEx);
-          assert.match(amexExpressCheckoutCard.cardMemberNumber, /^\d{4}$/);
-          assert.equal(response.customer.paymentMethods[0], amexExpressCheckoutCard);
-
-          done();
-        });
-      });
-
       it('creates a customer with an Venmo Account nonce', function (done) {
         let customerParams =
           {paymentMethodNonce: Nonces.VenmoAccount};

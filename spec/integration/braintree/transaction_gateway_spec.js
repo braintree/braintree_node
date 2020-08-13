@@ -2413,28 +2413,6 @@ describe('TransactionGateway', function () {
       )
     );
 
-    context('with amex express checkout card', () =>
-      it('returns AmexExpressCheckoutCard for payment_instrument', done =>
-        specHelper.defaultGateway.customer.create({}, function () {
-          let transactionParams = {
-            paymentMethodNonce: Nonces.AmexExpressCheckout,
-            merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
-            amount: '100.00'
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isTrue(response.success);
-            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AmexExpressCheckoutCard);
-            assert.equal(response.transaction.amexExpressCheckoutCard.cardType, specHelper.braintree.CreditCard.CardType.AmEx);
-            assert.match(response.transaction.amexExpressCheckoutCard.cardMemberNumber, /^\d{4}$/);
-
-            done();
-          });
-        })
-      )
-    );
-
     context('with venmo account', function () {
       it('returns VenmoAccount for payment_instrument', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
