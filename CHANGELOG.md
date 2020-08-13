@@ -39,6 +39,7 @@ Breaking Changes:
   * `OrderIdIsRequiredWithIdealPayment`
 * Rename `DownForMaintenanceError` to `ServiceUnavailableError`
 * Transaction searches throw `UnexpectedError` instead of `DownForMaintenanceError` when search response yields unexpected results
+* Remove Masterpass payment method support
 
 ## Unreleased
 * Add `networkTransactionId` to `CreditCardVerification`
