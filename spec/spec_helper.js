@@ -7,7 +7,6 @@ let uri = require('url');
 let TransactionAmounts = require('../lib/braintree/test/transaction_amounts').TransactionAmounts;
 let Util = require('../lib/braintree/util').Util;
 let Config = require('../lib/braintree/config').Config;
-let querystring = require('../vendor/querystring.node.js.511d6a2/querystring');
 let chai = require('chai');
 let Buffer = require('buffer').Buffer;
 let xml2js = require('xml2js');
@@ -111,40 +110,6 @@ let generate3DSNonce = function (params, callback) {
     params,
     responseCallback
   );
-};
-
-let simulateTrFormPost = function (url, trData, inputFormData, callback) {
-  let request;
-  let headers = {
-    'Content-Type': 'application/x-www-form-urlencoded',
-    Host: 'localhost'
-  };
-  let formData = Util.convertObjectKeysToUnderscores(inputFormData);
-
-  formData.tr_data = trData; // eslint-disable-line camelcase
-  let requestBody = querystring.stringify(formData);
-
-  headers['Content-Length'] = requestBody.length.toString();
-
-  let options = {
-    port: specHelper.defaultGateway.config.environment.port,
-    host: specHelper.defaultGateway.config.environment.server,
-    method: 'POST',
-    headers,
-    path: url
-  };
-
-  if (specHelper.defaultGateway.config.environment.ssl) {
-    request = https.request(options, function () {});
-  } else {
-    request = http.request(options, function () {});
-  }
-
-  request.on('response', response => callback(null, response.headers.location.split('?', 2)[1]));
-
-  request.write(requestBody);
-
-  return request.end();
 };
 
 let dateToMdy = function (date) {
@@ -608,7 +573,6 @@ global.specHelper = {
   plans,
   randomId,
   settlePayPalTransaction,
-  simulateTrFormPost,
   defaultMerchantAccountId: 'sandbox_credit_card',
   nonDefaultMerchantAccountId: 'sandbox_credit_card_non_default',
   nonDefaultSubMerchantAccountId: 'sandbox_sub_merchant_account',
