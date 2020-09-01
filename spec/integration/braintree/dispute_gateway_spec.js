@@ -1,7 +1,7 @@
 'use strict';
 
 let fs = require('fs');
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 let Dispute = require('../../../lib/braintree/dispute').Dispute;
 let DocumentUpload = require('../../../lib/braintree/document_upload').DocumentUpload;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;

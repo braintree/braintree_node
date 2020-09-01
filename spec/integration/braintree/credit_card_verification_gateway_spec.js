@@ -2,7 +2,7 @@
 
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 
 describe('CreditCardVerificationGateway', function () {
   describe('find', function () {

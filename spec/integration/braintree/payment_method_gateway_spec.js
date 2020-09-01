@@ -4,9 +4,9 @@ let braintree = specHelper.braintree;
 let Braintree = require('../../../lib/braintree');
 let Config = require('../../../lib/braintree/config').Config;
 let Environment = require('../../../lib/braintree/environment').Environment;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 
 describe('PaymentMethodGateway', function () {
   describe('create', function () {

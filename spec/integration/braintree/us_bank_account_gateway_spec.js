@@ -2,7 +2,7 @@
 
 let Transaction = require('../../../lib/braintree/transaction').Transaction;
 let UsBankAccountVerification = require('../../../lib/braintree/us_bank_account_verification').UsBankAccountVerification;
-let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
+let MerchantAccountTest = require('../../../lib/braintree/test_values/merchant_account').MerchantAccountTest;
 
 describe('UsBankAccountGateway', function () {
   describe('find', function () {

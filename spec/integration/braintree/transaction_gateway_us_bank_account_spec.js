@@ -2,7 +2,7 @@
 
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let Transaction = require('../../../lib/braintree/transaction').Transaction;
-let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
+let MerchantAccountTest = require('../../../lib/braintree/test_values/merchant_account').MerchantAccountTest;
 
 describe('TransactionGateway', function () {
   describe('exempt merchant', function () {

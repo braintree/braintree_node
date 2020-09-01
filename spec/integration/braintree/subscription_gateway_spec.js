@@ -3,7 +3,7 @@
 let dateFormat = require('dateformat');
 let _ = require('underscore')._;
 let braintree = specHelper.braintree;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
 
 describe('SubscriptionGateway', function () {
   let customerId, creditCardToken;

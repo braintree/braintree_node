@@ -59,6 +59,7 @@ Breaking Changes:
   * `RiskData.CustomerLocationZipIsInvalid`
   * `RiskData.CustomerLocationZipIsTooLong`
   * `RiskData.CustomerTenureIsTooLong`
+* Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
 
 ## 2.23.0
 * Add `threeDSecurePassThru` parameters to `Customer.create`, `PaymentMethod.create`, `CreditCard.create`, `Customer.update`, `PaymentMethod.update` and `CreditCard.update`
