@@ -183,15 +183,13 @@ let generateValidUsBankAccountNonce = function (accountNumber, gw, callback) {
   gw = gw || specHelper.defaultGateway;
   gw.clientToken.generate({}, function (err, result) {
     let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-    let req;
-
     let url = uri.parse(clientToken.braintree_api.url);
     let token = clientToken.braintree_api.access_token;
     let options = {
       host: url.hostname,
       port: url.port,
       method: 'POST',
-      path: '/graphql',
+      path: '/tokens',
       headers: {
         'Content-Type': 'application/json',
         'Braintree-Version': '2016-10-07',
@@ -199,50 +197,30 @@ let generateValidUsBankAccountNonce = function (accountNumber, gw, callback) {
       }
     };
 
-    let query = `
-      mutation TokenizeUsBankAccount($input: TokenizeUsBankAccountInput!) {
-        tokenizeUsBankAccount(input: $input) {
-          paymentMethod {
-            id
-          }
-        }
-      }`;
-
-    let variables = {
-      input: {
-        usBankAccount: {
-          accountNumber: accountNumber,
-          routingNumber: '021000021',
-          accountType: 'CHECKING',
-          billingAddress: {
-            streetAddress: '123 Ave',
-            state: 'CA',
-            city: 'San Francisco',
-            zipCode: '94112'
-          },
-          individualOwner: {
-            firstName: 'Dan',
-            lastName: 'Schulman'
-          },
-          achMandate: 'cl mandate text'
-        }
+    let payload = {
+      type: 'us_bank_account',
+      billing_address: { // eslint-disable-line camelcase
+        street_address: '123 Ave', // eslint-disable-line camelcase
+        region: 'CA',
+        locality: 'San Francisco',
+        postal_code: '94112' // eslint-disable-line camelcase
+      },
+      account_type: 'checking', // eslint-disable-line camelcase
+      ownership_type: 'personal', // eslint-disable-line camelcase
+      routing_number: '021000021', // eslint-disable-line camelcase
+      account_number: accountNumber, // eslint-disable-line camelcase
+      first_name: 'Dan', // eslint-disable-line camelcase
+      last_name: 'Schulman', // eslint-disable-line camelcase
+      ach_mandate: { // eslint-disable-line camelcase
+        text: 'cl mandate text'
       }
     };
 
-    let graphQLRequest = {
-      query: query,
-      variables: variables
-    };
-
-    let requestBody = JSON.stringify(graphQLRequest);
+    let requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload));
 
     options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString();
 
-    if (url.protocol === 'http:') {
-      req = http.request(options);
-    } else {
-      req = https.request(options);
-    }
+    let req = https.request(options);
 
     req.on('response', response => {
       let body = '';
@@ -253,7 +231,7 @@ let generateValidUsBankAccountNonce = function (accountNumber, gw, callback) {
       response.on('end', () => {
         let json = JSON.parse(body);
 
-        callback(json.data.tokenizeUsBankAccount.paymentMethod.id);
+        callback(json.data.id);
       }
       );
 
@@ -277,15 +255,13 @@ let generatePlaidUsBankAccountNonce = function (gw, callback) {
   gw = gw || specHelper.defaultGateway;
   gw.clientToken.generate({}, function (err, result) {
     let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-    let req;
-
     let url = uri.parse(clientToken.braintree_api.url);
     let token = clientToken.braintree_api.access_token;
     let options = {
       host: url.hostname,
       port: url.port,
       method: 'POST',
-      path: '/graphql',
+      path: '/tokens',
       headers: {
         'Content-Type': 'application/json',
         'Braintree-Version': '2016-10-07',
@@ -293,50 +269,29 @@ let generatePlaidUsBankAccountNonce = function (gw, callback) {
       }
     };
 
-    let query = `
-      mutation TokenizeUsBankLogin($input: TokenizeUsBankLoginInput!) {
-        tokenizeUsBankLogin(input: $input) {
-          paymentMethod {
-            id
-          }
-        }
-      }`;
-
-    let variables = {
-      input: {
-        usBankLogin: {
-          publicToken: 'good',
-          accountId: 'plaid_account_id',
-          accountType: 'CHECKING',
-          billingAddress: {
-            streetAddress: '123 Ave',
-            state: 'CA',
-            city: 'San Francisco',
-            zipCode: '94112'
-          },
-          individualOwner: {
-            firstName: 'Dan',
-            lastName: 'Schulman'
-          },
-          achMandate: 'cl mandate text'
-        }
+    let payload = {
+      type: 'plaid_public_token',
+      public_token: 'good', // eslint-disable-line camelcase
+      account_id: 'plaid_account_id', // eslint-disable-line camelcase
+      billing_address: { // eslint-disable-line camelcase
+        street_address: '123 Ave', // eslint-disable-line camelcase
+        region: 'CA',
+        locality: 'San Francisco',
+        postal_code: '94112' // eslint-disable-line camelcase
+      },
+      ownership_type: 'personal', // eslint-disable-line camelcase
+      first_name: 'Dan', // eslint-disable-line camelcase
+      last_name: 'Schulman', // eslint-disable-line camelcase
+      ach_mandate: { // eslint-disable-line camelcase
+        text: 'cl mandate text'
       }
     };
 
-    let graphQLRequest = {
-      query: query,
-      variables: variables
-    };
-
-    let requestBody = JSON.stringify(graphQLRequest);
+    let requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(payload));
 
     options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString();
 
-    if (url.protocol === 'http:') {
-      req = http.request(options);
-    } else {
-      req = https.request(options);
-    }
+    let req = https.request(options);
 
     req.on('response', response => {
       let body = '';
@@ -347,7 +302,7 @@ let generatePlaidUsBankAccountNonce = function (gw, callback) {
       response.on('end', () => {
         let json = JSON.parse(body);
 
-        callback(json.data.tokenizeUsBankLogin.paymentMethod.id);
+        callback(json.data.id);
       }
       );
 

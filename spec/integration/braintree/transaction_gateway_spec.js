@@ -3330,37 +3330,6 @@ describe('TransactionGateway', function () {
       });
     });
 
-    it('handles risk_threshold rejection (test credit card number)', function (done) {
-      let transactionParams = {
-        amount: '10.0',
-        creditCard: {
-          number: CreditCardNumbers.CardTypeIndicators.RiskThresholds,
-          expirationDate: '05/16'
-        }
-      };
-
-      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isFalse(response.success, 'response had no errors');
-        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
-        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.RiskThreshold);
-        done();
-      });
-    });
-
-    it('handles risk_threshold rejection (test nonce)', function (done) {
-      let transactionParams = {
-        amount: '10.0',
-        paymentMethodNonce: Nonces.GatewayRejectedRiskThresholds
-      };
-
-      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isFalse(response.success, 'response had no errors');
-        assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
-        assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.RiskThreshold);
-        done();
-      });
-    });
-
     it('allows fraud params', function (done) {
       let transactionParams = {
         amount: '10.0',
@@ -5414,7 +5383,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '4111111111111111',
+          number: '5105105105105100',
           expirationDate: '05/12'
         },
         options: {
@@ -5479,7 +5448,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '4111111111111111',
+          number: '5105105105105100',
           expirationDate: '05/12'
         },
         options: {
@@ -5505,7 +5474,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '4111111111111111',
+          number: '5105105105105100',
           expirationDate: '05/12'
         },
         options: {
@@ -5540,7 +5509,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '4111111111111111',
+          number: '5105105105105100',
           expirationDate: '05/12'
         },
         options: {
@@ -5600,7 +5569,7 @@ describe('TransactionGateway', function () {
       let transactionParams = {
         amount: '5.00',
         creditCard: {
-          number: '4111111111111111',
+          number: '5105105105105100',
           expirationDate: '05/12'
         }
       };
@@ -6094,46 +6063,6 @@ describe('TransactionGateway', function () {
             done();
           });
         });
-      });
-    });
-  });
-
-  describe('card on file network tokenization', function () {
-    it('creates a network tokenized transaction with a vaulted credit card token', function (done) {
-      let transactionParams = {
-        amount: '5.00',
-        paymentMethodToken: 'network_tokenized_credit_card'
-      };
-
-      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isNull(err);
-        assert.isTrue(response.success);
-        assert.equal(response.transaction.type, 'sale');
-        assert.equal(response.transaction.amount, '5.00');
-        assert.equal(response.transaction.processorResponseCode, '1000');
-        assert.equal(response.transaction.processorResponseType, 'approved');
-        assert.isTrue(response.transaction.processedWithNetworkToken);
-
-        done();
-      });
-    });
-
-    it('creates a non-network tokenized transaction with a nonce', function (done) {
-      let transactionParams = {
-        amount: '5.00',
-        paymentMethodNonce: Nonces.AbstractTransactable
-      };
-
-      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-        assert.isNull(err);
-        assert.isTrue(response.success);
-        assert.equal(response.transaction.type, 'sale');
-        assert.equal(response.transaction.amount, '5.00');
-        assert.equal(response.transaction.processorResponseCode, '1000');
-        assert.equal(response.transaction.processorResponseType, 'approved');
-        assert.isFalse(response.transaction.processedWithNetworkToken);
-
-        done();
       });
     });
   });

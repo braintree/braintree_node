@@ -42,9 +42,7 @@ Breaking Changes:
 * Remove Masterpass Card support
 * Remove Amex Express Checkout Card support
 
-## 2.24.0
-* Add * `GatewayRejectionReason.RiskThreshold` to `Transaction`
-* Update @braintree/wrap-promise to v2.1.0
+## Unreleased
 * Add `networkTransactionId` to `CreditCardVerification`
 * Add `retrievalReferenceNumber` to `Transaction`
 * Add `productSku` to `Transaction`
@@ -61,8 +59,6 @@ Breaking Changes:
   * `RiskData.CustomerLocationZipIsInvalid`
   * `RiskData.CustomerLocationZipIsTooLong`
   * `RiskData.CustomerTenureIsTooLong`
-* Add `processedWithNetworkToken` to `Transaction`
-* Add `isNetworkTokenized` to `CreditCard`
 
 ## 2.23.0
 * Add `threeDSecurePassThru` parameters to `Customer.create`, `PaymentMethod.create`, `CreditCard.create`, `Customer.update`, `PaymentMethod.update` and `CreditCard.update`

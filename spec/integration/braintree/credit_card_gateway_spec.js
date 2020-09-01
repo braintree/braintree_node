@@ -812,8 +812,7 @@ describe('CreditCardGateway', function () {
   );
 
   describe('find', function () {
-    let customerToken, creditCardParams, customerId;
-    let networkTokenizedCreditCardToken = 'network_tokenized_credit_card';
+    let customerToken;
 
     before(function (done) {
       let customerParams = {
@@ -825,7 +824,6 @@ describe('CreditCardGateway', function () {
 
       specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
         customerToken = response.customer.creditCards[0].token;
-        customerId = response.customer.id;
         done();
       });
     });
@@ -855,33 +853,6 @@ describe('CreditCardGateway', function () {
         done();
       })
     );
-
-    it('finds the network tokenized card', done =>
-      specHelper.defaultGateway.creditCard.find(networkTokenizedCreditCardToken, function (err, creditCard) {
-        assert.isNull(err);
-        assert.isTrue(creditCard.isNetworkTokenized);
-
-        done();
-      })
-    );
-
-    it('finds the non network tokenized card', done => {
-      creditCardParams = {
-        customerId,
-        number: '5105105105105100',
-        expirationDate: '05/2012'
-      };
-      specHelper.defaultGateway.creditCard.create(creditCardParams, function (err, response) {
-        assert.isNull(err);
-        assert.isTrue(response.success);
-
-        specHelper.defaultGateway.creditCard.find(response.creditCard.token, function (err, creditCard) {
-          assert.isNull(err);
-          assert.isFalse(creditCard.isNetworkTokenized);
-          done();
-        });
-      });
-    });
   });
 
   describe('fromNonce', function () {
