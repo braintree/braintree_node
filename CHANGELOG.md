@@ -2,6 +2,7 @@
 
 ## WIP: next major version
 * Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
+* Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
 Breaking Changes:
 * Remove deprecated iDEAL, Coinbase, and Transparent Redirect
 * Remove deprecated `connect` method
@@ -42,7 +43,9 @@ Breaking Changes:
 * Remove Masterpass Card support
 * Remove Amex Express Checkout Card support
 
-## Unreleased
+## 2.24.0
+* Add * `GatewayRejectionReason.RiskThreshold` to `Transaction`
+* Update @braintree/wrap-promise to v2.1.0
 * Add `networkTransactionId` to `CreditCardVerification`
 * Add `retrievalReferenceNumber` to `Transaction`
 * Add `productSku` to `Transaction`
@@ -59,7 +62,8 @@ Breaking Changes:
   * `RiskData.CustomerLocationZipIsInvalid`
   * `RiskData.CustomerLocationZipIsTooLong`
   * `RiskData.CustomerTenureIsTooLong`
-* Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
+* Add `processedWithNetworkToken` to `Transaction`
+* Add `isNetworkTokenized` to `CreditCard`
 
 ## 2.23.0
 * Add `threeDSecurePassThru` parameters to `Customer.create`, `PaymentMethod.create`, `CreditCard.create`, `Customer.update`, `PaymentMethod.update` and `CreditCard.update`
