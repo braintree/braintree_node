@@ -1,7 +1,7 @@
 {
   "name": "braintree",
   "version": "2.24.0",
-  "description": "A library for integrating with Braintree.",
+  "description": "A library for server-side integrating with Braintree.",
   "keywords": [
     "braintree",
     "payments"
@@ -17,8 +17,8 @@
     "url": "https://github.com/braintree/braintree_node.git"
   },
   "engines": {
-    "node": ">=4.7",
-    "npm": ">=5"
+    "node": ">=10.0",
+    "npm": ">=6"
   },
   "dependencies": {
     "@braintree/wrap-promise": "2.1.0",
