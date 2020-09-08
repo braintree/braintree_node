@@ -4,6 +4,7 @@
 
 * Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
 * Remove underscore dependency
+* Remove semver package dependency
 * Remove readable-stream dependency
 
 ### Breaking Changes:

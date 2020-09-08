@@ -4,7 +4,6 @@ let Braintree = require('../../../lib/braintree');
 let Transaction = Braintree.Transaction;
 let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 let CreditCard = Braintree.CreditCard;
-let Util = require('../../../lib/braintree/util').Util;
 let Writable = require('stream').Writable;
 let braintree = specHelper.braintree;
 
@@ -419,12 +418,6 @@ describe('TransactionSearch', () =>
     });
 
     it('allows piping results to a writable stream', function (done) {
-      if (!Util.supportsStreams2()) {
-        done();
-
-        return;
-      }
-
       let random = specHelper.randomId();
       let transactionParams = {
         amount: '10.00',
