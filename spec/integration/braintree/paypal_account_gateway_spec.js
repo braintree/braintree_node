@@ -2,7 +2,7 @@
 
 let braintree = specHelper.braintree;
 let Config = require('../../../lib/braintree/config').Config;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
 
 describe('PayPalGateway', function () {
   describe('find', function () {

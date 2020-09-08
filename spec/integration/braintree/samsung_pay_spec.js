@@ -1,6 +1,6 @@
 'use strict';
 
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
 let PaymentInstrumentTypes = require('../../../lib/braintree/payment_instrument_types').PaymentInstrumentTypes;
 
 describe('Samsung Pay', function () {

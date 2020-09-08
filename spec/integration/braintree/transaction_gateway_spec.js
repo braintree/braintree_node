@@ -2,9 +2,9 @@
 
 let braintree = specHelper.braintree;
 let Braintree = require('../../../lib/braintree');
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
-let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
+let VenmoSdk = require('../../../lib/braintree/test_values/venmo_sdk').VenmoSdk;
 let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let PaymentInstrumentTypes = require('../../../lib/braintree/payment_instrument_types').PaymentInstrumentTypes;

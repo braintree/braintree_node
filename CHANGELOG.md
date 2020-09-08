@@ -2,6 +2,7 @@
 
 ## WIP: next major version
 * Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
+* Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
 Breaking Changes:
 * Remove deprecated iDEAL, Coinbase, and Transparent Redirect
 * Remove deprecated `connect` method

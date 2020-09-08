@@ -1,12 +1,12 @@
 'use strict';
 
-let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let VenmoSdk = require('../../../lib/braintree/test_values/venmo_sdk').VenmoSdk;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
 let Config = require('../../../lib/braintree/config').Config;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
-let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let MerchantAccountTest = require('../../../lib/braintree/test_values/merchant_account').MerchantAccountTest;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 
 describe('CustomerGateway', function () {
   describe('create', function () {

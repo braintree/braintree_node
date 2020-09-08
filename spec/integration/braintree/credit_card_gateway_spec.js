@@ -1,11 +1,11 @@
 'use strict';
 
 let braintree = specHelper.braintree;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
 let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
-let CreditCardDefaults = require('../../../lib/braintree/test/credit_card_defaults').CreditCardDefaults;
-let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
+let CreditCardDefaults = require('../../../lib/braintree/test_values/credit_card_defaults').CreditCardDefaults;
+let VenmoSdk = require('../../../lib/braintree/test_values/venmo_sdk').VenmoSdk;
 let Config = require('../../../lib/braintree/config').Config;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
