@@ -25,7 +25,6 @@
     "dateformat": "^3.0.3",
     "readable-stream": "1.1.10",
     "semver": "^7.3.2",
-    "underscore": "^1.10.2",
     "xml2js": "0.1.13"
   },
   "devDependencies": {

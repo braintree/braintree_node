@@ -1,7 +1,6 @@
 'use strict';
 
 let Braintree = require('../../../lib/braintree');
-let _ = require('underscore');
 let Transaction = Braintree.Transaction;
 let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 let CreditCard = Braintree.CreditCard;
@@ -304,7 +303,7 @@ describe('TransactionSearch', () =>
       };
       let counter = 0;
 
-      _.each(__range__(1, 51, true), () =>
+      __range__(1, 51, true).forEach(() =>
         specHelper.defaultGateway.transaction.sale(transactionParams, function () {
           counter += 1;
           if (counter === 51) {
@@ -320,8 +319,8 @@ describe('TransactionSearch', () =>
                 transactions[transaction.id] = true;
                 responseCounter += 1;
 
-                if (_.size(transactions) !== responseCounter || responseCounter === 51) {
-                  assert.equal(_.size(transactions), responseCounter);
+                if (Object.keys(transactions).length !== responseCounter || responseCounter === 51) {
+                  assert.equal(Object.keys(transactions).length, responseCounter);
                   done();
                 }
               });

@@ -1,9 +1,25 @@
 'use strict';
 
 let dateFormat = require('dateformat');
-let _ = require('underscore')._;
 let braintree = specHelper.braintree;
 let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
+
+function sortArrayByObject(array, key) {
+  return array.sort((prevObj, nextObj) => {
+    const str1 = prevObj[key].toUpperCase();
+    const str2 = nextObj[key].toUpperCase();
+
+    if (str1 < str2) {
+      return -1;
+    }
+
+    if (str1 > str2) {
+      return 1;
+    }
+
+    return 0;
+  });
+}
 
 describe('SubscriptionGateway', function () {
   let customerId, creditCardToken;
@@ -236,7 +252,7 @@ describe('SubscriptionGateway', function () {
         assert.isNull(err);
         assert.isTrue(response.success);
 
-        let addons = _.sortBy(response.subscription.addOns, a => a.id);
+        const addons = sortArrayByObject(response.subscription.addOns, 'id');
 
         assert.equal(addons.length, 2);
 
@@ -254,7 +270,7 @@ describe('SubscriptionGateway', function () {
         assert.isTrue(addons[1].neverExpires);
         assert.equal(addons[1].currentBillingCycle, 0);
 
-        let discounts = _.sortBy(response.subscription.discounts, d => d.id);
+        const discounts = sortArrayByObject(response.subscription.discounts, 'id');
 
         assert.equal(discounts.length, 2);
 

@@ -1,5 +1,4 @@
 'use strict';
-let _ = require('underscore');
 
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
@@ -335,7 +334,7 @@ describe('UsBankAccountVerificationGateway', function () {
 
               let createdIds = [];
 
-              _.forEach(verifications, function (v) {
+              verifications.forEach(v => {
                 createdIds.push(v.id);
               });
 
@@ -352,7 +351,7 @@ describe('UsBankAccountVerificationGateway', function () {
                 createdIds.sort();
                 response.ids.sort();
 
-                assert.isTrue(_.isEqual(createdIds, response.ids));
+                assert.deepEqual(createdIds, response.ids);
                 assert.equal(verifications[0].verificationMethod, UsBankAccountVerification.VerificationMethod.IndependentCheck);
                 assert.equal(verifications[1].verificationMethod, UsBankAccountVerification.VerificationMethod.IndependentCheck);
 

@@ -1,9 +1,13 @@
 # Changelog
 
 ## WIP: next major version
+
 * Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
+* Remove underscore dependency
+
+### Breaking Changes:
+
 * Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
-Breaking Changes:
 * Remove deprecated iDEAL, Coinbase, and Transparent Redirect
 * Remove deprecated `connect` method
 * Config class now throws an error when token environment does not match passed environment
@@ -42,6 +46,7 @@ Breaking Changes:
 * Transaction searches throw `UnexpectedError` instead of `DownForMaintenanceError` when search response yields unexpected results
 * Remove Masterpass Card support
 * Remove Amex Express Checkout Card support
+* Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
 
 ## 2.24.0
 * Add * `GatewayRejectionReason.RiskThreshold` to `Transaction`
