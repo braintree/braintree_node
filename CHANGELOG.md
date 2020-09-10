@@ -1,5 +1,3 @@
-# Changelog
-
 ## WIP: next major version
 
 * Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
@@ -49,6 +47,7 @@
 * Remove Masterpass Card support
 * Remove Amex Express Checkout Card support
 * Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
+* Bump API version to support declined refund objects.
 
 ## 2.24.0
 * Add * `GatewayRejectionReason.RiskThreshold` to `Transaction`

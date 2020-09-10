@@ -5034,7 +5034,12 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.refund(result.transaction.id, '2046.00', function (err, response) {
             assert.isNull(err);
             assert.isFalse(response.success, 'response had no errors');
-            assert.equal(response.errors.for('transaction').on('base')[0].code, '915201');
+            assert.equal(response.transaction.type, 'credit');
+            assert.equal(response.transaction.status, 'processor_declined');
+            assert.equal(response.transaction.processorResponseCode, '2046');
+            assert.equal(response.transaction.processorResponseText, 'Declined');
+            assert.equal(response.transaction.processorResponseType, 'soft_declined');
+            assert.equal(response.transaction.additionalProcessorResponse, '2046 : Declined');
 
             done();
           })
@@ -5059,8 +5064,12 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.refund(result.transaction.id, '2009.00', function (err, response) {
             assert.isNull(err);
             assert.isFalse(response.success, 'response had no errors');
-            assert.equal(response.errors.for('transaction').on('base')[0].code, '915200');
-
+            assert.equal(response.transaction.type, 'credit');
+            assert.equal(response.transaction.status, 'processor_declined');
+            assert.equal(response.transaction.processorResponseCode, '2009');
+            assert.equal(response.transaction.processorResponseText, 'No Such Issuer');
+            assert.equal(response.transaction.processorResponseType, 'hard_declined');
+            assert.equal(response.transaction.additionalProcessorResponse, '2009 : No Such Issuer');
             done();
           })
         )
