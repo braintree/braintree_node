@@ -47,6 +47,7 @@
 * Remove Masterpass Card support
 * Remove Amex Express Checkout Card support
 * Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
+* Fix bug where `expired` and `expiringBetween` methods on `CreditCardGateway` did not return full credit card results
 * Bump API version to support declined refund objects.
 
 ## 2.24.0
