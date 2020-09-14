@@ -8,7 +8,6 @@ let TransactionAmounts = require('../lib/braintree/test_values/transaction_amoun
 let Util = require('../lib/braintree/util').Util;
 let Config = require('../lib/braintree/config').Config;
 let chai = require('chai');
-let xml2js = require('xml2js');
 
 chai.config.includeStack = true;
 
@@ -477,8 +476,6 @@ class ClientApiHttp {
 
   constructor(config) {
     this.config = config;
-    this.parser = new xml2js.Parser({
-      explicitRoot: true});
   }
 
   get(url, params, callback) {
