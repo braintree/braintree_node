@@ -651,4 +651,31 @@ describe('Util', function () {
       assert.equal(error.message, 'These keys are invalid: invalidKey, creditCard[nestedInvalidKey]');
     });
   });
+
+  describe('zip', () => {
+    it('produces an array of arrays, merges the elements of N component arrays at each index', () => {
+      const array1 = [1, 2, 3, 4, 5, 6];
+      const array2 = ['a', 'b', 'c', 'd', 'e', 'f'];
+
+      assert.deepEqual(Util.zip(array1, array2), [[1, 'a'], [2, 'b'], [3, 'c'], [4, 'd'], [5, 'e'], [6, 'f']]);
+    });
+
+    it('produces an array as long as the longest component array', () => {
+      const array1 = [1, 2, 3];
+      const array2 = ['a', 'b', 'c', 'd', 'e', 'f'];
+
+      assert.equal(Util.zip(array1, array2).length, 6);
+      assert.equal(Util.zip(array2, array1).length, 6);
+    });
+
+    it('inserts `undefined` as needed to keep indices intact across variable length component arrays', () => {
+      const array1 = [1, 2, 3];
+      const array2 = ['a', 'b', 'c', 'd', 'e', 'f'];
+
+      assert.isUndefined(Util.zip(array1, array2)[3][0]);
+      assert.equal(Util.zip(array1, array2)[3][1], 'd');
+      assert.isUndefined(Util.zip(array2, array1)[3][1]);
+      assert.equal(Util.zip(array2, array1)[3][0], 'd');
+    });
+  });
 });

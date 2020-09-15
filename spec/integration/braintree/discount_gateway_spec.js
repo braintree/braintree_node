@@ -1,7 +1,5 @@
 'use strict';
 
-let _ = require('underscore')._;
-
 describe('DiscountGateway', () =>
   describe('self.all', () =>
     it('gets all discounts', function (done) {
@@ -21,7 +19,7 @@ describe('DiscountGateway', () =>
           assert.isNull(err);
           assert.isTrue(response.success);
 
-          let discount = _.find(response.discounts, discount => discount.id === attributes.id);
+          const discount = response.discounts.find(discount => discount.id === attributes.id);
 
           assert.equal(attributes.name, discount.name);
           assert.equal(attributes.amount, discount.amount);

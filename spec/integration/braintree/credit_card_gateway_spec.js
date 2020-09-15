@@ -1,11 +1,11 @@
 'use strict';
 
 let braintree = specHelper.braintree;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
 let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
-let CreditCardDefaults = require('../../../lib/braintree/test/credit_card_defaults').CreditCardDefaults;
-let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
+let CreditCardDefaults = require('../../../lib/braintree/test_values/credit_card_defaults').CreditCardDefaults;
+let VenmoSdk = require('../../../lib/braintree/test_values/venmo_sdk').VenmoSdk;
 let Config = require('../../../lib/braintree/config').Config;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
@@ -764,31 +764,62 @@ describe('CreditCardGateway', function () {
     );
   });
 
-  describe('expired', () =>
-    it('returns expired cards', function (done) {
-      let customerParams = {
+  describe('expired', () => {
+    it('returns expired cards in iterable format', function (done) {
+      const year = new Date().getFullYear() - 3;
+      const customerParams = {
         creditCard: {
           number: '5105105105105100',
-          expirationDate: `01/${new Date().getFullYear() - 3}`
+          expirationDate: `01/${year}`
         }
       };
 
       specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
-        let testCard = response.customer.creditCards[0];
+        const testCard = response.customer.creditCards[0];
 
         specHelper.defaultGateway.creditCard.expired(function (err, result) {
+          assert.isNull(err);
           assert.include(result.ids, testCard.token);
+          assert(result.length() > 0);
+
+          return result.first(function (err, card) {
+            assert(card.expired);
+            done();
+          });
+        });
+      });
+    });
+
+    it('returns expired cards in stream format', function (done) {
+      const year = new Date().getFullYear() - 3;
+      const customerParams = {
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: `01/${year}`
+        }
+      };
+
+      specHelper.defaultGateway.customer.create(customerParams, function () {
+        let cards = [];
+
+        let search = specHelper.defaultGateway.creditCard.expired();
+
+        search.on('data', card => cards.push(card));
+
+        search.on('end', function () {
+          assert(cards.length > 0);
+          assert(cards[0].expired);
 
           done();
         });
       });
-    })
-  );
+    });
+  });
 
-  describe('expiringBetween', () =>
-    it('returns card expiring between the given dates', function (done) {
+  describe('expiringBetween', () => {
+    it('returns cards expiring between the given dates in iterable format', function (done) {
       const year = new Date().getFullYear() - 3;
-      let customerParams = {
+      const customerParams = {
         creditCard: {
           number: '5105105105105100',
           expirationDate: `05/${year}`
@@ -796,20 +827,54 @@ describe('CreditCardGateway', function () {
       };
 
       specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
-        let testCard = response.customer.creditCards[0];
+        const testCard = response.customer.creditCards[0];
 
-        let before = new Date(`${year}-04-31`);
-        let after = new Date(`${year}-10-01`);
+        const startDate = new Date(`${year}-04-31`);
+        const endDate = new Date(`${year}-10-01`);
 
-        specHelper.defaultGateway.creditCard.expiringBetween(before, after, function (err, result) {
+        specHelper.defaultGateway.creditCard.expiringBetween(startDate, endDate, function (err, result) {
           assert.isNull(err);
           assert.include(result.ids, testCard.token);
+          assert(result.length() > 0);
+
+          return result.first(function (err, card) {
+            assert(card.expired);
+            assert.equal(card.expirationYear, year);
+            done();
+          });
+        });
+      });
+    });
+
+    it('returns cards expiring between the given dates in stream format', function (done) {
+      const year = new Date().getFullYear() - 3;
+      const customerParams = {
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: `05/${year}`
+        }
+      };
+
+      specHelper.defaultGateway.customer.create(customerParams, function () {
+        const startDate = new Date(`${year}-04-31`);
+        const endDate = new Date(`${year}-10-01`);
+
+        let cards = [];
+
+        let search = specHelper.defaultGateway.creditCard.expiringBetween(startDate, endDate);
+
+        search.on('data', card => cards.push(card));
+
+        search.on('end', function () {
+          assert(cards.length > 0);
+          assert(cards[0].expired);
+          assert.equal(cards[0].expirationYear, year);
 
           done();
         });
       });
-    })
-  );
+    });
+  });
 
   describe('find', function () {
     let customerToken, creditCardParams, customerId;

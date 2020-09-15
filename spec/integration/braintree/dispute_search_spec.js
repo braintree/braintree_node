@@ -1,7 +1,7 @@
 'use strict';
 
 let Dispute = require('../../../lib/braintree/dispute').Dispute;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 
 describe('DisputeSearch', () => {
   describe('callback', () => {

@@ -1,12 +1,12 @@
 'use strict';
 
-let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let VenmoSdk = require('../../../lib/braintree/test_values/venmo_sdk').VenmoSdk;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
 let Config = require('../../../lib/braintree/config').Config;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
-let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let MerchantAccountTest = require('../../../lib/braintree/test_values/merchant_account').MerchantAccountTest;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 
 describe('CustomerGateway', function () {
   describe('create', function () {
@@ -313,25 +313,6 @@ describe('CustomerGateway', function () {
         });
       });
 
-      it('creates a customer with an Amex Express Checkout card nonce', function (done) {
-        let customerParams =
-          {paymentMethodNonce: Nonces.AmexExpressCheckout};
-
-        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.isNotNull(response.customer.amexExpressCheckoutCards[0]);
-          let amexExpressCheckoutCard = response.customer.amexExpressCheckoutCards[0];
-
-          assert.isNotNull(amexExpressCheckoutCard.token);
-          assert.equal(amexExpressCheckoutCard.cardType, specHelper.braintree.CreditCard.CardType.AmEx);
-          assert.match(amexExpressCheckoutCard.cardMemberNumber, /^\d{4}$/);
-          assert.equal(response.customer.paymentMethods[0], amexExpressCheckoutCard);
-
-          done();
-        });
-      });
-
       it('creates a customer with an Venmo Account nonce', function (done) {
         let customerParams =
           {paymentMethodNonce: Nonces.VenmoAccount};
@@ -380,23 +361,6 @@ describe('CustomerGateway', function () {
           });
         })
       );
-
-      it('cannot create a customer with a Coinbase account payment method nonce', function (done) {
-        let customerParams =
-          {paymentMethodNonce: Nonces.Coinbase};
-
-        specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
-          assert.isNull(err);
-          assert.isFalse(response.success);
-
-          assert.equal(
-            response.errors.for('coinbaseAccount').on('base')[0].code,
-            ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
-          );
-
-          done();
-        });
-      });
 
       it('creates a customer with a paypal account payment method nonce', function (done) {
         let customerParams =

@@ -1,3 +1,51 @@
+## unreleased 
+
+* Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
+* Remove several no-longer-used dependencies (underscore, semver and readable-stream)
+* Breaking Changes
+  * Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
+  * Remove deprecated iDEAL, Coinbase, and Transparent Redirect
+  * Remove deprecated `connect` method
+  * Config class now throws an error when token environment does not match passed environment
+  * Remove `GrantedPaymentInstrumentUpdate` (deprecated in 2.16.0)
+  * Remove `InvalidTransparentRedirectHashError`
+  * Remove `SEPA` test nonce
+  * Remove deprecated `tag` parameter from dispute calls
+  * Remove deprecated validation error codes:
+    * `DiscountAmountMustBeGreaterThanZero`
+    * `UnitTaxAmountMustBeGreaterThanZero`
+    * `SEPABankAccount`:
+      * `IBANIsRequired`
+      * `BICIsRequired`
+      * `AccountHolderNameIsRequired`
+    * `SEPAMandate`:
+      * `AccountHolderNameIsRequired`
+      * `BICIsRequired`
+      * `IBANIsRequired`
+      * `TypeIsRequired`
+      * `IBANInvalidCharacter`
+      * `BICInvalidCharacter`
+      * `BICLengthIsInvalid`
+      * `BICUnsupportedCountry`
+      * `IBANUnsupportedCountry`
+      * `IBANInvalidFormat`
+      * `BillingAddressConflict`
+      * `BillingAddressIdIsInvalid`
+      * `TypeIsInvalid`
+    * `AmountDoesNotMatchIdealPaymentAmount`
+    * `IdealPaymentNotComplete`
+    * `IdealPaymentsCannotBeVaulted`
+    * `MerchantAccountDoesNotMatchIdealPaymentMerchantAccount`
+    * `OrderIdDoesNotMatchIdealPaymentOrderId`
+    * `OrderIdIsRequiredWithIdealPayment`
+  * Rename `DownForMaintenanceError` to `ServiceUnavailableError`
+  * Transaction searches throw `UnexpectedError` instead of `DownForMaintenanceError` when search response yields unexpected results
+  * Remove Masterpass Card support
+  * Remove Amex Express Checkout Card support
+  * Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
+  * Fix bug where `expired` and `expiringBetween` methods on `CreditCardGateway` did not return full credit card results
+  * Bump API version to support declined refund objects.
+
 ## 2.24.0
 * Add * `GatewayRejectionReason.RiskThreshold` to `Transaction`
 * Update @braintree/wrap-promise to v2.1.0

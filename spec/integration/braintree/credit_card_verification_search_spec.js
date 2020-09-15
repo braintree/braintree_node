@@ -1,7 +1,7 @@
 'use strict';
 
 let Braintree = require('../../../lib/braintree');
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 let CreditCard = Braintree.CreditCard;
 let CreditCardVerification = Braintree.CreditCardVerification;
 
@@ -64,7 +64,7 @@ describe('CreditCardVerification', () =>
           return search.status().is(CreditCardVerification.StatusType.Verified);
         }
 
-          , function (err, response) {
+        , function (err, response) {
           assert.equal(response.length(), 1);
 
           return response.first(function (err, verification) {
@@ -86,7 +86,7 @@ describe('CreditCardVerification', () =>
               return search.ids().in(verificationId);
             }
 
-              , function (err, response) {
+            , function (err, response) {
               assert.equal(response.length(), 1);
 
               return response.first(function (err, verification) {
@@ -176,7 +176,7 @@ describe('CreditCardVerification', () =>
 
             return search.customerEmail().is(email);
           }
-            , function (err, response) {
+          , function (err, response) {
             let verifications = [];
 
             return response.each(function (err, verification) {

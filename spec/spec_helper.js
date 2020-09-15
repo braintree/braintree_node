@@ -4,14 +4,12 @@
 let http = require('http');
 let https = require('https');
 let uri = require('url');
-let TransactionAmounts = require('../lib/braintree/test/transaction_amounts').TransactionAmounts;
+let TransactionAmounts = require('../lib/braintree/test_values/transaction_amounts').TransactionAmounts;
 let Util = require('../lib/braintree/util').Util;
 let Config = require('../lib/braintree/config').Config;
 let chai = require('chai');
-let Buffer = require('buffer').Buffer;
-let xml2js = require('xml2js');
 
-chai.Assertion.includeStack = true;
+chai.config.includeStack = true;
 
 global.assert = chai.assert;
 
@@ -48,7 +46,7 @@ let advancedFraudConfig = {
 };
 let advancedFraudGateway = new braintree.BraintreeGateway(advancedFraudConfig);
 
-let multiplyString = (string, times) => (new Array(times + 1)).join(string);
+let multiplyString = (string, times) => new Array(times + 1).join(string);
 
 let plans = {
   trialless: {id: 'integration_trialless_plan', price: '12.34'},
@@ -446,7 +444,7 @@ let createEscrowedTransaction = function (callback) {
 };
 
 let decodeClientToken = function (encodedClientToken) {
-  let decodedClientToken = new Buffer(encodedClientToken, 'base64').toString('utf8');
+  let decodedClientToken = Buffer.from(encodedClientToken, 'base64').toString('utf8');
   let unescapedClientToken = decodedClientToken.replace('\\u0026', '&');
 
   return unescapedClientToken;
@@ -478,8 +476,6 @@ class ClientApiHttp {
 
   constructor(config) {
     this.config = config;
-    this.parser = new xml2js.Parser({
-      explicitRoot: true});
   }
 
   get(url, params, callback) {
