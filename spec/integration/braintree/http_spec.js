@@ -49,7 +49,7 @@ describe('Http', () =>
 
     it('returns timeout errors', function (done) {
       let config = new Config({
-        environment: new Environment('not_a_subdomain.braintreegateway.com', '12345', false),
+        environment: braintree.Environment.Sandbox,
         merchantId: 'node',
         publicKey: 'node',
         privateKey: 'node'

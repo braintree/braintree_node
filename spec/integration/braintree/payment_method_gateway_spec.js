@@ -4,9 +4,9 @@ let braintree = specHelper.braintree;
 let Braintree = require('../../../lib/braintree');
 let Config = require('../../../lib/braintree/config').Config;
 let Environment = require('../../../lib/braintree/environment').Environment;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 
 describe('PaymentMethodGateway', function () {
   describe('create', function () {
@@ -221,34 +221,6 @@ describe('PaymentMethodGateway', function () {
       );
     });
 
-    context('Amex Express Checkout', () =>
-      it('vaults an Amex Express Checkout Card from the nonce', done =>
-        specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
-          customerId = response.customer.id;
-
-          let paymentMethodParams = {
-            customerId,
-            paymentMethodNonce: Nonces.AmexExpressCheckout
-          };
-
-          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-            assert.isNull(err);
-            assert.isTrue(response.success);
-            assert.isNotNull(response.paymentMethod.token);
-            assert.isString(response.paymentMethod.expirationMonth);
-            assert.isString(response.paymentMethod.expirationYear);
-            assert.isTrue(response.paymentMethod.default);
-            assert.include(response.paymentMethod.imageUrl, '.png');
-            assert.match(response.paymentMethod.sourceDescription, /^AmEx \d{4}$/);
-            assert.match(response.paymentMethod.cardMemberNumber, /^\d{4}$/);
-            assert.equal(response.paymentMethod.customerId, customerId);
-
-            done();
-          });
-        })
-      )
-    );
-
     context('Venmo Account', () =>
       it('vaults an Venmo Account from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
@@ -268,31 +240,6 @@ describe('PaymentMethodGateway', function () {
             assert.equal(response.paymentMethod.customerId, customerId);
             assert.equal(response.paymentMethod.username, 'venmojoe');
             assert.equal(response.paymentMethod.venmoUserId, 'Venmo-Joe-1');
-
-            done();
-          });
-        })
-      )
-    );
-
-    context('Coinbase', () =>
-      it('no longer supports vaulting a Coinbase account from the nonce', done =>
-        specHelper.defaultGateway.customer.create({firstName: 'Paul', lastName: 'Gross'}, function (err, response) {
-          customerId = response.customer.id;
-
-          let paymentMethodParams = {
-            customerId,
-            paymentMethodNonce: Nonces.Coinbase
-          };
-
-          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-            assert.isNull(err);
-            assert.isFalse(response.success);
-
-            assert.equal(
-              response.errors.for('coinbaseAccount').on('base')[0].code,
-              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
-            );
 
             done();
           });
@@ -2016,31 +1963,6 @@ describe('PaymentMethodGateway', function () {
         );
       });
     });
-
-    context('coinbase', () =>
-
-      it('can no longer create a Coinbase payment method token', done =>
-        specHelper.defaultGateway.customer.create({}, function (err, response) {
-          let customerId = response.customer.id;
-
-          let paymentMethodParams = {
-            customerId,
-            paymentMethodNonce: Nonces.Coinbase
-          };
-
-          specHelper.defaultGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
-            assert.isFalse(response.success);
-
-            assert.equal(
-              response.errors.for('coinbaseAccount').on('base')[0].code,
-              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
-            );
-
-            done();
-          });
-        })
-      )
-    );
 
     context('paypal accounts', function () {
       it("updates a paypal account's token", done =>

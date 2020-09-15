@@ -2,7 +2,7 @@
 
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let UsBankAccountVerification = require('../../../lib/braintree/us_bank_account_verification').UsBankAccountVerification;
-let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
+let MerchantAccountTest = require('../../../lib/braintree/test_values/merchant_account').MerchantAccountTest;
 
 describe('PaymentMethodGateway', function () {
   describe('exempt merchant', function () {

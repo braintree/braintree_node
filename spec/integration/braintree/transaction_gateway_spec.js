@@ -2,9 +2,9 @@
 
 let braintree = specHelper.braintree;
 let Braintree = require('../../../lib/braintree');
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
-let Nonces = require('../../../lib/braintree/test/nonces').Nonces;
-let VenmoSdk = require('../../../lib/braintree/test/venmo_sdk').VenmoSdk;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
+let Nonces = require('../../../lib/braintree/test_values/nonces').Nonces;
+let VenmoSdk = require('../../../lib/braintree/test_values/venmo_sdk').VenmoSdk;
 let CreditCard = require('../../../lib/braintree/credit_card').CreditCard;
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let PaymentInstrumentTypes = require('../../../lib/braintree/payment_instrument_types').PaymentInstrumentTypes;
@@ -2413,28 +2413,6 @@ describe('TransactionGateway', function () {
       )
     );
 
-    context('with amex express checkout card', () =>
-      it('returns AmexExpressCheckoutCard for payment_instrument', done =>
-        specHelper.defaultGateway.customer.create({}, function () {
-          let transactionParams = {
-            paymentMethodNonce: Nonces.AmexExpressCheckout,
-            merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
-            amount: '100.00'
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isTrue(response.success);
-            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.AmexExpressCheckoutCard);
-            assert.equal(response.transaction.amexExpressCheckoutCard.cardType, specHelper.braintree.CreditCard.CardType.AmEx);
-            assert.match(response.transaction.amexExpressCheckoutCard.cardMemberNumber, /^\d{4}$/);
-
-            done();
-          });
-        })
-      )
-    );
-
     context('with venmo account', function () {
       it('returns VenmoAccount for payment_instrument', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
@@ -2493,29 +2471,6 @@ describe('TransactionGateway', function () {
         });
       });
     });
-
-    context('Coinbase', () =>
-      it('can no longer use Coinbase in a transaction sale', done =>
-        specHelper.defaultGateway.customer.create({}, function () {
-          let transactionParams = {
-            paymentMethodNonce: Nonces.Coinbase,
-            amount: '100.00'
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isFalse(response.success, 'response had no errors');
-
-            assert.equal(
-              response.errors.for('transaction').on('base')[0].code,
-              ValidationErrorCodes.PaymentMethod.PaymentMethodNoLongerSupported
-            );
-
-            done();
-          });
-        })
-      )
-    );
 
     it('successfully creates a paypal transaction with local payment webhook content', done =>
       specHelper.defaultGateway.customer.create({}, function () {
@@ -5079,7 +5034,12 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.refund(result.transaction.id, '2046.00', function (err, response) {
             assert.isNull(err);
             assert.isFalse(response.success, 'response had no errors');
-            assert.equal(response.errors.for('transaction').on('base')[0].code, '915201');
+            assert.equal(response.transaction.type, 'credit');
+            assert.equal(response.transaction.status, 'processor_declined');
+            assert.equal(response.transaction.processorResponseCode, '2046');
+            assert.equal(response.transaction.processorResponseText, 'Declined');
+            assert.equal(response.transaction.processorResponseType, 'soft_declined');
+            assert.equal(response.transaction.additionalProcessorResponse, '2046 : Declined');
 
             done();
           })
@@ -5104,8 +5064,12 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.refund(result.transaction.id, '2009.00', function (err, response) {
             assert.isNull(err);
             assert.isFalse(response.success, 'response had no errors');
-            assert.equal(response.errors.for('transaction').on('base')[0].code, '915200');
-
+            assert.equal(response.transaction.type, 'credit');
+            assert.equal(response.transaction.status, 'processor_declined');
+            assert.equal(response.transaction.processorResponseCode, '2009');
+            assert.equal(response.transaction.processorResponseText, 'No Such Issuer');
+            assert.equal(response.transaction.processorResponseType, 'hard_declined');
+            assert.equal(response.transaction.additionalProcessorResponse, '2009 : No Such Issuer');
             done();
           })
         )

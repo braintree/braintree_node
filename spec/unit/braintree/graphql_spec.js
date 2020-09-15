@@ -22,7 +22,7 @@ describe('GraphQL', function () {
       UNSUPPORTED_CLIENT: braintree.errorTypes.upgradeRequired,
       RESOURCE_LIMIT: braintree.errorTypes.tooManyRequestsError,
       INTERNAL: braintree.errorTypes.serverError,
-      SERVICE_AVAILABILITY: braintree.errorTypes.downForMaintenanceError,
+      SERVICE_AVAILABILITY: braintree.errorTypes.serviceUnavailableError,
       UNDOCUMENTED_ERROR: braintree.errorTypes.unexpectedError
     };
 

@@ -1,10 +1,9 @@
 'use strict';
-let _ = require('underscore');
 
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 let braintree = specHelper.braintree;
 let UsBankAccountVerification = require('../../../lib/braintree/us_bank_account_verification').UsBankAccountVerification;
-let MerchantAccountTest = require('../../../lib/braintree/test/merchant_account').MerchantAccountTest;
+let MerchantAccountTest = require('../../../lib/braintree/test_values/merchant_account').MerchantAccountTest;
 
 describe('UsBankAccountVerificationGateway', function () {
   describe('confirmMicroTransferAmounts', function () {
@@ -286,7 +285,7 @@ describe('UsBankAccountVerificationGateway', function () {
               return search;
             }
 
-              , function (err, response) {
+            , function (err, response) {
               assert.isNull(err);
               assert.equal(response.length(), 1);
 
@@ -335,7 +334,7 @@ describe('UsBankAccountVerificationGateway', function () {
 
               let createdIds = [];
 
-              _.forEach(verifications, function (v) {
+              verifications.forEach(v => {
                 createdIds.push(v.id);
               });
 
@@ -345,14 +344,14 @@ describe('UsBankAccountVerificationGateway', function () {
                 return search.accountNumber().endsWith('1234');
               }
 
-                , function (err, response) {
+              , function (err, response) {
                 assert.isNull(err);
                 assert.equal(response.length(), 2);
 
                 createdIds.sort();
                 response.ids.sort();
 
-                assert.isTrue(_.isEqual(createdIds, response.ids));
+                assert.deepEqual(createdIds, response.ids);
                 assert.equal(verifications[0].verificationMethod, UsBankAccountVerification.VerificationMethod.IndependentCheck);
                 assert.equal(verifications[1].verificationMethod, UsBankAccountVerification.VerificationMethod.IndependentCheck);
 

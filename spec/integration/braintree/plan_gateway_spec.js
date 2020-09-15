@@ -1,7 +1,5 @@
 'use strict';
 
-let _ = require('underscore')._;
-
 describe('PlanGateway', () =>
   describe('self.all', () =>
     it('gets all plans', function (done) {
@@ -38,7 +36,7 @@ describe('PlanGateway', () =>
               assert.isNull(err);
               assert.isTrue(response.success);
 
-              let plan = _.find(response.plans, plan => plan.id === attributes.id);
+              const plan = response.plans.find(plan => plan.id === attributes.id);
 
               assert.equal(attributes.id, plan.id);
               assert.equal(attributes.billingDayOfMonth, plan.billingDayOfMonth);

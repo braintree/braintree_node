@@ -1,11 +1,9 @@
 'use strict';
 
 let Braintree = require('../../../lib/braintree');
-let _ = require('underscore');
 let Transaction = Braintree.Transaction;
-let CreditCardNumbers = require('../../../lib/braintree/test/credit_card_numbers').CreditCardNumbers;
+let CreditCardNumbers = require('../../../lib/braintree/test_values/credit_card_numbers').CreditCardNumbers;
 let CreditCard = Braintree.CreditCard;
-let Util = require('../../../lib/braintree/util').Util;
 let Writable = require('stream').Writable;
 let braintree = specHelper.braintree;
 
@@ -304,7 +302,7 @@ describe('TransactionSearch', () =>
       };
       let counter = 0;
 
-      _.each(__range__(1, 51, true), () =>
+      __range__(1, 51, true).forEach(() =>
         specHelper.defaultGateway.transaction.sale(transactionParams, function () {
           counter += 1;
           if (counter === 51) {
@@ -320,8 +318,8 @@ describe('TransactionSearch', () =>
                 transactions[transaction.id] = true;
                 responseCounter += 1;
 
-                if (_.size(transactions) !== responseCounter || responseCounter === 51) {
-                  assert.equal(_.size(transactions), responseCounter);
+                if (Object.keys(transactions).length !== responseCounter || responseCounter === 51) {
+                  assert.equal(Object.keys(transactions).length, responseCounter);
                   done();
                 }
               });
@@ -420,12 +418,6 @@ describe('TransactionSearch', () =>
     });
 
     it('allows piping results to a writable stream', function (done) {
-      if (!Util.supportsStreams2()) {
-        done();
-
-        return;
-      }
-
       let random = specHelper.randomId();
       let transactionParams = {
         amount: '10.00',
@@ -474,7 +466,7 @@ describe('TransactionSearch', () =>
       search.on('data', function () {});
 
       return search.on('end', function () {
-        assert.equal(error.type, braintree.errorTypes.downForMaintenanceError);
+        assert.equal(error.type, braintree.errorTypes.unexpectedError);
 
         done();
       });
@@ -707,9 +699,9 @@ describe('TransactionSearch', () =>
       );
     });
 
-    it('raises Down For Maintenance Error for search timeouts', done =>
+    it('raises Unexpected Error for search timeouts', done =>
       specHelper.defaultGateway.transaction.search(search => search.amount().is(-10), function (err) {
-        assert.equal(err.type, braintree.errorTypes.downForMaintenanceError);
+        assert.equal(err.type, braintree.errorTypes.unexpectedError);
 
         done();
       })

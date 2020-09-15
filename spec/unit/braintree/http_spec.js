@@ -31,6 +31,12 @@ describe('Http', function () {
       assert.equal(http.checkHttpStatus(404).type, braintree.errorTypes.notFoundError);
     });
 
+    it('returns a request timeout error for 408  => ', function () {
+      let http = new Http(new Config(specHelper.defaultConfig));
+
+      assert.equal(http.checkHttpStatus(408).type, braintree.errorTypes.requestTimeoutError);
+    });
+
     it('returns an upgrade required error for 426  => ', function () {
       let http = new Http(new Config(specHelper.defaultConfig));
 
@@ -43,16 +49,22 @@ describe('Http', function () {
       assert.equal(http.checkHttpStatus(429).type, braintree.errorTypes.tooManyRequestsError);
     });
 
-    it('returns a down for maintenance error for 500 =>', function () {
+    it('returns a server error for 500 =>', function () {
       let http = new Http(new Config(specHelper.defaultConfig));
 
       assert.equal(http.checkHttpStatus(500).type, braintree.errorTypes.serverError);
     });
 
-    it('returns a down for maintenance error for 503 =>', function () {
+    it('returns a service unavailable error for 503 =>', function () {
       let http = new Http(new Config(specHelper.defaultConfig));
 
-      assert.equal(http.checkHttpStatus(503).type, braintree.errorTypes.downForMaintenanceError);
+      assert.equal(http.checkHttpStatus(503).type, braintree.errorTypes.serviceUnavailableError);
+    });
+
+    it('returns a gateway timeout error for 504  => ', function () {
+      let http = new Http(new Config(specHelper.defaultConfig));
+
+      assert.equal(http.checkHttpStatus(504).type, braintree.errorTypes.gatewayTimeoutError);
     });
   });
 

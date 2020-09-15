@@ -1,5 +1,6 @@
 'use strict';
 
+const sinon = require('sinon');
 let DisputeGateway = require('../../../lib/braintree/dispute_gateway').DisputeGateway;
 
 describe('DisputeGateway', function () {
@@ -32,6 +33,14 @@ describe('DisputeGateway', function () {
   });
 
   describe('addTextEvidence', () => {
+    beforeEach(() => {
+      sinon.spy(console, 'warn');
+    });
+
+    afterEach(() => {
+      console.warn.restore(); // eslint-disable-line no-console
+    });
+
     it('null Dispute ID throws NotFoundError', () => {
       return disputeGateway.addTextEvidence(null, 'text evidence')
         .then(assert.fail)
@@ -95,21 +104,21 @@ describe('DisputeGateway', function () {
         });
     });
 
-    it('non-string tag in evidence request throws invalidKeysError', () => {
-      return disputeGateway.addTextEvidence('dispute_id', {content: 'UPS', sequenceNumber: '0', tag: 4})
+    it('non-string category in evidence request throws invalidKeysError', () => {
+      return disputeGateway.addTextEvidence('dispute_id', {content: 'UPS', sequenceNumber: '0', category: 4})
         .then(assert.fail)
         .catch((e) => {
           assert.equal('invalidKeysError', e.type);
-          assert.equal('tag must be a string', e.message);
+          assert.equal('category must be a string', e.message);
         });
     });
 
-    it('empty tag in evidence request throws invalidKeysError', () => {
-      return disputeGateway.addTextEvidence('dispute_id', {content: 'UPS', sequenceNumber: 2, tag: ''})
+    it('empty category in evidence request throws invalidKeysError', () => {
+      return disputeGateway.addTextEvidence('dispute_id', {content: 'UPS', sequenceNumber: 2, category: ''})
         .then(assert.fail)
         .catch((e) => {
           assert.equal('invalidKeysError', e.type);
-          assert.equal('tag cannot be empty', e.message);
+          assert.equal('category cannot be empty', e.message);
         });
     });
   });

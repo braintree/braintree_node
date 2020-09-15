@@ -1,7 +1,5 @@
 'use strict';
 
-let _ = require('underscore')._;
-
 describe('AddOnGateway', () =>
   describe('self.all', () =>
     it('gets all addons', function (done) {
@@ -21,7 +19,7 @@ describe('AddOnGateway', () =>
           assert.isNull(err);
           assert.isTrue(response.success);
 
-          let addOn = _.find(response.addOns, addOn => addOn.id === attributes.id);
+          const addOn = response.addOns.find(addOn => addOn.id === attributes.id);
 
           assert.equal(attributes.name, addOn.name);
           assert.equal(attributes.amount, addOn.amount);

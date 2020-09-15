@@ -24,5 +24,3 @@ There is a supplied Dockerfile for creating an environment to run this server SD
 1. `rake test` needs to pass
 1. Add a changelog entry under the `unreleased` header
 1. Open a PR
-1. Ask a developer on your team for a review, modifying for an approval
-1. Ask a Developer Experience developer for a review, modifying for an approval
