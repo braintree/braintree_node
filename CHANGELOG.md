@@ -1,5 +1,4 @@
-## unreleased 
-
+## 3.0.0 
 * Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
 * Remove several no-longer-used dependencies (underscore, semver and readable-stream)
 * Breaking Changes
