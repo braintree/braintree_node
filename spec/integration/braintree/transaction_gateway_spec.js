@@ -2346,26 +2346,48 @@ describe('TransactionGateway', function () {
       );
     });
 
-    context('with apple pay', () =>
-      it('returns ApplePayCard for payment_instrument', done =>
-        specHelper.defaultGateway.customer.create({}, function () {
-          let transactionParams = {
-            paymentMethodNonce: Nonces.ApplePayAmEx,
-            amount: '100.00'
-          };
+    context('with apple pay', () => {
+      it('returns ApplePayCard for payment_instrument when Apple Pay nonce is provided', done => {
+        let transactionParams = {
+          paymentMethodNonce: Nonces.ApplePayAmEx,
+          amount: '100.00'
+        };
 
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isTrue(response.success);
-            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard);
-            assert.isNotNull(response.transaction.applePayCard.card_type);
-            assert.isNotNull(response.transaction.applePayCard.payment_instrument_name);
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard);
+          assert.isNotNull(response.transaction.applePayCard.cardType);
+          assert.isNotNull(response.transaction.applePayCard.paymentInstrumentName);
 
-            done();
-          });
-        })
-      )
-    );
+          done();
+        });
+      });
+
+      it('returns ApplePayCard for payment_instrument when Apple Pay params are provided', done => {
+        let transactionParams = {
+          amount: '100.00',
+          applePayCard: {
+            cardholderName: 'Adam Davis',
+            cryptogram: 'AAAAAAAA/COBt84dnIEcwAA3gAAGhgEDoLABAAhAgAABAAAALnNCLw==',
+            eciIndicator: '07',
+            expirationMonth: '05',
+            expirationYear: '14',
+            number: '4111111111111111'
+          }
+        };
+
+        specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard);
+          assert.isNotNull(response.transaction.applePayCard.cardType);
+          assert.isNotNull(response.transaction.applePayCard.paymentInstrumentName);
+
+          done();
+        });
+      });
+    });
 
     context('with android pay proxy card', () =>
       it('returns AndroidPayCard for payment_instrument', done =>
