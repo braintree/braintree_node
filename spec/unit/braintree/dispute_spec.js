@@ -48,6 +48,7 @@ describe('Dispute', function () {
       id: 'transaction_id',
       amount: '100.00',
       createdAt: '2013-03-19',
+      installmentCount: null,
       orderId: null,
       purchaseOrderNumber: 'po',
       paymentInstrumentSubtype: 'Visa'
@@ -155,6 +156,7 @@ describe('Dispute', function () {
       assert.equal('transaction_id', dispute.transaction.id);
       assert.equal('100.00', dispute.transaction.amount);
       assert.equal('2013-03-19', dispute.transaction.createdAt);
+      assert.equal(null, dispute.transaction.installmentCount);
       assert.equal(null, dispute.transaction.orderId);
       assert.equal('po', dispute.transaction.purchaseOrderNumber);
       assert.equal('Visa', dispute.transaction.paymentInstrumentSubtype);

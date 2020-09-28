@@ -473,6 +473,7 @@ describe('DisputeGateway', () => {
         assert.equal(Dispute.Status.Open, dispute.status);
         assert.equal('open_disputed_transaction', dispute.transaction.id);
         assert.isDefined(dispute.graphQLId);
+        assert.isDefined(dispute.transaction.installmentCount);
       });
     });
 
