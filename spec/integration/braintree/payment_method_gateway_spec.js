@@ -1126,10 +1126,9 @@ describe('PaymentMethodGateway', function () {
             specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
               assert.isNull(err);
               assert.isFalse(response.success);
-              assert.equal(
-                response.errors.for('paypalAccount').on('base')[0].code,
-                '82902'
-              );
+              const codes = response.errors.for('paypalAccount').on('base').map((error) => error.code);
+
+              assert.include(codes, '82902');
 
               done();
             });
@@ -1162,7 +1161,9 @@ describe('PaymentMethodGateway', function () {
 
             specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
               assert.isFalse(response.success);
-              assert.equal(response.errors.for('paypalAccount').on('base')[0].code, '82902');
+              const codes = response.errors.for('paypalAccount').on('base').map((error) => error.code);
+
+              assert.include(codes, '82902');
 
               done();
             });
