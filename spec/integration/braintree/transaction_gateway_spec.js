@@ -4802,6 +4802,15 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('exposes the acquirerReferenceNumber', function (done) {
+      let transactionId = 'transactionwithacquirerreferencenumber';
+
+      specHelper.defaultGateway.transaction.find(transactionId, function (err, transaction) {
+        assert.equal(transaction.acquirerReferenceNumber, '123456789 091019');
+        done();
+      });
+    });
+
     it('exposes authorizationAdjustments', function (done) {
       let transactionId = 'authadjustmenttransaction';
 
