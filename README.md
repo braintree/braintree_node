@@ -29,6 +29,8 @@ Braintree employs a deprecation policy for our SDKs. For more information on the
 * [Documentation](https://developers.braintreepayments.com/node/sdk/server/overview)
 * [Bug Tracker](https://github.com/braintree/braintree_node/issues)
 
+Updating from an Inactive, Deprecated, or Unsupported version of this SDK? Check our [Migration Guide](https://developers.braintreepayments.com/reference/general/server-sdk-migration-guide/node) for tips.
+
 ## Quick Start
 
 ```javascript

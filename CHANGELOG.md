@@ -1,5 +1,6 @@
 ## unreleased
 - Add `AcquirerReferenceNumber` to `Transaction`
+- Deprecate `recurring` in `transaction.sale()` requests
 
 ## 3.0.0 
 * Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
