@@ -462,10 +462,9 @@ describe('CustomerGateway', function () {
         specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
           assert.isNull(err);
           assert.isFalse(response.success);
-          assert.equal(
-            response.errors.for('customer').for('paypalAccount').on('base')[0].code,
-            '82902'
-          );
+          const codes = response.errors.for('customer').for('paypalAccount').on('base').map((error) => error.code);
+
+          assert.include(codes, '82902');
         });
 
         done();
@@ -1451,10 +1450,9 @@ describe('CustomerGateway', function () {
           specHelper.defaultGateway.customer.update(paypalCustomerId, customerParams, function (err, response) {
             assert.isNull(err);
             assert.isFalse(response.success);
-            assert.equal(
-              response.errors.for('customer').for('paypalAccount').on('base')[0].code,
-              '82902'
-            );
+            const codes = response.errors.for('customer').for('paypalAccount').on('base').map((error) => error.code);
+
+            assert.include(codes, '82902');
 
             specHelper.defaultGateway.paymentMethod.find(paymentMethodToken, (err) => assert.equal(err.type, braintree.errorTypes.notFoundError));
 

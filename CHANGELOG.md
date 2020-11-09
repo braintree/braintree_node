@@ -1,3 +1,7 @@
+## 3.1.0
+- Add `AcquirerReferenceNumber` to `Transaction`
+- Deprecate `recurring` in `transaction.sale()` requests
+
 ## 3.0.0 
 * Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
 * Remove several no-longer-used dependencies (underscore, semver and readable-stream)

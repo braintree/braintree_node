@@ -74,7 +74,7 @@ describe('DisputeSearch', () => {
         );
       }, function (err, response) {
         assert.isNull(err);
-        assert.equal(1, response.length);
+        assert(response.length >= 1);
 
         done();
       });
@@ -87,7 +87,7 @@ describe('DisputeSearch', () => {
         );
       }, function (err, response) {
         assert.isNull(err);
-        assert.equal(1, response.length);
+        assert(response.length >= 1);
 
         done();
       });
@@ -100,7 +100,7 @@ describe('DisputeSearch', () => {
         );
       }, function (err, response) {
         assert.isNull(err);
-        assert.equal(1, response.length);
+        assert(response.length >= 1);
 
         done();
       });
@@ -199,7 +199,7 @@ describe('DisputeSearch', () => {
       stream.on('data', dispute => disputes.push(dispute));
 
       stream.on('end', () => {
-        assert.equal(1, disputes.length);
+        assert(disputes.length >= 1);
 
         done();
       });
@@ -215,7 +215,7 @@ describe('DisputeSearch', () => {
       stream.on('data', dispute => disputes.push(dispute));
 
       stream.on('end', () => {
-        assert.equal(1, disputes.length);
+        assert(disputes.length >= 1);
 
         done();
       });
@@ -231,7 +231,7 @@ describe('DisputeSearch', () => {
       stream.on('data', dispute => disputes.push(dispute));
 
       stream.on('end', () => {
-        assert.equal(1, disputes.length);
+        assert(disputes.length >= 1);
 
         done();
       });
