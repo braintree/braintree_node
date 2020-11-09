@@ -1,4 +1,4 @@
-## unreleased
+## 3.1.0
 - Add `AcquirerReferenceNumber` to `Transaction`
 - Deprecate `recurring` in `transaction.sale()` requests
 
