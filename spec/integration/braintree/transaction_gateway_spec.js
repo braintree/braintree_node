@@ -3443,10 +3443,6 @@ describe('TransactionGateway', function () {
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success, 'response had no errors');
         assert.equal(
-          response.errors.for('transaction').for('riskData').on('customerBrowser')[0].code,
-          ValidationErrorCodes.RiskData.CustomerBrowserIsTooLong
-        );
-        assert.equal(
           response.errors.for('transaction').for('riskData').on('customerDeviceId')[0].code,
           ValidationErrorCodes.RiskData.CustomerDeviceIdIsTooLong
         );
