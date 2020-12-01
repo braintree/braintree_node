@@ -3323,7 +3323,7 @@ describe('TransactionGateway', function () {
           number: '4111111111111111',
           expirationDate: '05/16'
         },
-        deviceSessionId: 'abc123'
+        deviceData: 'abc123'
       };
 
       specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
@@ -3384,6 +3384,23 @@ describe('TransactionGateway', function () {
     });
 
     it('allows fraud params', function (done) {
+      let transactionParams = {
+        amount: '10.0',
+        deviceData: 'deviceData123',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        done();
+      });
+    });
+
+    it('allows deprecated fraud params', function (done) {
       let transactionParams = {
         amount: '10.0',
         deviceSessionId: '123456789',
