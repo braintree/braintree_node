@@ -39,6 +39,47 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('passes scaExemption', function (done) {
+      let requestedExemption = 'low_value';
+      let transactionParams = {
+        amount: '5.00',
+        scaExemption: requestedExemption,
+        creditCard: {
+          number: '4023490000000008',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.scaExemptionRequested, requestedExemption);
+
+        done();
+      });
+    });
+
+    it('handles scaExemption validation errors', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        scaExemption: 'invalid_sca_exemption',
+        creditCard: {
+          number: '4023490000000008',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('transaction').on('scaExemption')[0].code,
+          ValidationErrorCodes.Transaction.ScaExemptionIsInvalid
+        );
+
+        done();
+      });
+    });
+
     it('charges a card with billing and shipping address specified', function (done) {
       let transactionParams = {
         amount: '5.00',
