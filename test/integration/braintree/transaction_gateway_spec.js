@@ -6190,4 +6190,68 @@ describe('TransactionGateway', function () {
       });
     });
   });
+
+  describe('installments for BRL transaction', function () {
+    it('creates an authorization and recives installment_count', function (done) {
+      let transactionParams = {
+        merchantAccountId: 'card_processor_brl',
+        amount: '100.00',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/12'
+        },
+        installments: {
+          count: 4
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.installmentCount, 4);
+
+        done();
+      });
+    });
+
+    it('submits for settlement and creates installments', done => {
+      let transactionParams = {
+        merchantAccountId: 'card_processor_brl',
+        amount: '100.00',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/12'
+        },
+        installments: {
+          count: 4
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        let transaction = response.transaction;
+
+        transaction.installments.forEach((element, index) => {
+          assert.equal(element.id, `${transaction.id}_INST_${index + 1}`);
+          assert.equal(element.amount, '25.00');
+        });
+
+        specHelper.defaultGateway.transaction.refund(transaction.id, '20.00', function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          let refundTransaction = response.transaction;
+
+          refundTransaction.refundedInstallments.forEach(element => {
+            assert.equal(element.adjustments[0].kind, 'REFUND');
+            assert.equal(element.adjustments[0].amount, '-5.00');
+          });
+        });
+        done();
+      });
+    });
+  });
 });
