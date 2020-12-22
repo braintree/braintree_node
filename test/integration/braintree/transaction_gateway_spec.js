@@ -2284,29 +2284,6 @@ describe('TransactionGateway', function () {
           });
         });
       });
-
-      it('handles validation error card type is invalid', function (done) {
-        specHelper.defaultGateway.customer.create({}, function () {
-          let transactionParams = {
-            amount: '10.00',
-            creditCard: {
-              number: '371260714673002',
-              expirationDate: '05/12'
-            },
-            externalVault: {
-              status: Transaction.ExternalVault.Vaulted,
-              previousNetworkTransactionId: '123456789012345'
-            }
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isFalse(response.success);
-            assert.equal(response.errors.for('transaction').for('externalVault').on('previousNetworkTransactionId')[0].code, ValidationErrorCodes.Transaction.ExternalVault.CardTypeIsInvalid);
-            done();
-          });
-        });
-      });
     });
 
     context('with paypal here', function () {
