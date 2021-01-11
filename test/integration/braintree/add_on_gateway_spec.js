@@ -15,11 +15,12 @@ describe('AddOnGateway', () =>
       };
 
       specHelper.createModificationForTests(attributes, () =>
-        specHelper.defaultGateway.addOn.all(function (err, response) {
-          assert.isNull(err);
+        specHelper.defaultGateway.addOn.all().then(response => {
           assert.isTrue(response.success);
+          // NEXT_MAJOR_VERSION remove this check when we return just the collection in the next major version update
+          assert.equal(response, response.addOns);
 
-          const addOn = response.addOns.find(addOn => addOn.id === attributes.id);
+          const addOn = response.find(addOn => addOn.id === attributes.id);
 
           assert.equal(attributes.name, addOn.name);
           assert.equal(attributes.amount, addOn.amount);
