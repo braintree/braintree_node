@@ -2128,7 +2128,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('does not support amex', function (done) {
+      it('supports amex', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             amount: '10.00',
@@ -2141,7 +2141,7 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
-            assert.isNull(response.transaction.networkTransactionId);
+            assert.isNotNull(response.transaction.networkTransactionId);
             done();
           });
         });
@@ -2187,7 +2187,7 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
-            assert.isNull(response.transaction.networkTransactionId);
+            assert.isNotNull(response.transaction.networkTransactionId);
             done();
           });
         });
@@ -2198,7 +2198,7 @@ describe('TransactionGateway', function () {
           let transactionParams = {
             amount: '10.00',
             creditCard: {
-              number: '371260714673002',
+              number: '3530111333300000',
               expirationDate: '05/12'
             },
             externalVault: {
