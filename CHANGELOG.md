@@ -1,11 +1,16 @@
-## Unreleased
-* Add exceptions defined in `exceptions.js` as an export
+## 3.2.0
+- `plan.all`, `discount.all` and `addOn.all` return collections of plan, discount and addOn objects respectively. (fixes #178)
+- Deprecate `deviceSessionId` and `fraudMerchantId` in the `CrediteCardGateway`, `CustomerGateway`, `PaymentMethodGateway`, and `TransactionGateway` classes
+* Add `installments` to `Transaction` requests
+* Add `count` to `installments`
+* Add `scaExemption` to `TransactionGateway`
+* Add exceptions defined in `exceptions.js` as an export (thanks @jtcooper10!)
 
 ## 3.1.0
 - Add `AcquirerReferenceNumber` to `Transaction`
 - Deprecate `recurring` in `transaction.sale()` requests
 
-## 3.0.0 
+## 3.0.0
 * Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
 * Remove several no-longer-used dependencies (underscore, semver and readable-stream)
 * Breaking Changes

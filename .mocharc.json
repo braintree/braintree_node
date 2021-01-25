@@ -1,0 +1,8 @@
+{
+  "require" : [
+    "test/spec_helper"
+  ],
+  "package": "./package.json",
+  "timeout": 62000,
+  "reporter": "spec"
+}

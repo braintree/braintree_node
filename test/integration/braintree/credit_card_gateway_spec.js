@@ -71,6 +71,32 @@ describe('CreditCardGateway', function () {
           options: {
             verifyCard: 'true'
           },
+          deviceData: 'deviceData123'
+        };
+
+        specHelper.advancedFraudGateway.creditCard.create(creditCardParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          assert.equal(response.creditCard.verification.riskData.decision, 'Approve');
+          assert.isDefined(response.creditCard.verification.riskData.fraudServiceProvider);
+          assert.isDefined(response.creditCard.verification.riskData.id);
+
+          done();
+        });
+      });
+    });
+
+    it('includes the verification on the credit card with deprecated risk data', function (done) {
+      specHelper.advancedFraudGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
+        let advancedFraudCustomerId = response.customer.id;
+        let creditCardParams = {
+          customerId: advancedFraudCustomerId,
+          number: '4111111111111111',
+          expirationDate: '05/2020',
+          options: {
+            verifyCard: 'true'
+          },
           deviceSessionId: 'abc123'
         };
 

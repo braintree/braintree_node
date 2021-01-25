@@ -3,9 +3,9 @@
 let fs = require('fs');
 let ValidationErrorCodes = require('../../../lib/braintree/validation_error_codes').ValidationErrorCodes;
 
-let LARGE_FILE_PATH = './spec/fixtures/large_file.png';
-let EMPTY_FILE_PATH = './spec/fixtures/empty_file.png';
-let TOO_LONG_FILE_PATH = './spec/fixtures/too_long.pdf';
+let LARGE_FILE_PATH = './test/fixtures/large_file.png';
+let EMPTY_FILE_PATH = './test/fixtures/empty_file.png';
+let TOO_LONG_FILE_PATH = './test/fixtures/too_long.pdf';
 
 function removeLargeFile(done) {
   fs.unlink(LARGE_FILE_PATH, done);
@@ -15,7 +15,7 @@ describe('DocumentUploadGateway', () => {
   after(removeLargeFile);
   describe('create', () => {
     it('uploads documents', () => {
-      let filePath = './spec/fixtures/bt_logo.png';
+      let filePath = './test/fixtures/bt_logo.png';
 
       let file = fs.createReadStream(filePath);
       let params = {
@@ -35,7 +35,7 @@ describe('DocumentUploadGateway', () => {
     });
 
     it('returns error when unsupported file type', () => {
-      let file = fs.createReadStream('./spec/fixtures/gif_extension_bt_logo.gif');
+      let file = fs.createReadStream('./test/fixtures/gif_extension_bt_logo.gif');
       let params = {
         kind: 'evidence_document',
         file: file
@@ -50,7 +50,7 @@ describe('DocumentUploadGateway', () => {
     });
 
     it('returns error when malformed file', () => {
-      let file = fs.createReadStream('./spec/fixtures/malformed_pdf.pdf');
+      let file = fs.createReadStream('./test/fixtures/malformed_pdf.pdf');
       let params = {
         kind: 'evidence_document',
         file: file
@@ -65,7 +65,7 @@ describe('DocumentUploadGateway', () => {
     });
 
     it('returns error when invalid kind', () => {
-      let file = fs.createReadStream('./spec/fixtures/bt_logo.png');
+      let file = fs.createReadStream('./test/fixtures/bt_logo.png');
       let params = {
         kind: 'invalid_kind',
         file: file
@@ -80,7 +80,7 @@ describe('DocumentUploadGateway', () => {
     });
 
     it('returns error when file is over 4mb', () => {
-      let writeFile = fs.openSync('./spec/fixtures/large_file.png', 'w+');
+      let writeFile = fs.openSync('./test/fixtures/large_file.png', 'w+');
 
       for (let i = 0; i <= 1048577; i++) {
         fs.writeSync(writeFile, 'aaaa');
@@ -137,7 +137,7 @@ describe('DocumentUploadGateway', () => {
     });
 
     it('throws error when using an invalid signature', () => {
-      let file = fs.createReadStream('./spec/fixtures/bt_logo.png');
+      let file = fs.createReadStream('./test/fixtures/bt_logo.png');
       let params = {
         invalid: 'invalid_param',
         kind: 'evidence_document',

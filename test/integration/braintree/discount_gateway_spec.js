@@ -15,9 +15,10 @@ describe('DiscountGateway', () =>
       };
 
       specHelper.createModificationForTests(attributes, () =>
-        specHelper.defaultGateway.discount.all(function (err, response) {
-          assert.isNull(err);
+        specHelper.defaultGateway.discount.all().then(response => {
           assert.isTrue(response.success);
+          // NEXT_MAJOR_VERSION remove this check when we return just the collection in the next major version update
+          assert.equal(response, response.discounts);
 
           const discount = response.discounts.find(discount => discount.id === attributes.id);
 

@@ -1,6 +1,6 @@
 {
   "name": "braintree",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "A library for server-side integrating with Braintree.",
   "keywords": [
     "braintree",
@@ -34,10 +34,10 @@
   },
   "license": "MIT",
   "scripts": {
-    "lint": "eslint lib/ spec/",
+    "lint": "eslint lib/ test/",
     "pretest": "npm run lint",
-    "test:unit": "mocha spec/unit --recursive -r spec/spec_helper",
-    "test:integration": "mocha --timeout 60000 --slow 2000 spec/integration --recursive -r spec/spec_helper",
+    "test:unit": "mocha test/unit --recursive -r test/spec_helper",
+    "test:integration": "mocha --timeout 60000 --slow 2000 test/integration --recursive -r test/spec_helper",
     "test": "npm run test:unit"
   }
 }

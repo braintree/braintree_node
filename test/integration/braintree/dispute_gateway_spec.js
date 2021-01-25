@@ -17,7 +17,7 @@ describe('DisputeGateway', () => {
 
   function createEvidenceDocument() {
     let documentUploadParams = {
-      file: fs.createReadStream('./spec/fixtures/bt_logo.png'),
+      file: fs.createReadStream('./test/fixtures/bt_logo.png'),
       kind: DocumentUpload.Kind.EvidenceDocument
     };
 

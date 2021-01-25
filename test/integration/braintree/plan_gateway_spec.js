@@ -32,9 +32,10 @@ describe('PlanGateway', () =>
       specHelper.createPlanForTests(attributes, () =>
         specHelper.createModificationForTests(addOnAttributes, () =>
           specHelper.createModificationForTests(discountAttributes, () =>
-            specHelper.defaultGateway.plan.all(function (err, response) {
-              assert.isNull(err);
+            specHelper.defaultGateway.plan.all().then(response => {
               assert.isTrue(response.success);
+              // NEXT_MAJOR_VERSION remove this check when we return just the collection in the next major version update
+              assert.equal(response, response.plans);
 
               const plan = response.plans.find(plan => plan.id === attributes.id);
 

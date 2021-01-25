@@ -39,6 +39,47 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('passes scaExemption', function (done) {
+      let requestedExemption = 'low_value';
+      let transactionParams = {
+        amount: '5.00',
+        scaExemption: requestedExemption,
+        creditCard: {
+          number: '4023490000000008',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.scaExemptionRequested, requestedExemption);
+
+        done();
+      });
+    });
+
+    it('handles scaExemption validation errors', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        scaExemption: 'invalid_sca_exemption',
+        creditCard: {
+          number: '4023490000000008',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success);
+        assert.equal(
+          response.errors.for('transaction').on('scaExemption')[0].code,
+          ValidationErrorCodes.Transaction.ScaExemptionIsInvalid
+        );
+
+        done();
+      });
+    });
+
     it('charges a card with billing and shipping address specified', function (done) {
       let transactionParams = {
         amount: '5.00',
@@ -2087,7 +2128,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('does not support amex', function (done) {
+      it('supports amex', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             amount: '10.00',
@@ -2100,7 +2141,7 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
-            assert.isNull(response.transaction.networkTransactionId);
+            assert.isNotNull(response.transaction.networkTransactionId);
             done();
           });
         });
@@ -2146,7 +2187,7 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
-            assert.isNull(response.transaction.networkTransactionId);
+            assert.isNotNull(response.transaction.networkTransactionId);
             done();
           });
         });
@@ -2157,7 +2198,7 @@ describe('TransactionGateway', function () {
           let transactionParams = {
             amount: '10.00',
             creditCard: {
-              number: '371260714673002',
+              number: '3530111333300000',
               expirationDate: '05/12'
             },
             externalVault: {
@@ -2280,29 +2321,6 @@ describe('TransactionGateway', function () {
             assert.isNull(err);
             assert.isFalse(response.success);
             assert.equal(response.errors.for('transaction').for('externalVault').on('status')[0].code, ValidationErrorCodes.Transaction.ExternalVault.StatusWithPreviousNetworkTransactionIdIsInvalid);
-            done();
-          });
-        });
-      });
-
-      it('handles validation error card type is invalid', function (done) {
-        specHelper.defaultGateway.customer.create({}, function () {
-          let transactionParams = {
-            amount: '10.00',
-            creditCard: {
-              number: '371260714673002',
-              expirationDate: '05/12'
-            },
-            externalVault: {
-              status: Transaction.ExternalVault.Vaulted,
-              previousNetworkTransactionId: '123456789012345'
-            }
-          };
-
-          specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
-            assert.isNull(err);
-            assert.isFalse(response.success);
-            assert.equal(response.errors.for('transaction').for('externalVault').on('previousNetworkTransactionId')[0].code, ValidationErrorCodes.Transaction.ExternalVault.CardTypeIsInvalid);
             done();
           });
         });
@@ -3323,7 +3341,7 @@ describe('TransactionGateway', function () {
           number: '4111111111111111',
           expirationDate: '05/16'
         },
-        deviceSessionId: 'abc123'
+        deviceData: 'abc123'
       };
 
       specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
@@ -3386,6 +3404,23 @@ describe('TransactionGateway', function () {
     it('allows fraud params', function (done) {
       let transactionParams = {
         amount: '10.0',
+        deviceData: 'deviceData123',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/16'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        done();
+      });
+    });
+
+    it('allows deprecated fraud params', function (done) {
+      let transactionParams = {
+        amount: '10.0',
         deviceSessionId: '123456789',
         fraudMerchantId: '0000000031',
         creditCard: {
@@ -3442,10 +3477,6 @@ describe('TransactionGateway', function () {
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success, 'response had no errors');
-        assert.equal(
-          response.errors.for('transaction').for('riskData').on('customerBrowser')[0].code,
-          ValidationErrorCodes.RiskData.CustomerBrowserIsTooLong
-        );
         assert.equal(
           response.errors.for('transaction').for('riskData').on('customerDeviceId')[0].code,
           ValidationErrorCodes.RiskData.CustomerDeviceIdIsTooLong
@@ -6173,6 +6204,70 @@ describe('TransactionGateway', function () {
         assert.equal(response.transaction.processorResponseType, 'approved');
         assert.isFalse(response.transaction.processedWithNetworkToken);
 
+        done();
+      });
+    });
+  });
+
+  describe('installments for BRL transaction', function () {
+    it('creates an authorization and recives installment_count', function (done) {
+      let transactionParams = {
+        merchantAccountId: 'card_processor_brl',
+        amount: '100.00',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/12'
+        },
+        installments: {
+          count: 4
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.installmentCount, 4);
+
+        done();
+      });
+    });
+
+    it('submits for settlement and creates installments', done => {
+      let transactionParams = {
+        merchantAccountId: 'card_processor_brl',
+        amount: '100.00',
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/12'
+        },
+        installments: {
+          count: 4
+        },
+        options: {
+          submitForSettlement: true
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        let transaction = response.transaction;
+
+        transaction.installments.forEach((element, index) => {
+          assert.equal(element.id, `${transaction.id}_INST_${index + 1}`);
+          assert.equal(element.amount, '25.00');
+        });
+
+        specHelper.defaultGateway.transaction.refund(transaction.id, '20.00', function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          let refundTransaction = response.transaction;
+
+          refundTransaction.refundedInstallments.forEach(element => {
+            assert.equal(element.adjustments[0].kind, 'REFUND');
+            assert.equal(element.adjustments[0].amount, '-5.00');
+          });
+        });
         done();
       });
     });

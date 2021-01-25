@@ -1,6 +1,6 @@
 'use strict';
 
-let TestSearch = require('../../../spec/test-search');
+let TestSearch = require('../../../test/test-search');
 
 let newSearch = () => new TestSearch(); // eslint-disable-line func-style
 let value = 'mail@example.com';

@@ -12,9 +12,9 @@ namespace :test do
     if args.file_name.nil?
       sh "npm test"
     elsif args.test_name.nil?
-      sh "#{mocha} spec/unit/braintree/#{args.file_name}.js"
+      sh "#{mocha} test/unit/braintree/#{args.file_name}.js"
     else
-      sh "#{mocha} -g '#{args.test_name}' spec/unit/braintree/#{args.file_name}.js"
+      sh "#{mocha} -g '#{args.test_name}' test/unit/braintree/#{args.file_name}.js"
     end
   end
 
@@ -27,9 +27,9 @@ namespace :test do
     if args.file_name.nil?
       sh "npm run test:integration"
     elsif args.test_name.nil?
-      sh "#{mocha} --slow 2000 spec/integration/braintree/#{args.file_name}.js"
+      sh "#{mocha} --slow 2000 test/integration/braintree/#{args.file_name}.js"
     else
-      sh "#{mocha} --slow 2000 -g '#{args.test_name}' spec/integration/braintree/#{args.file_name}.js"
+      sh "#{mocha} --slow 2000 -g '#{args.test_name}' test/integration/braintree/#{args.file_name}.js"
     end
   end
 end
@@ -39,5 +39,5 @@ task :npm_install do
 end
 
 def mocha
-  "./node_modules/mocha/bin/mocha --timeout 62000 --reporter spec -r spec/spec_helper"
+  "./node_modules/mocha/bin/mocha --timeout 62000 --reporter spec -r test/spec_helper"
 end
