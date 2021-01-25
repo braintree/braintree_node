@@ -4,6 +4,7 @@
 * Add `installments` to `Transaction` requests
 * Add `count` to `installments`
 * Add `scaExemption` to `TransactionGateway`
+* Add exceptions defined in `exceptions.js` as an export (thanks @jtcooper10!)
 
 ## 3.1.0
 - Add `AcquirerReferenceNumber` to `Transaction`
