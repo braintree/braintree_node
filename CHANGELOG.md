@@ -1,5 +1,5 @@
-## unreleased
-- `plan.all`, `discount.all` and `addOn.all` return collections of plan, discount and addOn objects respectively.
+## 3.2.0
+- `plan.all`, `discount.all` and `addOn.all` return collections of plan, discount and addOn objects respectively. (fixes #178)
 - Deprecate `deviceSessionId` and `fraudMerchantId` in the `CrediteCardGateway`, `CustomerGateway`, `PaymentMethodGateway`, and `TransactionGateway` classes
 * Add `installments` to `Transaction` requests
 * Add `count` to `installments`
