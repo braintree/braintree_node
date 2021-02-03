@@ -38,13 +38,21 @@ let merchant2Config = {
 };
 let merchant2Gateway = new braintree.BraintreeGateway(merchant2Config);
 
-let advancedFraudConfig = {
+let advancedFraudKountConfig = {
   environment: braintree.Environment.Development,
   merchantId: 'advanced_fraud_integration_merchant_id',
   publicKey: 'advanced_fraud_integration_public_key',
   privateKey: 'advanced_fraud_integration_private_key'
 };
-let advancedFraudGateway = new braintree.BraintreeGateway(advancedFraudConfig);
+let advancedFraudKountGateway = new braintree.BraintreeGateway(advancedFraudKountConfig);
+
+let fraudProtectionEnterpriseConfig = {
+  environment: braintree.Environment.Development,
+  merchantId: 'fraud_protection_enterprise_integration_merchant_id',
+  publicKey: 'fraud_protection_enterprise_integration_public_key',
+  privateKey: 'fraud_protection_enterprise_integration_private_key'
+};
+let fraudProtectionEnterpriseGateway = new braintree.BraintreeGateway(fraudProtectionEnterpriseConfig);
 
 let multiplyString = (string, times) => new Array(times + 1).join(string);
 
@@ -552,8 +560,7 @@ ClientApiHttp.initClass();
 
 global.specHelper = {
   addOns,
-  advancedFraudConfig,
-  advancedFraudGateway,
+  advancedFraudKountGateway,
   braintree,
   create3DSVerification,
   generate3DSNonce,
@@ -588,5 +595,6 @@ global.specHelper = {
   createPlanForTests,
   createModificationForTests,
   createGrant,
-  createToken
+  createToken,
+  fraudProtectionEnterpriseGateway
 };

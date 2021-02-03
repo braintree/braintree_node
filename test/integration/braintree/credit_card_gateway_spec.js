@@ -62,10 +62,10 @@ describe('CreditCardGateway', function () {
     });
 
     it('includes the verification on the credit card with risk data', function (done) {
-      specHelper.advancedFraudGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
-        let advancedFraudCustomerId = response.customer.id;
+      specHelper.fraudProtectionEnterpriseGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
+        let fraudProtectionEnterpriseCustomerId = response.customer.id;
         let creditCardParams = {
-          customerId: advancedFraudCustomerId,
+          customerId: fraudProtectionEnterpriseCustomerId,
           number: '4111111111111111',
           expirationDate: '05/2020',
           options: {
@@ -74,21 +74,22 @@ describe('CreditCardGateway', function () {
           deviceData: 'deviceData123'
         };
 
-        specHelper.advancedFraudGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.fraudProtectionEnterpriseGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
 
           assert.equal(response.creditCard.verification.riskData.decision, 'Approve');
           assert.isDefined(response.creditCard.verification.riskData.fraudServiceProvider);
           assert.isDefined(response.creditCard.verification.riskData.id);
-
+          assert.isDefined(response.creditCard.verification.riskData.decisionReasons);
+          assert.isDefined(response.creditCard.verification.riskData.transactionRiskScore);
           done();
         });
       });
     });
 
     it('includes the verification on the credit card with deprecated risk data', function (done) {
-      specHelper.advancedFraudGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
+      specHelper.advancedFraudKountGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
         let advancedFraudCustomerId = response.customer.id;
         let creditCardParams = {
           customerId: advancedFraudCustomerId,
@@ -100,7 +101,7 @@ describe('CreditCardGateway', function () {
           deviceSessionId: 'abc123'
         };
 
-        specHelper.advancedFraudGateway.creditCard.create(creditCardParams, function (err, response) {
+        specHelper.advancedFraudKountGateway.creditCard.create(creditCardParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
 
