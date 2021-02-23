@@ -1,3 +1,6 @@
+## unreleased
+- Update `dateformat` module to v4.5.1
+
 ## 3.2.1
 - Remove unnecessary `user` package (#186)
 
