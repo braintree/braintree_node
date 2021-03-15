@@ -162,8 +162,6 @@ describe('PaymentMethodNonceGateway', function () {
         specHelper.defaultGateway.paymentMethodNonce.find(nonce, function (err, paymentMethodNonce) {
           assert.isNull(err);
           let info = paymentMethodNonce.threeDSecureInfo;
-          console.dir(paymentMethodNonce);
-          console.log(paymentMethodNonce.default);
           assert.equal(paymentMethodNonce.nonce, nonce);
           assert.isTrue(info.liabilityShifted);
           assert.isTrue(info.liabilityShiftPossible);

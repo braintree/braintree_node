@@ -152,7 +152,6 @@ describe('PaymentMethodGateway', function () {
             assert.isNotNull(response.paymentMethod.customerId);
             const token = response.paymentMethod.token;
           specHelper.defaultGateway.paymentMethodNonce.create(token, function (err, response) {
-          console.dir(response);
           });
           });
         })
