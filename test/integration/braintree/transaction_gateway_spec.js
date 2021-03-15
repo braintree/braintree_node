@@ -511,7 +511,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.advancedFraudKountGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.isUndefined(response.transaction.riskData);
@@ -3344,11 +3344,13 @@ describe('TransactionGateway', function () {
         deviceData: 'abc123'
       };
 
-      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.fraudProtectionEnterpriseGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
         assert.equal(response.transaction.riskData.decision, 'Approve');
         assert.isDefined(response.transaction.riskData.fraudServiceProvider);
         assert.isDefined(response.transaction.riskData.id);
+        assert.isDefined(response.transaction.riskData.decisionReasons);
+        assert.isDefined(response.transaction.riskData.transactionRiskScore);
         done();
       });
     });
@@ -3362,7 +3364,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.advancedFraudKountGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
         assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.Fraud);
@@ -3379,7 +3381,7 @@ describe('TransactionGateway', function () {
         }
       };
 
-      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.advancedFraudKountGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
         assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.RiskThreshold);
@@ -3393,7 +3395,7 @@ describe('TransactionGateway', function () {
         paymentMethodNonce: Nonces.GatewayRejectedRiskThresholds
       };
 
-      specHelper.advancedFraudGateway.transaction.sale(transactionParams, function (err, response) {
+      specHelper.advancedFraudKountGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isFalse(response.success, 'response had no errors');
         assert.equal(response.transaction.status, Transaction.Status.GatewayRejected);
         assert.equal(response.transaction.gatewayRejectionReason, Transaction.GatewayRejectionReason.RiskThreshold);
