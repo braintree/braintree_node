@@ -5273,6 +5273,8 @@ describe('TransactionGateway', function () {
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
+          assert.isTrue(response.transaction.taxExempt);
+          assert.equal(response.transaction.purchaseOrderNumber, 'ABC123');
           assert.equal(response.transaction.status, 'submitted_for_settlement');
 
           done();
@@ -5309,6 +5311,7 @@ describe('TransactionGateway', function () {
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
+          assert.equal(response.transaction.shipsFromPostalCode, '90210');
           assert.equal(response.transaction.status, 'submitted_for_settlement');
 
           done();
