@@ -5042,7 +5042,8 @@ describe('TransactionGateway', function () {
       specHelper.createTransactionToRefund(function (transaction) {
         let options = {
           order_id: 'abcd', // eslint-disable-line camelcase
-          amount: '1.00'
+          amount: '1.00',
+          merchant_account_id: specHelper.nonDefaultMerchantAccountId // eslint-disable-line camelcase
         };
 
         specHelper.defaultGateway.transaction.refund(transaction.id, options, function (err, response) {
@@ -5052,6 +5053,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.refundedTransactionId, transaction.id);
           assert.equal(response.transaction.orderId, 'abcd');
           assert.equal(response.transaction.amount, '1.00');
+          assert.equal(response.transaction.merchantAccountId, specHelper.nonDefaultMerchantAccountId);
 
           done();
         });
