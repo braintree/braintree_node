@@ -2,6 +2,7 @@
 * Support all options for `gateway.transaction.submitForSettlement` and `gateway.transaction.submitForPartialSettlement`
 * Fix issue where options passed to `gateway.transaction.submitForSettlement` were being ignored (closes #168)
 * Fix issue where options passed to `gateway.transaction.submitForPartialSettlement` were being ignored
+* Add `Transaction.adjustAuthorization()` method to support multiple authorizations for a single transaction
 
 ## 3.2.2
 - Update `dateformat` module to v4.5.1
