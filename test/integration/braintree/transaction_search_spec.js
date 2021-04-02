@@ -630,6 +630,56 @@ describe('TransactionSearch', () =>
       );
     });
 
+    it('searches on store ids', function (done) {
+      let transactionId = 'contact_visa_transaction';
+
+      let search = function (s) { // eslint-disable-line func-style
+        s.id().is('contact_visa_transaction');
+
+        return s.storeIds().in('store-id');
+      };
+
+      specHelper.defaultGateway.transaction.search(search, function (err, response) {
+        let transactions = [];
+
+        response.each(function (err, transaction) {
+          transactions.push(transaction);
+
+          if (transactions.length === 1) {
+            assert.equal(transactions.length, 1);
+            assert.equal(transactions[0].id, transactionId);
+
+            done();
+          }
+        });
+      });
+    });
+
+    it('searches on store ids', function (done) {
+      let transactionId = 'contact_visa_transaction';
+
+      let search = function (s) { // eslint-disable-line func-style
+        s.id().is('contact_visa_transaction');
+
+        return s.storeIds().is('store-id');
+      };
+
+      specHelper.defaultGateway.transaction.search(search, function (err, response) {
+        let transactions = [];
+
+        response.each(function (err, transaction) {
+          transactions.push(transaction);
+
+          if (transactions.length === 1) {
+            assert.equal(transactions.length, 1);
+            assert.equal(transactions[0].id, transactionId);
+
+            done();
+          }
+        });
+      });
+    });
+
     it('filters on valid merchant account ids', function (done) {
       let random = specHelper.randomId();
       let transactionParams = {
