@@ -3346,7 +3346,7 @@ describe('TransactionGateway', function () {
 
       specHelper.fraudProtectionEnterpriseGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
-        assert.equal(response.transaction.riskData.decision, 'Approve');
+        assert.isDefined(response.transaction.riskData.decision);
         assert.isDefined(response.transaction.riskData.fraudServiceProvider);
         assert.isDefined(response.transaction.riskData.id);
         assert.isDefined(response.transaction.riskData.decisionReasons);
