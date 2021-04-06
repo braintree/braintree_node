@@ -1,4 +1,5 @@
-## unreleased
+## Unreleased
+* Add `LocalPaymentReversed` webhook notification support
 * Support all options for `gateway.transaction.submitForSettlement` and `gateway.transaction.submitForPartialSettlement`
 * Fix issue where options passed to `gateway.transaction.submitForSettlement` were being ignored (closes #168)
 * Fix issue where options passed to `gateway.transaction.submitForPartialSettlement` were being ignored
