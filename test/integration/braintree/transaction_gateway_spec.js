@@ -3346,7 +3346,7 @@ describe('TransactionGateway', function () {
 
       specHelper.fraudProtectionEnterpriseGateway.transaction.sale(transactionParams, function (err, response) {
         assert.isTrue(response.success);
-        assert.equal(response.transaction.riskData.decision, 'Approve');
+        assert.isDefined(response.transaction.riskData.decision);
         assert.isDefined(response.transaction.riskData.fraudServiceProvider);
         assert.isDefined(response.transaction.riskData.id);
         assert.isDefined(response.transaction.riskData.decisionReasons);
@@ -5042,7 +5042,8 @@ describe('TransactionGateway', function () {
       specHelper.createTransactionToRefund(function (transaction) {
         let options = {
           order_id: 'abcd', // eslint-disable-line camelcase
-          amount: '1.00'
+          amount: '1.00',
+          merchant_account_id: specHelper.nonDefaultMerchantAccountId // eslint-disable-line camelcase
         };
 
         specHelper.defaultGateway.transaction.refund(transaction.id, options, function (err, response) {
@@ -5052,6 +5053,7 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.refundedTransactionId, transaction.id);
           assert.equal(response.transaction.orderId, 'abcd');
           assert.equal(response.transaction.amount, '1.00');
+          assert.equal(response.transaction.merchantAccountId, specHelper.nonDefaultMerchantAccountId);
 
           done();
         });
@@ -5273,6 +5275,8 @@ describe('TransactionGateway', function () {
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
+          assert.isTrue(response.transaction.taxExempt);
+          assert.equal(response.transaction.purchaseOrderNumber, 'ABC123');
           assert.equal(response.transaction.status, 'submitted_for_settlement');
 
           done();
@@ -5309,6 +5313,7 @@ describe('TransactionGateway', function () {
         specHelper.defaultGateway.transaction.submitForSettlement(response.transaction.id, null, submitForSettlementParams, function (err, response) {
           assert.isNull(err);
           assert.isTrue(response.success);
+          assert.equal(response.transaction.shipsFromPostalCode, '90210');
           assert.equal(response.transaction.status, 'submitted_for_settlement');
 
           done();
@@ -6272,6 +6277,153 @@ describe('TransactionGateway', function () {
         });
         done();
       });
+    });
+  });
+
+  describe('Multi Auth Adjustment endpoint on successful', function () {
+    it('returns success response', function (done) {
+      let transactionParams = {
+        merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
+        amount: '75.50',
+        creditCard: {
+          number: '5555555555554444',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.adjustAuthorization(response.transaction.id, '85.00', function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.amount, '85.00');
+          done();
+        })
+      );
+    });
+  });
+
+  describe('Multi Auth Adjustment endpoint on failure', function () {
+    let firstDataMasterTransactionParams = {
+      merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
+      amount: '75.50',
+      creditCard: {
+        number: '5555555555554444',
+        expirationDate: '06/09'
+      }
+    };
+
+    it('returns error code, when processor does not support multi auth adjustment', function (done) {
+      let transactionParams = {
+        merchantAccountId: specHelper.defaultMerchantAccountId,
+        amount: '75.50',
+        creditCard: {
+          number: CreditCardNumbers.CardTypeIndicators.Visa,
+          expirationDate: '06/09'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.adjustAuthorization(response.transaction.id, '75.50', function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.transaction.amount, '75.50');
+          let errorCode = response.errors.for('transaction').on('base')[0].code;
+
+          assert.equal(errorCode, ValidationErrorCodes.Transaction.ProcessorDoesNotSupportAuthAdjustment);
+          done();
+        })
+      );
+    });
+
+    it('returns error code, when submitted adjustment amount is zero', function (done) {
+      specHelper.defaultGateway.transaction.sale(firstDataMasterTransactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.adjustAuthorization(response.transaction.id, '0.0', function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.transaction.amount, '75.50');
+          let errorCode = response.errors.for('authorizationAdjustment').on('amount')[0].code;
+
+          assert.equal(errorCode, ValidationErrorCodes.Transaction.AdjustmentAmountMustBeGreaterThanZero);
+          done();
+        })
+      );
+    });
+
+    it('returns error code, when adjusted amount is same as authorized amount', function (done) {
+      specHelper.defaultGateway.transaction.sale(firstDataMasterTransactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.adjustAuthorization(response.transaction.id, '75.50', function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.transaction.amount, '75.50');
+          let errorCode = response.errors.for('authorizationAdjustment').on('base')[0].code;
+
+          assert.equal(errorCode, ValidationErrorCodes.Transaction.NoNetAmountToPerformAuthAdjustment);
+          done();
+        })
+      );
+    });
+
+    it('returns error code, when transaction status is not authorized', function (done) {
+      let additionalParams = {options: {submitForSettlement: true}};
+      let transactionParams = Object.assign(additionalParams, firstDataMasterTransactionParams);
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.adjustAuthorization(response.transaction.id, '75.50', function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.transaction.amount, '75.50');
+          let errorCode = response.errors.for('transaction').on('base')[0].code;
+
+          assert.equal(errorCode, ValidationErrorCodes.Transaction.TransactionMustBeInStateAuthorized);
+          done();
+        })
+      );
+    });
+
+    it('returns error code, when transaction type is undefined or final', function (done) {
+      let additionalParams = {transactionSource: 'recurring_first'};
+      let transactionParams = Object.assign(additionalParams, firstDataMasterTransactionParams);
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.adjustAuthorization(response.transaction.id, '85.50', function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.transaction.amount, '75.50');
+          let errorCode = response.errors.for('transaction').on('base')[0].code;
+
+          assert.equal(errorCode, ValidationErrorCodes.Transaction.TransactionIsNotEligibleForAdjustment);
+          done();
+        })
+      );
+    });
+
+    let firstDataVisaTransactionParams = {
+      merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
+      amount: '75.50',
+      creditCard: {
+        number: CreditCardNumbers.CardTypeIndicators.Visa,
+        expirationDate: '06/09'
+      }
+    };
+
+    it('returns error code, when processor does not support incremental auth', function (done) {
+      specHelper.defaultGateway.transaction.sale(firstDataVisaTransactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.adjustAuthorization(response.transaction.id, '85.50', function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.transaction.amount, '75.50');
+          let errorCode = response.errors.for('transaction').on('base')[0].code;
+
+          assert.equal(errorCode, ValidationErrorCodes.Transaction.ProcessorDoesNotSupportIncrementalAuth);
+          done();
+        })
+      );
+    });
+
+    it('returns error code, when processor does not support auth reversal', function (done) {
+      specHelper.defaultGateway.transaction.sale(firstDataVisaTransactionParams, (err, response) =>
+        specHelper.defaultGateway.transaction.adjustAuthorization(response.transaction.id, '65.50', function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(response.transaction.amount, '75.50');
+          let errorCode = response.errors.for('transaction').on('base')[0].code;
+
+          assert.equal(errorCode, ValidationErrorCodes.Transaction.ProcessorDoesNotSupportPartialAuthReversal);
+          done();
+        })
+      );
     });
   });
 });

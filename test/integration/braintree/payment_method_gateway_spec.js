@@ -150,9 +150,8 @@ describe('PaymentMethodGateway', function () {
             assert.isNotNull(response.paymentMethod.paymentInstrumentName);
             assert.isNotNull(response.paymentMethod.sourceDescription);
             assert.isNotNull(response.paymentMethod.customerId);
-            const token = response.paymentMethod.token;
-          specHelper.defaultGateway.paymentMethodNonce.create(token, function (err, response) {
-          });
+
+            done();
           });
         })
       )

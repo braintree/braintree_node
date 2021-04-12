@@ -583,6 +583,7 @@ global.specHelper = {
   adyenMerchantAccountId: 'adyen_ma',
   fakeAmexDirectMerchantAccountId: 'fake_amex_direct_usd',
   fakeVenmoAccountMerchantAccountId: 'fake_first_data_venmo_account',
+  fakeFirstDataMerchantAccountId: 'fake_first_data_merchant_account',
   clientApiHttp: ClientApiHttp,
   decodeClientToken,
   createTransactionToRefund,
