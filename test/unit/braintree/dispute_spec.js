@@ -8,7 +8,6 @@ describe('Dispute', function () {
     amountDisputed: '100.00',
     amountWon: '0.00',
     caseNumber: 'CB123456',
-    chargebackProtectionLevel: 'not_protected',
     createdAt: '2013-04-10',
     currencyIsoCode: 'USD',
     dateOpened: '2013-04-01',
@@ -101,7 +100,6 @@ describe('Dispute', function () {
       assert.equal('2013-04-01', dispute.dateOpened);
       assert.equal('2013-04-02', dispute.dateWon);
       assert.equal(Dispute.Kind.Chargeback, dispute.kind);
-      assert.equal(Dispute.ChargebackProtectionLevel.NotProtected, dispute.chargebackProtectionLevel);
     });
 
     it('populates new fields', () => {
@@ -132,7 +130,6 @@ describe('Dispute', function () {
       assert.equal('2013-04-10', dispute.statusHistory[0].effectiveDate);
       assert.equal('open', dispute.statusHistory[0].status);
       assert.equal('2013-04-10', dispute.statusHistory[0].timestamp);
-      assert.equal(Dispute.ChargebackProtectionLevel.NotProtected, dispute.chargebackProtectionLevel);
     });
 
     it('handles null fields', () => {
