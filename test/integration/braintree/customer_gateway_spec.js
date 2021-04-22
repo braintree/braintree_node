@@ -67,6 +67,22 @@ describe('CustomerGateway', function () {
       });
     });
 
+    it('creates a customer with tax identifiers', function (done) {
+      let customerParams = {
+        taxIdentifiers: [
+          {countryCode: 'US', identifier: '987654321'},
+          {countryCode: 'CL', identifier: '123456789'}
+        ]
+      };
+
+      specHelper.defaultGateway.customer.create(customerParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+
+        done();
+      });
+    });
+
     it('handles uft8 characters', done =>
       specHelper.defaultGateway.customer.create({firstName: 'Jöhn', lastName: 'Smith'}, function (err, response) {
         assert.isNull(err);
@@ -1090,6 +1106,31 @@ describe('CustomerGateway', function () {
         assert.equal(response.customer.lastName, 'New Last Name');
 
         done();
+      });
+    });
+
+    it('updates a tax identifier', function (done) {
+      let customerParams = {
+        taxIdentifiers: [
+          {countryCode: 'US', identifier: '987654321'},
+          {countryCode: 'CL', identifier: '123456789'}
+        ]
+      };
+
+      specHelper.defaultGateway.customer.create(customerParams, function (err, createResponse) {
+        assert.isNull(err);
+        assert.isTrue(createResponse.success);
+
+        customerParams.taxIdentifiers = [
+          {countryCode: 'US', identifier: '567891234'}
+        ];
+
+        specHelper.defaultGateway.customer.update(createResponse.customer.id, customerParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          done();
+        });
       });
     });
 
