@@ -1,4 +1,5 @@
 ## Unreleased
+* Add `chargeback_protection_level` into dispute search
 * Add `LocalPaymentReversed` webhook notification support
 * Support all options for `gateway.transaction.submitForSettlement` and `gateway.transaction.submitForPartialSettlement`
 * Fix issue where options passed to `gateway.transaction.submitForSettlement` were being ignored (closes #168)
