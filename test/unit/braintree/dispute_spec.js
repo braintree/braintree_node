@@ -52,7 +52,12 @@ describe('Dispute', function () {
       orderId: null,
       purchaseOrderNumber: 'po',
       paymentInstrumentSubtype: 'Visa'
-    }
+    },
+    paypalMessages: [{
+      message: 'message',
+      sender: 'seller',
+      sentAt: '2013-04-10'
+    }]
   };
 
   describe('constructor', () => {
@@ -127,6 +132,9 @@ describe('Dispute', function () {
       assert.equal('evidence2', dispute.evidence[1].id);
       assert.equal('2009-04-11', dispute.evidence[1].sentToProcessorAt);
       assert.equal(null, dispute.evidence[1].url);
+      assert.equal('message', dispute.paypalMessages[0].message);
+      assert.equal('seller', dispute.paypalMessages[0].sender);
+      assert.equal('2013-04-10', dispute.paypalMessages[0].sentAt);
       assert.equal('2013-04-10', dispute.statusHistory[0].effectiveDate);
       assert.equal('open', dispute.statusHistory[0].status);
       assert.equal('2013-04-10', dispute.statusHistory[0].timestamp);
@@ -138,6 +146,7 @@ describe('Dispute', function () {
         dateOpened: null,
         dateWon: null,
         evidence: null,
+        paypalMessages: null,
         replyByDate: null,
         statusHistory: null
       });
@@ -146,6 +155,7 @@ describe('Dispute', function () {
       assert.equal(null, dispute.dateOpened);
       assert.equal(null, dispute.dateWon);
       assert.equal(null, dispute.evidence);
+      assert.equal(null, dispute.paypalMessages);
       assert.equal(null, dispute.replyByDate);
       assert.equal(null, dispute.statusHistory);
     });
