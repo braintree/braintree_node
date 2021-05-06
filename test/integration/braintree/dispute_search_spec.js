@@ -169,10 +169,10 @@ describe('DisputeSearch', () => {
           stream.on('data', dispute => disputes.push(dispute));
 
           stream.on('end', () => {
-            assert(disputes.length == 1);
-            assert(disputes[0].caseNumber === "CASE-CHARGEBACK-PROTECTED");
-            assert(disputes[0].reason === Dispute.Reason.Fraud);
-            assert(disputes[0].chargebackProtectionLevel === Dispute.ChargebackProtectionLevel.Effortless);
+            assert.equal(disputes.length, 1);
+            assert.equal(disputes[0].caseNumber, "CASE-CHARGEBACK-PROTECTED");
+            assert.equal(disputes[0].reason, Dispute.Reason.Fraud);
+            assert.equal(disputes[0].chargebackProtectionLevel, Dispute.ChargebackProtectionLevel.Effortless);
 
             done();
           });
