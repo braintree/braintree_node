@@ -1,6 +1,6 @@
 ## 3.4.0
 * Add `taxIdentifiers` parameter to `Customer.create` and `Customer.update`
-
+* Add `chargeback_protection_level` into dispute search
 ## 3.3.0
 * Add `LocalPaymentReversed` webhook notification support
 * Support all options for `gateway.transaction.submitForSettlement` and `gateway.transaction.submitForPartialSettlement`
