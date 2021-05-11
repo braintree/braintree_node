@@ -36,6 +36,22 @@ describe('WebhookNotificationGateway', function () {
   });
 
   describe('sampleNotification', function () {
+    it('returns a parsable signature and payload', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.GrantedPaymentMethodRevoked,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.GrantedPaymentMethodRevoked);
+        assert.equal(webhookNotification.subject.venmoAccount.token, 'my_id');
+        assert.exists(webhookNotification.timestamp);
+        done();
+      });
+    });
+
     it('throws an error when signature is empty', function (done) {
       specHelper.defaultGateway.webhookNotification.parse(null, 'some payload', function (err) {
         assert.equal(err.type, errorTypes.invalidSignatureError);
