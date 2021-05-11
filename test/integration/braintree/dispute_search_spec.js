@@ -159,6 +159,25 @@ describe('DisputeSearch', () => {
       });
     });
 
+    it('returns disputes by chargebackProtectionLevel', (done) => {
+      let stream = specHelper.defaultGateway.dispute.search(function (search) {
+        return search.chargebackProtectionLevel().in([
+          Dispute.ChargebackProtectionLevel.Effortless
+        ]);
+      });
+
+      stream.on('data', dispute => disputes.push(dispute));
+
+      stream.on('end', () => {
+        assert.equal(disputes.length, 1);
+        assert.equal(disputes[0].caseNumber, 'CASE-CHARGEBACK-PROTECTED');
+        assert.equal(disputes[0].reason, Dispute.Reason.Fraud);
+        assert.equal(disputes[0].chargebackProtectionLevel, Dispute.ChargebackProtectionLevel.Effortless);
+
+        done();
+      });
+    });
+
     it('returns disputes by customer_id', (done) => {
       specHelper.defaultGateway.customer.create({
         firstName: 'Action',
