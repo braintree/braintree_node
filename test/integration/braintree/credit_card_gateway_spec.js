@@ -114,6 +114,56 @@ describe('CreditCardGateway', function () {
       });
     });
 
+    it('includes risk data when skipAdvancedFraudChecking is false', function (done) {
+      specHelper.fraudProtectionEnterpriseGateway.customer.create({}, function (err, response) {
+        let advancedFraudCustomerId = response.customer.id;
+        let creditCardParams = {
+          customerId: advancedFraudCustomerId,
+          number: '4111111111111111',
+          expirationDate: '05/2020',
+          options: {
+            verifyCard: 'true',
+            skipAdvancedFraudChecking: 'false'
+          }
+        };
+
+        specHelper.fraudProtectionEnterpriseGateway.creditCard.create(creditCardParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let riskData = response.creditCard.verification.riskData;
+
+          assert.isDefined(riskData);
+          done();
+        });
+      });
+    });
+
+    it('does not include risk data when skipAdvancedFraudChecking is true', function (done) {
+      specHelper.fraudProtectionEnterpriseGateway.customer.create({}, function (err, response) {
+        let advancedFraudCustomerId = response.customer.id;
+        let creditCardParams = {
+          customerId: advancedFraudCustomerId,
+          number: '4111111111111111',
+          expirationDate: '05/2020',
+          options: {
+            verifyCard: 'true',
+            skipAdvancedFraudChecking: 'true'
+          }
+        };
+
+        specHelper.fraudProtectionEnterpriseGateway.creditCard.create(creditCardParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let riskData = response.creditCard.verification.riskData;
+
+          assert.isUndefined(riskData);
+          done();
+        });
+      });
+    });
+
     it('creates from three d secure pass thru parameters', function (done) {
       specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Smith'}, function (err, response) {
         customerId = response.customer.id;
@@ -1242,6 +1292,66 @@ describe('CreditCardGateway', function () {
         assert.include(errorCodes, '81716');
 
         done();
+      });
+    });
+
+    it('includes risk data when skipAdvancedFraudChecking is false', function (done) {
+      let customerParams = {
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/2020'
+        }
+      };
+
+      specHelper.fraudProtectionEnterpriseGateway.customer.create(customerParams, function (err, response) {
+        let creditCardToken = response.customer.creditCards[0].token;
+        let creditCardParams = {
+          expirationDate: '08/2025',
+          options: {
+            verifyCard: 'true',
+            skipAdvancedFraudChecking: 'false'
+          }
+        };
+
+        specHelper.fraudProtectionEnterpriseGateway.creditCard.update(creditCardToken, creditCardParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let riskData = response.creditCard.verification.riskData;
+
+          assert.isDefined(riskData);
+          done();
+        });
+      });
+    });
+
+    it('does not include risk data when skipAdvancedFraudChecking is true', function (done) {
+      let customerParams = {
+        creditCard: {
+          number: '4111111111111111',
+          expirationDate: '05/2020'
+        }
+      };
+
+      specHelper.fraudProtectionEnterpriseGateway.customer.create(customerParams, function (err, response) {
+        let creditCardToken = response.customer.creditCards[0].token;
+        let creditCardParams = {
+          expirationDate: '08/2025',
+          options: {
+            verifyCard: 'true',
+            skipAdvancedFraudChecking: 'true'
+          }
+        };
+
+        specHelper.fraudProtectionEnterpriseGateway.creditCard.update(creditCardToken, creditCardParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let riskData = response.creditCard.verification.riskData;
+
+          assert.isUndefined(riskData);
+          done();
+        });
       });
     });
   });

@@ -1,4 +1,5 @@
-## unreleased
+## Unreleased
+* Add `skipAdvancedFraudChecking` to `Customer.create` and `Customer.update`
 * Add webhook sample for `GrantedPaymentMethodRevoked`
 
 ## 3.4.0

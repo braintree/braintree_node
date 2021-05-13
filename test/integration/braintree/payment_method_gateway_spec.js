@@ -132,6 +132,94 @@ describe('PaymentMethodGateway', function () {
       })
     );
 
+    it('includes risk data when skipAdvancedFraudChecking is false', done =>
+      specHelper.fraudProtectionEnterpriseGateway.customer.create({}, function (err, response) {
+        customerId = response.customer.id;
+
+        specHelper.fraudProtectionEnterpriseGateway.clientToken.generate({}, function (err, result) {
+          let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
+
+          let params = {
+            authorizationFingerprint,
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '01/2023'
+            }
+          };
+
+          let myHttp = new specHelper.clientApiHttp(new Config(specHelper.fraudProtectionEnterpriseConfig)); // eslint-disable-line new-cap
+
+          return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode, body) {
+            let nonce = JSON.parse(body).creditCards[0].nonce;
+
+            let paymentMethodParams = {
+              paymentMethodNonce: nonce,
+              customerId,
+              options: {
+                verifyCard: 'true',
+                skipAdvancedFraudChecking: 'false'
+              }
+            };
+
+            specHelper.fraudProtectionEnterpriseGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+
+              let riskData = response.creditCard.verification.riskData;
+
+              assert.isDefined(riskData);
+              done();
+            });
+          });
+        });
+      })
+    );
+
+    it('does not include risk data when skipAdvancedFraudChecking is true', done =>
+      specHelper.fraudProtectionEnterpriseGateway.customer.create({}, function (err, response) {
+        customerId = response.customer.id;
+
+        specHelper.fraudProtectionEnterpriseGateway.clientToken.generate({}, function (err, result) {
+          let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
+
+          let params = {
+            authorizationFingerprint,
+            creditCard: {
+              number: '4111111111111111',
+              expirationDate: '01/2023'
+            }
+          };
+
+          let myHttp = new specHelper.clientApiHttp(new Config(specHelper.fraudProtectionEnterpriseConfig)); // eslint-disable-line new-cap
+
+          return myHttp.post('/client_api/v1/payment_methods/credit_cards.json', params, function (statusCode, body) {
+            let nonce = JSON.parse(body).creditCards[0].nonce;
+
+            let paymentMethodParams = {
+              paymentMethodNonce: nonce,
+              customerId,
+              options: {
+                verifyCard: 'true',
+                skipAdvancedFraudChecking: 'true'
+              }
+            };
+
+            specHelper.fraudProtectionEnterpriseGateway.paymentMethod.create(paymentMethodParams, function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+
+              let riskData = response.creditCard.verification.riskData;
+
+              assert.isUndefined(riskData);
+              done();
+            });
+          });
+        });
+      })
+    );
+
     context('Apple Pay', () =>
       it('vaults an Apple Pay card from the nonce', done =>
         specHelper.defaultGateway.customer.create({firstName: 'John', lastName: 'Appleseed'}, function (err, response) {
@@ -1647,6 +1735,68 @@ describe('PaymentMethodGateway', function () {
           });
         })
       );
+
+      it('includes risk data when skipAdvancedFraudChecking is false', function (done) {
+        let customerParams = {
+          creditCard: {
+            number: '4111111111111111',
+            expirationDate: '06/2023'
+          }
+        };
+
+        specHelper.fraudProtectionEnterpriseGateway.customer.create(customerParams, function (err, response) {
+          let creditCard = response.customer.creditCards[0];
+
+          let paymentMethodParams = {
+            expirationDate: '09/2033',
+            options: {
+              verifyCard: 'true',
+              skipAdvancedFraudChecking: 'false'
+            }
+          };
+
+          specHelper.fraudProtectionEnterpriseGateway.paymentMethod.update(creditCard.token, paymentMethodParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            let riskData = response.creditCard.verification.riskData;
+
+            assert.isDefined(riskData);
+            done();
+          });
+        });
+      });
+
+      it('does not include risk data when skipAdvancedFraudChecking is true', function (done) {
+        let customerParams = {
+          creditCard: {
+            number: '4111111111111111',
+            expirationDate: '06/2023'
+          }
+        };
+
+        specHelper.fraudProtectionEnterpriseGateway.customer.create(customerParams, function (err, response) {
+          let creditCard = response.customer.creditCards[0];
+
+          let paymentMethodParams = {
+            expirationDate: '09/2033',
+            options: {
+              verifyCard: 'true',
+              skipAdvancedFraudChecking: 'true'
+            }
+          };
+
+          specHelper.fraudProtectionEnterpriseGateway.paymentMethod.update(creditCard.token, paymentMethodParams, function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            let riskData = response.creditCard.verification.riskData;
+
+            assert.isUndefined(riskData);
+            done();
+          });
+        });
+      });
 
       it('can pass a custom verification amount', done =>
         specHelper.defaultGateway.customer.create({}, function (err, response) {
