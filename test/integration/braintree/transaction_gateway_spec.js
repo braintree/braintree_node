@@ -2193,7 +2193,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('supports null previousNetworkTransactionId with non-visa', function (done) {
+      it('supports previousNetworkTransactionId with non-visa', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             amount: '10.00',
@@ -2210,7 +2210,7 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
-            assert.isNull(response.transaction.networkTransactionId);
+            assert.isNotNull(response.transaction.networkTransactionId);
             done();
           });
         });
