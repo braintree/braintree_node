@@ -2193,7 +2193,7 @@ describe('TransactionGateway', function () {
         });
       });
 
-      it('supports previousNetworkTransactionId with non-visa', function (done) {
+      it('supports null previousNetworkTransactionId with non-visa', function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
             amount: '10.00',
