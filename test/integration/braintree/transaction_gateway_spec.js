@@ -6280,6 +6280,47 @@ describe('TransactionGateway', function () {
     });
   });
 
+  describe('manual key entry transaction', function () {
+    it('is successful when correct card details', function (done) {
+      let transactionParams = {
+        merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
+        amount: '10.00',
+        creditCard: {
+          paymentReaderCardDetails: {
+            encryptedCardData: '8F34DFB312DC79C24FD5320622F3E11682D79E6B0C0FD881',
+            keySerialNumber: 'FFFFFF02000572A00005'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) => {
+        assert.isTrue(response.success);
+        done();
+      });
+    });
+
+    it('is unsuccessful when invalid card details', function (done) {
+      let transactionParams = {
+        merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
+        amount: '10.00',
+        creditCard: {
+          paymentReaderCardDetails: {
+            encryptedCardData: 'invalid',
+            keySerialNumber: 'invalid'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) => {
+        assert.isFalse(response.success);
+        let errorCode = response.errors.for('transaction').on('merchantAccountId')[0].code;
+
+        assert.equal(ValidationErrorCodes.Transaction.PaymentInstrumentNotSupportedByMerchantAccount, errorCode);
+        done();
+      });
+    });
+  });
+
   describe('Multi Auth Adjustment endpoint on successful', function () {
     it('returns success response', function (done) {
       let transactionParams = {
