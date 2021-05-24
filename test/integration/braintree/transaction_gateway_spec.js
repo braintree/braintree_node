@@ -2465,6 +2465,13 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.VenmoAccount);
+            assert.equal(response.transaction.venmoAccountDetails.username, 'venmojoe');
+            assert.equal(response.transaction.venmoAccountDetails.venmoUserId, 'Venmo-Joe-1');
+
+            // NEXT_MAJOR_VERSION - venmoAccount has been replaced with venmoAccountDetails, so these assertions can be removed
+            assert.equal(response.transaction.venmoAccount.username, 'venmojoe');
+            assert.equal(response.transaction.venmoAccount.venmoUserId, 'Venmo-Joe-1');
 
             done();
           });
@@ -2488,6 +2495,10 @@ describe('TransactionGateway', function () {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.VenmoAccount);
+            assert.equal(response.transaction.venmoAccountDetails.username, 'venmojoe');
+            assert.equal(response.transaction.venmoAccountDetails.venmoUserId, 'Venmo-Joe-1');
+
+            // NEXT_MAJOR_VERSION - venmoAccount has been replaced with venmoAccountDetails, so these assertions can be removed
             assert.equal(response.transaction.venmoAccount.username, 'venmojoe');
             assert.equal(response.transaction.venmoAccount.venmoUserId, 'Venmo-Joe-1');
 

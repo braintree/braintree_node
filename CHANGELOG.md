@@ -2,6 +2,7 @@
 * Add `paymentReaderCardDetails` parameter to `Transaction.sale`
 * Add `skipAdvancedFraudChecking` to `Customer.create` and `Customer.update`
 * Add webhook sample for `GrantedPaymentMethodRevoked`
+* Add `venmoAccountDetails` to `Transaction`
 
 ## 3.4.0
 * Add `taxIdentifiers` parameter to `Customer.create` and `Customer.update`
