@@ -3,10 +3,10 @@
 * Add `skipAdvancedFraudChecking` to `Customer.create` and `Customer.update`
 * Add webhook sample for `GrantedPaymentMethodRevoked`
 * Add `venmoAccountDetails` to `Transaction`
+* Add `chargebackProtectionLevel` into dispute search
 
 ## 3.4.0
 * Add `taxIdentifiers` parameter to `Customer.create` and `Customer.update`
-* Add `chargeback_protection_level` into dispute search
 
 ## 3.3.0
 * Add `LocalPaymentReversed` webhook notification support
