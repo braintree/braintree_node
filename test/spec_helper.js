@@ -597,5 +597,6 @@ global.specHelper = {
   createModificationForTests,
   createGrant,
   createToken,
-  fraudProtectionEnterpriseGateway
+  fraudProtectionEnterpriseGateway,
+  fraudProtectionEnterpriseConfig
 };

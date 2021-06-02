@@ -2210,7 +2210,7 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
-            assert.isNull(response.transaction.networkTransactionId);
+            assert.isNotNull(response.transaction.networkTransactionId);
             done();
           });
         });
@@ -2465,6 +2465,13 @@ describe('TransactionGateway', function () {
           specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
             assert.isNull(err);
             assert.isTrue(response.success);
+            assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.VenmoAccount);
+            assert.equal(response.transaction.venmoAccountDetails.username, 'venmojoe');
+            assert.equal(response.transaction.venmoAccountDetails.venmoUserId, 'Venmo-Joe-1');
+
+            // NEXT_MAJOR_VERSION - venmoAccount has been replaced with venmoAccountDetails, so these assertions can be removed
+            assert.equal(response.transaction.venmoAccount.username, 'venmojoe');
+            assert.equal(response.transaction.venmoAccount.venmoUserId, 'Venmo-Joe-1');
 
             done();
           });
@@ -2488,6 +2495,10 @@ describe('TransactionGateway', function () {
             assert.isNull(err);
             assert.isTrue(response.success);
             assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.VenmoAccount);
+            assert.equal(response.transaction.venmoAccountDetails.username, 'venmojoe');
+            assert.equal(response.transaction.venmoAccountDetails.venmoUserId, 'Venmo-Joe-1');
+
+            // NEXT_MAJOR_VERSION - venmoAccount has been replaced with venmoAccountDetails, so these assertions can be removed
             assert.equal(response.transaction.venmoAccount.username, 'venmojoe');
             assert.equal(response.transaction.venmoAccount.venmoUserId, 'Venmo-Joe-1');
 
@@ -6275,6 +6286,47 @@ describe('TransactionGateway', function () {
             assert.equal(element.adjustments[0].amount, '-5.00');
           });
         });
+        done();
+      });
+    });
+  });
+
+  describe('manual key entry transaction', function () {
+    it('is successful when correct card details', function (done) {
+      let transactionParams = {
+        merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
+        amount: '10.00',
+        creditCard: {
+          paymentReaderCardDetails: {
+            encryptedCardData: '8F34DFB312DC79C24FD5320622F3E11682D79E6B0C0FD881',
+            keySerialNumber: 'FFFFFF02000572A00005'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) => {
+        assert.isTrue(response.success);
+        done();
+      });
+    });
+
+    it('is unsuccessful when invalid card details', function (done) {
+      let transactionParams = {
+        merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
+        amount: '10.00',
+        creditCard: {
+          paymentReaderCardDetails: {
+            encryptedCardData: 'invalid',
+            keySerialNumber: 'invalid'
+          }
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, (err, response) => {
+        assert.isFalse(response.success);
+        let errorCode = response.errors.for('transaction').on('merchantAccountId')[0].code;
+
+        assert.equal(ValidationErrorCodes.Transaction.PaymentInstrumentNotSupportedByMerchantAccount, errorCode);
         done();
       });
     });

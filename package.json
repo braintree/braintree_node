@@ -1,6 +1,6 @@
 {
   "name": "braintree",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "description": "A library for server-side integrating with Braintree.",
   "keywords": [
     "braintree",
@@ -26,11 +26,11 @@
     "xml2js": "0.4.23"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "eslint": "^7.19.0",
+    "chai": "^4.3.4",
+    "eslint": "^7.26.0",
     "eslint-config-braintree": "^4.0.0",
-    "mocha": "^8.2.1",
-    "sinon": "^9.2.4"
+    "mocha": "^8.4.0",
+    "sinon": "^10.0.0"
   },
   "license": "MIT",
   "scripts": {

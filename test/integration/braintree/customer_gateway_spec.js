@@ -67,6 +67,54 @@ describe('CustomerGateway', function () {
       });
     });
 
+    it('includes risk data when skipAdvancedFraudChecking is false', function (done) {
+      let customerParams = {
+        credit_card: { // eslint-disable-line camelcase
+          number: '4111111111111111',
+          expiration_month: '11', // eslint-disable-line camelcase
+          expiration_year: '2099', // eslint-disable-line camelcase
+          options: {
+            verifyCard: true,
+            skipAdvancedFraudChecking: false
+          }
+        }
+      };
+
+      specHelper.fraudProtectionEnterpriseGateway.customer.create(customerParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+
+        let riskData = response.customer.creditCards[0].verification.riskData;
+
+        assert.isDefined(riskData);
+        done();
+      });
+    });
+
+    it('does not include risk data when skipAdvancedFraudChecking is true', function (done) {
+      let customerParams = {
+        credit_card: { // eslint-disable-line camelcase
+          number: '4111111111111111',
+          expiration_month: '11', // eslint-disable-line camelcase
+          expiration_year: '2099', // eslint-disable-line camelcase
+          options: {
+            verifyCard: true,
+            skipAdvancedFraudChecking: true
+          }
+        }
+      };
+
+      specHelper.fraudProtectionEnterpriseGateway.customer.create(customerParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+
+        let riskData = response.customer.creditCards[0].verification.riskData;
+
+        assert.isUndefined(riskData);
+        done();
+      });
+    });
+
     it('creates a customer with tax identifiers', function (done) {
       let customerParams = {
         taxIdentifiers: [
@@ -1218,6 +1266,62 @@ describe('CustomerGateway', function () {
               done();
             });
           });
+        });
+      });
+    });
+
+    it('includes risk data when skipAdvancedFraudChecking is false', function (done) {
+      specHelper.fraudProtectionEnterpriseGateway.customer.create({}, function (err, response) {
+        let customerId = response.customer.id;
+
+        let customerParams = {
+          creditCard: {
+            number: '4111111111111111',
+            expiration_month: '11', // eslint-disable-line camelcase
+            expiration_year: '2099', // eslint-disable-line camelcase
+            options: {
+              verifyCard: true,
+              skipAdvancedFraudChecking: false
+            }
+          }
+        };
+
+        specHelper.fraudProtectionEnterpriseGateway.customer.update(customerId, customerParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let riskData = response.customer.creditCards[0].verification.riskData;
+
+          assert.isDefined(riskData);
+          done();
+        });
+      });
+    });
+
+    it('does not include risk data when skipAdvancedFraudChecking is true', function (done) {
+      specHelper.fraudProtectionEnterpriseGateway.customer.create({}, function (err, response) {
+        let customerId = response.customer.id;
+
+        let customerParams = {
+          creditCard: {
+            number: '4111111111111111',
+            expiration_month: '11', // eslint-disable-line camelcase
+            expiration_year: '2099', // eslint-disable-line camelcase
+            options: {
+              verifyCard: true,
+              skipAdvancedFraudChecking: true
+            }
+          }
+        };
+
+        specHelper.fraudProtectionEnterpriseGateway.customer.update(customerId, customerParams, function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let riskData = response.customer.creditCards[0].verification.riskData;
+
+          assert.isUndefined(riskData);
+          done();
         });
       });
     });
