@@ -861,7 +861,7 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.LocalPaymentReversed);
 
-        let localPaymentReversed = webhookNotification.subject.localPaymentReversed;
+        let localPaymentReversed = webhookNotification.localPaymentReversed;
 
         assert.equal('a-payment-id', localPaymentReversed.paymentId);
         done();
