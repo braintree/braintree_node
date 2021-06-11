@@ -46,7 +46,7 @@ describe('WebhookNotificationGateway', function () {
 
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.GrantedPaymentMethodRevoked);
-        assert.equal(webhookNotification.subject.venmoAccount.token, 'my_id');
+        assert.equal(webhookNotification.revokedPaymentMethodMetadata.token, 'my_id');
         assert.exists(webhookNotification.timestamp);
         done();
       });
@@ -646,11 +646,12 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.GrantorUpdatedGrantedPaymentMethod);
 
-        let update = webhookNotification.subject.grantedPaymentInstrumentUpdate;
+        let update = webhookNotification.grantedPaymentInstrumentUpdate;
 
         assert.equal('vczo7jqrpwrsi2px', update.grantOwnerMerchantId);
         assert.equal('cf0i8wgarszuy6hc', update.grantRecipientMerchantId);
         assert.equal('ee257d98-de40-47e8-96b3-a6954ea7a9a4', update.paymentMethodNonce.nonce);
+        assert.equal(false, update.paymentMethodNonce.consumed);
         assert.equal('abc123z', update.token);
         assert.equal('expiration-month', update.updatedFields[0]);
         assert.equal('expiration-year', update.updatedFields[1]);
@@ -669,11 +670,12 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.RecipientUpdatedGrantedPaymentMethod);
 
-        let update = webhookNotification.subject.grantedPaymentInstrumentUpdate;
+        let update = webhookNotification.grantedPaymentInstrumentUpdate;
 
         assert.equal('vczo7jqrpwrsi2px', update.grantOwnerMerchantId);
         assert.equal('cf0i8wgarszuy6hc', update.grantRecipientMerchantId);
         assert.equal('ee257d98-de40-47e8-96b3-a6954ea7a9a4', update.paymentMethodNonce.nonce);
+        assert.equal(false, update.paymentMethodNonce.consumed);
         assert.equal('abc123z', update.token);
         assert.equal('expiration-month', update.updatedFields[0]);
         assert.equal('expiration-year', update.updatedFields[1]);
@@ -837,7 +839,7 @@ describe('WebhookNotificationGateway', function () {
       specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
         assert.equal(webhookNotification.kind, WebhookNotification.Kind.LocalPaymentCompleted);
 
-        let localPaymentCompleted = webhookNotification.subject.localPayment;
+        let localPaymentCompleted = webhookNotification.localPaymentCompleted;
 
         assert.equal('a-payment-id', localPaymentCompleted.paymentId);
         assert.equal('a-payer-id', localPaymentCompleted.payerId);
