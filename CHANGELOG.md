@@ -1,3 +1,7 @@
+## 3.6.0
+* Fix issue where webhook data passed to `LocalPaymentReversed` webhook class is missing
+* Add `grantedPaymentInstrumentUpdate` to `WebhookNotification`
+
 ## 3.5.0
 * Add `paymentReaderCardDetails` parameter to `Transaction.sale`
 * Add `skipAdvancedFraudChecking` to `Customer.create` and `Customer.update`
