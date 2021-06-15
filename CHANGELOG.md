@@ -1,4 +1,4 @@
-## Unreleased
+## 3.6.0
 * Fix issue where webhook data passed to `LocalPaymentReversed` webhook class is missing
 * Add `grantedPaymentInstrumentUpdate` to `WebhookNotification`
 
