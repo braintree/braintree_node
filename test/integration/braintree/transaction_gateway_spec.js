@@ -42,11 +42,11 @@ describe('TransactionGateway', function () {
     it('charges a card with exchangeRateQuoteId', function (done) {
       let transactionParams = {
         amount: '5.00',
-        exchangeRateQuoteId: 'dummyExchangeRateQuoteId123',
         creditCard: {
           number: '5105105105105100',
           expirationDate: '05/12'
-        }
+        },
+        exchangeRateQuoteId: 'dummyExchangeRateQuoteId-node'
       };
 
       specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
@@ -59,8 +59,26 @@ describe('TransactionGateway', function () {
         assert.equal(response.transaction.processorResponseCode, '1000');
         assert.equal(response.transaction.processorResponseType, 'approved');
         assert.exists(response.transaction.authorizationExpiresAt);
-        assert.equal(response.transaction.exchangeRateQuoteId, 'dummyExchangeRateQuoteId123');
+        done();
+      });
+    });
 
+    it('handles error when exchangeRateQuoteId is invalid', function (done) {
+      let transactionParams = {
+        amount: '10.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        exchangeRateQuoteId: new Array(5000).join('a')
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(response.errors.for('transaction').on('exchangeRateQuoteId')[0].code,
+          ValidationErrorCodes.Transaction.ExchangeRateQuoteIDIsTooLong
+        );
         done();
       });
     });
