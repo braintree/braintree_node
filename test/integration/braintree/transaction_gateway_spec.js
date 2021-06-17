@@ -39,6 +39,32 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('charges a card with exchangeRateQuoteId', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        exchangeRateQuoteId: 'dummyExchangeRateQuoteId123',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        }
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+        assert.isNull(response.transaction.voiceReferralNumber);
+        assert.equal(response.transaction.processorResponseCode, '1000');
+        assert.equal(response.transaction.processorResponseType, 'approved');
+        assert.exists(response.transaction.authorizationExpiresAt);
+        assert.equal(response.transaction.exchangeRateQuoteId, 'dummyExchangeRateQuoteId123');
+
+        done();
+      });
+    });
+
     it('passes scaExemption', function (done) {
       let requestedExemption = 'low_value';
       let transactionParams = {

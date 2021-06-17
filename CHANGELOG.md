@@ -1,5 +1,6 @@
 ## Unreleased
 * Add error code `TaxAmountIsRequiredForAibSwedish` for attribute `tax_amount` in `transaction` key for AIB:Domestic transactions in Sweden
+* Add `exchangeRateQuoteId` to `TransactionGateway`
 
 ## 3.6.0
 * Fix issue where webhook data passed to `LocalPaymentReversed` webhook class is missing
