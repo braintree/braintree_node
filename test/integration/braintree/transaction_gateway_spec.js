@@ -221,6 +221,24 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('handles an error when tax amount is not present for AIB:Domestic Sweden transactions', function (done) {
+      let transactionParams = {
+        type: 'sale',
+        merchantAccountId: 'aib_swe_ma',
+        amount: '64.05',
+        paymentMethodNonce: Nonces.TransactableVisa
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isFalse(response.success, 'response had no errors');
+        assert.equal(
+          response.errors.for('transaction').on('taxAmount')[0].code,
+          ValidationErrorCodes.Transaction.TaxAmountIsRequiredForAibSwedish
+        );
+        done();
+      });
+    });
+
     it('charges an elo card', function (done) {
       let transactionParams = {
         merchantAccountId: 'adyen_ma',
