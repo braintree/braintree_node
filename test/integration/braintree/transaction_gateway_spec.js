@@ -77,7 +77,7 @@ describe('TransactionGateway', function () {
         assert.isNull(err);
         assert.isFalse(response.success);
         assert.equal(response.errors.for('transaction').on('exchangeRateQuoteId')[0].code,
-          ValidationErrorCodes.Transaction.ExchangeRateQuoteIDIsTooLong
+          ValidationErrorCodes.Transaction.ExchangeRateQuoteIdIsTooLong
         );
         done();
       });
