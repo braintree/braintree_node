@@ -10,7 +10,7 @@ let legacyMerchantAccountParams = {
     firstName: 'Joe',
     lastName: 'Bloggs',
     email: 'joe@bloggs.com',
-    phone: '555-555-5555',
+    phone: '555-123-1234',
     address: {
       streetAddress: '123 Credibility St.',
       postalCode: '60606',
@@ -21,7 +21,7 @@ let legacyMerchantAccountParams = {
     ssn: '123-00-1234',
     routingNumber: '122100024',
     accountNumber: '43759348798',
-    taxId: '123456789',
+    taxId: '423456789',
     companyName: 'Waterfalls, inc'
   },
   tosAccepted: true,
