@@ -21,7 +21,7 @@ let legacyMerchantAccountParams = {
     ssn: '123-00-1234',
     routingNumber: '122100024',
     accountNumber: '43759348798',
-    taxId: '123456789',
+    taxId: '423456789',
     companyName: 'Waterfalls, inc'
   },
   tosAccepted: true,
@@ -46,7 +46,7 @@ let validMerchantAccountParams = {
   business: {
     legalName: "Joe's Bloggs",
     dbaName: "Joe's Junkyard",
-    taxId: '123456789',
+    taxId: '423456789',
     address: {
       streetAddress: '456 Fake St',
       postalCode: '48104',
@@ -227,7 +227,7 @@ describe('MerchantAccountGateway', function () {
       params.individual.address.postal_code = '60622';
       params.business.dba_name = "James's Bloggs";
       params.business.legal_name = "James's Bloggs Inc";
-      params.business.tax_id = '123456789';
+      params.business.tax_id = '423456789';
       params.business.address.street_address = '999 Fake St';
       params.business.address.locality = 'Miami';
       params.business.address.region = 'FL';
@@ -256,7 +256,7 @@ describe('MerchantAccountGateway', function () {
         assert.equal(response.merchantAccount.individual.address.postalCode, '60622');
         assert.equal(response.merchantAccount.business.dbaName, "James's Bloggs");
         assert.equal(response.merchantAccount.business.legalName, "James's Bloggs Inc");
-        assert.equal(response.merchantAccount.business.taxId, '123456789');
+        assert.equal(response.merchantAccount.business.taxId, '423456789');
         assert.equal(response.merchantAccount.business.address.streetAddress, '999 Fake St');
         assert.equal(response.merchantAccount.business.address.locality, 'Miami');
         assert.equal(response.merchantAccount.business.address.region, 'FL');
