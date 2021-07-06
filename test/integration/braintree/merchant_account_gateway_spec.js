@@ -21,7 +21,7 @@ let legacyMerchantAccountParams = {
     ssn: '123-00-1234',
     routingNumber: '122100024',
     accountNumber: '43759348798',
-    taxId: '423456789',
+    taxId: '123456789',
     companyName: 'Waterfalls, inc'
   },
   tosAccepted: true,
