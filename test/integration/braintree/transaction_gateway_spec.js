@@ -2409,7 +2409,16 @@ describe('TransactionGateway', function () {
             eciIndicator: '07',
             expirationMonth: '05',
             expirationYear: '14',
-            number: '4111111111111111'
+            number: '4111111111111111',
+            commercial: 'a-commercial',
+            debit: 'a-debit',
+            durbinRegulated: 'a-durbin-regulated',
+            healthcare: 'a-healthcare',
+            payroll: 'a-payroll',
+            prepaid: 'a-prepaid',
+            productId: 'a-product-id',
+            countryOfIssuance: 'a-country-of-issuance',
+            issuingBank: 'an-issuing-bank'
           }
         };
 
@@ -2419,6 +2428,15 @@ describe('TransactionGateway', function () {
           assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard);
           assert.isNotNull(response.transaction.applePayCard.cardType);
           assert.isNotNull(response.transaction.applePayCard.paymentInstrumentName);
+          assert.isNotNull(response.transaction.applePayCard.commercial);
+          assert.isNotNull(response.transaction.applePayCard.debit);
+          assert.isNotNull(response.transaction.applePayCard.durbinRegulated);
+          assert.isNotNull(response.transaction.applePayCard.healthcare);
+          assert.isNotNull(response.transaction.applePayCard.payroll);
+          assert.isNotNull(response.transaction.applePayCard.prepaid);
+          assert.isNotNull(response.transaction.applePayCard.productId);
+          assert.isNotNull(response.transaction.applePayCard.countryOfIssuance);
+          assert.isNotNull(response.transaction.applePayCard.issuingBank);
 
           done();
         });
