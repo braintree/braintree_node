@@ -2418,16 +2418,7 @@ describe('TransactionGateway', function () {
             eciIndicator: '07',
             expirationMonth: '05',
             expirationYear: '14',
-            number: '4111111111111111',
-            // commercial: 'a-commercial',
-            // debit: 'a-debit',
-            // durbinRegulated: 'a-durbin-regulated',
-            // healthcare: 'a-healthcare',
-            // payroll: 'a-payroll',
-            // prepaid: 'a-prepaid',
-            // productId: 'a-product-id',
-            // countryOfIssuance: 'a-country-of-issuance',
-            // issuingBank: 'an-issuing-bank'
+            number: '4111111111111111'
           }
         };
 
@@ -5018,8 +5009,6 @@ describe('TransactionGateway', function () {
         assert.isString(transaction.paypalAccount.sellerProtectionStatus);
         assert.isString(transaction.paypalAccount.captureId);
         assert.isString(transaction.paypalAccount.refundId);
-        assert.isString(transaction.paypalAccount.taxId);
-        assert.isString(transaction.paypalAccount.taxIdType);
         assert.isString(transaction.paypalAccount.transactionFeeAmount);
         assert.isString(transaction.paypalAccount.transactionFeeCurrencyIsoCode);
         assert.isString(transaction.paypalAccount.refundFromTransactionFeeAmount);
