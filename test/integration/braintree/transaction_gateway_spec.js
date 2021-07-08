@@ -2418,7 +2418,7 @@ describe('TransactionGateway', function () {
             eciIndicator: '07',
             expirationMonth: '05',
             expirationYear: '14',
-            number: '4111111111111111',
+            number: '4111111111111111'
             // commercial: 'a-commercial',
             // debit: 'a-debit',
             // durbinRegulated: 'a-durbin-regulated',
