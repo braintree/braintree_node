@@ -2,6 +2,20 @@
 * Add error code `TaxAmountIsRequiredForAibSwedish` for attribute `tax_amount` in `transaction` key for AIB:Domestic transactions in Sweden
 * Add `exchangeRateQuoteId` to `TransactionGateway`
 * Add `ExchangeRateQuoteIdIsTooLong` to `validation_error_codes`
+* Add the following fields to `AndroidPayCard` and `ApplePayCard`:
+  * `commercial`
+  * `debit`
+  * `durbinRegulated`
+  * `healthcare`
+  * `payroll`
+  * `prepaid`
+  * `productId`
+  * `countryOfIssuance`
+  * `issuingBank`
+  * `bin`
+  * `token`
+  * `last_4` (ApplePayCard only)
+  * `card_type` (ApplePayCard only)
 
 ## 3.6.0
 * Fix issue where webhook data passed to `LocalPaymentReversed` webhook class is missing
