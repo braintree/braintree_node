@@ -2474,8 +2474,12 @@ describe('TransactionGateway', function () {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard);
-          assert.isNotNull(response.transaction.applePayCard.cardType);
           assert.isNotNull(response.transaction.applePayCard.paymentInstrumentName);
+
+          assert.isNotNull(response.transaction.applePayCard.last4);
+          assert.isNotNull(response.transaction.applePayCard.cardType);
+          assert.isNotNull(response.transaction.applePayCard.bin);
+          assert.isNotNull(response.transaction.applePayCard.token);
           assert.isNotNull(response.transaction.applePayCard.commercial);
           assert.isNotNull(response.transaction.applePayCard.debit);
           assert.isNotNull(response.transaction.applePayCard.durbinRegulated);
