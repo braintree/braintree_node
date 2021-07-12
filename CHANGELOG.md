@@ -13,8 +13,6 @@
   * `countryOfIssuance`
   * `issuingBank`
   * `bin`
-  * `last_4` (ApplePayCard only)
-  * `card_type` (ApplePayCard only)
 
 ## 3.6.0
 * Fix issue where webhook data passed to `LocalPaymentReversed` webhook class is missing
