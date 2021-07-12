@@ -39,6 +39,50 @@ describe('TransactionGateway', function () {
       });
     });
 
+    it('charges a card with exchangeRateQuoteId', function (done) {
+      let transactionParams = {
+        amount: '5.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        exchangeRateQuoteId: 'dummyExchangeRateQuoteId-node'
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, 'sale');
+        assert.equal(response.transaction.amount, '5.00');
+        assert.equal(response.transaction.creditCard.maskedNumber, '510510******5100');
+        assert.isNull(response.transaction.voiceReferralNumber);
+        assert.equal(response.transaction.processorResponseCode, '1000');
+        assert.equal(response.transaction.processorResponseType, 'approved');
+        assert.exists(response.transaction.authorizationExpiresAt);
+        done();
+      });
+    });
+
+    it('handles error when exchangeRateQuoteId is invalid', function (done) {
+      let transactionParams = {
+        amount: '10.00',
+        creditCard: {
+          number: '5105105105105100',
+          expirationDate: '05/12'
+        },
+        exchangeRateQuoteId: new Array(5000).join('a')
+      };
+
+      specHelper.defaultGateway.transaction.sale(transactionParams, function (err, response) {
+        assert.isNull(err);
+        assert.isFalse(response.success);
+        assert.equal(response.errors.for('transaction').on('exchangeRateQuoteId')[0].code,
+          ValidationErrorCodes.Transaction.ExchangeRateQuoteIdIsTooLong
+        );
+        done();
+      });
+    });
+
     it('passes scaExemption', function (done) {
       let requestedExemption = 'low_value';
       let transactionParams = {
@@ -5028,6 +5072,8 @@ describe('TransactionGateway', function () {
         assert.isString(transaction.paypalAccount.sellerProtectionStatus);
         assert.isString(transaction.paypalAccount.captureId);
         assert.isString(transaction.paypalAccount.refundId);
+        assert.isString(transaction.paypalAccount.taxId);
+        assert.isString(transaction.paypalAccount.taxIdType);
         assert.isString(transaction.paypalAccount.transactionFeeAmount);
         assert.isString(transaction.paypalAccount.transactionFeeCurrencyIsoCode);
         assert.isString(transaction.paypalAccount.refundFromTransactionFeeAmount);
