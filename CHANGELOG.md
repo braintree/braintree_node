@@ -13,7 +13,6 @@
   * `countryOfIssuance`
   * `issuingBank`
   * `bin`
-  * `token`
   * `last_4` (ApplePayCard only)
   * `card_type` (ApplePayCard only)
 
