@@ -2441,6 +2441,7 @@ describe('TransactionGateway', function () {
 
           assert.isNotNull(response.transaction.applePayCard.last4);
           assert.isNotNull(response.transaction.applePayCard.cardType);
+          assert.isNotNull(response.transaction.applePayCard.bin);
           assert.isNotNull(response.transaction.applePayCard.commercial);
           assert.isNotNull(response.transaction.applePayCard.debit);
           assert.isNotNull(response.transaction.applePayCard.durbinRegulated);
@@ -2477,6 +2478,7 @@ describe('TransactionGateway', function () {
           assert.isNotNull(response.transaction.applePayCard.last4);
           assert.isNotNull(response.transaction.applePayCard.cardType);
           assert.isNotNull(response.transaction.applePayCard.commercial);
+          assert.isNotNull(response.transaction.applePayCard.bin);
           assert.isNotNull(response.transaction.applePayCard.debit);
           assert.isNotNull(response.transaction.applePayCard.durbinRegulated);
           assert.isNotNull(response.transaction.applePayCard.healthcare);
@@ -2534,6 +2536,7 @@ describe('TransactionGateway', function () {
             assert.isNotNull(response.transaction.androidPayCard.last4);
             assert.isNotNull(response.transaction.androidPayCard.cardType);
             assert.isNotNull(response.transaction.androidPayCard.commercial);
+            assert.isNotNull(response.transaction.androidPayCard.bin);
             assert.isNotNull(response.transaction.androidPayCard.debit);
             assert.isNotNull(response.transaction.androidPayCard.durbinRegulated);
             assert.isNotNull(response.transaction.androidPayCard.healthcare);
