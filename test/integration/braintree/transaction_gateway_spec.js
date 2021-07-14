@@ -2437,8 +2437,20 @@ describe('TransactionGateway', function () {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard);
-          assert.isNotNull(response.transaction.applePayCard.cardType);
           assert.isNotNull(response.transaction.applePayCard.paymentInstrumentName);
+
+          assert.isNotNull(response.transaction.applePayCard.last4);
+          assert.isNotNull(response.transaction.applePayCard.cardType);
+          assert.isNotNull(response.transaction.applePayCard.bin);
+          assert.isNotNull(response.transaction.applePayCard.commercial);
+          assert.isNotNull(response.transaction.applePayCard.debit);
+          assert.isNotNull(response.transaction.applePayCard.durbinRegulated);
+          assert.isNotNull(response.transaction.applePayCard.healthcare);
+          assert.isNotNull(response.transaction.applePayCard.payroll);
+          assert.isNotNull(response.transaction.applePayCard.prepaid);
+          assert.isNotNull(response.transaction.applePayCard.productId);
+          assert.isNotNull(response.transaction.applePayCard.countryOfIssuance);
+          assert.isNotNull(response.transaction.applePayCard.issuingBank);
 
           done();
         });
@@ -2461,8 +2473,20 @@ describe('TransactionGateway', function () {
           assert.isNull(err);
           assert.isTrue(response.success);
           assert.equal(response.transaction.paymentInstrumentType, PaymentInstrumentTypes.ApplePayCard);
-          assert.isNotNull(response.transaction.applePayCard.cardType);
           assert.isNotNull(response.transaction.applePayCard.paymentInstrumentName);
+
+          assert.isNotNull(response.transaction.applePayCard.last4);
+          assert.isNotNull(response.transaction.applePayCard.cardType);
+          assert.isNotNull(response.transaction.applePayCard.commercial);
+          assert.isNotNull(response.transaction.applePayCard.bin);
+          assert.isNotNull(response.transaction.applePayCard.debit);
+          assert.isNotNull(response.transaction.applePayCard.durbinRegulated);
+          assert.isNotNull(response.transaction.applePayCard.healthcare);
+          assert.isNotNull(response.transaction.applePayCard.payroll);
+          assert.isNotNull(response.transaction.applePayCard.prepaid);
+          assert.isNotNull(response.transaction.applePayCard.productId);
+          assert.isNotNull(response.transaction.applePayCard.countryOfIssuance);
+          assert.isNotNull(response.transaction.applePayCard.issuingBank);
 
           done();
         });
@@ -2508,6 +2532,19 @@ describe('TransactionGateway', function () {
             assert.equal(response.transaction.androidPayCard.cardType, specHelper.braintree.CreditCard.CardType.MasterCard);
             assert.equal(response.transaction.androidPayCard.last4, '4444');
             assert.isTrue(response.transaction.androidPayCard.isNetworkTokenized);
+
+            assert.isNotNull(response.transaction.androidPayCard.last4);
+            assert.isNotNull(response.transaction.androidPayCard.cardType);
+            assert.isNotNull(response.transaction.androidPayCard.commercial);
+            assert.isNotNull(response.transaction.androidPayCard.bin);
+            assert.isNotNull(response.transaction.androidPayCard.debit);
+            assert.isNotNull(response.transaction.androidPayCard.durbinRegulated);
+            assert.isNotNull(response.transaction.androidPayCard.healthcare);
+            assert.isNotNull(response.transaction.androidPayCard.payroll);
+            assert.isNotNull(response.transaction.androidPayCard.prepaid);
+            assert.isNotNull(response.transaction.androidPayCard.productId);
+            assert.isNotNull(response.transaction.androidPayCard.countryOfIssuance);
+            assert.isNotNull(response.transaction.androidPayCard.issuingBank);
 
             done();
           });
