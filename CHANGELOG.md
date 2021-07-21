@@ -12,6 +12,7 @@
   * `productId`
   * `countryOfIssuance`
   * `issuingBank`
+* Add `localPaymentFunded` and `localPaymentExpired` webhook notication support
 
 ## 3.6.0
 * Fix issue where webhook data passed to `LocalPaymentReversed` webhook class is missing
