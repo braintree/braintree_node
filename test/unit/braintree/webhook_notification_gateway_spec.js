@@ -852,6 +852,49 @@ describe('WebhookNotificationGateway', function () {
       });
     });
 
+    it('returns a parsable signature and payload for Local Payment Expired', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.LocalPaymentExpired,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.LocalPaymentExpired);
+
+        let localPaymentExpired = webhookNotification.localPaymentExpired;
+
+        assert.equal('a-payment-id', localPaymentExpired.paymentId);
+        assert.equal('a-payment-context-id', localPaymentExpired.paymentContextId);
+        done();
+      });
+    });
+
+    it('returns a parsable signature and payload for Local Payment Funded', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.LocalPaymentFunded,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.LocalPaymentFunded);
+
+        let localPaymentFunded = webhookNotification.localPaymentFunded;
+
+        assert.equal('a-payment-id', localPaymentFunded.paymentId);
+        assert.equal('a-payment-context-id', localPaymentFunded.paymentContextId);
+        assert.exists(localPaymentFunded.transaction);
+        assert.equal('1', localPaymentFunded.transaction.id);
+        assert.equal('settled', localPaymentFunded.transaction.status);
+        assert.equal('order1234', localPaymentFunded.transaction.orderId);
+        assert.equal('10.00', localPaymentFunded.transaction.amount);
+        done();
+      });
+    });
+
     it('returns a parsable signature and payload for Local Payment Reversed', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.LocalPaymentReversed,
