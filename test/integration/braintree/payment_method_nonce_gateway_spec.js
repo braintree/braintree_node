@@ -148,36 +148,26 @@ describe('PaymentMethodNonceGateway', function () {
 
   describe('find', function () {
     it('find the nonce', function (done) {
-      let nonceParams = {
-        creditCard: {
-          number: '4111111111111111',
-          expirationMonth: '05',
-          expirationYear: '2020'
-        }
-      };
 
-      specHelper.generate3DSNonce(nonceParams, function (nonce) {
-        assert.isNotNull(nonce);
+      const nonce = 'fake-three-d-secure-visa-full-authentication-nonce';
+      specHelper.defaultGateway.paymentMethodNonce.find(nonce, function (err, paymentMethodNonce) {
+        assert.isNull(err);
+        let info = paymentMethodNonce.threeDSecureInfo;
 
-        specHelper.defaultGateway.paymentMethodNonce.find(nonce, function (err, paymentMethodNonce) {
-          assert.isNull(err);
-          let info = paymentMethodNonce.threeDSecureInfo;
+        assert.equal(paymentMethodNonce.nonce, nonce);
+        assert.isTrue(info.liabilityShifted);
+        assert.isTrue(info.liabilityShiftPossible);
+        assert.equal(info.enrolled, 'Y');
+        assert.equal(info.status, 'authenticate_successful');
+        assert.equal(info.cavv, 'cavv_value');
+        assert.equal(info.xid, 'xid_value');
+        assert.equal(info.eciFlag, '05');
+        assert.equal(info.threeDSecureVersion, '1.0.2');
+        assert.isNull(info.dsTransactionId);
 
-          assert.equal(paymentMethodNonce.nonce, nonce);
-          assert.isTrue(info.liabilityShifted);
-          assert.isTrue(info.liabilityShiftPossible);
-          assert.equal(info.enrolled, 'Y');
-          assert.equal(info.status, 'authenticate_successful');
-          assert.equal(info.cavv, 'test_cavv');
-          assert.equal(info.xid, 'test_xid');
-          assert.equal(info.eciFlag, 'test_eci');
-          assert.equal(info.threeDSecureVersion, '1.0.2');
-          assert.isNull(info.dsTransactionId);
+        assert.equal(paymentMethodNonce.details.bin, '411111');
 
-          assert.equal(paymentMethodNonce.details.bin, '411111');
-
-          done();
-        });
+        done();
       });
     });
 
