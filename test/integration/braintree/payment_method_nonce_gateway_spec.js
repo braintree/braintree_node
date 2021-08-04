@@ -148,8 +148,8 @@ describe('PaymentMethodNonceGateway', function () {
 
   describe('find', function () {
     it('find the nonce', function (done) {
-
       const nonce = 'fake-three-d-secure-visa-full-authentication-nonce';
+
       specHelper.defaultGateway.paymentMethodNonce.find(nonce, function (err, paymentMethodNonce) {
         assert.isNull(err);
         let info = paymentMethodNonce.threeDSecureInfo;
