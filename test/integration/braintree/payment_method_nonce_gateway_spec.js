@@ -165,7 +165,7 @@ describe('PaymentMethodNonceGateway', function () {
         assert.equal(info.threeDSecureVersion, '1.0.2');
         assert.isNull(info.dsTransactionId);
 
-        assert.equal(paymentMethodNonce.details.bin, '411111');
+        assert.equal(paymentMethodNonce.details.bin, '400000');
 
         done();
       });
