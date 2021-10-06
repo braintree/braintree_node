@@ -1,5 +1,137 @@
+## 3.7.0
+* Add error code `TaxAmountIsRequiredForAibSwedish` for attribute `tax_amount` in `transaction` key for AIB:Domestic transactions in Sweden
+* Add `exchangeRateQuoteId` to `TransactionGateway`
+* Add `ExchangeRateQuoteIdIsTooLong` to `validation_error_codes`
+* Add the following fields to `AndroidPayCard` and `ApplePayCard`:
+  * `commercial`
+  * `debit`
+  * `durbinRegulated`
+  * `healthcare`
+  * `payroll`
+  * `prepaid`
+  * `productId`
+  * `countryOfIssuance`
+  * `issuingBank`
+* Add `localPaymentFunded` and `localPaymentExpired` webhook notication support
+
+## 3.6.0
+* Fix issue where webhook data passed to `LocalPaymentReversed` webhook class is missing
+* Add `grantedPaymentInstrumentUpdate` to `WebhookNotification`
+
+## 3.5.0
+* Add `paymentReaderCardDetails` parameter to `Transaction.sale`
+* Add `skipAdvancedFraudChecking` to `Customer.create` and `Customer.update`
+* Add webhook sample for `GrantedPaymentMethodRevoked`
+* Add `venmoAccountDetails` to `Transaction`
+* Add `chargebackProtectionLevel` into dispute search
+
+## 3.4.0
+* Add `taxIdentifiers` parameter to `Customer.create` and `Customer.update`
+
+## 3.3.0
+* Add `LocalPaymentReversed` webhook notification support
+* Support all options for `gateway.transaction.submitForSettlement` and `gateway.transaction.submitForPartialSettlement`
+* Fix issue where options passed to `gateway.transaction.submitForSettlement` were being ignored (closes #168)
+* Fix issue where options passed to `gateway.transaction.submitForPartialSettlement` were being ignored
+* Add `storeId` and `storeIds` fields to `Transaction.search`
+* Add `Transaction.adjustAuthorization()` method to support multiple authorizations for a single transaction
+
+## 3.2.2
+- Update `dateformat` module to v4.5.1
+
+## 3.2.1
+- Remove unnecessary `user` package (#186)
+
+## 3.2.0
+- `plan.all`, `discount.all` and `addOn.all` return collections of plan, discount and addOn objects respectively. (fixes #178)
+- Deprecate `deviceSessionId` and `fraudMerchantId` in the `CrediteCardGateway`, `CustomerGateway`, `PaymentMethodGateway`, and `TransactionGateway` classes
+* Add `installments` to `Transaction` requests
+* Add `count` to `installments`
+* Add `scaExemption` to `TransactionGateway`
+* Add exceptions defined in `exceptions.js` as an export (thanks @jtcooper10!)
+
+## 3.1.0
+- Add `AcquirerReferenceNumber` to `Transaction`
+- Deprecate `recurring` in `transaction.sale()` requests
+
+## 3.0.0
+* Add `RequestTimeoutError` and `GatewayTimeoutError` exceptions
+* Remove several no-longer-used dependencies (underscore, semver and readable-stream)
+* Breaking Changes
+  * Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
+  * Remove deprecated iDEAL, Coinbase, and Transparent Redirect
+  * Remove deprecated `connect` method
+  * Config class now throws an error when token environment does not match passed environment
+  * Remove `GrantedPaymentInstrumentUpdate` (deprecated in 2.16.0)
+  * Remove `InvalidTransparentRedirectHashError`
+  * Remove `SEPA` test nonce
+  * Remove deprecated `tag` parameter from dispute calls
+  * Remove deprecated validation error codes:
+    * `DiscountAmountMustBeGreaterThanZero`
+    * `UnitTaxAmountMustBeGreaterThanZero`
+    * `SEPABankAccount`:
+      * `IBANIsRequired`
+      * `BICIsRequired`
+      * `AccountHolderNameIsRequired`
+    * `SEPAMandate`:
+      * `AccountHolderNameIsRequired`
+      * `BICIsRequired`
+      * `IBANIsRequired`
+      * `TypeIsRequired`
+      * `IBANInvalidCharacter`
+      * `BICInvalidCharacter`
+      * `BICLengthIsInvalid`
+      * `BICUnsupportedCountry`
+      * `IBANUnsupportedCountry`
+      * `IBANInvalidFormat`
+      * `BillingAddressConflict`
+      * `BillingAddressIdIsInvalid`
+      * `TypeIsInvalid`
+    * `AmountDoesNotMatchIdealPaymentAmount`
+    * `IdealPaymentNotComplete`
+    * `IdealPaymentsCannotBeVaulted`
+    * `MerchantAccountDoesNotMatchIdealPaymentMerchantAccount`
+    * `OrderIdDoesNotMatchIdealPaymentOrderId`
+    * `OrderIdIsRequiredWithIdealPayment`
+  * Rename `DownForMaintenanceError` to `ServiceUnavailableError`
+  * Transaction searches throw `UnexpectedError` instead of `DownForMaintenanceError` when search response yields unexpected results
+  * Remove Masterpass Card support
+  * Remove Amex Express Checkout Card support
+  * Rename `braintree/lib/test` to `braintree/lib/test_values` to avoid accidental removal of directories named `test` (fixes #98 and #174)
+  * Fix bug where `expired` and `expiringBetween` methods on `CreditCardGateway` did not return full credit card results
+  * Bump API version to support declined refund objects.
+
+## 2.24.0
+* Add * `GatewayRejectionReason.RiskThreshold` to `Transaction`
+* Update @braintree/wrap-promise to v2.1.0
+* Add `networkTransactionId` to `CreditCardVerification`
+* Add `retrievalReferenceNumber` to `Transaction`
+* Add `productSku` to `Transaction`
+* Add `phoneNumber` and `shippingMethod` to `Address`
+* Add `customerDeviceId`, `customerLocationZip`, and `customerTenure` to `RiskData`
+* Add validation errors:
+  * `Transaction.ProductSkuIsInvalid`
+  * `Transaction.ShippingMethodIsInvalid`
+  * `Transaction.ShippingPhoneNumberIsInvalid`
+  * `Transaction.BillingPhoneNumberIsInvalid`
+  * `RiskData.CustomerBrowserIsTooLong`
+  * `RiskData.CustomerDeviceIdIsTooLong`
+  * `RiskData.CustomerLocationZipInvalidCharacters`
+  * `RiskData.CustomerLocationZipIsInvalid`
+  * `RiskData.CustomerLocationZipIsTooLong`
+  * `RiskData.CustomerTenureIsTooLong`
+* Add `processedWithNetworkToken` to `Transaction`
+* Add `isNetworkTokenized` to `CreditCard`
+
 ## 2.23.0
-* Add keep-alive to http module
+* Add `threeDSecurePassThru` parameters to `Customer.create`, `PaymentMethod.create`, `CreditCard.create`, `Customer.update`, `PaymentMethod.update` and `CreditCard.update`
+* Add `threeDSecureAuthenticationId` support on transaction sale
+* Add ThreeDSecure test payment method nonces
+* Add test `AuthenticationId`s Unreleased
+* Add `DisputeAccepted`, `DisputeDisputed`, and `DisputeExpired` webhook constants
+* Add `Authentication Insight` support to payment method nonce create
+* Add `recurringCustomerConsent` and `recurringMaxAmount` to `authenticationInsightOptions` for `PaymentMethodNonce.create`
+* Add `FileIsEmpty` error code
 
 ## 2.22.0
 * Add `RefundAuthHardDeclined` and `RefundAuthSoftDeclined` to validation errors

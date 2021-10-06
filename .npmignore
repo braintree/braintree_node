@@ -2,8 +2,7 @@
 /.git
 /.gitignore
 /node_modules
-/spec_compiled
-/spec
+/test
 /src
 /lib/**/*.map
 /Rakefile

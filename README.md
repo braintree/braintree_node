@@ -12,22 +12,29 @@ The Braintree Node library provides integration access to the Braintree Gateway.
 
 ### Dependencies
 
-* node >= 4
+* node >= 10
+
+## Versions
+
+Braintree employs a deprecation policy for our SDKs. For more information on the statuses of an SDK check our [developer docs](http://developers.braintreepayments.com/reference/general/server-sdk-deprecation-policy).
+
+| Major version number | Status      | Released        | Deprecated      | Unsupported     |
+| -------------------- | ----------- | --------------- | --------------- | --------------- |
+| 3.x.x                | Active      | September 2020  | TBA             | TBA             |
+| 2.x.x                | Inactive    | February 2017   | September 2022  | September 2023  |
 
 ## Links
 
 * [Documentation](https://developers.braintreepayments.com/node/sdk/server/overview)
 * [Bug Tracker](https://github.com/braintree/braintree_node/issues)
 
+Updating from an Inactive, Deprecated, or Unsupported version of this SDK? Check our [Migration Guide](https://developers.braintreepayments.com/reference/general/server-sdk-migration-guide/node) for tips.
+
 ## Quick Start
 
 ```javascript
 var braintree = require('braintree');
 
-// previously, gateways were created by calling `braintree.connect`, but as no
-// connection takes place in the method call, we've opted to document how
-// to instantiate a Braintree Gateway directly. `connect` can still be used,
-// but it is deprecated and will be removed in the next major version
 var gateway = new braintree.BraintreeGateway({
   environment: braintree.Environment.Sandbox,
   merchantId: 'your_merchant_id',
@@ -87,6 +94,10 @@ gateway.transaction.sale({
 ```
 
 Almost all methods that uses a callback can alternatively use a Promise. The only exceptions are `gateway.merchantAccount.all` or any of the `search` methods because they return a stream if no callback is provided. 
+
+## Documentation
+
+* [Official documentation](https://developers.braintreepayments.com/node/sdk/server/overview)
 
 ## Developing (Docker)
 
