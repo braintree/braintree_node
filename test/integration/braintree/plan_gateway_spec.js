@@ -84,7 +84,7 @@ describe('PlanGateway', () => {
         assert.equal(response.plan.name, 'my plan name');
         assert.equal(response.plan.currencyIsoCode, 'USD');
         assert.isNotNull(response.plan.createdAt);
-        
+
         done();
       });
     });
@@ -126,6 +126,7 @@ describe('PlanGateway', () => {
 
   describe('update', function () {
     let plan;
+
     beforeEach(function (done) {
       let planParams = {
         billingDayOfMonth: 12,
@@ -148,13 +149,15 @@ describe('PlanGateway', () => {
       let updateParams = {
         name: 'my updated plan name',
         price: '99.99'
-      }
+      };
 
       specHelper.defaultGateway.plan.update(plan.id, updateParams, function (err, response) {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.equal(response.plan.price, '99.99');
         assert.equal(response.plan.name, 'my updated plan name');
+
+        done();
       });
     });
   });
