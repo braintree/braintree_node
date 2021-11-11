@@ -1,3 +1,6 @@
+## unreleased
+* Add plan create/update/find API endpoint
+
 ## 3.7.0
 * Add error code `TaxAmountIsRequiredForAibSwedish` for attribute `tax_amount` in `transaction` key for AIB:Domestic transactions in Sweden
 * Add `exchangeRateQuoteId` to `TransactionGateway`
