@@ -1,4 +1,5 @@
 ## unreleased
+* Add support for `TransactionReview` webhook notification
 * Add plan create/update/find API endpoint
 
 ## 3.7.0
