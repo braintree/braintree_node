@@ -271,7 +271,7 @@ describe('WebhookNotificationGateway', function () {
         assert.equal(webhookNotification.transactionReview.decision, 'a smart decision');
         assert.equal(webhookNotification.transactionReview.reviewerEmail, 'hey@girl.com');
         assert.equal(webhookNotification.transactionReview.reviewerNote, 'I reviewed this');
-        assert.exists(webhookNotification.transactionReview.reviewerTime);
+        assert.exists(webhookNotification.transactionReview.reviewedTime);
         done();
       });
     });
