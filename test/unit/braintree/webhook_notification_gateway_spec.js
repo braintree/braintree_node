@@ -257,6 +257,25 @@ describe('WebhookNotificationGateway', function () {
       });
     });
 
+    it('returns a parsable signature and payload for reviewed transaction', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.TransactionReviewed,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.TransactionReviewed);
+        assert.equal(webhookNotification.transactionReview.transactionId, 'my_id');
+        assert.equal(webhookNotification.transactionReview.decision, 'a smart decision');
+        assert.equal(webhookNotification.transactionReview.reviewerEmail, 'hey@girl.com');
+        assert.equal(webhookNotification.transactionReview.reviewerNote, 'I reviewed this');
+        assert.exists(webhookNotification.transactionReview.reviewedTime);
+        done();
+      });
+    });
+
     it('returns a parsable signature and payload for settled transaction', function (done) {
       let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
         WebhookNotification.Kind.TransactionSettled,
