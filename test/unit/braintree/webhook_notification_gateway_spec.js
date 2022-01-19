@@ -954,7 +954,7 @@ describe('WebhookNotificationGateway', function () {
 
         let enrichedCustomerData = paymentMethodCustomerDataUpdatedMetadata.enrichedCustomerData;
 
-        assert.deepEqual([], enrichedCustomerData.fieldsUpdated);
+        assert.equal('username', enrichedCustomerData.fieldsUpdated[0]);
 
         let profileData = enrichedCustomerData.profileData;
 
