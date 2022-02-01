@@ -3,6 +3,7 @@
 
 let Config = require('../../../lib/braintree/config').Config;
 let Environment = require('../../../lib/braintree/environment').Environment;
+let http = require('http');
 
 describe('Config', function () {
   it('can be configured with merchant credentials', function () {
@@ -148,6 +149,35 @@ describe('Config', function () {
       assert.equal(config.timeout, 60000);
     })
   );
+
+  describe('custom http agent', () => {
+    it('is not set by default', function () {
+      let config = new Config({
+        merchantId: 'merchantId',
+        publicKey: 'publicKey',
+        privateKey: 'privateKey',
+        environment: 'development'
+      });
+
+      assert.isUndefined(config.customHttpAgent);
+    });
+
+    it('is enabled when user passes in a custom agent', function () {
+      let customAgent = new http.Agent({keepAlive: true});
+
+      let config = new Config({
+        merchantId: 'merchantId',
+        publicKey: 'publicKey',
+        privateKey: 'privateKey',
+        environment: 'development',
+        customHttpAgent: customAgent
+      });
+
+      assert.equal(config.customHttpAgent, customAgent);
+      assert.equal(config.customHttpAgent.keepAlive, true);
+      assert.equal(config.customHttpAgent.keepAliveMsecs, 1000);
+    });
+  });
 
   describe('accessToken', function () {
     it('uses accessToken parsed environment', function () {
