@@ -1,4 +1,4 @@
-## Unreleased
+## 3.9.0 
 * Add support for passing a custom [http agent](https://nodejs.org/api/http.html#class-httpagent) in Configuration (thanks @blugavere & @James1x0!)
 
 ## 3.8.0
