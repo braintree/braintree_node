@@ -931,5 +931,41 @@ describe('WebhookNotificationGateway', function () {
         done();
       });
     });
+
+    it('returns a parsable signature and payload for Payment Method Customer Data Updated', function (done) {
+      let notification = specHelper.defaultGateway.webhookTesting.sampleNotification(
+        WebhookNotification.Kind.PaymentMethodCustomerDataUpdated,
+        'my_id'
+      );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(bt_signature, bt_payload, function (err, webhookNotification) {
+        assert.equal(webhookNotification.kind, WebhookNotification.Kind.PaymentMethodCustomerDataUpdated);
+
+        let paymentMethodCustomerDataUpdatedMetadata = webhookNotification.paymentMethodCustomerDataUpdatedMetadata;
+
+        assert.equal('TOKEN-12345', paymentMethodCustomerDataUpdatedMetadata.token);
+        assert.equal('2022-01-01T21:28:37Z', paymentMethodCustomerDataUpdatedMetadata.datetimeUpdated);
+
+        let paymentMethod = paymentMethodCustomerDataUpdatedMetadata.paymentMethod;
+
+        assert.equal('my_id', paymentMethod.token);
+
+        let enrichedCustomerData = paymentMethodCustomerDataUpdatedMetadata.enrichedCustomerData;
+
+        assert.equal('username', enrichedCustomerData.fieldsUpdated[0]);
+
+        let profileData = enrichedCustomerData.profileData;
+
+        assert.equal('John', profileData.firstName);
+        assert.equal('Doe', profileData.lastName);
+        assert.equal('venmo_username', profileData.username);
+        assert.equal('1231231234', profileData.phoneNumber);
+        assert.equal('john.doe@paypal.com', profileData.email);
+
+        done();
+      });
+    });
   });
 });
