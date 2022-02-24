@@ -1,5 +1,8 @@
 # Changelog
 
+# Unreleased
+* Add ExchangeRateQuote API
+
 ## 3.10.0
 * Add `PaymentMethodCustomerDataUpdated` webhook notification support
 
