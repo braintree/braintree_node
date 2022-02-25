@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
 let braintree = specHelper.braintree;
 
-describe('Braintree', () =>
-  describe('AuthenticationError', () =>
-    it('is returned with invalid credentials', function (done) {
+describe("Braintree", () =>
+  describe("AuthenticationError", () =>
+    it("is returned with invalid credentials", function (done) {
       let gateway = new specHelper.braintree.BraintreeGateway({
         environment: specHelper.braintree.Environment.Development,
-        merchantId: 'invalid',
-        publicKey: 'invalid',
-        privateKey: 'invalid'
+        merchantId: "invalid",
+        publicKey: "invalid",
+        privateKey: "invalid",
       });
 
       return gateway.transaction.sale({}, function (err) {
@@ -17,6 +17,4 @@ describe('Braintree', () =>
 
         done();
       });
-    })
-  )
-);
+    })));

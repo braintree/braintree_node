@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 
-let Disbursement = require('../../../lib/braintree/disbursement').Disbursement;
+let Disbursement = require("../../../lib/braintree/disbursement").Disbursement;
 
-describe('Disbursement', function () {
-  describe('isDebit', function () {
-    it('returns true if the type is debit', () => {
+describe("Disbursement", function () {
+  describe("isDebit", function () {
+    it("returns true if the type is debit", () => {
       let attrs = {
-        amount: 5.00,
-        disbursementType: 'debit'
+        amount: 5.0,
+        disbursementType: "debit",
       };
 
       let disbursement = new Disbursement(attrs);
@@ -15,10 +15,10 @@ describe('Disbursement', function () {
       assert.equal(true, disbursement.isDebit());
     });
 
-    it('returns false if the type is not debit', () => {
+    it("returns false if the type is not debit", () => {
       let attrs = {
-        amount: 5.00,
-        disbursementType: 'other'
+        amount: 5.0,
+        disbursementType: "other",
       };
 
       let disbursement = new Disbursement(attrs);
@@ -27,11 +27,11 @@ describe('Disbursement', function () {
     });
   });
 
-  describe('isCredit', function () {
-    it('returns true if the type is credit', () => {
+  describe("isCredit", function () {
+    it("returns true if the type is credit", () => {
       let attrs = {
-        amount: 5.00,
-        disbursementType: 'credit'
+        amount: 5.0,
+        disbursementType: "credit",
       };
 
       let disbursement = new Disbursement(attrs);
@@ -39,10 +39,10 @@ describe('Disbursement', function () {
       assert.equal(true, disbursement.isCredit());
     });
 
-    it('returns false if the type is not credit', () => {
+    it("returns false if the type is not credit", () => {
       let attrs = {
-        amount: 5.00,
-        disbursementType: 'other'
+        amount: 5.0,
+        disbursementType: "other",
       };
 
       let disbursement = new Disbursement(attrs);

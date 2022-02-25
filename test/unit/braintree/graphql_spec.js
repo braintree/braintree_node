@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
 let braintree = specHelper.braintree;
-let Config = require('../../../lib/braintree/config').Config;
-let GraphQL = require('../../../lib/braintree/graphql').GraphQL;
+let Config = require("../../../lib/braintree/config").Config;
+let GraphQL = require("../../../lib/braintree/graphql").GraphQL;
 
-describe('GraphQL', function () {
-  describe('checkGraphQLErrors', function () {
-    it('returns a null for non-error responses', function () {
+describe("GraphQL", function () {
+  describe("checkGraphQLErrors", function () {
+    it("returns a null for non-error responses", function () {
       let graphQL = new GraphQL(new Config(specHelper.defaultConfig));
       let response = {
-        data: 'successful_result'
+        data: "successful_result",
       };
 
       assert.equal(graphQL.checkGraphQLErrors(response), null);
@@ -23,65 +23,71 @@ describe('GraphQL', function () {
       RESOURCE_LIMIT: braintree.errorTypes.tooManyRequestsError,
       INTERNAL: braintree.errorTypes.serverError,
       SERVICE_AVAILABILITY: braintree.errorTypes.serviceUnavailableError,
-      UNDOCUMENTED_ERROR: braintree.errorTypes.unexpectedError
+      UNDOCUMENTED_ERROR: braintree.errorTypes.unexpectedError,
     };
 
     Object.keys(exceptions).forEach(function (errorClass) {
       let expectedException = exceptions[errorClass];
 
-      it('returns exception for ' + errorClass + ' response', function () {
+      it("returns exception for " + errorClass + " response", function () {
         let graphQL = new GraphQL(new Config(specHelper.defaultConfig));
         let response = {
           errors: [
             {
-              message: 'error_message',
+              message: "error_message",
               extensions: {
-                errorClass: errorClass
-              }
-            }
-          ]
+                errorClass: errorClass,
+              },
+            },
+          ],
         };
 
-        assert.equal(graphQL.checkGraphQLErrors(response).type, expectedException);
+        assert.equal(
+          graphQL.checkGraphQLErrors(response).type,
+          expectedException
+        );
       });
     });
 
-    it('does not return an exception for VALIDATION response', function () {
+    it("does not return an exception for VALIDATION response", function () {
       let graphQL = new GraphQL(new Config(specHelper.defaultConfig));
       let response = {
         errors: [
           {
-            message: 'validation_error',
+            message: "validation_error",
             extensions: {
-              errorClass: 'VALIDATION'
-            }
-          }
-        ]
+              errorClass: "VALIDATION",
+            },
+          },
+        ],
       };
 
       assert.equal(graphQL.checkGraphQLErrors(response), null);
     });
 
-    it('returns an exception if both VALIDATION and another error are present in the response', function () {
+    it("returns an exception if both VALIDATION and another error are present in the response", function () {
       let graphQL = new GraphQL(new Config(specHelper.defaultConfig));
       let response = {
         errors: [
           {
-            message: 'validation_error',
+            message: "validation_error",
             extensions: {
-              errorClass: 'VALIDATION'
-            }
+              errorClass: "VALIDATION",
+            },
           },
           {
-            message: 'error_message',
+            message: "error_message",
             extensions: {
-              errorClass: 'AUTHORIZATION'
-            }
-          }
-        ]
+              errorClass: "AUTHORIZATION",
+            },
+          },
+        ],
       };
 
-      assert.equal(graphQL.checkGraphQLErrors(response).type, braintree.errorTypes.authorizationError);
+      assert.equal(
+        graphQL.checkGraphQLErrors(response).type,
+        braintree.errorTypes.authorizationError
+      );
     });
   });
 });
