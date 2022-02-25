@@ -1,33 +1,34 @@
-'use strict';
+"use strict";
 
-let TransactionGateway = require('../../../lib/braintree/transaction_gateway').TransactionGateway;
+let TransactionGateway =
+  require("../../../lib/braintree/transaction_gateway").TransactionGateway;
 
-describe('TransactionGateway', () =>
-  describe('sale', function () {
+describe("TransactionGateway", () =>
+  describe("sale", function () {
     let fakeGateway = {
       config: {
         baseMerchantPath() {
-          return '';
-        }
+          return "";
+        },
       },
       http: {
         post(url, params) {
           return Promise.resolve(params);
-        }
-      }
+        },
+      },
     };
 
-    it('accepts skip_advanced_fraud_checking options', function (done) {
+    it("accepts skip_advanced_fraud_checking options", function (done) {
       let transactionGateway = new TransactionGateway(fakeGateway);
       let transactionParams = {
-        amount: '5.00',
+        amount: "5.00",
         creditCard: {
-          number: '5105105105105100',
-          expirationDate: '05/12'
+          number: "5105105105105100",
+          expirationDate: "05/12",
         },
         options: {
-          skipAdvancedFraudChecking: true
-        }
+          skipAdvancedFraudChecking: true,
+        },
       };
 
       transactionGateway.sale(transactionParams, (err, params) => {
@@ -37,17 +38,17 @@ describe('TransactionGateway', () =>
       });
     });
 
-    it('does not include skip_advanced_fraud_checking in params if its not specified', function (done) {
+    it("does not include skip_advanced_fraud_checking in params if its not specified", function (done) {
       let transactionGateway = new TransactionGateway(fakeGateway);
       let transactionParams = {
-        amount: '5.00',
+        amount: "5.00",
         creditCard: {
-          number: '5105105105105100',
-          expirationDate: '05/12'
+          number: "5105105105105100",
+          expirationDate: "05/12",
         },
         options: {
-          submitForSettlement: true
-        }
+          submitForSettlement: true,
+        },
       };
 
       transactionGateway.sale(transactionParams, (err, params) => {
@@ -56,5 +57,4 @@ describe('TransactionGateway', () =>
         done();
       });
     });
-  })
-);
+  }));

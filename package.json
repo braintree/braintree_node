@@ -29,11 +29,15 @@
     "chai": "^4.3.4",
     "eslint": "^7.26.0",
     "eslint-config-braintree": "^4.0.0",
+    "eslint-config-prettier": "^8.4.0",
     "mocha": "^8.4.0",
+    "prettier": "^2.5.1",
     "sinon": "^10.0.0"
   },
   "license": "MIT",
   "scripts": {
+    "prettier": "prettier --write .",
+    "prelint": "prettier --check .",
     "lint": "eslint lib/ test/",
     "pretest": "npm run lint",
     "test:unit": "mocha test/unit --recursive -r test/spec_helper",
