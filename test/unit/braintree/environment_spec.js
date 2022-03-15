@@ -26,6 +26,7 @@ describe("Environment", () =>
       assert.equal("https://test.domain", env.baseUrl());
     });
 
+    // prettier-ignore
     it("includes the port for the Development environment", function () {
       let baseUrl = `http://localhost:${process.env.GATEWAY_PORT || "3000"}`;
 
