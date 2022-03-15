@@ -26,6 +26,11 @@ describe("Environment", () =>
       assert.equal("https://test.domain", env.baseUrl());
     });
 
+    // as part of the CI build, we replace this base URL with the
+    // URL that works in the backend system powering CI. Unfortunately
+    // this process changes the length of the file, and prettier will
+    // fail the line, so we have a pre-emptive ignore here to stop it
+    // from failing the build because the line is too long
     // prettier-ignore
     it("includes the port for the Development environment", function () {
       let baseUrl = `http://localhost:${process.env.GATEWAY_PORT || "3000"}`;
