@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added test for `retried` field on transaction.sale response
+
 ## 3.10.0
 
 - Add `PaymentMethodCustomerDataUpdated` webhook notification support
