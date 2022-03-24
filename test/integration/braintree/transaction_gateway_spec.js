@@ -8185,7 +8185,7 @@ describe("TransactionGateway", function () {
   });
 
   describe("card on file network tokenization", function () {
-    it("creates a network tokenized transaction with a vaulted credit card token", function (done) {
+    it("creates a succesfull network tokenized transaction with a vaulted credit card token", function (done) {
       let transactionParams = {
         amount: "5.00",
         paymentMethodToken: "network_tokenized_credit_card",
@@ -8198,8 +8198,35 @@ describe("TransactionGateway", function () {
           assert.isTrue(response.success);
           assert.equal(response.transaction.type, "sale");
           assert.equal(response.transaction.amount, "5.00");
+          assert.isUndefined(response.transaction.retried);
           assert.equal(response.transaction.processorResponseCode, "1000");
           assert.equal(response.transaction.processorResponseType, "approved");
+          assert.isTrue(response.transaction.processedWithNetworkToken);
+
+          done();
+        }
+      );
+    });
+
+    it("creates a soft declined network tokenized transaction with a vaulted credit card token", function (done) {
+      let transactionParams = {
+        amount: "2000.00",
+        paymentMethodToken: "network_tokenized_credit_card",
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(response.transaction.type, "sale");
+          assert.equal(response.transaction.amount, "2000.00");
+          assert.isTrue(response.transaction.retried);
+          assert.equal(response.transaction.processorResponseCode, "2000");
+          assert.equal(
+            response.transaction.processorResponseType,
+            "soft_declined"
+          );
           assert.isTrue(response.transaction.processedWithNetworkToken);
 
           done();
