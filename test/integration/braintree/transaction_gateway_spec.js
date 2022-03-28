@@ -3236,7 +3236,7 @@ describe("TransactionGateway", function () {
               );
               assert.equal(
                 response.transaction.venmoAccountDetails.venmoUserId,
-                "Venmo-Joe-1"
+                "1234567891234567891"
               );
 
               // NEXT_MAJOR_VERSION - venmoAccount has been replaced with venmoAccountDetails, so these assertions can be removed
@@ -3246,7 +3246,7 @@ describe("TransactionGateway", function () {
               );
               assert.equal(
                 response.transaction.venmoAccount.venmoUserId,
-                "Venmo-Joe-1"
+                "1234567891234567891"
               );
 
               done();
@@ -3283,7 +3283,7 @@ describe("TransactionGateway", function () {
               );
               assert.equal(
                 response.transaction.venmoAccountDetails.venmoUserId,
-                "Venmo-Joe-1"
+                "1234567891234567891"
               );
 
               // NEXT_MAJOR_VERSION - venmoAccount has been replaced with venmoAccountDetails, so these assertions can be removed
@@ -3293,7 +3293,7 @@ describe("TransactionGateway", function () {
               );
               assert.equal(
                 response.transaction.venmoAccount.venmoUserId,
-                "Venmo-Joe-1"
+                "1234567891234567891"
               );
 
               done();

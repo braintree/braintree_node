@@ -420,7 +420,10 @@ describe("PaymentMethodGateway", function () {
                 assert.include(response.paymentMethod.imageUrl, ".png");
                 assert.equal(response.paymentMethod.customerId, customerId);
                 assert.equal(response.paymentMethod.username, "venmojoe");
-                assert.equal(response.paymentMethod.venmoUserId, "Venmo-Joe-1");
+                assert.equal(
+                  response.paymentMethod.venmoUserId,
+                  "1234567891234567891"
+                );
 
                 done();
               }

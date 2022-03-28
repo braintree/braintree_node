@@ -485,7 +485,7 @@ describe("CustomerGateway", function () {
 
             assert.isNotNull(venmoAccount.token);
             assert.equal(venmoAccount.username, "venmojoe");
-            assert.equal(venmoAccount.venmoUserId, "Venmo-Joe-1");
+            assert.equal(venmoAccount.venmoUserId, "1234567891234567891");
             assert.equal(response.customer.paymentMethods[0], venmoAccount);
 
             done();
