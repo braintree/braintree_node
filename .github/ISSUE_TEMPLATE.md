@@ -2,9 +2,9 @@
 
 ### General information
 
-* SDK/Library version: <!-- Example: 2.1.3 -->
-* Environment: <!-- Is this issue in Sandbox or Production? -->
-* Language, language version, and OS: <!-- Example: Node v4.6.0 on Ubuntu 16.10 -->
+- SDK/Library version: <!-- Example: 2.1.3 -->
+- Environment: <!-- Is this issue in Sandbox or Production? -->
+- Language, language version, and OS: <!-- Example: Node v4.6.0 on Ubuntu 16.10 -->
 
 ### Issue description
 

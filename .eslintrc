@@ -1,5 +1,5 @@
 {
-  "extends": "braintree/server",
+  "extends": ["braintree/server", "prettier"],
   "parserOptions": {
     "ecmaVersion": 6
   },
@@ -7,9 +7,7 @@
     "new-cap": [
       2,
       {
-        "capIsNewExceptions": [
-          "Sha1hexdigest"
-        ]
+        "capIsNewExceptions": ["Sha1hexdigest"]
       }
     ],
     "max-len": 0,

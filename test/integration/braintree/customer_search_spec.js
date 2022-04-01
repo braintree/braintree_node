@@ -1,37 +1,46 @@
-'use strict';
+"use strict";
+/* eslint-disable no-loop-func */
 
-let Config = require('../../../lib/braintree/config').Config;
+let Config = require("../../../lib/braintree/config").Config;
 
-describe('CustomerSearch', () =>
-  describe('search', function () {
+describe("CustomerSearch", () =>
+  describe("search", function () {
     let lastName;
 
     before(function (done) {
       lastName = specHelper.randomId();
-      specHelper.defaultGateway.customer.create({firstName: 'Bob', lastName}, () =>
-        specHelper.defaultGateway.customer.create({firstName: 'Ryan', lastName}, () => done())
+      specHelper.defaultGateway.customer.create(
+        { firstName: "Bob", lastName },
+        () =>
+          specHelper.defaultGateway.customer.create(
+            { firstName: "Ryan", lastName },
+            () => done()
+          )
       );
     });
 
-    it('can return no results', done =>
-      specHelper.defaultGateway.customer.search(search => search.email().is(specHelper.randomId() + '@example.com'), function (err, response) {
-        assert.isNull(err);
-        assert.equal(response.length(), 0);
+    it("can return no results", (done) =>
+      specHelper.defaultGateway.customer.search(
+        (search) => search.email().is(specHelper.randomId() + "@example.com"),
+        function (err, response) {
+          assert.isNull(err);
+          assert.equal(response.length(), 0);
 
-        done();
-      })
-    );
+          done();
+        }
+      ));
 
-    it('can return a single result', function (done) {
-      let search = function (search) { // eslint-disable-line func-style
-        search.firstName().is('Bob');
+    it("can return a single result", function (done) {
+      // eslint-disable-next-line func-style
+      let search = function (search) {
+        search.firstName().is("Bob");
 
         return search.lastName().is(lastName);
       };
 
       specHelper.defaultGateway.customer.search(search, (err, response) =>
         response.first(function (err, customer) {
-          assert.equal(customer.firstName, 'Bob');
+          assert.equal(customer.firstName, "Bob");
           assert.equal(customer.lastName, lastName);
 
           done();
@@ -39,14 +48,16 @@ describe('CustomerSearch', () =>
       );
     });
 
-    it('allows stream style interation of results', function (done) {
-      let search = specHelper.defaultGateway.customer.search(search => search.lastName().is(lastName));
+    it("allows stream style interation of results", function (done) {
+      let search = specHelper.defaultGateway.customer.search((search) =>
+        search.lastName().is(lastName)
+      );
 
       let customers = [];
 
-      search.on('data', customer => customers.push(customer));
+      search.on("data", (customer) => customers.push(customer));
 
-      search.on('end', function () {
+      search.on("end", function () {
         assert.equal(customers.length, 2);
         assert.equal(customers[0].lastName, lastName);
         assert.equal(customers[1].lastName, lastName);
@@ -57,31 +68,33 @@ describe('CustomerSearch', () =>
       return search.resume();
     });
 
-    it('can return multiple results', done =>
-      specHelper.defaultGateway.customer.search(search => search.lastName().is(lastName), function (err, response) {
-        let customers = [];
+    it("can return multiple results", (done) =>
+      specHelper.defaultGateway.customer.search(
+        (search) => search.lastName().is(lastName),
+        function (err, response) {
+          let customers = [];
 
-        return response.each(function (err, customer) {
-          customers.push(customer);
+          return response.each(function (err, customer) {
+            customers.push(customer);
 
-          if (customers.length === 2) {
-            assert.equal(customers.length, 2);
-            assert.equal(customers[0].lastName, lastName);
-            assert.equal(customers[1].lastName, lastName);
+            if (customers.length === 2) {
+              assert.equal(customers.length, 2);
+              assert.equal(customers[0].lastName, lastName);
+              assert.equal(customers[1].lastName, lastName);
 
-            done();
-          }
-        });
-      })
-    );
-
-    it('can search on payment method token with duplicates', function (done) {
-      let joe = {
-        firstName: 'Joe',
-        creditCard: {
-          number: '5105105105105100',
-          expirationDate: '05/2012'
+              done();
+            }
+          });
         }
+      ));
+
+    it("can search on payment method token with duplicates", function (done) {
+      let joe = {
+        firstName: "Joe",
+        creditCard: {
+          number: "5105105105105100",
+          expirationDate: "05/2012",
+        },
       };
 
       specHelper.defaultGateway.customer.create(joe, function (err, response) {
@@ -89,42 +102,49 @@ describe('CustomerSearch', () =>
         let joeId = response.customer.id;
 
         let jim = {
-          firstName: 'Jim',
+          firstName: "Jim",
           creditCard: {
-            number: '5105105105105100',
-            expirationDate: '05/2012'
-          }
+            number: "5105105105105100",
+            expirationDate: "05/2012",
+          },
         };
 
-        specHelper.defaultGateway.customer.create(jim, function (err, response) {
-          let jimId = response.customer.id;
+        specHelper.defaultGateway.customer.create(
+          jim,
+          function (err, response) {
+            let jimId = response.customer.id;
 
-          let search = function (search) { // eslint-disable-line func-style
-            search.paymentMethodTokenWithDuplicates().is(token);
+            // eslint-disable-next-line func-style
+            let search = function (search) {
+              search.paymentMethodTokenWithDuplicates().is(token);
 
-            return search.ids().in([joeId, jimId]);
-          };
+              return search.ids().in([joeId, jimId]);
+            };
 
-          specHelper.defaultGateway.customer.search(search, function (err, response) {
-            let customers = [];
+            specHelper.defaultGateway.customer.search(
+              search,
+              function (err, response) {
+                let customers = [];
 
-            return response.each(function (err, customer) {
-              customers.push(customer);
+                return response.each(function (err, customer) {
+                  customers.push(customer);
 
-              if (customers.length === 2) {
-                assert.equal(customers.length, 2);
-                assert.equal(customers[0].firstName, 'Jim');
-                assert.equal(customers[1].firstName, 'Joe');
+                  if (customers.length === 2) {
+                    assert.equal(customers.length, 2);
+                    assert.equal(customers[0].firstName, "Jim");
+                    assert.equal(customers[1].firstName, "Joe");
 
-                done();
+                    done();
+                  }
+                });
               }
-            });
-          });
-        });
+            );
+          }
+        );
       });
     });
 
-    it('handles complex searches', function (done) {
+    it("handles complex searches", function (done) {
       let id = specHelper.randomId();
       let email = `${specHelper.randomId()}@example.com`;
       let firstName = `John_${specHelper.randomId()}`;
@@ -133,65 +153,63 @@ describe('CustomerSearch', () =>
       let cardToken = `card_${specHelper.randomId()}`;
 
       let customerParams = {
-        company: 'Braintree',
+        company: "Braintree",
         email,
-        fax: '(123)456-7890',
+        fax: "(123)456-7890",
         firstName,
         id,
         lastName,
-        phone: '(456)123-7890',
-        website: 'http://www.example.com/',
+        phone: "(456)123-7890",
+        website: "http://www.example.com/",
         creditCard: {
-          number: '5105105105105100',
-          expirationDate: '05/2012',
+          number: "5105105105105100",
+          expirationDate: "05/2012",
           cardholderName: `${firstName} ${lastName}`,
           token: cardToken,
           billingAddress: {
             firstName,
             lastName,
-            streetAddress: '123 Fake St',
-            extendedAddress: 'Suite 403',
-            locality: 'Chicago',
-            region: 'IL',
-            postalCode: '60607',
-            countryName: 'United States of America'
-          }
-        }
+            streetAddress: "123 Fake St",
+            extendedAddress: "Suite 403",
+            locality: "Chicago",
+            region: "IL",
+            postalCode: "60607",
+            countryName: "United States of America",
+          },
+        },
       };
 
       specHelper.defaultGateway.customer.create(customerParams, function () {
         let textCriteria = {
-          addressCountryName: 'United States of America',
-          addressExtendedAddress: 'Suite 403',
+          addressCountryName: "United States of America",
+          addressExtendedAddress: "Suite 403",
           addressFirstName: firstName,
           addressLastName: lastName,
-          addressLocality: 'Chicago',
-          addressPostalCode: '60607',
-          addressStreetAddress: '123 Fake St',
+          addressLocality: "Chicago",
+          addressPostalCode: "60607",
+          addressStreetAddress: "123 Fake St",
           cardholderName: `${firstName} ${lastName}`,
-          company: 'Braintree',
+          company: "Braintree",
           email,
-          fax: '(123)456-7890',
+          fax: "(123)456-7890",
           firstName,
           id,
           lastName,
           paymentMethodToken: cardToken,
-          phone: '(456)123-7890',
-          website: 'http://www.example.com/'
+          phone: "(456)123-7890",
+          website: "http://www.example.com/",
         };
 
-        let equalityCriteria =
-          {creditCardExpirationDate: '05/2012'};
+        let equalityCriteria = { creditCardExpirationDate: "05/2012" };
 
         let partialCriteria = {
           creditCardNumber: {
-            startsWith: '5105',
-            endsWith: '100'
-          }
+            startsWith: "5105",
+            endsWith: "100",
+          },
         };
 
-        let multipleValueCriteria =
-          {ids: customerParams.id};
+        let multipleValueCriteria = { ids: customerParams.id };
 
         let today = new Date();
         let yesterday = new Date();
@@ -203,11 +221,12 @@ describe('CustomerSearch', () =>
         let rangeCriteria = {
           createdAt: {
             min: yesterday,
-            max: tomorrow
-          }
+            max: tomorrow,
+          },
         };
 
-        let search = function (search) { // eslint-disable-line func-style
+        // eslint-disable-next-line func-style
+        let search = function (search) {
           let operator, value;
 
           for (let criteria in textCriteria) {
@@ -258,37 +277,42 @@ describe('CustomerSearch', () =>
               }
               let range = rangeCriteria[criteria];
 
-              result.push((() => { // eslint-disable-line no-loop-func
-                let result1 = [];
+              result.push(
+                (() => {
+                  let result1 = [];
 
-                for (operator in range) {
-                  if (!range.hasOwnProperty(operator)) {
-                    continue;
+                  for (operator in range) {
+                    if (!range.hasOwnProperty(operator)) {
+                      continue;
+                    }
+                    value = range[operator];
+                    result1.push(search[criteria]()[operator](value));
                   }
-                  value = range[operator];
-                  result1.push(search[criteria]()[operator](value));
-                }
 
-                return result1;
-              })());
+                  return result1;
+                })()
+              );
             }
 
             return result;
           })();
         };
 
-        specHelper.defaultGateway.customer.search(search, function (err, response) {
-          assert.isTrue(response.success);
-          assert.equal(response.length(), 1);
+        specHelper.defaultGateway.customer.search(
+          search,
+          function (err, response) {
+            assert.isTrue(response.success);
+            assert.equal(response.length(), 1);
 
-          return response.first(function (err, customer) {
-            assert.isObject(customer);
-            assert.equal(customer.id, customerParams.id);
-            assert.isNull(err);
+            return response.first(function (err, customer) {
+              assert.isObject(customer);
+              assert.equal(customer.id, customerParams.id);
+              assert.isNull(err);
 
-            done();
-          });
-        });
+              done();
+            });
+          }
+        );
       });
     });
 
@@ -302,54 +326,77 @@ describe('CustomerSearch', () =>
       let customerParams = {
         id: customerId,
         firstName,
-        lastName
+        lastName,
       };
 
       specHelper.defaultGateway.customer.create(customerParams, function () {
-        let myHttp = new specHelper.clientApiHttp(new Config(specHelper.defaultConfig)); // eslint-disable-line new-cap
+        // eslint-disable-next-line new-cap
+        let myHttp = new specHelper.clientApiHttp(
+          new Config(specHelper.defaultConfig)
+        );
 
-        specHelper.defaultGateway.clientToken.generate({}, function (err, result) {
-          let clientToken = JSON.parse(specHelper.decodeClientToken(result.clientToken));
-          let authorizationFingerprint = clientToken.authorizationFingerprint;
+        specHelper.defaultGateway.clientToken.generate(
+          {},
+          function (err, result) {
+            let clientToken = JSON.parse(
+              specHelper.decodeClientToken(result.clientToken)
+            );
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
 
-          let params = {
-            authorizationFingerprint,
-            paypalAccount: {
-              consentCode: 'PAYPAL_CONSENT_CODE',
-              token: paymentMethodToken
-            }
-          };
-
-          return myHttp.post('/client_api/v1/payment_methods/paypal_accounts.json', params, function (statusCode, body) {
-            let nonce = JSON.parse(body).paypalAccounts[0].nonce;
-            let paypalAccountParams = {
-              customerId,
-              paymentMethodNonce: nonce
+            let params = {
+              authorizationFingerprint,
+              paypalAccount: {
+                consentCode: "PAYPAL_CONSENT_CODE",
+                token: paymentMethodToken,
+              },
             };
 
-            specHelper.defaultGateway.paymentMethod.create(paypalAccountParams, function (err, response) {
-              let search = function (searchResult) { // eslint-disable-line func-style
-                searchResult.paypalAccountEmail().is(response.paymentMethod.email);
+            return myHttp.post(
+              "/client_api/v1/payment_methods/paypal_accounts.json",
+              params,
+              function (statusCode, body) {
+                let nonce = JSON.parse(body).paypalAccounts[0].nonce;
+                let paypalAccountParams = {
+                  customerId,
+                  paymentMethodNonce: nonce,
+                };
 
-                return searchResult.id().is(customerId);
-              };
+                specHelper.defaultGateway.paymentMethod.create(
+                  paypalAccountParams,
+                  function (err, response) {
+                    // eslint-disable-next-line func-style
+                    let search = function (searchResult) {
+                      searchResult
+                        .paypalAccountEmail()
+                        .is(response.paymentMethod.email);
 
-              specHelper.defaultGateway.customer.search(search, function (err, response) {
-                assert.isTrue(response.success);
-                assert.equal(response.length(), 1);
+                      return searchResult.id().is(customerId);
+                    };
 
-                return response.first(function (err, customer) {
-                  assert.isObject(customer);
-                  assert.equal(customer.paypalAccounts[0].token, paymentMethodToken);
-                  assert.isNull(err);
+                    specHelper.defaultGateway.customer.search(
+                      search,
+                      function (err, response) {
+                        assert.isTrue(response.success);
+                        assert.equal(response.length(), 1);
 
-                  done();
-                });
-              });
-            });
-          });
-        });
+                        return response.first(function (err, customer) {
+                          assert.isObject(customer);
+                          assert.equal(
+                            customer.paypalAccounts[0].token,
+                            paymentMethodToken
+                          );
+                          assert.isNull(err);
+
+                          done();
+                        });
+                      }
+                    );
+                  }
+                );
+              }
+            );
+          }
+        );
       });
     });
-  })
-);
+  }));
