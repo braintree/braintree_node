@@ -735,6 +735,33 @@ describe("TransactionSearch", () =>
       );
     });
 
+    it("returns settlement_confirmed transaction", function (done) {
+      let transactionId = "settlement_confirmed_txn";
+
+      // eslint-disable-next-line func-style
+      let search = function (s) {
+        return s.id().is(transactionId);
+      };
+
+      specHelper.defaultGateway.transaction.search(
+        search,
+        function (err, response) {
+          let transactions = [];
+
+          response.each(function (err, transaction) {
+            transactions.push(transaction);
+
+            if (transactions.length === 1) {
+              assert.equal(transactions.length, 1);
+              assert.equal(transactions[0].id, transactionId);
+
+              done();
+            }
+          });
+        }
+      );
+    });
+
     it("searches on store ids", function (done) {
       let transactionId = "contact_visa_transaction";
 
