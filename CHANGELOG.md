@@ -1,9 +1,11 @@
 # Changelog
 
+## Unreleased
+- Add ExchangeRateQuote API
+
 ## 3.11.0
 
 - Added test for `retried` field on transaction.sale response
-- Add ExchangeRateQuote API
 
 ## 3.10.0
 
