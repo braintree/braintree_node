@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add `LiabilityShift` class and `liabilityShift` to RiskData
+
 ## 3.11.0
 
 - Added test for `retried` field on transaction.sale response
