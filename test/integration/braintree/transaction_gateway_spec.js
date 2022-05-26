@@ -4484,6 +4484,26 @@ describe("TransactionGateway", function () {
       );
     });
 
+    it("handles chargeback protection risk data returned by the gateway", function (done) {
+      let transactionParams = {
+        amount: "10.0",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/16",
+        },
+        deviceData: "abc123",
+      };
+
+      specHelper.effortlessChargebackProtectionGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isTrue(response.success);
+          assert.isDefined(response.transaction.riskData.liabilityShift);
+          done();
+        }
+      );
+    });
+
     it("handles fraud rejection", function (done) {
       let transactionParams = {
         amount: "10.0",

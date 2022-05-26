@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Add ExchangeRateQuote API
+- Add `LiabilityShift` class and `liabilityShift` to RiskData
 
 ## 3.11.0
 
