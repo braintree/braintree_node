@@ -57,7 +57,6 @@ describe("ExchangeRateQuoteGateway", () =>
       sinon.stub(GraphQLClient.prototype, "query").resolves({
         data: {
           generateExchangeRateQuote: {
-            clientMutationId: null,
             quotes: [
               {
                 id: "ZXhjaGFuZ2VyYXRlcXVvdGVfMDEyM0FCQw",

@@ -100,10 +100,7 @@ describe("Exchange Rate Quote Gateway", () =>
         (err, response) => {
           assert.isNull(err);
           assert.isNotNull(response && response.errors && response.errors[0]);
-          assert.equal(
-            response.errors[0].message,
-            "Variable 'baseAmount' has an invalid value : Values of type Amount must be either a whole number or a number with up to 3 decimal places."
-          );
+          assert.isTrue(response.errors[0].message.includes("invalid value"));
           done();
         }
       );
@@ -131,10 +128,7 @@ describe("Exchange Rate Quote Gateway", () =>
         (err, response) => {
           assert.isNotNull(err);
           assert.isUndefined(response);
-          assert.equal(
-            err.message,
-            "Unexpected HTTP response: Field 'quoteCurrency' of variable 'exchangeRateQuoteRequest' has coerced Null value for NonNull type 'CurrencyCodeAlpha!'"
-          );
+          assert.isTrue(err.message.includes("quoteCurrency"));
           done();
         }
       );
@@ -161,10 +155,7 @@ describe("Exchange Rate Quote Gateway", () =>
         (err, response) => {
           assert.isNull(err);
           assert.isNotNull(response && response.errors && response.errors[0]);
-          assert.equal(
-            response.errors[0].message,
-            "Variable 'baseAmount' has an invalid value : Values of type Amount must be either a whole number or a number with up to 3 decimal places."
-          );
+          assert.isTrue(response.errors[0].message.includes("invalid value"));
           done();
         }
       );
