@@ -134,6 +134,49 @@ describe("Exchange Rate Quote Gateway", () =>
       );
     });
 
+    it("handles request missing baseCurrency error", (done) => {
+      let exchangeRateQuoteRequest = {
+        quotes: [
+          {
+            quoteCurrency: "CAD",
+            baseAmount: "10.50",
+            markup: "3.89",
+          },
+        ],
+      };
+
+      specHelper.defaultGateway.exchangeRateQuote.generate(
+        exchangeRateQuoteRequest, 
+        (err, response) => {
+          assert.isNotNull(err);
+          assert.isUndefined(response);
+          assert.isTrue(err.message.includes("baseCurrency"));
+          done();
+        }
+      );
+    });
+
+    it("handles request missing baseCurrency and quoteCurrency error", (done) => {
+      let exchangeRateQuoteRequest = {
+        quotes: [
+          {
+            baseAmount: "10.50",
+            markup: "3.89",
+          },
+        ],
+      };
+
+      specHelper.defaultGateway.exchangeRateQuote.generate(
+        exchangeRateQuoteRequest, 
+        (err, response) => {
+          assert.isNotNull(err);
+          assert.isUndefined(response);
+          assert.isTrue(err.message.includes("baseCurrency"));
+          done();
+        }
+      );
+    });
+
     it("handles request baseAmount value error", (done) => {
       let exchangeRateQuoteRequest = {
         quotes: [
