@@ -146,7 +146,7 @@ describe("Exchange Rate Quote Gateway", () =>
       };
 
       specHelper.defaultGateway.exchangeRateQuote.generate(
-        exchangeRateQuoteRequest, 
+        exchangeRateQuoteRequest,
         (err, response) => {
           assert.isNotNull(err);
           assert.isUndefined(response);
@@ -167,7 +167,7 @@ describe("Exchange Rate Quote Gateway", () =>
       };
 
       specHelper.defaultGateway.exchangeRateQuote.generate(
-        exchangeRateQuoteRequest, 
+        exchangeRateQuoteRequest,
         (err, response) => {
           assert.isNotNull(err);
           assert.isUndefined(response);
