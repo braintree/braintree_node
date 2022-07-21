@@ -4,6 +4,9 @@
 
 - Add support for `ExchangeRateQuote` API
 - Add `LiabilityShift` class and `liabilityShift` to RiskData
+- Add `ReasonCode` to search for transactions that have ach return response reason code associated with them.
+- Add `reasonCode` to search criteria in TransactionSearch`
+- Add `achReturnResponsesCreatedAt` to `TransactionSearch`
 
 ## 3.11.0
 
