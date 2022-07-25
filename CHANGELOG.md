@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.12.0
 
 - Add support for `ExchangeRateQuote` API
 - Add `LiabilityShift` class and `liabilityShift` to RiskData
