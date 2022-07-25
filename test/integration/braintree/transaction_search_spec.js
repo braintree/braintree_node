@@ -820,6 +820,129 @@ describe("TransactionSearch", () =>
       );
     });
 
+    it("searches on reason code", function (done) {
+      let transactionId = "ach_txn_ret1";
+      let reasonCode = "R01";
+
+      // eslint-disable-next-line func-style
+      let search = function (s) {
+        s.id().is(transactionId);
+
+        return s.reasonCode().is(reasonCode);
+      };
+
+      specHelper.defaultGateway.transaction.search(
+        search,
+        function (err, response) {
+          let transactions = [];
+
+          response.each(function (err, transaction) {
+            transactions.push(transaction);
+
+            if (transactions.length === 1) {
+              assert.equal(transactions.length, 1);
+              assert.equal(transactions[0].id, transactionId);
+
+              done();
+            }
+          });
+        }
+      );
+    });
+
+    it("searches on reason codes", function (done) {
+      let transactionId = "ach_txn_ret2";
+
+      let reasonCode = ["R01", "R02"];
+
+      // eslint-disable-next-line func-style
+      let search = function (s) {
+        s.id().is(transactionId);
+
+        return s.reasonCode().in(reasonCode);
+      };
+
+      specHelper.defaultGateway.transaction.search(
+        search,
+        function (err, response) {
+          let transactions = [];
+
+          response.each(function (err, transaction) {
+            transactions.push(transaction);
+
+            if (transactions.length === 1) {
+              assert.equal(transactions.length, 1);
+              assert.equal(transactions[0].id, transactionId);
+
+              done();
+            }
+          });
+        }
+      );
+    });
+
+    it("searches on reason code any", function (done) {
+      let reasonCode = "any_reason_code";
+
+      // eslint-disable-next-line func-style
+      let search = function (s) {
+        return s.reasonCode().is(reasonCode);
+      };
+
+      specHelper.defaultGateway.transaction.search(
+        search,
+        function (err, response) {
+          let transactions = [];
+
+          response.each(function (err, transaction) {
+            transactions.push(transaction);
+
+            if (transactions.length === 2) {
+              assert.equal(transactions.length, 2);
+
+              done();
+            }
+          });
+        }
+      );
+    });
+
+    it("it finds records within date range of the custom field", function (done) {
+      let today = new Date();
+      let yesterday = new Date();
+      let tomorrow = new Date();
+
+      yesterday.setDate(today.getDate() - 1);
+      tomorrow.setDate(today.getDate() + 1);
+
+      // eslint-disable-next-line func-style
+      let search = function () {
+        return {
+          achReturnResponsesCreatedAt: {
+            min: yesterday,
+            max: tomorrow,
+          },
+        };
+      };
+
+      specHelper.defaultGateway.transaction.search(
+        search,
+        function (err, response) {
+          let transactions = [];
+
+          response.each(function (err, transaction) {
+            transactions.push(transaction);
+
+            if (transactions.length === 2) {
+              assert.equal(transactions.length, 2);
+
+              done();
+            }
+          });
+        }
+      );
+    });
+
     it("filters on valid merchant account ids", function (done) {
       let random = specHelper.randomId();
       let transactionParams = {

@@ -59,6 +59,16 @@ let fraudProtectionEnterpriseGateway = new braintree.BraintreeGateway(
   fraudProtectionEnterpriseConfig
 );
 
+let effortlessChargebackProtectionConfig = {
+  environment: braintree.Environment.Development,
+  merchantId: "fraud_protection_effortless_chargeback_protection_merchant_id",
+  publicKey: "effortless_chargeback_protection_public_key",
+  privateKey: "effortless_chargeback_protection_private_key",
+};
+let effortlessChargebackProtectionGateway = new braintree.BraintreeGateway(
+  effortlessChargebackProtectionConfig
+);
+
 let multiplyString = (string, times) => new Array(times + 1).join(string);
 
 let plans = {
@@ -682,4 +692,5 @@ global.specHelper = {
   createToken,
   fraudProtectionEnterpriseGateway,
   fraudProtectionEnterpriseConfig,
+  effortlessChargebackProtectionGateway,
 };
