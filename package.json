@@ -29,9 +29,9 @@
     "chai": "^4.3.4",
     "eslint": "^7.26.0",
     "eslint-config-braintree": "^4.0.0",
-    "eslint-config-prettier": "^8.4.0",
+    "eslint-config-prettier": "^8.5.0",
     "mocha": "^8.4.0",
-    "prettier": "^2.5.1",
+    "prettier": "^2.7.1",
     "sinon": "^10.0.0"
   },
   "license": "MIT",

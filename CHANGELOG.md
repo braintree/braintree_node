@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Bump ansi-regex from 3.0.0 to 3.0.1
+- Bump eslint-config-prettier from 8.4.0 to 8.5.0
+- Bump prettier from 2.5.1 to 2.7.1
+
 ## 3.12.0
 
 - Add support for `ExchangeRateQuote` API
