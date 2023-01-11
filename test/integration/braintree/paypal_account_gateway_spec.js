@@ -10,7 +10,7 @@ describe("PayPalGateway", function () {
       specHelper.defaultGateway.customer.create({}, function (err, response) {
         let paymentMethodParams = {
           customerId: response.customer.id,
-          paymentMethodNonce: Nonces.PayPalFuturePayment,
+          paymentMethodNonce: Nonces.PayPalBillingAgreement,
         };
 
         specHelper.defaultGateway.paymentMethod.create(

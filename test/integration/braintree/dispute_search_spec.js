@@ -191,13 +191,57 @@ describe("DisputeSearch", () => {
       stream.on("data", (dispute) => disputes.push(dispute));
 
       stream.on("end", () => {
+        assert.equal(disputes.length > 0, true);
+
+        disputes.forEach((dispute) => {
+          assert.equal(dispute.reason, Dispute.Reason.Fraud);
+          assert.equal(
+            // NEXT_MAJOR_VERSION Remove this assertion when chargebackProtectionLevel is removed from the SDK
+            dispute.chargebackProtectionLevel,
+            Dispute.ChargebackProtectionLevel.Effortless
+          );
+        });
+
+        done();
+      });
+    });
+
+    it("returns disputes by preDisputeProgram", (done) => {
+      let stream = specHelper.defaultGateway.dispute.search(function (search) {
+        return search
+          .preDisputeProgram()
+          .in([Dispute.PreDisputeProgram.VisaRdr]);
+      });
+
+      stream.on("data", (dispute) => disputes.push(dispute));
+
+      stream.on("end", () => {
         assert.equal(disputes.length, 1);
-        assert.equal(disputes[0].caseNumber, "CASE-CHARGEBACK-PROTECTED");
-        assert.equal(disputes[0].reason, Dispute.Reason.Fraud);
         assert.equal(
-          disputes[0].chargebackProtectionLevel,
-          Dispute.ChargebackProtectionLevel.Effortless
+          disputes[0].preDisputeProgram,
+          Dispute.PreDisputeProgram.VisaRdr
         );
+
+        done();
+      });
+    });
+
+    it("returns disputes with no preDisputeProgram", (done) => {
+      let stream = specHelper.defaultGateway.dispute.search(function (search) {
+        return search.preDisputeProgram().is(Dispute.PreDisputeProgram.None);
+      });
+
+      stream.on("data", (dispute) => disputes.push(dispute));
+
+      stream.on("end", () => {
+        assert(disputes.length > 1);
+
+        let preDisputePrograms = disputes
+          .map((dispute) => dispute.preDisputeProgram)
+          .filter((element, index, array) => array.indexOf(element) === index);
+
+        assert.equal(preDisputePrograms.length, 1);
+        assert(preDisputePrograms.includes(Dispute.PreDisputeProgram.None));
 
         done();
       });

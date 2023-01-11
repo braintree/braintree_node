@@ -18,6 +18,7 @@ describe("Dispute", function () {
     kind: "chargeback",
     merchantAccountId: "abc123",
     originalDisputeId: "original_dispute_id",
+    preDisputeProgram: "none",
     reason: "fraud",
     reasonCode: "83",
     reasonDescription: "Reason code 83 description",
@@ -113,9 +114,14 @@ describe("Dispute", function () {
       assert.equal("2013-04-01", dispute.dateOpened);
       assert.equal("2013-04-02", dispute.dateWon);
       assert.equal(Dispute.Kind.Chargeback, dispute.kind);
+      // NEXT_MAJOR_VERSION Remove this assertion when chargebackProtectionLevel is removed from the SDK
       assert.equal(
         Dispute.ChargebackProtectionLevel.NotProtected,
         dispute.chargebackProtectionLevel
+      );
+      assert.equal(
+        Dispute.ProtectionLevel.NoProtection,
+        dispute.protectionLevel
       );
     });
 
@@ -129,6 +135,7 @@ describe("Dispute", function () {
       assert.equal("Forwarded comments", dispute.processorComments);
       assert.equal("abc123", dispute.merchantAccountId);
       assert.equal("original_dispute_id", dispute.originalDisputeId);
+      assert.equal(Dispute.PreDisputeProgram.None, dispute.preDisputeProgram);
       assert.equal("83", dispute.reasonCode);
       assert.equal("Reason code 83 description", dispute.reasonDescription);
       assert.equal("123456", dispute.referenceNumber);
@@ -150,9 +157,14 @@ describe("Dispute", function () {
       assert.equal("2013-04-10", dispute.statusHistory[0].effectiveDate);
       assert.equal("open", dispute.statusHistory[0].status);
       assert.equal("2013-04-10", dispute.statusHistory[0].timestamp);
+      // NEXT_MAJOR_VERSION Remove this assertion when chargebackProtectionLevel is removed from the SDK
       assert.equal(
         Dispute.ChargebackProtectionLevel.NotProtected,
         dispute.chargebackProtectionLevel
+      );
+      assert.equal(
+        Dispute.ProtectionLevel.NoProtection,
+        dispute.protectionLevel
       );
     });
 
@@ -165,6 +177,7 @@ describe("Dispute", function () {
         paypalMessages: null,
         replyByDate: null,
         statusHistory: null,
+        chargebackProtectionLevel: null,
       });
 
       assert.equal(null, dispute.amount);
@@ -174,6 +187,52 @@ describe("Dispute", function () {
       assert.equal(null, dispute.paypalMessages);
       assert.equal(null, dispute.replyByDate);
       assert.equal(null, dispute.statusHistory);
+      // NEXT_MAJOR_VERSION Remove this assertion when chargebackProtectionLevel is removed from the SDK
+      assert.equal(null, dispute.chargebackProtectionLevel);
+      assert.equal(
+        Dispute.ProtectionLevel.NoProtection,
+        dispute.protectionLevel
+      );
+    });
+
+    it("populates effortless chargeback protection level", () => {
+      let newAttributes = {
+        attributes,
+        ["chargebackProtectionLevel"]:
+          Dispute.ChargebackProtectionLevel.Effortless,
+      };
+
+      let dispute = new Dispute(newAttributes);
+
+      // NEXT_MAJOR_VERSION Remove this assertion when chargebackProtectionLevel is removed from the SDK
+      assert.equal(
+        Dispute.ChargebackProtectionLevel.Effortless,
+        dispute.chargebackProtectionLevel
+      );
+      assert.equal(
+        Dispute.ProtectionLevel.EffortlessCBP,
+        dispute.protectionLevel
+      );
+    });
+
+    it("populates stardard chargeback protection level", () => {
+      let newAttributes = {
+        attributes,
+        ["chargebackProtectionLevel"]:
+          Dispute.ChargebackProtectionLevel.Standard,
+      };
+
+      let dispute = new Dispute(newAttributes);
+
+      // NEXT_MAJOR_VERSION Remove this assertion when chargebackProtectionLevel is removed from the SDK
+      assert.equal(
+        Dispute.ChargebackProtectionLevel.Standard,
+        dispute.chargebackProtectionLevel
+      );
+      assert.equal(
+        Dispute.ProtectionLevel.StandardCBP,
+        dispute.protectionLevel
+      );
     });
 
     it("populates transaction", () => {

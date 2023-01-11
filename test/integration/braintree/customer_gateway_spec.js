@@ -472,6 +472,47 @@ describe("CustomerGateway", function () {
         );
       });
 
+      it("creates a customer with an SEPA Direct Debit Account nonce", function (done) {
+        let customerParams = { paymentMethodNonce: Nonces.SepaDirectDebit };
+
+        specHelper.defaultGateway.customer.create(
+          customerParams,
+          function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.isNotNull(response.customer.sepaDirectDebitAccounts[0]);
+            let sepaDirectDebitAccount =
+              response.customer.sepaDirectDebitAccounts[0];
+
+            assert.isNotNull(sepaDirectDebitAccount.token);
+            assert.isNotNull(sepaDirectDebitAccount.createdAt);
+            assert.isNotNull(sepaDirectDebitAccount.updatedAt);
+            assert.isNotNull(sepaDirectDebitAccount.customerId);
+            assert.isNotNull(sepaDirectDebitAccount.customerGlobalId);
+            assert.isNotNull(sepaDirectDebitAccount.globalId);
+            assert.isNotNull(sepaDirectDebitAccount.graphQLId);
+            assert.isNotNull(sepaDirectDebitAccount.imageUrl);
+            assert.isTrue(sepaDirectDebitAccount.default);
+            assert.equal(
+              sepaDirectDebitAccount.merchantOrPartnerCustomerId,
+              "a-fake-mp-customer-id"
+            );
+            assert.equal(sepaDirectDebitAccount.last4, "1234");
+            assert.equal(
+              sepaDirectDebitAccount.bankReferenceToken,
+              "a-fake-bank-reference-token"
+            );
+            assert.equal(sepaDirectDebitAccount.mandateType, "RECURRENT");
+            assert.equal(
+              response.customer.paymentMethods[0],
+              sepaDirectDebitAccount
+            );
+
+            done();
+          }
+        );
+      });
+
       it("creates a customer with an Venmo Account nonce", function (done) {
         let customerParams = { paymentMethodNonce: Nonces.VenmoAccount };
 
@@ -533,7 +574,9 @@ describe("CustomerGateway", function () {
         ));
 
       it("creates a customer with a paypal account payment method nonce", function (done) {
-        let customerParams = { paymentMethodNonce: Nonces.PayPalFuturePayment };
+        let customerParams = {
+          paymentMethodNonce: Nonces.PayPalBillingAgreement,
+        };
 
         specHelper.defaultGateway.customer.create(
           customerParams,
@@ -1124,7 +1167,7 @@ describe("CustomerGateway", function () {
 
           let paypalAccountParams = {
             customerId: customerResponse.customer.id,
-            paymentMethodNonce: Nonces.PayPalFuturePayment,
+            paymentMethodNonce: Nonces.PayPalBillingAgreement,
           };
 
           specHelper.defaultGateway.paymentMethod.create(

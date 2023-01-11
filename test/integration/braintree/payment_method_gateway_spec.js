@@ -1779,6 +1779,54 @@ describe("PaymentMethodGateway", function () {
           );
         }));
     });
+
+    context("SEPA direct debit", function () {
+      it("creates a SEPA direct debit account from a payment method nonce", (done) =>
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          customerId = response.customer.id;
+          specHelper.defaultGateway.clientToken.generate(
+            {},
+            function (err, result) {
+              assert.isNull(err);
+              assert.isTrue(result.success);
+              let sepaDirectDebitAccountParams = {
+                customerId,
+                paymentMethodNonce: Nonces.SepaDirectDebit,
+              };
+
+              specHelper.defaultGateway.paymentMethod.create(
+                sepaDirectDebitAccountParams,
+                function (err, response) {
+                  assert.isNull(err);
+                  assert.isTrue(response.success);
+                  let sepaDirectDebitAccount = response.paymentMethod;
+
+                  assert.equal(sepaDirectDebitAccount.customerId, customerId);
+                  assert.equal(sepaDirectDebitAccount.mandateType, "RECURRENT");
+                  assert.equal(
+                    sepaDirectDebitAccount.merchantOrPartnerCustomerId,
+                    "a-fake-mp-customer-id"
+                  );
+                  assert.equal(sepaDirectDebitAccount.default, true);
+                  assert.equal(sepaDirectDebitAccount.last4, "1234");
+                  assert.equal(
+                    sepaDirectDebitAccount.bankReferenceToken,
+                    "a-fake-bank-reference-token"
+                  );
+                  assert.isString(sepaDirectDebitAccount.token);
+                  assert.isString(sepaDirectDebitAccount.globalId);
+                  assert.isString(sepaDirectDebitAccount.graphQLId);
+                  assert.isString(sepaDirectDebitAccount.customerGlobalId);
+                  assert.isString(sepaDirectDebitAccount.createdAt);
+                  assert.isString(sepaDirectDebitAccount.updatedAt);
+                  assert.match(sepaDirectDebitAccount.imageUrl, /svg/);
+                }
+              );
+              done();
+            }
+          );
+        }));
+    });
   });
 
   describe("find", function () {
@@ -1819,7 +1867,7 @@ describe("PaymentMethodGateway", function () {
         specHelper.defaultGateway.customer.create({}, function (err, response) {
           let paymentMethodParams = {
             customerId: response.customer.id,
-            paymentMethodNonce: Nonces.PayPalFuturePayment,
+            paymentMethodNonce: Nonces.PayPalBillingAgreement,
           };
 
           specHelper.defaultGateway.paymentMethod.create(
@@ -1832,6 +1880,53 @@ describe("PaymentMethodGateway", function () {
                 function (err, paypalAccount) {
                   assert.isNull(err);
                   assert.isString(paypalAccount.email);
+
+                  done();
+                }
+              );
+            }
+          );
+        }))
+    );
+
+    context("SEPA direct debit", () =>
+      it("finds the account", (done) =>
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          let customer = response.customer;
+          let paymentMethodParams = {
+            customerId: customer.id,
+            paymentMethodNonce: Nonces.SepaDirectDebit,
+          };
+
+          specHelper.defaultGateway.paymentMethod.create(
+            paymentMethodParams,
+            function (err, response) {
+              let paymentMethodToken = response.paymentMethod.token;
+
+              specHelper.defaultGateway.paymentMethod.find(
+                paymentMethodToken,
+                function (err, sepaDirectDebitAccount) {
+                  assert.isNull(err);
+
+                  assert.equal(sepaDirectDebitAccount.customerId, customer.id);
+                  assert.equal(sepaDirectDebitAccount.mandateType, "RECURRENT");
+                  assert.equal(
+                    sepaDirectDebitAccount.merchantOrPartnerCustomerId,
+                    "a-fake-mp-customer-id"
+                  );
+                  assert.equal(sepaDirectDebitAccount.default, true);
+                  assert.equal(sepaDirectDebitAccount.last4, "1234");
+                  assert.equal(
+                    sepaDirectDebitAccount.bankReferenceToken,
+                    "a-fake-bank-reference-token"
+                  );
+                  assert.isString(sepaDirectDebitAccount.token);
+                  assert.isString(sepaDirectDebitAccount.globalId);
+                  assert.isString(sepaDirectDebitAccount.graphQLId);
+                  assert.isString(sepaDirectDebitAccount.customerGlobalId);
+                  assert.isString(sepaDirectDebitAccount.createdAt);
+                  assert.isString(sepaDirectDebitAccount.updatedAt);
+                  assert.match(sepaDirectDebitAccount.imageUrl, /svg/);
 
                   done();
                 }
@@ -3239,6 +3334,42 @@ describe("PaymentMethodGateway", function () {
           done();
         }
       ));
+
+    context("SEPA direct debit", function () {
+      before((done) =>
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          let customerId = response.customer.id;
+          let sepaDirectDebitAccountParams = {
+            customerId,
+            paymentMethodNonce: Nonces.SepaDirectDebit,
+          };
+
+          specHelper.defaultGateway.paymentMethod.create(
+            sepaDirectDebitAccountParams,
+            function (err, response) {
+              paymentMethodToken = response.paymentMethod.token;
+              done();
+            }
+          );
+        })
+      );
+
+      it("deletes the SEPA direct debit account", (done) =>
+        specHelper.defaultGateway.paymentMethod.delete(
+          paymentMethodToken,
+          function (err) {
+            assert.isNull(err);
+
+            specHelper.defaultGateway.sepaDirectDebitAccount.find(
+              paymentMethodToken,
+              function (err) {
+                assert.equal(err.type, braintree.errorTypes.notFoundError);
+                done();
+              }
+            );
+          }
+        ));
+    });
   });
 
   context("grant and revoke payment methods", function () {

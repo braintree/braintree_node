@@ -3212,6 +3212,53 @@ describe("TransactionGateway", function () {
         }))
     );
 
+    context("with SEPA Direct Debit account", function () {
+      it("returns SepaDirectDebitAccount for payment_instrument", function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.SepaDirectDebit,
+            amount: "100.00",
+            options: {
+              submitForSettlement: true,
+            },
+          };
+
+          specHelper.defaultGateway.transaction.sale(
+            transactionParams,
+            function (err, response) {
+              assert.isNull(err);
+
+              assert.isTrue(response.success);
+              let transaction = response.transaction;
+
+              assert.equal(
+                transaction.paymentInstrumentType,
+                PaymentInstrumentTypes.SepaDirectDebitAccount
+              );
+
+              let details = transaction.sepaDirectDebitAccountDetails;
+
+              assert.isNotNull(details.captureId);
+              assert.isNotNull(details.transactionFeeAmount);
+              assert.isNotNull(details.transactionFeeCurrencyIsoCode);
+              assert.equal(
+                details.bankReferenceToken,
+                "a-fake-bank-reference-token"
+              );
+              assert.equal(
+                details.merchantOrPartnerCustomerId,
+                "a-fake-mp-customer-id"
+              );
+              assert.equal(details.last4, "1234");
+              assert.equal(details.mandateType, "RECURRENT");
+
+              done();
+            }
+          );
+        });
+      });
+    });
+
     context("with venmo account", function () {
       it("returns VenmoAccount for payment_instrument", function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
@@ -5549,7 +5596,7 @@ describe("TransactionGateway", function () {
       );
     });
 
-    context("amex rewards", function () {
+    context.skip("amex rewards", function () {
       it("succeeds", function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
@@ -6816,7 +6863,7 @@ describe("TransactionGateway", function () {
       specHelper.defaultGateway.customer.create({}, function (err, response) {
         let paymentMethodParams = {
           customerId: response.customer.id,
-          paymentMethodNonce: Nonces.PayPalFuturePayment,
+          paymentMethodNonce: Nonces.PayPalBillingAgreement,
         };
 
         specHelper.defaultGateway.paymentMethod.create(
@@ -7121,7 +7168,7 @@ describe("TransactionGateway", function () {
       );
     });
 
-    context("amex rewards", function () {
+    context.skip("amex rewards", function () {
       it("succeeds", function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,

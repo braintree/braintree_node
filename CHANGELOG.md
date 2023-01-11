@@ -1,10 +1,22 @@
 # Changelog
 
-## Unreleased
+## 3.13.0
 
+- Add `SEPADirectDebitAccount` payment method
+- Add `SEPADirectDebitAccountDetails` to transaction object
+- Add `SEPADirectDebitNonceDetails` to payment method nonce object
+- Add `SEPA_DIRECT_DEBIT_ACCOUNT` to payment instrument type
+- Add `SepaDirectDebitAccount` to customer object
+- Add `sepaDebitPaypalV2_OrderId` to transaction search text fields
+- Add SEPA Direct Debit specific error codes
+- Add SEPA Direct Debit array to customer object
 - Bump ansi-regex from 3.0.0 to 3.0.1
 - Bump eslint-config-prettier from 8.4.0 to 8.5.0
 - Bump prettier from 2.5.1 to 2.7.1
+- Add `preDisputeProgram` to `Dispute` and `DisputeSearch`
+- Add `AutoAccepted` to `Dispute.Status`
+- Add `DisputeAutoAccepted` to `WebhookNotification.Kind`
+- Deprecate `chargebackProtectionLevel` and add `protectionLevel` to `Dispute`
 
 ## 3.12.0
 

@@ -277,7 +277,7 @@ describe("TransactionSearch", () =>
     it("finds paypal transactions", function (done) {
       let transactionParams = {
         amount: Braintree.Test.TransactionAmounts.Authorize,
-        paymentMethodNonce: Braintree.Test.Nonces.PayPalFuturePayment,
+        paymentMethodNonce: Braintree.Test.Nonces.PayPalBillingAgreement,
         options: {
           submitForSettlement: true,
         },
@@ -319,6 +319,54 @@ describe("TransactionSearch", () =>
                   );
                 }
               )
+          )
+      );
+    });
+
+    it("finds sepa direct debit transactions", function (done) {
+      let transactionParams = {
+        amount: Braintree.Test.TransactionAmounts.Authorize,
+        paymentMethodNonce: Braintree.Test.Nonces.SepaDirectDebit,
+        options: {
+          submitForSettlement: true,
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, response) =>
+          specHelper.defaultGateway.testing.settle(
+            response.transaction.id,
+            () => {
+              // eslint-disable-next-line func-style
+              let search = function (search) {
+                let details =
+                  response.transaction.sepaDirectDebitAccountDetails;
+
+                return search
+                  .sepaDebitPaypalV2_OrderId()
+                  .is(details.paypalV2OrderId || "");
+              };
+
+              specHelper.defaultGateway.transaction.search(
+                search,
+                function (err, response) {
+                  assert.isNull(err);
+                  assert.isTrue(response.success);
+
+                  return response.first(function (err, transaction) {
+                    assert.isObject(transaction);
+                    assert.equal(
+                      transaction.paymentInstrumentType,
+                      "sepa_debit_account"
+                    );
+                    assert.isNull(err);
+
+                    done();
+                  });
+                }
+              );
+            }
           )
       );
     });

@@ -1,6 +1,6 @@
 {
   "name": "braintree",
-  "version": "3.12.0",
+  "version": "3.13.0",
   "description": "A library for server-side integrating with Braintree.",
   "keywords": [
     "braintree",
@@ -31,6 +31,7 @@
     "eslint-config-braintree": "^4.0.0",
     "eslint-config-prettier": "^8.5.0",
     "mocha": "^8.4.0",
+    "mocha-junit-reporter": "^2.1.0",
     "prettier": "^2.7.1",
     "sinon": "^10.0.0"
   },
@@ -41,7 +42,9 @@
     "lint": "eslint lib/ test/",
     "pretest": "npm run lint",
     "test:unit": "mocha test/unit --recursive -r test/spec_helper",
+    "test:unit:report": "mocha test/unit --recursive -r test/spec_helper --reporter mocha-junit-reporter  --reporter-options mochaFile=tmp/build/unit_test_results.junit.xml",
     "test:integration": "mocha --timeout 60000 --slow 2000 test/integration --recursive -r test/spec_helper",
+    "test:integration:report": "mocha --timeout 60000 --slow 2000 test/integration --recursive -r test/spec_helper --reporter mocha-junit-reporter  --reporter-options mochaFile=tmp/build/integration_test_results.junit.xml",
     "test": "npm run test:unit"
   }
 }

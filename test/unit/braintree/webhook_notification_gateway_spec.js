@@ -616,6 +616,37 @@ describe("WebhookNotificationGateway", function () {
       );
     });
 
+    it("returns a parsable signature and payload for dispute auto accepted", function (done) {
+      let notification =
+        specHelper.defaultGateway.webhookTesting.sampleNotification(
+          WebhookNotification.Kind.DisputeAutoAccepted,
+          "my_id"
+        );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(
+        bt_signature,
+        bt_payload,
+        function (err, webhookNotification) {
+          assert.equal(
+            webhookNotification.kind,
+            WebhookNotification.Kind.DisputeAutoAccepted
+          );
+          assert.equal(
+            Dispute.Status.AutoAccepted,
+            webhookNotification.dispute.status
+          );
+          assert.equal(
+            Dispute.Kind.Chargeback,
+            webhookNotification.dispute.kind
+          );
+          assert.equal("2014-03-28", webhookNotification.dispute.dateOpened);
+          done();
+        }
+      );
+    });
+
     it("returns a parsable signature and payload for dispute disputed", function (done) {
       let notification =
         specHelper.defaultGateway.webhookTesting.sampleNotification(
