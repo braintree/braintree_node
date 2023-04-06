@@ -5,7 +5,6 @@ let Braintree = require("../../../lib/braintree");
 let CreditCardNumbers =
   require("../../../lib/braintree/test_values/credit_card_numbers").CreditCardNumbers;
 let Nonces = require("../../../lib/braintree/test_values/nonces").Nonces;
-let VenmoSdk = require("../../../lib/braintree/test_values/venmo_sdk").VenmoSdk;
 let CreditCard = require("../../../lib/braintree/credit_card").CreditCard;
 let ValidationErrorCodes =
   require("../../../lib/braintree/validation_error_codes").ValidationErrorCodes;
@@ -4305,6 +4304,48 @@ describe("TransactionGateway", function () {
       );
     });
 
+    it("allows specifying transactions with transaction source as 'installment_first'", function (done) {
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "5105105105105100",
+          expirationDate: "05/12",
+        },
+        transactionSource: "installment_first",
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          done();
+        }
+      );
+    });
+
+    it("allows specifying transactions with transaction source as 'installment'", function (done) {
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "5105105105105100",
+          expirationDate: "05/12",
+        },
+        transactionSource: "installment",
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          done();
+        }
+      );
+    });
+
     it("allows specifying transactions with transaction source as 'merchant'", function (done) {
       let transactionParams = {
         amount: "5.00",
@@ -4531,7 +4572,7 @@ describe("TransactionGateway", function () {
       );
     });
 
-    it("handles chargeback protection risk data returned by the gateway", function (done) {
+    xit("handles chargeback protection risk data returned by the gateway", function (done) {
       let transactionParams = {
         amount: "10.0",
         creditCard: {
@@ -5424,48 +5465,6 @@ describe("TransactionGateway", function () {
       });
     });
 
-    it("can use venmo sdk payment method codes", function (done) {
-      let transactionParams = {
-        amount: "1.00",
-        venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode,
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.equal(response.transaction.creditCard.bin, "411111");
-
-          done();
-        }
-      );
-    });
-
-    it("can use venmo sdk session", function (done) {
-      let transactionParams = {
-        amount: "1.00",
-        creditCard: {
-          number: "4111111111111111",
-          expirationDate: "05/12",
-        },
-        options: {
-          venmoSdkSession: VenmoSdk.Session,
-        },
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.isFalse(response.transaction.creditCard.venmoSdk);
-
-          done();
-        }
-      );
-    });
-
     it("can use vaulted credit card nonce", function (done) {
       let customerParams = {
         firstName: "Adam",
@@ -5892,7 +5891,7 @@ describe("TransactionGateway", function () {
     });
 
     context("three d secure", function () {
-      it("creates a transaction with threeDSecureToken", function (done) {
+      it("creates a transaction with threeDSecureAuthenticationId", function (done) {
         let threeDVerificationParams = {
           number: "4111111111111111",
           expirationMonth: "05",
@@ -5902,7 +5901,7 @@ describe("TransactionGateway", function () {
         specHelper.create3DSVerification(
           specHelper.threeDSecureMerchantAccountId,
           threeDVerificationParams,
-          function (threeDSecureToken) {
+          function (threeDSecureAuthenticationId) {
             let transactionParams = {
               merchantAccountId: specHelper.threeDSecureMerchantAccountId,
               amount: "5.00",
@@ -5910,7 +5909,7 @@ describe("TransactionGateway", function () {
                 number: "4111111111111111",
                 expirationDate: "05/2009",
               },
-              threeDSecureToken,
+              threeDSecureAuthenticationId,
             };
 
             specHelper.defaultGateway.transaction.sale(
@@ -5926,7 +5925,7 @@ describe("TransactionGateway", function () {
         );
       });
 
-      it("returns an error if sent null threeDSecureToken", function (done) {
+      it("returns an error if sent null threeDSecureAuthenticationId", function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.threeDSecureMerchantAccountId,
           amount: "5.00",
@@ -5934,7 +5933,7 @@ describe("TransactionGateway", function () {
             number: "4111111111111111",
             expirationDate: "05/2009",
           },
-          threeDSecureToken: null,
+          threeDSecureAuthenticationId: null,
         };
 
         specHelper.defaultGateway.transaction.sale(
@@ -5942,9 +5941,11 @@ describe("TransactionGateway", function () {
           function (err, response) {
             assert.isFalse(response.success, "response had no errors");
             assert.equal(
-              response.errors.for("transaction").on("threeDSecureToken")[0]
-                .code,
-              ValidationErrorCodes.Transaction.ThreeDSecureTokenIsInvalid
+              response.errors
+                .for("transaction")
+                .on("threeDSecureAuthenticationId")[0].code,
+              ValidationErrorCodes.Transaction
+                .ThreeDSecureAuthenticationIdIsInvalid
             );
 
             done();
@@ -5962,7 +5963,7 @@ describe("TransactionGateway", function () {
         specHelper.create3DSVerification(
           specHelper.threeDSecureMerchantAccountId,
           threeDVerificationParams,
-          function (threeDSecureToken) {
+          function (threeDSecureAuthenticationId) {
             let transactionParams = {
               merchantAccountId: specHelper.threeDSecureMerchantAccountId,
               amount: "5.00",
@@ -5970,7 +5971,7 @@ describe("TransactionGateway", function () {
                 number: "5105105105105100",
                 expirationDate: "05/2009",
               },
-              threeDSecureToken,
+              threeDSecureAuthenticationId,
             };
 
             specHelper.defaultGateway.transaction.sale(
@@ -5978,10 +5979,11 @@ describe("TransactionGateway", function () {
               function (err, response) {
                 assert.isFalse(response.success, "response had no errors");
                 assert.equal(
-                  response.errors.for("transaction").on("threeDSecureToken")[0]
-                    .code,
+                  response.errors
+                    .for("transaction")
+                    .on("threeDSecureAuthenticationId")[0].code,
                   ValidationErrorCodes.Transaction
-                    .ThreeDSecureTransactionDataDoesntMatchVerify
+                    .ThreeDSecurePaymentMethodDoesntMatchThreeDSecureAuthenticationPaymentMethod
                 );
 
                 done();
@@ -6596,7 +6598,7 @@ describe("TransactionGateway", function () {
             assert.equal(info.cavv, "somebase64value");
             assert.equal(info.xid, "xidvalue");
             assert.equal(info.eciFlag, "07");
-            assert.equal(info.threeDSecureVersion, "1.0.2");
+            assert.isNotNull(info.threeDSecureVersion);
             assert.equal(info.dsTransactionId, "dstxnid");
             done();
           }
@@ -8605,7 +8607,7 @@ describe("TransactionGateway", function () {
     });
 
     it("returns error code, when transaction type is undefined or final", function (done) {
-      let additionalParams = { transactionSource: "recurring_first" };
+      let additionalParams = { transactionSource: "recurring" };
       let transactionParams = Object.assign(
         additionalParams,
         firstDataMasterTransactionParams

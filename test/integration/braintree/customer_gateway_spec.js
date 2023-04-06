@@ -1,7 +1,6 @@
 "use strict";
 /* eslint-disable new-cap */
 
-let VenmoSdk = require("../../../lib/braintree/test_values/venmo_sdk").VenmoSdk;
 let Nonces = require("../../../lib/braintree/test_values/nonces").Nonces;
 let Config = require("../../../lib/braintree/config").Config;
 let ValidationErrorCodes =
@@ -955,48 +954,6 @@ describe("CustomerGateway", function () {
             response.params.customer.creditCard.billingAddress.countryName,
             "invalid country"
           );
-
-          done();
-        }
-      );
-    });
-
-    it("creates a customer with venmo sdk payment method code", function (done) {
-      let customerParams = {
-        creditCard: {
-          venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode,
-        },
-      };
-
-      specHelper.defaultGateway.customer.create(
-        customerParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.equal(response.customer.creditCards[0].bin, "411111");
-
-          done();
-        }
-      );
-    });
-
-    it("creates a customer with venmo sdk session", function (done) {
-      let customerParams = {
-        creditCard: {
-          number: "5105105105105100",
-          expirationDate: "05/2012",
-          options: {
-            venmoSdkSession: VenmoSdk.Session,
-          },
-        },
-      };
-
-      specHelper.defaultGateway.customer.create(
-        customerParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.isFalse(response.customer.creditCards[0].venmoSdk);
 
           done();
         }

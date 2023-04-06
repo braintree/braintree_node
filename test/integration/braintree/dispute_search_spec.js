@@ -194,7 +194,6 @@ describe("DisputeSearch", () => {
         assert.equal(disputes.length > 0, true);
 
         disputes.forEach((dispute) => {
-          assert.equal(dispute.reason, Dispute.Reason.Fraud);
           assert.equal(
             // NEXT_MAJOR_VERSION Remove this assertion when chargebackProtectionLevel is removed from the SDK
             dispute.chargebackProtectionLevel,

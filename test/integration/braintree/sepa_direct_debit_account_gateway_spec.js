@@ -69,6 +69,67 @@ describe("SepaDirectDebitGateway", function () {
           done();
         }
       ));
+
+    it("returns subscriptions associated with a SEPA direct debit account", (done) =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        let paymentMethodParams = {
+          customerId: response.customer.id,
+          paymentMethodNonce: Nonces.SepaDirectDebit,
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(
+          paymentMethodParams,
+          function (err, response) {
+            let token = response.paymentMethod.token;
+
+            let subscriptionParams = {
+              paymentMethodToken: token,
+              planId: specHelper.plans.trialless.id,
+            };
+
+            specHelper.defaultGateway.subscription.create(
+              subscriptionParams,
+              function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+
+                let subscription1 = response.subscription;
+
+                specHelper.defaultGateway.subscription.create(
+                  subscriptionParams,
+                  function (err, response) {
+                    assert.isNull(err);
+                    assert.isTrue(response.success);
+
+                    let subscription2 = response.subscription;
+
+                    specHelper.defaultGateway.sepaDirectDebitAccount.find(
+                      token,
+                      function (err, sepaDirectDebitAccount) {
+                        assert.isNull(err);
+
+                        assert.equal(
+                          sepaDirectDebitAccount.subscriptions.length,
+                          2
+                        );
+                        let subscriptionIds = [
+                          sepaDirectDebitAccount.subscriptions[0].id,
+                          sepaDirectDebitAccount.subscriptions[1].id,
+                        ];
+
+                        assert.include(subscriptionIds, subscription1.id);
+                        assert.include(subscriptionIds, subscription2.id);
+
+                        done();
+                      }
+                    );
+                  }
+                );
+              }
+            );
+          }
+        );
+      }));
   });
 
   describe("delete", function () {

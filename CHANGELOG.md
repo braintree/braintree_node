@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.14.0
+
+- Add `intendedTransactionSource` to `CreditCardVerificationGateway`
+- Add `paymentMethodNonce` to `CreditCardVerificationGateway`
+- Add `threeDSecureAuthenticationId` to `CreditCardVerificationGateway`
+- Add `threeDSecurePassThru` to `CreditCardVerificationGateway`
+- Deprecated `threeDSecureToken` in favor of `threeDSecureAuthenticationId`
+- Deprecate `venmoSdkPaymentMethodCode` and `venmoSdkSession` in `TransactionGateway`, `CustomerGateway`, and `CreditCardGateway`
+- Add support for subscriptions in SEPA direct debit accounts
+
 ## 3.13.0
 
 - Add `SEPADirectDebitAccount` payment method

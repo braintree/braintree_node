@@ -335,5 +335,150 @@ describe("CreditCardVerificationGateway", function () {
         });
       });
     });
+
+    it("supports intendedTransactionSource", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4111111111111111",
+          expirationDate: "05/2029",
+        },
+        intendedTransactionSource: "installment",
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+
+          done();
+        }
+      );
+    });
+
+    it("creates a verification with paymentMethodNonce", function (done) {
+      let nonceParams = {
+        creditCard: {
+          number: "4111111111111111",
+          expirationMonth: "05",
+          expirationYear: "2029",
+        },
+      };
+
+      specHelper.generateNonceForNewPaymentMethod(
+        nonceParams,
+        null,
+        function (nonce) {
+          let params = {
+            creditCard: {
+              cardholderName: "John Smith",
+              number: "4111111111111111",
+            },
+            paymentMethodNonce: nonce,
+          };
+
+          specHelper.defaultGateway.creditCardVerification.create(
+            params,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+
+              let verification = response.verification;
+
+              assert.equal(verification.processorResponseCode, "1000");
+              assert.equal(verification.processorResponseText, "Approved");
+              assert.equal(verification.processorResponseType, "approved");
+
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("creates a verification with threeDSecureAuthenticationId", function (done) {
+      let threeDVerificationParams = {
+        number: "4111111111111111",
+        expirationMonth: "05",
+        expirationYear: "2029",
+      };
+
+      specHelper.create3DSVerification(
+        specHelper.threeDSecureMerchantAccountId,
+        threeDVerificationParams,
+        function (threeDSecureAuthId) {
+          let params = {
+            creditCard: {
+              cardholderName: "John Smith",
+              number: "4111111111111111",
+              expirationDate: "05/2029",
+            },
+            options: {
+              merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+            },
+            threeDSecureAuthenticationId: threeDSecureAuthId,
+          };
+
+          specHelper.defaultGateway.creditCardVerification.create(
+            params,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+
+              let verification = response.verification;
+
+              assert.equal(verification.processorResponseCode, "1000");
+              assert.equal(verification.processorResponseText, "Approved");
+              assert.equal(verification.processorResponseType, "approved");
+
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("creates a verification with threeDSecurePassThru", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4111111111111111",
+          expirationDate: "05/2029",
+        },
+        threeDSecurePassThru: {
+          eciFlag: "02",
+          cavv: "some_cavv",
+          xid: "some_xid",
+          threeDSecureVersion: "1.0.2",
+          authenticationResponse: "Y",
+          directoryResponse: "Y",
+          cavvAlgorithm: "2",
+          dsTransactionId: "some_ds_id",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+
+          done();
+        }
+      );
+    });
   });
 });

@@ -398,6 +398,78 @@ describe("DisputeGateway", () => {
           );
         });
     });
+
+    it("creates text evidence for the dispute with CARRIER_NAME shipping tracking", () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(disputeId, {
+            content: "UPS",
+            category: "CARRIER_NAME",
+            sequenceNumber: 0,
+          });
+        })
+        .then((response) => {
+          let evidence = response.evidence;
+
+          assert.isTrue(response.success);
+          assert.equal("UPS", evidence.comment);
+          assert.equal("CARRIER_NAME", evidence.category);
+          assert.equal(0, evidence.sequenceNumber);
+        });
+    });
+
+    it("creates text evidence for the dispute with TRACKING_NUMBER shipping tracking", () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(disputeId, {
+            content: "3",
+            category: "TRACKING_NUMBER",
+            sequenceNumber: 0,
+          });
+        })
+        .then((response) => {
+          let evidence = response.evidence;
+
+          assert.isTrue(response.success);
+          assert.equal("3", evidence.comment);
+          assert.equal("TRACKING_NUMBER", evidence.category);
+          assert.equal(0, evidence.sequenceNumber);
+        });
+    });
+
+    it("creates text evidence for the dispute with TRACKING_URL shipping tracking", () => {
+      let disputeId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(disputeId, {
+            content: "https://example.com/tracking-number/abc12345",
+            category: "TRACKING_URL",
+            sequenceNumber: 1,
+          });
+        })
+        .then((response) => {
+          let evidence = response.evidence;
+
+          assert.isTrue(response.success);
+          assert.equal(
+            "https://example.com/tracking-number/abc12345",
+            evidence.comment
+          );
+          assert.equal("TRACKING_URL", evidence.category);
+          assert.equal(1, evidence.sequenceNumber);
+        });
+    });
   });
 
   describe("self.finalize", () => {

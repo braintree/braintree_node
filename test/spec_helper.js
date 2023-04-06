@@ -109,9 +109,10 @@ let settlePayPalTransaction = (transactionId, callback) =>
 
 let create3DSVerification = function (merchantAccountId, params, callback) {
   let responseCallback = function (err, response) {
-    let threeDSecureToken = response.threeDSecureVerification.threeDSecureToken;
+    let threeDSecureAuthenticationId =
+      response.threeDSecureVerification.threeDSecureAuthenticationId;
 
-    callback(threeDSecureToken);
+    callback(threeDSecureAuthenticationId);
   };
 
   defaultGateway.http.post(

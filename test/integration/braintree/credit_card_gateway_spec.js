@@ -8,7 +8,6 @@ let CreditCardNumbers =
   require("../../../lib/braintree/test_values/credit_card_numbers").CreditCardNumbers;
 let CreditCardDefaults =
   require("../../../lib/braintree/test_values/credit_card_defaults").CreditCardDefaults;
-let VenmoSdk = require("../../../lib/braintree/test_values/venmo_sdk").VenmoSdk;
 let Config = require("../../../lib/braintree/config").Config;
 let ValidationErrorCodes =
   require("../../../lib/braintree/validation_error_codes").ValidationErrorCodes;
@@ -602,98 +601,6 @@ describe("CreditCardGateway", function () {
 
           assert.equal(1, errorCodes.length);
           assert.include(errorCodes, "81716");
-
-          done();
-        }
-      );
-    });
-
-    it("accepts a venmo sdk payment method code", function (done) {
-      let creditCardParams = {
-        customerId,
-        venmoSdkPaymentMethodCode: VenmoSdk.VisaPaymentMethodCode,
-      };
-
-      specHelper.defaultGateway.creditCard.create(
-        creditCardParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.equal(response.creditCard.maskedNumber, "411111******1111");
-          assert.isFalse(response.creditCard.venmoSdk);
-
-          done();
-        }
-      );
-    });
-
-    it("rejects a bad venmo sdk payment method code", function (done) {
-      let creditCardParams = {
-        customerId,
-        venmoSdkPaymentMethodCode: VenmoSdk.InvalidPaymentMethodCode,
-      };
-
-      specHelper.defaultGateway.creditCard.create(
-        creditCardParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isFalse(response.success);
-          let errorCodes = Array.from(response.errors.deepErrors()).map(
-            (error) => error.code
-          );
-
-          assert.equal(1, errorCodes.length);
-          assert.include(errorCodes, "91727");
-          assert.equal(
-            response.message,
-            "Invalid VenmoSDK payment method code"
-          );
-
-          done();
-        }
-      );
-    });
-
-    it("venmo sdk is true for card created with a venmo sdk session", function (done) {
-      let creditCardParams = {
-        customerId,
-        number: "5105105105105100",
-        expirationDate: "05/2012",
-        options: {
-          venmoSdkSession: VenmoSdk.Session,
-        },
-      };
-
-      specHelper.defaultGateway.creditCard.create(
-        creditCardParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.equal(response.creditCard.maskedNumber, "510510******5100");
-          assert.isFalse(response.creditCard.venmoSdk);
-
-          done();
-        }
-      );
-    });
-
-    it("venmo sdk is false for card created with an invalid venmo sdk session", function (done) {
-      let creditCardParams = {
-        customerId,
-        number: "5105105105105100",
-        expirationDate: "05/2012",
-        options: {
-          venmoSdkSession: VenmoSdk.InvalidSession,
-        },
-      };
-
-      specHelper.defaultGateway.creditCard.create(
-        creditCardParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.equal(response.creditCard.maskedNumber, "510510******5100");
-          assert.isFalse(response.creditCard.venmoSdk);
 
           done();
         }

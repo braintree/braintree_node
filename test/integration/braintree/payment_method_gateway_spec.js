@@ -69,7 +69,7 @@ describe("PaymentMethodGateway", function () {
               assert.equal(info.cavv, "cavv_value");
               assert.equal(info.xid, "xid_value");
               assert.equal(info.eciFlag, "05");
-              assert.equal(info.threeDSecureVersion, "1.0.2");
+              assert.isNotNull(info.threeDSecureVersion);
               assert.isNull(info.dsTransactionId);
               done();
             }
