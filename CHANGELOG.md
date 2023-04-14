@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.15.0
+
+- Update `xml2js` to v0.5.0
+
 ## 3.14.0
 
 - Add `intendedTransactionSource` to `CreditCardVerificationGateway`
