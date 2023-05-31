@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.16.0
+
+- Add `merchant_advice_code` and `merchant_advice_code_text` to Transaction object
+
 ## 3.15.0
 
 - Update `xml2js` to v0.5.0

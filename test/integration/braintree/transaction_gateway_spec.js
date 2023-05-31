@@ -47,6 +47,29 @@ describe("TransactionGateway", function () {
       );
     });
 
+    it("exposes MAC and MAC text", function (done) {
+      let transactionParams = {
+        amount: "2000.00",
+        creditCard: {
+          number: "5105105105105100",
+          expirationDate: "05/30",
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.equal(response.transaction.merchantAdviceCode, "01");
+          assert.equal(
+            response.transaction.merchantAdviceCodeText,
+            "New account information available"
+          );
+
+          done();
+        }
+      );
+    });
+
     it("charges a card with exchangeRateQuoteId", function (done) {
       let transactionParams = {
         amount: "5.00",
