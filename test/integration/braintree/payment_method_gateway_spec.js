@@ -1780,6 +1780,50 @@ describe("PaymentMethodGateway", function () {
         }));
     });
 
+    context("with a fake apple pay mpan nonce", function () {
+      before((done) =>
+        specHelper.defaultGateway.customer.create(
+          { firstName: "John", lastName: "Smith" },
+          function (err, response) {
+            customerId = response.customer.id;
+            done();
+          }
+        )
+      );
+
+      it("creates a payment method", (done) =>
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          customerId = response.customer.id;
+
+          let applePayCardParams = {
+            paymentMethodNonce: Nonces.ApplePayMpan,
+            customerId,
+          };
+
+          specHelper.defaultGateway.paymentMethod.create(
+            applePayCardParams,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+
+              let token = response.paymentMethod.token;
+
+              specHelper.defaultGateway.paymentMethod.find(
+                token,
+                function (err, applePayCard) {
+                  assert.isNull(err);
+                  assert.isTrue(applePayCard !== null);
+                  assert.isNotNull(applePayCard.merchantTokenIdentifier);
+                  assert.isNotNull(applePayCard.sourceCardLast4);
+
+                  done();
+                }
+              );
+            }
+          );
+        }));
+    });
+
     context("SEPA direct debit", function () {
       it("creates a SEPA direct debit account from a payment method nonce", (done) =>
         specHelper.defaultGateway.customer.create({}, function (err, response) {

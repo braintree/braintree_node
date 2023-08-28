@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.17.0
+
+- Add `merchantTokenIdentifier` and `sourceCardLast4` to `ApplePayCard` and `ApplePayDetail`
+- Add `processing_overrides` to `Transaction.sale` options
+
 ## 3.16.0
 
 - Add `merchant_advice_code` and `merchant_advice_code_text` to Transaction object

@@ -39,16 +39,6 @@ let merchant2Config = {
 };
 let merchant2Gateway = new braintree.BraintreeGateway(merchant2Config);
 
-let advancedFraudKountConfig = {
-  environment: braintree.Environment.Development,
-  merchantId: "advanced_fraud_integration_merchant_id",
-  publicKey: "advanced_fraud_integration_public_key",
-  privateKey: "advanced_fraud_integration_private_key",
-};
-let advancedFraudKountGateway = new braintree.BraintreeGateway(
-  advancedFraudKountConfig
-);
-
 let fraudProtectionEnterpriseConfig = {
   environment: braintree.Environment.Development,
   merchantId: "fraud_protection_enterprise_integration_merchant_id",
@@ -654,7 +644,6 @@ ClientApiHttp.initClass();
 
 global.specHelper = {
   addOns,
-  advancedFraudKountGateway,
   braintree,
   create3DSVerification,
   generate3DSNonce,

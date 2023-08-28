@@ -1128,6 +1128,39 @@ describe("TransactionSearch", () =>
         )
       );
     });
+
+    it("verify retried_transaction_id on transaction object", (done) => {
+      let transactionParams = {
+        amount: "2000.00",
+        paymentMethodToken: "network_tokenized_credit_card",
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, saleResponse) => {
+          let retryId = saleResponse.transaction.retryIds[0];
+
+          specHelper.defaultGateway.transaction.search(
+            function (search) {
+              search.id().is(retryId);
+
+              return search.amount().is("2000.00");
+            },
+            function (err, response) {
+              if (response.length() === 0) {
+                return;
+              }
+
+              response.first(function (err, transaction) {
+                assert.equal(retryId, transaction.id);
+                assert.isNotNull(transaction.retriedTransactionId);
+                done();
+              });
+            }
+          );
+        }
+      );
+    });
   }));
 
 function __range__(left, right, inclusive) {

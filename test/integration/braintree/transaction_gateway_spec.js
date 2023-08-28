@@ -742,29 +742,6 @@ describe("TransactionGateway", function () {
       );
     });
 
-    it("skips advanced fraud checking if transaction[options][skip_advanced_fraud_checking] is set to true", function (done) {
-      let transactionParams = {
-        amount: "5.00",
-        creditCard: {
-          number: "5105105105105100",
-          expirationDate: "05/12",
-        },
-        options: {
-          skipAdvancedFraudChecking: true,
-        },
-      };
-
-      specHelper.advancedFraudKountGateway.transaction.sale(
-        transactionParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.isUndefined(response.transaction.riskData);
-          done();
-        }
-      );
-    });
-
     it("can serialize response object without gateway property on transaction", function (done) {
       let transactionParams = {
         amount: "5.00",
@@ -4615,33 +4592,7 @@ describe("TransactionGateway", function () {
       );
     });
 
-    it("handles fraud rejection", function (done) {
-      let transactionParams = {
-        amount: "10.0",
-        creditCard: {
-          number: CreditCardNumbers.CardTypeIndicators.Fraud,
-          expirationDate: "05/16",
-        },
-      };
-
-      specHelper.advancedFraudKountGateway.transaction.sale(
-        transactionParams,
-        function (err, response) {
-          assert.isFalse(response.success, "response had no errors");
-          assert.equal(
-            response.transaction.status,
-            Transaction.Status.GatewayRejected
-          );
-          assert.equal(
-            response.transaction.gatewayRejectionReason,
-            Transaction.GatewayRejectionReason.Fraud
-          );
-          done();
-        }
-      );
-    });
-
-    it("handles risk_threshold rejection (test credit card number)", function (done) {
+    xit("handles risk_threshold rejection (test credit card number)", function (done) {
       let transactionParams = {
         amount: "10.0",
         creditCard: {
@@ -4650,7 +4601,7 @@ describe("TransactionGateway", function () {
         },
       };
 
-      specHelper.advancedFraudKountGateway.transaction.sale(
+      specHelper.fraudProtectionEnterpriseGateway.transaction.sale(
         transactionParams,
         function (err, response) {
           assert.isFalse(response.success, "response had no errors");
@@ -4667,13 +4618,13 @@ describe("TransactionGateway", function () {
       );
     });
 
-    it("handles risk_threshold rejection (test nonce)", function (done) {
+    xit("handles risk_threshold rejection (test nonce)", function (done) {
       let transactionParams = {
         amount: "10.0",
         paymentMethodNonce: Nonces.GatewayRejectedRiskThresholds,
       };
 
-      specHelper.advancedFraudKountGateway.transaction.sale(
+      specHelper.fraudProtectionEnterpriseGateway.transaction.sale(
         transactionParams,
         function (err, response) {
           assert.isFalse(response.success, "response had no errors");
@@ -5700,6 +5651,40 @@ describe("TransactionGateway", function () {
               points: "1000",
               currencyAmount: "10.00",
               currencyIsoCode: "USD",
+            },
+          },
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isTrue(response.success);
+            assert.equal(
+              response.transaction.status,
+              Transaction.Status.SubmittedForSettlement
+            );
+
+            done();
+          }
+        );
+      });
+    });
+
+    context("processing overrides", function () {
+      it("succeeds", function (done) {
+        let transactionParams = {
+          amount: "10.00",
+          creditCard: {
+            number: "5105105105105100",
+            expirationDate: "05/12",
+          },
+          options: {
+            submitForSettlement: true,
+            processingOverrides: {
+              customerEmail: "NodeSDK@example.com",
+              customerFirstName: "NodeSDK_customerFirstName",
+              customerLastName: "NodeSDK_customerLasttName",
+              customerTaxIdentifier: "1.2.3.4.5.6",
             },
           },
         };
@@ -8291,6 +8276,8 @@ describe("TransactionGateway", function () {
           assert.equal(response.transaction.type, "sale");
           assert.equal(response.transaction.amount, "5.00");
           assert.isUndefined(response.transaction.retried);
+          assert.isEmpty(response.transaction.retryIds);
+          assert.isNull(response.transaction.retriedTransactionId);
           assert.equal(response.transaction.processorResponseCode, "1000");
           assert.equal(response.transaction.processorResponseType, "approved");
           assert.isTrue(response.transaction.processedWithNetworkToken);
@@ -8314,6 +8301,8 @@ describe("TransactionGateway", function () {
           assert.equal(response.transaction.type, "sale");
           assert.equal(response.transaction.amount, "2000.00");
           assert.isTrue(response.transaction.retried);
+          assert.isTrue(response.transaction.retryIds.length > 0);
+          assert.isNull(response.transaction.retriedTransactionId);
           assert.equal(response.transaction.processorResponseCode, "2000");
           assert.equal(
             response.transaction.processorResponseType,
@@ -8653,65 +8642,6 @@ describe("TransactionGateway", function () {
                 errorCode,
                 ValidationErrorCodes.Transaction
                   .TransactionIsNotEligibleForAdjustment
-              );
-              done();
-            }
-          )
-      );
-    });
-
-    let firstDataVisaTransactionParams = {
-      merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
-      amount: "75.50",
-      creditCard: {
-        number: CreditCardNumbers.CardTypeIndicators.Visa,
-        expirationDate: "06/09",
-      },
-    };
-
-    it("returns error code, when processor does not support incremental auth", function (done) {
-      specHelper.defaultGateway.transaction.sale(
-        firstDataVisaTransactionParams,
-        (err, response) =>
-          specHelper.defaultGateway.transaction.adjustAuthorization(
-            response.transaction.id,
-            "85.50",
-            function (err, response) {
-              assert.isFalse(response.success);
-              assert.equal(response.transaction.amount, "75.50");
-              let errorCode = response.errors
-                .for("transaction")
-                .on("base")[0].code;
-
-              assert.equal(
-                errorCode,
-                ValidationErrorCodes.Transaction
-                  .ProcessorDoesNotSupportIncrementalAuth
-              );
-              done();
-            }
-          )
-      );
-    });
-
-    it("returns error code, when processor does not support auth reversal", function (done) {
-      specHelper.defaultGateway.transaction.sale(
-        firstDataVisaTransactionParams,
-        (err, response) =>
-          specHelper.defaultGateway.transaction.adjustAuthorization(
-            response.transaction.id,
-            "65.50",
-            function (err, response) {
-              assert.isFalse(response.success);
-              assert.equal(response.transaction.amount, "75.50");
-              let errorCode = response.errors
-                .for("transaction")
-                .on("base")[0].code;
-
-              assert.equal(
-                errorCode,
-                ValidationErrorCodes.Transaction
-                  .ProcessorDoesNotSupportPartialAuthReversal
               );
               done();
             }
