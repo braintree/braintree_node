@@ -5047,6 +5047,8 @@ describe("TransactionGateway", function () {
             feeAmount: "10.00",
             taxAmount: "20.00",
             restrictedTicket: false,
+            arrivalDate: "2023-01-01",
+            ticketIssuerAddress: "ti-address",
             legs: [
               {
                 conjunctionTicket: "CJ0001",
@@ -5097,6 +5099,68 @@ describe("TransactionGateway", function () {
           assert.isTrue(response.success);
 
           done();
+        }
+      );
+    });
+
+    it("allows submitting a transaction with travel flight industry data", function (done) {
+      let transactionParams = {
+        amount: "5.00",
+        merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
+        creditCard: {
+          number: "5105105105105100",
+          expirationDate: "05/12",
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, response) => {
+          let submitForSettlementParams = {
+            industry: {
+              industryType: Transaction.IndustryData.TravelAndFlight,
+              data: {
+                passengerFirstName: "John",
+                issuedDate: "2018-01-01",
+                ticketNumber: "ticket-number",
+                issuingCarrierCode: "AA",
+                restrictedTicket: false,
+                arrivalDate: "2023-01-01",
+                ticketIssuerAddress: "ti-address",
+                legs: [
+                  {
+                    serviceClass: "Y",
+                    carrierCode: "AA",
+                    fareBasisCode: "W",
+                    flightNumber: "AA100",
+                    departureDate: "2018-01-02",
+                    departureAirportCode: "MDW",
+                    departureTime: "08:00",
+                    arrivalAirportCode: "ATX",
+                    arrivalTime: "10:00",
+                    stopoverPermitted: false,
+                    fareAmount: "35.00",
+                  },
+                ],
+              },
+            },
+          };
+
+          specHelper.defaultGateway.transaction.submitForSettlement(
+            response.transaction.id,
+            null,
+            submitForSettlementParams,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(
+                response.transaction.status,
+                "submitted_for_settlement"
+              );
+
+              done();
+            }
+          );
         }
       );
     });
@@ -8275,7 +8339,7 @@ describe("TransactionGateway", function () {
           assert.isTrue(response.success);
           assert.equal(response.transaction.type, "sale");
           assert.equal(response.transaction.amount, "5.00");
-          assert.isUndefined(response.transaction.retried);
+          assert.isFalse(response.transaction.retried);
           assert.isEmpty(response.transaction.retryIds);
           assert.isNull(response.transaction.retriedTransactionId);
           assert.equal(response.transaction.processorResponseCode, "1000");

@@ -5,6 +5,7 @@ let Braintree = require("../../../lib/braintree");
 let Transaction = Braintree.Transaction;
 let CreditCardNumbers =
   require("../../../lib/braintree/test_values/credit_card_numbers").CreditCardNumbers;
+let Nonces = require("../../../lib/braintree/test_values/nonces").Nonces;
 let CreditCard = Braintree.CreditCard;
 let Writable = require("stream").Writable;
 let braintree = specHelper.braintree;
@@ -1156,6 +1157,45 @@ describe("TransactionSearch", () =>
                 assert.isNotNull(transaction.retriedTransactionId);
                 done();
               });
+            }
+          );
+        }
+      );
+    });
+
+    it("can search by debitNetwork", function (done) {
+      let random = specHelper.randomId();
+      let transactionParams = {
+        amount: "10.00",
+        orderId: random,
+        paymentMethodNonce: Nonces.TransactablePinlessDebitVisa,
+        merchantAccountId: "pinless_debit",
+        options: {
+          submitForSettlement: true,
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, response) => {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, "sale");
+          assert.equal(response.transaction.amount, "10.00");
+          assert.equal(
+            response.transaction.debitNetwork,
+            CreditCard.DebitNetwork.Nyce
+          );
+
+          return specHelper.defaultGateway.transaction.search(
+            function (search) {
+              search.debitNetwork().is(CreditCard.DebitNetwork.Nyce);
+
+              return search.id().is(response.transaction.id);
+            },
+            function (err, response) {
+              assert.equal(1, response.ids.length);
+              done();
             }
           );
         }

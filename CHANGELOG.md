@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.18.0
+
+- Add `arrivalDate` and `ticketIssuerAddress` to `Transaction.sale` request
+- Add `SubscriptionBillingSkipped` to `WebhookNotification.Kind`
+- Add `debitNetwork` to `Transaction.sale`
+- Add `DebitNetwork` enum to `CreditCard`
+- Add `debitNetwork` to search criteria in `Transaction.search`
+
 ## 3.17.0
 
 - Add `merchantTokenIdentifier` and `sourceCardLast4` to `ApplePayCard` and `ApplePayDetail`
