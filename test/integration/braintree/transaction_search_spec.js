@@ -324,6 +324,63 @@ describe("TransactionSearch", () =>
       );
     });
 
+    it("finds Meta Checkout transactions", function (done) {
+      let cardParams = {
+        amount: Braintree.Test.TransactionAmounts.Authorize,
+        paymentMethodNonce: Braintree.Test.Nonces.MetaCheckoutCard,
+        options: {
+          submitForSettlement: true,
+        },
+      };
+
+      let tokenParams = {
+        amount: Braintree.Test.TransactionAmounts.Authorize,
+        paymentMethodNonce: Braintree.Test.Nonces.MetaCheckoutToken,
+        options: {
+          submitForSettlement: true,
+        },
+      };
+
+      // eslint-disable-next-line func-style
+      let search = function (search) {
+        return search.paymentInstrumentType().is("MetaCheckout");
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        cardParams,
+        (err, response) => {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let cardTxId = response.transaction.id;
+
+          specHelper.defaultGateway.transaction.sale(
+            tokenParams,
+            (err, response) => {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+
+              let tokenTxId = response.transaction.id;
+
+              specHelper.defaultGateway.transaction.search(
+                search,
+                function (err, response) {
+                  assert.isNull(err);
+                  assert.isTrue(response.success);
+
+                  assert.isTrue(response.length() >= 2);
+                  assert.isTrue(response.ids.includes(cardTxId));
+                  assert.isTrue(response.ids.includes(tokenTxId));
+
+                  done();
+                }
+              );
+            }
+          );
+        }
+      );
+    });
+
     it("finds sepa direct debit transactions", function (done) {
       let transactionParams = {
         amount: Braintree.Test.TransactionAmounts.Authorize,

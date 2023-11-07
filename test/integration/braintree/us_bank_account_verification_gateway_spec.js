@@ -7,8 +7,160 @@ let UsBankAccountVerification =
   require("../../../lib/braintree/us_bank_account_verification").UsBankAccountVerification;
 let MerchantAccountTest =
   require("../../../lib/braintree/test_values/merchant_account").MerchantAccountTest;
+let Nonces = require("../../../lib/braintree/test_values/nonces").Nonces;
 
 describe("UsBankAccountVerificationGateway", function () {
+  describe("networkChecks", function () {
+    let gateway = specHelper.merchant2Gateway;
+
+    it("successfully verifies", function (done) {
+      let customerParams = {};
+
+      gateway.customer.create(customerParams, (err, response) => {
+        let customerId = response.customer.id;
+        let paymentMethodParams = {
+          customerId,
+          paymentMethodNonce: Nonces.UsBankAccount,
+          options: {
+            verificationMerchantAccountId:
+              MerchantAccountTest.AnotherUsBankMerchantAccount,
+            usBankAccountVerificationMethod:
+              UsBankAccountVerification.VerificationMethod.NetworkCheck,
+          },
+        };
+
+        gateway.paymentMethod.create(paymentMethodParams, (err, response) => {
+          assert.isNull(err);
+
+          let usBankAccount = response.usBankAccount;
+
+          assert.isTrue(usBankAccount.verified);
+          assert.equal(usBankAccount.last4, "0000");
+          assert.equal(usBankAccount.accountType, "checking");
+          assert.equal(usBankAccount.accountHolderName, "Dan Schulman");
+          assert.equal(usBankAccount.bankName, "Wells Fargo");
+          assert.equal(usBankAccount.routingNumber, "123456789");
+          assert.equal(usBankAccount.ownershipType, "personal");
+
+          let verification = usBankAccount.verifications[0];
+
+          assert.equal(
+            verification.verificationMethod,
+            UsBankAccountVerification.VerificationMethod.NetworkCheck
+          );
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.isNotNull(verification.verificationDeterminedAt);
+
+          done();
+        });
+      });
+    });
+
+    it("successfully verifies with customer verification add on", function (done) {
+      let customerParams = {};
+
+      gateway.customer.create(customerParams, (err, response) => {
+        let customerId = response.customer.id;
+        let paymentMethodParams = {
+          customerId,
+          paymentMethodNonce: Nonces.UsBankAccount,
+          options: {
+            verificationMerchantAccountId:
+              MerchantAccountTest.AnotherUsBankMerchantAccount,
+            usBankAccountVerificationMethod:
+              UsBankAccountVerification.VerificationMethod.NetworkCheck,
+            verificationAddOns:
+              UsBankAccountVerification.VerificationAddOns.CustomerVerification,
+          },
+        };
+
+        gateway.paymentMethod.create(paymentMethodParams, (err, response) => {
+          assert.isNull(err);
+
+          let usBankAccount = response.usBankAccount;
+
+          assert.isTrue(usBankAccount.verified);
+          assert.equal(usBankAccount.last4, "0000");
+          assert.equal(usBankAccount.accountType, "checking");
+          assert.equal(usBankAccount.accountHolderName, "Dan Schulman");
+          assert.equal(usBankAccount.bankName, "Wells Fargo");
+          assert.equal(usBankAccount.routingNumber, "123456789");
+          assert.equal(usBankAccount.ownershipType, "personal");
+
+          let verification = usBankAccount.verifications[0];
+
+          assert.equal(
+            verification.verificationMethod,
+            UsBankAccountVerification.VerificationMethod.NetworkCheck
+          );
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.isNotNull(verification.verificationDeterminedAt);
+
+          done();
+        });
+      });
+    });
+
+    it("returns additional processor response for unsuccessful verifications", function (done) {
+      let customerParams = {};
+
+      gateway.customer.create(customerParams, (err, response) => {
+        let customerId = response.customer.id;
+
+        specHelper.generateValidUsBankAccountNonce(
+          "1000000005",
+          gateway,
+          function (nonce) {
+            let paymentMethodParams = {
+              customerId,
+              paymentMethodNonce: nonce,
+              options: {
+                verificationMerchantAccountId:
+                  MerchantAccountTest.AnotherUsBankMerchantAccount,
+                usBankAccountVerificationMethod:
+                  UsBankAccountVerification.VerificationMethod.NetworkCheck,
+              },
+            };
+
+            gateway.paymentMethod.create(
+              paymentMethodParams,
+              (err, response) => {
+                assert.isNull(err);
+
+                let usBankAccount = response.usBankAccount;
+
+                assert.isFalse(usBankAccount.verified);
+                assert.equal(usBankAccount.last4, "0005");
+                assert.equal(usBankAccount.accountType, "checking");
+                assert.equal(usBankAccount.accountHolderName, "Dan Schulman");
+                assert.match(usBankAccount.bankName, /CHASE/);
+                assert.equal(usBankAccount.routingNumber, "021000021");
+                assert.equal(usBankAccount.ownershipType, "personal");
+
+                let verification = usBankAccount.verifications[0];
+
+                assert.equal(
+                  verification.verificationMethod,
+                  UsBankAccountVerification.VerificationMethod.NetworkCheck
+                );
+                assert.equal(verification.processorResponseCode, "2061");
+                assert.equal(
+                  verification.additionalProcessorResponse,
+                  "Invalid routing number"
+                );
+                assert.isNotNull(verification.verificationDeterminedAt);
+
+                done();
+              }
+            );
+          }
+        );
+      });
+    });
+  });
+
   describe("confirmMicroTransferAmounts", function () {
     let gateway = specHelper.merchant2Gateway;
 

@@ -3211,6 +3211,102 @@ describe("TransactionGateway", function () {
         }))
     );
 
+    context("with Meta Checkout Card", function () {
+      it("returns MetaCheckoutCard for payment_instrument", function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.MetaCheckoutCard,
+            amount: "100.00",
+          };
+
+          specHelper.defaultGateway.transaction.sale(
+            transactionParams,
+            function (err, response) {
+              assert.isNull(err);
+
+              assert.isTrue(response.success);
+              let transaction = response.transaction;
+
+              assert.equal(
+                transaction.paymentInstrumentType,
+                PaymentInstrumentTypes.MetaCheckoutCard
+              );
+
+              let details = transaction.metaCheckoutCard;
+
+              assert.equal(details.bin, "401288");
+              assert.equal(details.last4, "1881");
+              assert.equal(details.cardType, "Visa");
+              assert.equal(details.expirationMonth, "12");
+              assert.equal(details.expirationYear, "2024");
+              assert.equal(details.customerLocation, "US");
+              assert.equal(
+                details.cardholderName,
+                "Meta Checkout Card Cardholder"
+              );
+              assert.equal(
+                details.imageUrl,
+                "https://assets.braintreegateway.com/payment_method_logo/visa.png?environment=development"
+              );
+              assert.equal(details.isNetworkTokenized, false);
+              assert.equal(details.containerId, "container123");
+
+              done();
+            }
+          );
+        });
+      });
+    });
+
+    context("with Meta Checkout Token", function () {
+      it("returns MetaCheckoutToken for payment_instrument", function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            paymentMethodNonce: Nonces.MetaCheckoutToken,
+            amount: "100.00",
+          };
+
+          specHelper.defaultGateway.transaction.sale(
+            transactionParams,
+            function (err, response) {
+              assert.isNull(err);
+
+              assert.isTrue(response.success);
+              let transaction = response.transaction;
+
+              assert.equal(
+                transaction.paymentInstrumentType,
+                PaymentInstrumentTypes.MetaCheckoutToken
+              );
+
+              let details = transaction.metaCheckoutToken;
+
+              assert.equal(details.bin, "401288");
+              assert.equal(details.last4, "1881");
+              assert.equal(details.cardType, "Visa");
+              assert.equal(details.expirationMonth, "12");
+              assert.equal(details.expirationYear, "2024");
+              assert.equal(details.customerLocation, "US");
+              assert.equal(
+                details.cardholderName,
+                "Meta Checkout Token Cardholder"
+              );
+              assert.equal(
+                details.imageUrl,
+                "https://assets.braintreegateway.com/payment_method_logo/visa.png?environment=development"
+              );
+              assert.equal(details.isNetworkTokenized, true);
+              assert.equal(details.containerId, "container123");
+              assert.equal(details.ecommerceIndicator, "07");
+              assert.equal(details.cryptogram, "AlhlvxmN2ZKuAAESNFZ4GoABFA==");
+
+              done();
+            }
+          );
+        });
+      });
+    });
+
     context("with SEPA Direct Debit account", function () {
       it("returns SepaDirectDebitAccount for payment_instrument", function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
@@ -5033,6 +5129,8 @@ describe("TransactionGateway", function () {
         industry: {
           industryType: Transaction.IndustryData.TravelAndFlight,
           data: {
+            countryCode: "US",
+            dateOfBirth: "2012/12/12",
             passengerFirstName: "John",
             passengerLastName: "Doe",
             passengerMiddleInitial: "M",
@@ -6967,6 +7065,171 @@ describe("TransactionGateway", function () {
         );
       }));
 
+    it("successfully submits a transaction for settlement with travel flight industry data", (done) =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        let paymentMethodParams = {
+          customerId: response.customer.id,
+          paymentMethodNonce: Nonces.PayPalBillingAgreement,
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(
+          paymentMethodParams,
+          function (err, response) {
+            let transactionParams = {
+              amount: "5.00",
+              paymentMethodToken: response.paymentMethod.token,
+            };
+
+            let optionsParams = {
+              industry: {
+                industryType: Transaction.IndustryData.TravelAndFlight,
+                data: {
+                  countryCode: "US",
+                  dateOfBirth: "2012/12/12",
+                  passengerFirstName: "John",
+                  passengerLastName: "Doe",
+                  passengerMiddleInitial: "M",
+                  passengerTitle: "Mr.",
+                  issuedDate: "2018-01-01",
+                  travelAgencyName: "Expedia",
+                  travelAgencyCode: "12345678",
+                  ticketNumber: "ticket-number",
+                  issuingCarrierCode: "AA",
+                  customerCode: "customer-code",
+                  fareAmount: "70.00",
+                  feeAmount: "10.00",
+                  taxAmount: "20.00",
+                  restrictedTicket: false,
+                  legs: [
+                    {
+                      conjunctionTicket: "CJ0001",
+                      exchangeTicket: "ET0001",
+                      couponNumber: "1",
+                      serviceClass: "Y",
+                      carrierCode: "AA",
+                      fareBasisCode: "W",
+                      flightNumber: "AA100",
+                      departureDate: "2018-01-02",
+                      departureAirportCode: "MDW",
+                      departureTime: "08:00",
+                      arrivalAirportCode: "ATX",
+                      arrivalTime: "10:00",
+                      stopoverPermitted: false,
+                      fareAmount: "35.00",
+                      feeAmount: "5.00",
+                      taxAmount: "10.00",
+                      endorsementOrRestrictions: "NOT REFUNDABLE",
+                    },
+                    {
+                      conjunctionTicket: "CJ0002",
+                      exchangeTicket: "ET0002",
+                      couponNumber: "1",
+                      serviceClass: "Y",
+                      carrierCode: "AA",
+                      fareBasisCode: "W",
+                      flightNumber: "AA200",
+                      departureDate: "2018-01-03",
+                      departureAirportCode: "ATX",
+                      departureTime: "12:00",
+                      arrivalAirportCode: "MDW",
+                      arrivalTime: "14:00",
+                      stopoverPermitted: false,
+                      fareAmount: "35.00",
+                      feeAmount: "5.00",
+                      taxAmount: "10.00",
+                      endorsementOrRestrictions: "NOT REFUNDABLE",
+                    },
+                  ],
+                },
+              },
+            };
+
+            specHelper.defaultGateway.transaction.sale(
+              transactionParams,
+              (err, response) =>
+                specHelper.defaultGateway.transaction.submitForSettlement(
+                  response.transaction.id,
+                  "5.00",
+                  optionsParams,
+                  function (err, response) {
+                    assert.isNull(err);
+                    assert.isTrue(response.success);
+                    assert.equal(response.transaction.status, "settling");
+                    assert.equal(response.transaction.amount, "5.00");
+
+                    done();
+                  }
+                )
+            );
+          }
+        );
+      }));
+
+    it("fails with a validation error when travel flight industry data is invalid", (done) =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        let paymentMethodParams = {
+          customerId: response.customer.id,
+          paymentMethodNonce: Nonces.PayPalBillingAgreement,
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(
+          paymentMethodParams,
+          function (err, response) {
+            let transactionParams = {
+              amount: "5.00",
+              paymentMethodToken: response.paymentMethod.token,
+            };
+
+            let optionsParams = {
+              industry: {
+                industryType: Transaction.IndustryData.TravelAndFlight,
+                data: {
+                  fareAmount: "-1.23",
+                  legs: [
+                    {
+                      fareAmount: "-1.23",
+                    },
+                  ],
+                },
+              },
+            };
+
+            specHelper.defaultGateway.transaction.sale(
+              transactionParams,
+              (err, response) =>
+                specHelper.defaultGateway.transaction.submitForSettlement(
+                  response.transaction.id,
+                  "5.00",
+                  optionsParams,
+                  function (err, response) {
+                    assert.isFalse(response.success, "response had no errors");
+                    assert.equal(
+                      response.errors
+                        .for("transaction")
+                        .for("industry")
+                        .on("fareAmount")[0].code,
+                      ValidationErrorCodes.Transaction.IndustryData.TravelFlight
+                        .FareAmountCannotBeNegative
+                    );
+                    assert.equal(
+                      response.errors
+                        .for("transaction")
+                        .for("industry")
+                        .for("legs")
+                        .for("index0")
+                        .on("fareAmount")[0].code,
+                      ValidationErrorCodes.Transaction.IndustryData.Leg
+                        .TravelFlight.FareAmountCannotBeNegative
+                    );
+
+                    done();
+                  }
+                )
+            );
+          }
+        );
+      }));
+
     it("allows submitting for a partial amount", function (done) {
       let transactionParams = {
         amount: "5.00",
@@ -7979,6 +8242,171 @@ describe("TransactionGateway", function () {
           )
       );
     });
+
+    it("successfully submits a transaction for partial settlement with travel flight industry data", (done) =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        let paymentMethodParams = {
+          customerId: response.customer.id,
+          paymentMethodNonce: Nonces.PayPalBillingAgreement,
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(
+          paymentMethodParams,
+          function (err, response) {
+            let transactionParams = {
+              amount: "5.00",
+              paymentMethodToken: response.paymentMethod.token,
+            };
+
+            let optionsParams = {
+              industry: {
+                industryType: Transaction.IndustryData.TravelAndFlight,
+                data: {
+                  countryCode: "US",
+                  dateOfBirth: "2012/12/12",
+                  passengerFirstName: "John",
+                  passengerLastName: "Doe",
+                  passengerMiddleInitial: "M",
+                  passengerTitle: "Mr.",
+                  issuedDate: "2018-01-01",
+                  travelAgencyName: "Expedia",
+                  travelAgencyCode: "12345678",
+                  ticketNumber: "ticket-number",
+                  issuingCarrierCode: "AA",
+                  customerCode: "customer-code",
+                  fareAmount: "70.00",
+                  feeAmount: "10.00",
+                  taxAmount: "20.00",
+                  restrictedTicket: false,
+                  legs: [
+                    {
+                      conjunctionTicket: "CJ0001",
+                      exchangeTicket: "ET0001",
+                      couponNumber: "1",
+                      serviceClass: "Y",
+                      carrierCode: "AA",
+                      fareBasisCode: "W",
+                      flightNumber: "AA100",
+                      departureDate: "2018-01-02",
+                      departureAirportCode: "MDW",
+                      departureTime: "08:00",
+                      arrivalAirportCode: "ATX",
+                      arrivalTime: "10:00",
+                      stopoverPermitted: false,
+                      fareAmount: "35.00",
+                      feeAmount: "5.00",
+                      taxAmount: "10.00",
+                      endorsementOrRestrictions: "NOT REFUNDABLE",
+                    },
+                    {
+                      conjunctionTicket: "CJ0002",
+                      exchangeTicket: "ET0002",
+                      couponNumber: "1",
+                      serviceClass: "Y",
+                      carrierCode: "AA",
+                      fareBasisCode: "W",
+                      flightNumber: "AA200",
+                      departureDate: "2018-01-03",
+                      departureAirportCode: "ATX",
+                      departureTime: "12:00",
+                      arrivalAirportCode: "MDW",
+                      arrivalTime: "14:00",
+                      stopoverPermitted: false,
+                      fareAmount: "35.00",
+                      feeAmount: "5.00",
+                      taxAmount: "10.00",
+                      endorsementOrRestrictions: "NOT REFUNDABLE",
+                    },
+                  ],
+                },
+              },
+            };
+
+            specHelper.defaultGateway.transaction.sale(
+              transactionParams,
+              (err, response) =>
+                specHelper.defaultGateway.transaction.submitForPartialSettlement(
+                  response.transaction.id,
+                  "3.00",
+                  optionsParams,
+                  function (err, response) {
+                    assert.isNull(err);
+                    assert.isTrue(response.success);
+                    assert.equal(response.transaction.status, "settling");
+                    assert.equal(response.transaction.amount, "3.00");
+
+                    done();
+                  }
+                )
+            );
+          }
+        );
+      }));
+
+    it("fails with a validation error when travel flight industry data is invalid", (done) =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        let paymentMethodParams = {
+          customerId: response.customer.id,
+          paymentMethodNonce: Nonces.PayPalBillingAgreement,
+        };
+
+        specHelper.defaultGateway.paymentMethod.create(
+          paymentMethodParams,
+          function (err, response) {
+            let transactionParams = {
+              amount: "5.00",
+              paymentMethodToken: response.paymentMethod.token,
+            };
+
+            let optionsParams = {
+              industry: {
+                industryType: Transaction.IndustryData.TravelAndFlight,
+                data: {
+                  fareAmount: "-1.23",
+                  legs: [
+                    {
+                      fareAmount: "-1.23",
+                    },
+                  ],
+                },
+              },
+            };
+
+            specHelper.defaultGateway.transaction.sale(
+              transactionParams,
+              (err, response) =>
+                specHelper.defaultGateway.transaction.submitForPartialSettlement(
+                  response.transaction.id,
+                  "3.00",
+                  optionsParams,
+                  function (err, response) {
+                    assert.isFalse(response.success, "response had no errors");
+                    assert.equal(
+                      response.errors
+                        .for("transaction")
+                        .for("industry")
+                        .on("fareAmount")[0].code,
+                      ValidationErrorCodes.Transaction.IndustryData.TravelFlight
+                        .FareAmountCannotBeNegative
+                    );
+                    assert.equal(
+                      response.errors
+                        .for("transaction")
+                        .for("industry")
+                        .for("legs")
+                        .for("index0")
+                        .on("fareAmount")[0].code,
+                      ValidationErrorCodes.Transaction.IndustryData.Leg
+                        .TravelFlight.FareAmountCannotBeNegative
+                    );
+
+                    done();
+                  }
+                )
+            );
+          }
+        );
+      }));
 
     it("handles validation errors", function (done) {
       let transactionParams = {

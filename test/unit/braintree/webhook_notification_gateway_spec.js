@@ -1585,6 +1585,22 @@ describe("WebhookNotificationGateway", function () {
           let enrichedCustomerData =
             paymentMethodCustomerDataUpdatedMetadata.enrichedCustomerData;
 
+          let billingAddress = {
+            streetAddress: "Billing Street Address",
+            extendedAddress: "Billing Extended Address",
+            locality: "Locality",
+            region: "Region",
+            postalCode: "Postal Code",
+          };
+
+          let shippingAddress = {
+            streetAddress: "Shipping Street Address",
+            extendedAddress: "Shipping Extended Address",
+            locality: "Locality",
+            region: "Region",
+            postalCode: "Postal Code",
+          };
+
           assert.equal("username", enrichedCustomerData.fieldsUpdated[0]);
 
           let profileData = enrichedCustomerData.profileData;
@@ -1594,6 +1610,8 @@ describe("WebhookNotificationGateway", function () {
           assert.equal("venmo_username", profileData.username);
           assert.equal("1231231234", profileData.phoneNumber);
           assert.equal("john.doe@paypal.com", profileData.email);
+          assert.deepEqual(billingAddress, profileData.billingAddress);
+          assert.deepEqual(shippingAddress, profileData.shippingAddress);
 
           done();
         }

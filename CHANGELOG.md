@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.19.0
+
+- Add `dateOfBirth` and `countryCode` to `industry_data`
+- Add `verificationAddOns` to `PaymentMethod` create options for ACH `NetworkCheck`
+- Add `MetaCheckoutCard` and `MetaCheckoutToken` to Transaction object
+
 ## 3.18.0
 
 - Add `arrivalDate` and `ticketIssuerAddress` to `Transaction.sale` request
