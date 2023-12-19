@@ -336,6 +336,75 @@ describe("CreditCardVerificationGateway", function () {
       });
     });
 
+    it("creates a verification with billingAddress", function (done) {
+      let params = {
+        creditCard: {
+          billingAddress: {
+            company: "FinTech",
+            countryCodeAlpha2: "US",
+            countryCodeAlpha3: "USA",
+            countryCodeNumeric: "840",
+            countryName: "United States",
+            extendedAddress: "C Suite",
+            firstName: "John",
+            lastName: "Smith",
+            locality: "San Jose",
+            postalCode: "95131",
+            region: "CA",
+            streetAddress: "2211 North First Street",
+          },
+          cardholderName: "John Smith",
+          number: "4111111111111111",
+          expirationDate: "05/2029",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+
+          done();
+        }
+      );
+    });
+
+    it("creates a verification with externalVault", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4111111111111111",
+          expirationDate: "05/2029",
+        },
+        externalVault: {
+          status: "will_vault",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+
+          done();
+        }
+      );
+    });
+
     it("supports intendedTransactionSource", function (done) {
       let params = {
         creditCard: {
@@ -399,6 +468,36 @@ describe("CreditCardVerificationGateway", function () {
               done();
             }
           );
+        }
+      );
+    });
+
+    it("creates a verification with riskData", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4111111111111111",
+          expirationDate: "05/2029",
+        },
+        riskData: {
+          customerBrowser: "Edge",
+          customerIp: "192.168.0.1",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+
+          done();
         }
       );
     });

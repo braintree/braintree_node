@@ -676,6 +676,7 @@ describe("CustomerGateway", function () {
                         postalCode: "60646",
                         region: "IL",
                         streetAddress: "123 Fake St",
+                        phoneNumber: "312-123-4567",
                       },
                     },
                   },
@@ -874,6 +875,7 @@ describe("CustomerGateway", function () {
             region: "IL",
             postalCode: "60607",
             countryName: "United States of America",
+            phoneNumber: "312-123-4567",
           },
         },
       };
@@ -901,6 +903,7 @@ describe("CustomerGateway", function () {
           assert.equal(billingAddress.region, "IL");
           assert.equal(billingAddress.postalCode, "60607");
           assert.equal(billingAddress.countryName, "United States of America");
+          assert.equal(billingAddress.phoneNumber, "312-123-4567");
 
           done();
         }
@@ -1072,6 +1075,7 @@ describe("CustomerGateway", function () {
             locality: "Chicago",
             region: "IL",
             postalCode: "60607",
+            phoneNumber: "312-123-4567",
           },
         },
       };
@@ -1091,6 +1095,7 @@ describe("CustomerGateway", function () {
 
               assert.equal(billingAddress.streetAddress, "123 E Fake St");
               assert.equal(billingAddress.company, "");
+              assert.equal(billingAddress.phoneNumber, "312-123-4567");
 
               done();
             }
@@ -1112,6 +1117,7 @@ describe("CustomerGateway", function () {
             locality: "Chicago",
             region: "IL",
             postalCode: "60607",
+            phoneNumber: "312-123-4567",
           },
         },
       };
@@ -1226,6 +1232,7 @@ describe("CustomerGateway", function () {
               locality: "Chicago",
               region: "IL",
               postalCode: "60607",
+              phoneNumber: "312-123-4567",
             },
           },
         };
@@ -1266,6 +1273,7 @@ describe("CustomerGateway", function () {
               locality: "Chicago",
               region: "IL",
               postalCode: "60607",
+              phoneNumber: "312-123-4567",
             },
           },
         };
@@ -1750,6 +1758,7 @@ describe("CustomerGateway", function () {
               locality: "Chicago",
               region: "IL",
               postalCode: "60607",
+              phoneNumber: "312-123-4567",
             },
           },
         };
@@ -1773,6 +1782,7 @@ describe("CustomerGateway", function () {
             assert.equal(billingAddress.locality, "Chicago");
             assert.equal(billingAddress.region, "IL");
             assert.equal(billingAddress.postalCode, "60607");
+            assert.equal(billingAddress.phoneNumber, "312-123-4567");
             assert.equal(
               response.customer.addresses[0].streetAddress,
               "123 E Fake St"
@@ -1972,6 +1982,7 @@ describe("CustomerGateway", function () {
                             postalCode: "60646",
                             region: "IL",
                             streetAddress: "123 Fake St",
+                            phoneNumber: "312-123-4567",
                           },
                         },
                       },
@@ -2160,6 +2171,7 @@ describe("CustomerGateway", function () {
             billingAddress: {
               streetAddress: "123 New St",
               locality: "New City",
+              phoneNumber: "312-123-4567",
               options: {
                 updateExisting: true,
               },
@@ -2193,6 +2205,7 @@ describe("CustomerGateway", function () {
 
             assert.equal(billingAddress.streetAddress, "123 New St");
             assert.equal(billingAddress.locality, "New City");
+            assert.equal(billingAddress.phoneNumber, "312-123-4567");
 
             done();
           }

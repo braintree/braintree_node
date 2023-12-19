@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.20.0
+
+- Add support for `phoneNumber` params in `Customer.create` and `Transaction.sale` requests
+- Add parameters validation check for `CreditCardVerificationGateway` create request
+
 ## 3.19.0
 
 - Add `dateOfBirth` and `countryCode` to `industry_data`
