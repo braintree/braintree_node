@@ -1,6 +1,10 @@
 task :default => %w[test:unit test:integration]
 task :test => %w[test:unit test:integration]
 
+task :lint => [:npm_install] do
+  sh "npm run lint"
+end
+
 namespace :test do
 
   # Usage:
@@ -8,7 +12,7 @@ namespace :test do
   #   rake test:unit[config_spec]
   #   rake test:unit[config_spec,"can be configured with merchant credentials"]
   desc "Run unit tests"
-  task :unit, [:file_name, :test_name] => [:npm_install] do |task, args|
+  task :unit, [:file_name, :test_name] => [:lint] do |task, args|
     if args.file_name.nil?
       sh "npm test"
     elsif args.test_name.nil?
@@ -23,7 +27,7 @@ namespace :test do
   #   rake test:integration[plan_gateway_spec]
   #   rake test:integration[plan_gateway_spec,"gets all plans"]
   desc "Run integration tests"
-  task :integration, [:file_name, :test_name] => [:npm_install] do |task, args|
+  task :integration, [:file_name, :test_name] => [:lint] do |task, args|
     if args.file_name.nil?
       sh "npm run test:integration"
     elsif args.test_name.nil?

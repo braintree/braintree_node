@@ -8,5 +8,8 @@
   },
   "rules": {
     "no-shadow": 0
+  },
+  "parserOptions": {
+    "ecmaVersion": 8
   }
 }

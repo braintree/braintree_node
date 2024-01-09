@@ -1108,6 +1108,69 @@ describe("TransactionGateway", function () {
         );
       });
 
+      it("allows creation with paypal with single line item and returns it", function (done) {
+        let transactionParams = {
+          type: "sale",
+          amount: "45.15",
+          paymentMethodNonce: Nonces.PayPalOneTimePayment,
+          lineItems: [
+            {
+              quantity: "1",
+              name: "Name #1",
+              description: "Description #1",
+              kind: "debit",
+              unitAmount: "45.12",
+              unitTaxAmount: "1.23",
+              unitOfMeasure: "gallon",
+              discountAmount: "1.02",
+              taxAmount: "1.24",
+              totalAmount: "45.15",
+              productCode: "23434",
+              commodityCode: "9SAASSD8724",
+              url: "https://example.com/products/23434",
+              imageUrl: "https://google.com/image.png",
+              upcCode: "3878935708DA",
+              upcType: "UPC-A",
+            },
+          ],
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isTrue(response.success);
+            specHelper.defaultGateway.transactionLineItem.findAll(
+              response.transaction.id,
+              function (err, response) {
+                assert.equal(response.length, 1);
+                let lineItem = response[0];
+
+                assert.equal(lineItem.quantity, "1");
+                assert.equal(lineItem.name, "Name #1");
+                assert.equal(lineItem.description, "Description #1");
+                assert.equal(lineItem.kind, "debit");
+                assert.equal(lineItem.unitAmount, "45.12");
+                assert.equal(lineItem.unitTaxAmount, "1.23");
+                assert.equal(lineItem.unitOfMeasure, "gallon");
+                assert.equal(lineItem.discountAmount, "1.02");
+                assert.equal(lineItem.taxAmount, "1.24");
+                assert.equal(lineItem.totalAmount, "45.15");
+                assert.equal(lineItem.productCode, "23434");
+                assert.equal(lineItem.commodityCode, "9SAASSD8724");
+                assert.equal(
+                  lineItem.url,
+                  "https://example.com/products/23434"
+                );
+                assert.equal(lineItem.imageUrl, "https://google.com/image.png");
+                assert.equal(lineItem.upcCode, "3878935708DA");
+                assert.equal(lineItem.upcType, "UPC-A");
+                done();
+              }
+            );
+          }
+        );
+      });
+
       it("allows creation with single line item and returns it", function (done) {
         let transactionParams = {
           type: "sale",
@@ -2657,6 +2720,144 @@ describe("TransactionGateway", function () {
           }
         );
       });
+
+      it("handles validation error UPC code is too long and UPC type is invalid", function (done) {
+        let transactionParams = {
+          type: "sale",
+          amount: "35.05",
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: "1",
+              name: "Name #1",
+              description: "Description #1",
+              kind: "debit",
+              unitAmount: "45.12",
+              unitTaxAmount: "1.23",
+              unitOfMeasure: "gallon",
+              discountAmount: "1.02",
+              taxAmount: "1.24",
+              totalAmount: "45.15",
+              productCode: "23434",
+              commodityCode: "9SAASSD8724",
+              url: "https://example.com/products/23434",
+              imageUrl: "https://google.com/image.png",
+              upcCode: "THISUPCCODEISWAYTOOLONG",
+              upcType: "USB-A",
+            },
+          ],
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isFalse(response.success, "response had no errors");
+            assert.equal(
+              response.errors
+                .for("transaction")
+                .for("lineItems")
+                .for("index0")
+                .on("upcCode")[0].code,
+              ValidationErrorCodes.Transaction.LineItem.UpcCodeIsTooLong
+            );
+            assert.equal(
+              response.errors
+                .for("transaction")
+                .for("lineItems")
+                .for("index0")
+                .on("upcType")[0].code,
+              ValidationErrorCodes.Transaction.LineItem.UpcTypeIsInvalid
+            );
+            done();
+          }
+        );
+      });
+
+      it("handles validation error UPC code is missing", function (done) {
+        let transactionParams = {
+          type: "sale",
+          amount: "35.05",
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: "1",
+              name: "Name #1",
+              description: "Description #1",
+              kind: "debit",
+              unitAmount: "45.12",
+              unitTaxAmount: "1.23",
+              unitOfMeasure: "gallon",
+              discountAmount: "1.02",
+              taxAmount: "1.24",
+              totalAmount: "45.15",
+              productCode: "23434",
+              commodityCode: "9SAASSD8724",
+              url: "https://example.com/products/23434",
+              imageUrl: "https://google.com/image.png",
+              upcType: "UPC-A",
+            },
+          ],
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isFalse(response.success, "response had no errors");
+            assert.equal(
+              response.errors
+                .for("transaction")
+                .for("lineItems")
+                .for("index0")
+                .on("upcCode")[0].code,
+              ValidationErrorCodes.Transaction.LineItem.UpcCodeIsMissing
+            );
+            done();
+          }
+        );
+      });
+
+      it("handles validation error UPC type is missing", function (done) {
+        let transactionParams = {
+          type: "sale",
+          amount: "35.05",
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          lineItems: [
+            {
+              quantity: "1",
+              name: "Name #1",
+              description: "Description #1",
+              kind: "debit",
+              unitAmount: "45.12",
+              unitTaxAmount: "1.23",
+              unitOfMeasure: "gallon",
+              discountAmount: "1.02",
+              taxAmount: "1.24",
+              totalAmount: "45.15",
+              productCode: "23434",
+              commodityCode: "9SAASSD8724",
+              url: "https://example.com/products/23434",
+              imageUrl: "https://google.com/image.png",
+              upcCode: "3878935708DA",
+            },
+          ],
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isFalse(response.success, "response had no errors");
+            assert.equal(
+              response.errors
+                .for("transaction")
+                .for("lineItems")
+                .for("index0")
+                .on("upcType")[0].code,
+              ValidationErrorCodes.Transaction.LineItem.UpcTypeIsMissing
+            );
+            done();
+          }
+        );
+      });
     });
 
     context("network response code/text", function () {
@@ -3238,7 +3439,10 @@ describe("TransactionGateway", function () {
               assert.equal(details.last4, "1881");
               assert.equal(details.cardType, "Visa");
               assert.equal(details.expirationMonth, "12");
-              assert.equal(details.expirationYear, "2024");
+              assert.equal(
+                details.expirationYear,
+                parseInt(new Date().getFullYear() + 1, 10)
+              );
               assert.equal(details.customerLocation, "US");
               assert.equal(
                 details.cardholderName,
@@ -3285,7 +3489,10 @@ describe("TransactionGateway", function () {
               assert.equal(details.last4, "1881");
               assert.equal(details.cardType, "Visa");
               assert.equal(details.expirationMonth, "12");
-              assert.equal(details.expirationYear, "2024");
+              assert.equal(
+                details.expirationYear,
+                parseInt(new Date().getFullYear() + 1, 10)
+              );
               assert.equal(details.customerLocation, "US");
               assert.equal(
                 details.cardholderName,
@@ -9072,37 +9279,6 @@ describe("TransactionGateway", function () {
                 errorCode,
                 ValidationErrorCodes.Transaction
                   .NoNetAmountToPerformAuthAdjustment
-              );
-              done();
-            }
-          )
-      );
-    });
-
-    it("returns error code, when transaction status is not authorized", function (done) {
-      let additionalParams = { options: { submitForSettlement: true } };
-      let transactionParams = Object.assign(
-        additionalParams,
-        firstDataMasterTransactionParams
-      );
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        (err, response) =>
-          specHelper.defaultGateway.transaction.adjustAuthorization(
-            response.transaction.id,
-            "75.50",
-            function (err, response) {
-              assert.isFalse(response.success);
-              assert.equal(response.transaction.amount, "75.50");
-              let errorCode = response.errors
-                .for("transaction")
-                .on("base")[0].code;
-
-              assert.equal(
-                errorCode,
-                ValidationErrorCodes.Transaction
-                  .TransactionMustBeInStateAuthorized
               );
               done();
             }

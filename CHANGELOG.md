@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.21.0
+
+- Add `packageTracking` method to `transaction_gateway` to make request to add tracking information to transactions
+- Add `Packages` to Transaction object
+- Add `upcCode`, `upcType`, and `imageUrl` to `lineItems` in `transaction_gateway`
+- Add `process_debit_as_credit` to `credit_card` field in `transaction_gateway` for transaction `options`
+
 ## 3.20.0
 
 - Add support for `phoneNumber` params in `Customer.create` and `Transaction.sale` requests

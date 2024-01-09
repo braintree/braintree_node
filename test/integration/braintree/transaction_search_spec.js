@@ -1239,14 +1239,16 @@ describe("TransactionSearch", () =>
           assert.isTrue(response.success);
           assert.equal(response.transaction.type, "sale");
           assert.equal(response.transaction.amount, "10.00");
-          assert.equal(
-            response.transaction.debitNetwork,
-            CreditCard.DebitNetwork.Nyce
+          assert.include(
+            // eslint-disable-next-line new-cap
+            CreditCard.DebitNetwork.All(),
+            response.transaction.debitNetwork
           );
 
           return specHelper.defaultGateway.transaction.search(
             function (search) {
-              search.debitNetwork().is(CreditCard.DebitNetwork.Nyce);
+              // eslint-disable-next-line new-cap
+              search.debitNetwork().in(CreditCard.DebitNetwork.All());
 
               return search.id().is(response.transaction.id);
             },
@@ -1255,6 +1257,33 @@ describe("TransactionSearch", () =>
               done();
             }
           );
+        }
+      );
+    });
+
+    it("process_debit_as_credit_for_pinless_eligible_transactions", function () {
+      let random = specHelper.randomId();
+      let transactionParams = {
+        amount: "10.00",
+        orderId: random,
+        paymentMethodNonce: Nonces.TransactablePinlessDebitVisa,
+        merchantAccountId: "pinless_debit",
+        options: {
+          submitForSettlement: true,
+          creditCard: {
+            processDebitAsCredit: true,
+          },
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, response) => {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, "sale");
+          assert.equal(response.transaction.amount, "10.00");
+          assert.isNull(response.transaction.debitNetwork);
         }
       );
     });

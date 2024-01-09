@@ -5,3 +5,6 @@ console: build
 
 build:
 	docker build -t braintree-node .
+
+lint: build
+	docker run -i -v="$(PWD):/braintree-node" --net="host" braintree-node /bin/bash -l -c "npm install;npm run lint"
