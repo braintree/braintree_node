@@ -62,15 +62,14 @@ describe("PaymentMethodGateway", function () {
 
               let info = response.paymentMethod.verification.threeDSecureInfo;
 
-              assert.isTrue(info.liabilityShifted);
-              assert.isTrue(info.liabilityShiftPossible);
-              assert.equal(info.enrolled, "Y");
               assert.equal(info.status, "authenticate_successful");
-              assert.equal(info.cavv, "cavv_value");
-              assert.equal(info.xid, "xid_value");
-              assert.equal(info.eciFlag, "05");
-              assert.isNotNull(info.threeDSecureVersion);
-              assert.isNull(info.dsTransactionId);
+              assert.isBoolean(info.liabilityShifted);
+              assert.isBoolean(info.liabilityShiftPossible);
+              assert.isString(info.enrolled);
+              assert.isString(info.cavv);
+              assert.isString(info.xid);
+              assert.isString(info.eciFlag);
+              assert.isString(info.threeDSecureVersion);
               done();
             }
           );

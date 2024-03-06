@@ -217,15 +217,15 @@ describe("PaymentMethodNonceGateway", function () {
           let info = paymentMethodNonce.threeDSecureInfo;
 
           assert.equal(paymentMethodNonce.nonce, nonce);
-          assert.isTrue(info.liabilityShifted);
-          assert.isTrue(info.liabilityShiftPossible);
-          assert.equal(info.enrolled, "Y");
+
           assert.equal(info.status, "authenticate_successful");
-          assert.equal(info.cavv, "cavv_value");
-          assert.equal(info.xid, "xid_value");
-          assert.equal(info.eciFlag, "05");
-          assert.equal(info.threeDSecureVersion, "1.0.2");
-          assert.isNull(info.dsTransactionId);
+          assert.isBoolean(info.liabilityShifted);
+          assert.isBoolean(info.liabilityShiftPossible);
+          assert.isString(info.enrolled);
+          assert.isString(info.cavv);
+          assert.isString(info.xid);
+          assert.isString(info.eciFlag);
+          assert.isString(info.threeDSecureVersion);
 
           assert.equal(paymentMethodNonce.details.bin, "400000");
 

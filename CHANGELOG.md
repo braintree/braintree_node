@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.22.0
+
+- Add `UnderReview` to `Dispute.Status`
+- Add `DisputeUnderReview` to `WebhookNotification.Kind`
+
 ## 3.21.0
 
 - Add `packageTracking` method to `transaction_gateway` to make request to add tracking information to transactions

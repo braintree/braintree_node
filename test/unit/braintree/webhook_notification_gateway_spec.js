@@ -500,6 +500,37 @@ describe("WebhookNotificationGateway", function () {
       );
     });
 
+    it("returns a parsable signature and payload for dispute under_review", function (done) {
+      let notification =
+        specHelper.defaultGateway.webhookTesting.sampleNotification(
+          WebhookNotification.Kind.DisputeUnderReview,
+          "my_id"
+        );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(
+        bt_signature,
+        bt_payload,
+        function (err, webhookNotification) {
+          assert.equal(
+            webhookNotification.kind,
+            WebhookNotification.Kind.DisputeUnderReview
+          );
+          assert.equal(
+            Dispute.Status.UnderReview,
+            webhookNotification.dispute.status
+          );
+          assert.equal(
+            Dispute.Kind.Chargeback,
+            webhookNotification.dispute.kind
+          );
+          assert.equal("2014-03-28", webhookNotification.dispute.dateOpened);
+          done();
+        }
+      );
+    });
+
     it("returns a parsable signature and payload for dispute opened", function (done) {
       let notification =
         specHelper.defaultGateway.webhookTesting.sampleNotification(
