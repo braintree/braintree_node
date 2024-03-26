@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.23.0
+
+- Add `domains` parameter support to `ClientToken.generate`
+- Refactor key validation in `ClientTokenGateway`
+
 ## 3.22.0
 
 - Add `UnderReview` to `Dispute.Status`

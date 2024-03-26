@@ -1,6 +1,6 @@
 {
   "name": "braintree",
-  "version": "3.22.0",
+  "version": "3.23.0",
   "description": "A library for server-side integrating with Braintree.",
   "keywords": [
     "braintree",

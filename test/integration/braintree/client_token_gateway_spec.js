@@ -261,6 +261,70 @@ describe("ClientTokenGateway", function () {
     );
   });
 
+  it("can pass domains", function (done) {
+    let expectedDomains = ["example.com"];
+    let clientTokenParams = {
+      domains: expectedDomains,
+    };
+
+    specHelper.defaultGateway.clientToken.generate(
+      clientTokenParams,
+      function (err, result) {
+        assert.isTrue(result.success);
+        let clientToken = JSON.parse(
+          specHelper.decodeClientToken(result.clientToken)
+        );
+
+        let authFingerprintPayload = Buffer.from(
+          clientToken.authorizationFingerprint,
+          "base64"
+        ).toString("utf8");
+
+        expectedDomains.forEach((domain) => {
+          assert.isTrue(authFingerprintPayload.includes(domain));
+        });
+        done();
+      }
+    );
+  });
+
+  it("calls callback with an error when an invalid domain is supplied", (done) =>
+    specHelper.defaultGateway.clientToken.generate(
+      {
+        domains: ["example"],
+      },
+      function (err, result) {
+        assert.isFalse(result.success);
+        assert.equal(
+          result.message,
+          "Client token domains must be valid domain names (RFC 1035), e.g. example.com"
+        );
+        done();
+      }
+    ));
+
+  it("calls callback with an error when too many domains are supplied", (done) =>
+    specHelper.defaultGateway.clientToken.generate(
+      {
+        domains: [
+          "example1.com",
+          "example2.com",
+          "example3.com",
+          "example4.com",
+          "example5.com",
+          "example6.com",
+        ],
+      },
+      function (err, result) {
+        assert.isFalse(result.success);
+        assert.equal(
+          result.message,
+          "Cannot specify more than 5 client token domains"
+        );
+        done();
+      }
+    ));
+
   it("calls callback with an error when an invalid parameter is supplied", (done) =>
     specHelper.defaultGateway.clientToken.generate(
       {
