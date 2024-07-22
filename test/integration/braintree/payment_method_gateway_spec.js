@@ -946,6 +946,10 @@ describe("PaymentMethodGateway", function () {
                     customerId,
                     billingAddress: {
                       streetAddress: "123 Abc Way",
+                      internationalPhone: {
+                        countryCode: "1",
+                        nationalNumber: "3121234567",
+                      },
                     },
                   };
 
@@ -968,6 +972,16 @@ describe("PaymentMethodGateway", function () {
                           assert.equal(
                             creditCard.billingAddress.streetAddress,
                             "123 Abc Way"
+                          );
+                          assert.equal(
+                            response.creditCard.billingAddress
+                              .internationalPhone.countryCode,
+                            "1"
+                          );
+                          assert.equal(
+                            response.creditCard.billingAddress
+                              .internationalPhone.nationalNumber,
+                            "3121234567"
                           );
 
                           done();
@@ -2698,6 +2712,10 @@ describe("PaymentMethodGateway", function () {
                   let updateParams = {
                     billingAddress: {
                       region: "IL",
+                      internationalPhone: {
+                        countryCode: "1",
+                        nationalNumber: "3121234567",
+                      },
                     },
                   };
 
@@ -2712,6 +2730,16 @@ describe("PaymentMethodGateway", function () {
                       assert.equal(
                         updatedCreditCard.billingAddress.region,
                         "IL"
+                      );
+                      assert.equal(
+                        response.creditCard.billingAddress.internationalPhone
+                          .countryCode,
+                        "1"
+                      );
+                      assert.equal(
+                        response.creditCard.billingAddress.internationalPhone
+                          .nationalNumber,
+                        "3121234567"
                       );
                       assert.isNull(
                         updatedCreditCard.billingAddress.streetAddress

@@ -14,6 +14,10 @@ describe("AddressGateway", function () {
           region: "IL",
           postalCode: "60607",
           countryName: "United States of America",
+          internationalPhone: {
+            countryCode: "1",
+            nationalNumber: "3121234567",
+          },
         };
 
         specHelper.defaultGateway.address.create(
@@ -26,6 +30,11 @@ describe("AddressGateway", function () {
             assert.equal(response.address.locality, "Chicago");
             assert.equal(response.address.region, "IL");
             assert.equal(response.address.postalCode, "60607");
+            assert.equal(response.address.internationalPhone.countryCode, "1");
+            assert.equal(
+              response.address.internationalPhone.nationalNumber,
+              "3121234567"
+            );
             assert.equal(
               response.address.countryName,
               "United States of America"
@@ -205,6 +214,10 @@ describe("AddressGateway", function () {
                 region: "New State",
                 postalCode: "60630",
                 countryName: "United States of America",
+                internationalPhone: {
+                  countryCode: "1",
+                  nationalNumber: "3121234567",
+                },
               },
               function (err, response) {
                 assert.isNull(err);
@@ -214,6 +227,14 @@ describe("AddressGateway", function () {
                 assert.equal(response.address.locality, "New City");
                 assert.equal(response.address.region, "New State");
                 assert.equal(response.address.postalCode, "60630");
+                assert.equal(
+                  response.address.internationalPhone.countryCode,
+                  "1"
+                );
+                assert.equal(
+                  response.address.internationalPhone.nationalNumber,
+                  "3121234567"
+                );
                 assert.equal(
                   response.address.countryName,
                   "United States of America"

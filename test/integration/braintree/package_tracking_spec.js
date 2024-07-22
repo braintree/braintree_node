@@ -1,6 +1,7 @@
 "use strict";
 
 const { assert } = require("chai");
+let Nonces = require("../../../lib/braintree/test_values/nonces").Nonces;
 
 describe("package tracking", function () {
   it("returns validation error message from gateway api", async () => {
@@ -9,10 +10,7 @@ describe("package tracking", function () {
       options: {
         submitForSettlement: true,
       },
-      paypalAccount: {
-        payerId: "fake-payer-id",
-        paymentId: "fake-payment-id",
-      },
+      paymentMethodNonce: Nonces.PayPalOneTimePayment,
     };
 
     // carrier name missing
@@ -51,10 +49,7 @@ describe("package tracking", function () {
       options: {
         submitForSettlement: true,
       },
-      paypalAccount: {
-        payerId: "fake-payer-id",
-        paymentId: "fake-payment-id",
-      },
+      paymentMethodNonce: Nonces.PayPalOneTimePayment,
     };
 
     const firstPackage = {
@@ -132,5 +127,19 @@ describe("package tracking", function () {
     );
 
     assert.equal(2, Object.keys(findTransaction.packages).length);
+  });
+
+  it("successfully retrieves transactions with existing package tracking information", async () => {
+    const findTransaction = await specHelper.defaultGateway.transaction.find(
+      "package_tracking_tx"
+    );
+
+    const packages = findTransaction.packages;
+
+    assert.equal(2, Object.keys(packages).length);
+    assert.exists(packages[0].id);
+    assert.equal(packages[0].paypalTrackerId, "paypal_tracker_id_1");
+    assert.exists(packages[1].id);
+    assert.equal(packages[1].paypalTrackerId, "paypal_tracker_id_2");
   });
 });

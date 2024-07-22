@@ -190,6 +190,10 @@ describe("TransactionGateway", function () {
           postalCode: "60607",
           phoneNumber: "122-555-1237",
           countryName: "United States of America",
+          internationalPhone: {
+            countryCode: "1",
+            nationalNumber: "3121234567",
+          },
         },
         shipping: {
           streetAddress: "456 W Main St",
@@ -200,6 +204,10 @@ describe("TransactionGateway", function () {
           postalCode: "60103",
           countryName: "Mexico",
           shippingMethod: "electronic",
+          internationalPhone: {
+            countryCode: "1",
+            nationalNumber: "3121234567",
+          },
         },
       };
 
@@ -6195,6 +6203,68 @@ describe("TransactionGateway", function () {
         );
       });
     });
+
+    it("sends foreignRetailer when it is set to true in the request", function (done) {
+      let transactionParams = {
+        amount: "10.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/30",
+        },
+        foreignRetailer: true,
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.isTrue(response.transaction.foreignRetailer);
+          done();
+        }
+      );
+    });
+
+    it("skips sending foreignRetailer when it is set to false in the request", function (done) {
+      let transactionParams = {
+        amount: "10.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/30",
+        },
+        foreignRetailer: false,
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.isUndefined(response.transaction.foreignRetailer);
+          done();
+        }
+      );
+    });
+
+    it("skips sending foreignRetailer when it is not set in the request", function (done) {
+      let transactionParams = {
+        amount: "10.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/30",
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.isUndefined(response.transaction.foreignRetailer);
+          done();
+        }
+      );
+    });
   });
 
   describe("credit", function () {
@@ -8050,6 +8120,75 @@ describe("TransactionGateway", function () {
               done();
             }
           )
+      );
+    });
+
+    it("allows submitting with a final_capture indicator flag", function (done) {
+      let transactionParams = {
+        amount: "10.00",
+        creditCard: {
+          number: "5105105105105100",
+          expirationDate: "05/12",
+        },
+      };
+
+      let submitForPartialSettlementParams = {
+        finalCapture: true,
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, response) => {
+          assert.isTrue(response.success);
+          let authorizedTransaction = response.transaction;
+
+          specHelper.defaultGateway.transaction.submitForPartialSettlement(
+            authorizedTransaction.id,
+            "3.00",
+            function (err, response) {
+              assert.isTrue(response.success);
+              assert.equal(
+                response.transaction.status,
+                "submitted_for_settlement"
+              );
+              assert.equal(response.transaction.amount, "3.00");
+              specHelper.defaultGateway.transaction.find(
+                authorizedTransaction.id,
+                function (err, transaction) {
+                  assert.equal(transaction.status, "settlement_pending");
+                  assert.equal(
+                    1,
+                    transaction.partialSettlementTransactionIds.length
+                  );
+                }
+              );
+              specHelper.defaultGateway.transaction.submitForPartialSettlement(
+                authorizedTransaction.id,
+                "2.00",
+                submitForPartialSettlementParams,
+                function (err, response) {
+                  assert.isTrue(response.success);
+                  assert.equal(
+                    response.transaction.status,
+                    "submitted_for_settlement"
+                  );
+                  assert.equal(response.transaction.amount, "2.00");
+                  specHelper.defaultGateway.transaction.find(
+                    authorizedTransaction.id,
+                    function (err, transaction) {
+                      assert.equal(transaction.status, "settlement_pending");
+                      assert.equal(
+                        2,
+                        transaction.partialSettlementTransactionIds.length
+                      );
+                      done();
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }
       );
     });
 

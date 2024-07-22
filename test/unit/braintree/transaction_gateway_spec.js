@@ -58,3 +58,37 @@ describe("TransactionGateway", () =>
       });
     });
   }));
+
+describe("TransactionGateway", () =>
+  describe("submitForPartialSettlement", function () {
+    let fakeGateway = {
+      config: {
+        baseMerchantPath() {
+          return "";
+        },
+      },
+      http: {
+        post(url, params) {
+          return Promise.resolve(params);
+        },
+      },
+    };
+
+    it("submitForPartialSettlement with finalCapture flag", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+      let options = {
+        finalCapture: true,
+      };
+
+      transactionGateway.submitForPartialSettlement(
+        "test",
+        "5.00",
+        options,
+        (err, params) => {
+          assert.notExists(err);
+          assert.isTrue(params.transaction.finalCapture);
+          done();
+        }
+      );
+    });
+  }));

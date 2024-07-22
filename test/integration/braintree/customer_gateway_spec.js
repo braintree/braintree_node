@@ -41,12 +41,27 @@ describe("CustomerGateway", function () {
           });
 
           return gateway.customer.create(
-            { firstName: "John", lastName: "Smith" },
+            {
+              firstName: "John",
+              lastName: "Smith",
+              internationalPhone: {
+                countryCode: "1",
+                nationalNumber: "3121234567",
+              },
+            },
             function (err, response) {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.customer.firstName, "John");
               assert.equal(response.customer.lastName, "Smith");
+              assert.equal(
+                response.customer.internationalPhone.countryCode,
+                "1"
+              );
+              assert.equal(
+                response.customer.internationalPhone.nationalNumber,
+                "3121234567"
+              );
 
               done();
             }
@@ -1420,6 +1435,10 @@ describe("CustomerGateway", function () {
       let customerParams = {
         firstName: "New First Name",
         lastName: "New Last Name",
+        internationalPhone: {
+          countryCode: "1",
+          nationalNumber: "3121234567",
+        },
       };
 
       specHelper.defaultGateway.customer.update(
@@ -1430,6 +1449,11 @@ describe("CustomerGateway", function () {
           assert.isTrue(response.success);
           assert.equal(response.customer.firstName, "New First Name");
           assert.equal(response.customer.lastName, "New Last Name");
+          assert.equal(response.customer.internationalPhone.countryCode, "1");
+          assert.equal(
+            response.customer.internationalPhone.nationalNumber,
+            "3121234567"
+          );
 
           done();
         }

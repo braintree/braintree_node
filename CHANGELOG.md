@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.24.0
+
+- Add `foreignRetailer` to Transaction
+- Add `internationalPhone` to `Address` and `Customer`
+- Add `fundingSourceDescription` to PayPalAccount
+- Add missing `AndroidPayCard` error code
+- Add `RefundFailed` to `WebhookNotification.Kind`
+- Add `finalCapture` to Transaction `_submitForPartialSettlementSignature`
+- Deprecate `paypalTrackingId` in favor of `paypalTrackerId`
+
 ## 3.23.0
 
 - Add `domains` parameter support to `ClientToken.generate`

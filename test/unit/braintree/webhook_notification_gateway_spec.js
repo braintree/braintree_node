@@ -500,6 +500,29 @@ describe("WebhookNotificationGateway", function () {
       );
     });
 
+    it("returns a parsable signature and payload for refund failed", function (done) {
+      let notification =
+        specHelper.defaultGateway.webhookTesting.sampleNotification(
+          WebhookNotification.Kind.RefundFailed,
+          "my_id"
+        );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(
+        bt_signature,
+        bt_payload,
+        function (err, webhookNotification) {
+          assert.equal(
+            webhookNotification.kind,
+            WebhookNotification.Kind.RefundFailed
+          );
+          assert.equal(webhookNotification.transaction.id, "my_id");
+          done();
+        }
+      );
+    });
+
     it("returns a parsable signature and payload for dispute under_review", function (done) {
       let notification =
         specHelper.defaultGateway.webhookTesting.sampleNotification(

@@ -564,7 +564,7 @@ describe("DisputeGateway", () => {
         })
         .then(() => {
           return disputeGateway.addTextEvidence(disputeId, {
-            content: "foo",
+            content: "123",
             category: "PRIOR_NON_DISPUTED_TRANSACTION_ARN",
           });
         })
