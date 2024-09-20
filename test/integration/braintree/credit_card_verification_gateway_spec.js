@@ -87,6 +87,33 @@ describe("CreditCardVerificationGateway", function () {
       );
     });
 
+    it("handles verifications for Visa Ani", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4111111111111111",
+          expirationDate: "05/2014",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+          assert.equal(verification.aniFirstNameResponseCode, "I");
+          assert.equal(verification.aniLastNameResponseCode, "I");
+          done();
+        }
+      );
+    });
+
     it("handles processor declined verifications", function (done) {
       let params = {
         creditCard: {

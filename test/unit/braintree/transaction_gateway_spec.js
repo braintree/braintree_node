@@ -38,6 +38,41 @@ describe("TransactionGateway", () =>
       });
     });
 
+    it("accepts credit card network_tokenization_attributes", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "06/09",
+          networkTokenizationAttributes: {
+            cryptogram: "8F34DFB312DC79C24FD5320622F3E11682D79E6B0C0FD881",
+            ecommerceIndicator: "05",
+            tokenRequestorId: "123456",
+          },
+        },
+      };
+
+      transactionGateway.sale(transactionParams, (err, params) => {
+        assert.notExists(err);
+        assert.equal(
+          "8F34DFB312DC79C24FD5320622F3E11682D79E6B0C0FD881",
+          params.transaction.creditCard.networkTokenizationAttributes.cryptogram
+        );
+        assert.equal(
+          "05",
+          params.transaction.creditCard.networkTokenizationAttributes
+            .ecommerceIndicator
+        );
+        assert.equal(
+          "123456",
+          params.transaction.creditCard.networkTokenizationAttributes
+            .tokenRequestorId
+        );
+        done();
+      });
+    });
+
     it("does not include skip_advanced_fraud_checking in params if its not specified", function (done) {
       let transactionGateway = new TransactionGateway(fakeGateway);
       let transactionParams = {

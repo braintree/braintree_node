@@ -958,7 +958,7 @@ describe("MerchantAccountGateway", function () {
         return gateway.merchant.create(
           {
             email: "name@email.com",
-            countryCodeAlpha3: "USA",
+            countryCodeAlpha3: "GBR",
             paymentMethods: ["credit_card", "paypal"],
           },
           function (err, response) {
@@ -974,7 +974,7 @@ describe("MerchantAccountGateway", function () {
 
               let merchantAccount = merchantAccounts[0];
 
-              assert.equal(merchantAccount.currencyIsoCode, "USD");
+              assert.equal(merchantAccount.currencyIsoCode, "GBP");
               done();
             });
           }
@@ -990,7 +990,7 @@ describe("MerchantAccountGateway", function () {
         return gateway.merchant.create(
           {
             email: "name@email.com",
-            countryCodeAlpha3: "USA",
+            countryCodeAlpha3: "GBR",
             paymentMethods: ["credit_card", "paypal"],
           },
           function (err, response) {
@@ -1006,7 +1006,7 @@ describe("MerchantAccountGateway", function () {
 
               let merchantAccount = merchantAccounts[0];
 
-              assert.equal(merchantAccount.currencyIsoCode, "USD");
+              assert.equal(merchantAccount.currencyIsoCode, "GBP");
               assert.equal(merchantAccount.status, "active");
               assert.equal(merchantAccount.default, true);
               done();
@@ -1080,7 +1080,7 @@ describe("MerchantAccountGateway", function () {
         return gateway.merchant.create(
           {
             email: "name@email.com",
-            countryCodeAlpha3: "USA",
+            countryCodeAlpha3: "GBR",
             paymentMethods: ["credit_card", "paypal"],
           },
           function (err, response) {
@@ -1098,7 +1098,7 @@ describe("MerchantAccountGateway", function () {
               assert.equal(merchantAccounts.length, 1);
               let merchantAccount = merchantAccounts[0];
 
-              assert.equal(merchantAccount.currencyIsoCode, "USD");
+              assert.equal(merchantAccount.currencyIsoCode, "GBP");
               assert.equal(merchantAccount.status, "active");
               assert.equal(merchantAccount.default, true);
               done();
@@ -1149,14 +1149,14 @@ describe("MerchantAccountGateway", function () {
   describe("createForCurrency", function () {
     it("creates a new merchant account for currency", function (done) {
       let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$signup_client_id",
-        clientSecret: "client_secret$development$signup_client_secret",
+        clientId: "client_id$development$integration_client_id",
+        clientSecret: "client_secret$development$integration_client_secret",
       });
 
       return gateway.merchant.create(
         {
           email: "name@email.com",
-          countryCodeAlpha3: "USA",
+          countryCodeAlpha3: "GBR",
           paymentMethods: ["credit_card", "paypal"],
         },
         function (err, response) {
@@ -1185,14 +1185,14 @@ describe("MerchantAccountGateway", function () {
 
     it("returns error if merchant account exists for currency", function (done) {
       let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$signup_client_id",
-        clientSecret: "client_secret$development$signup_client_secret",
+        clientId: "client_id$development$integration_client_id",
+        clientSecret: "client_secret$development$integration_client_secret",
       });
 
       return gateway.merchant.create(
         {
           email: "name@email.com",
-          countryCodeAlpha3: "USA",
+          countryCodeAlpha3: "GBR",
           paymentMethods: ["credit_card", "paypal"],
         },
         function (err, response) {
@@ -1205,7 +1205,7 @@ describe("MerchantAccountGateway", function () {
 
           return gateway.merchantAccount.createForCurrency(
             {
-              currency: "USD",
+              currency: "GBP",
             },
             function (err, response) {
               assert.isNotNull(response.error);
@@ -1224,14 +1224,14 @@ describe("MerchantAccountGateway", function () {
 
     it("returns error if currency is not provided", function (done) {
       let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$signup_client_id",
-        clientSecret: "client_secret$development$signup_client_secret",
+        clientId: "client_id$development$integration_client_id",
+        clientSecret: "client_secret$development$integration_client_secret",
       });
 
       return gateway.merchant.create(
         {
           email: "name@email.com",
-          countryCodeAlpha3: "USA",
+          countryCodeAlpha3: "GBR",
           paymentMethods: ["credit_card", "paypal"],
         },
         function (err, response) {
@@ -1262,14 +1262,14 @@ describe("MerchantAccountGateway", function () {
 
     it("returns error if currency is invalid", function (done) {
       let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$signup_client_id",
-        clientSecret: "client_secret$development$signup_client_secret",
+        clientId: "client_id$development$integration_client_id",
+        clientSecret: "client_secret$development$integration_client_secret",
       });
 
       return gateway.merchant.create(
         {
           email: "name@email.com",
-          countryCodeAlpha3: "USA",
+          countryCodeAlpha3: "GBR",
           paymentMethods: ["credit_card", "paypal"],
         },
         function (err, response) {
@@ -1302,14 +1302,14 @@ describe("MerchantAccountGateway", function () {
 
     it("returns error if merchant account exists for id", function (done) {
       let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$signup_client_id",
-        clientSecret: "client_secret$development$signup_client_secret",
+        clientId: "client_id$development$integration_client_id",
+        clientSecret: "client_secret$development$integration_client_secret",
       });
 
       return gateway.merchant.create(
         {
           email: "name@email.com",
-          countryCodeAlpha3: "USA",
+          countryCodeAlpha3: "GBR",
           paymentMethods: ["credit_card", "paypal"],
         },
         function (err, response) {

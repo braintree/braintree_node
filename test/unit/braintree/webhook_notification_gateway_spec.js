@@ -1495,8 +1495,11 @@ describe("WebhookNotificationGateway", function () {
 
           let localPaymentCompleted = webhookNotification.localPaymentCompleted;
 
-          assert.equal("a-payment-id", localPaymentCompleted.paymentId);
+          assert.equal("a-bic", localPaymentCompleted.bic);
+          assert.equal("1234", localPaymentCompleted.ibanLastChars);
           assert.equal("a-payer-id", localPaymentCompleted.payerId);
+          assert.equal("a-payer-name", localPaymentCompleted.payerName);
+          assert.equal("a-payment-id", localPaymentCompleted.paymentId);
           assert.equal(
             "ee257d98-de40-47e8-96b3-a6954ea7a9a4",
             localPaymentCompleted.paymentMethodNonce

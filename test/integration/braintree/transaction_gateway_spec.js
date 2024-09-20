@@ -806,6 +806,31 @@ describe("TransactionGateway", function () {
         );
       });
 
+      it("allows creation with Shipping Tax Amount", function (done) {
+        let transactionParams = {
+          type: "sale",
+          amount: "64.05",
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          discountAmount: "1.00",
+          shippingAmount: "2.00",
+          shippingTaxAmount: "3.00",
+          shipsFromPostalCode: "12345",
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(response.transaction.discountAmount, "1.00");
+            assert.equal(response.transaction.shippingAmount, "2.00");
+            assert.equal(response.transaction.shippingTaxAmount, "3.00");
+            assert.equal(response.transaction.shipsFromPostalCode, "12345");
+            done();
+          }
+        );
+      });
+
       it("returns an error for transaction when discount amount format is invalid", function (done) {
         let transactionParams = {
           type: "sale",
@@ -7258,6 +7283,7 @@ describe("TransactionGateway", function () {
             purchaseOrderNumber: "ABC123",
             discountAmount: "1.34",
             shippingAmount: "2.11",
+            shippingTaxAmount: "1.21",
             shipsFromPostalCode: "90210",
             lineItems: [
               {
@@ -7278,6 +7304,7 @@ describe("TransactionGateway", function () {
               assert.isNull(err);
               assert.isTrue(response.success);
               assert.equal(response.transaction.shipsFromPostalCode, "90210");
+              assert.equal(response.transaction.shippingTaxAmount, "1.21");
               assert.equal(
                 response.transaction.status,
                 "submitted_for_settlement"
@@ -8900,6 +8927,63 @@ describe("TransactionGateway", function () {
             ValidationErrorCodes.Transaction
               .PaymentInstrumentNotSupportedByMerchantAccount,
             errorCode
+          );
+          done();
+        }
+      );
+    });
+  });
+
+  describe("External network token entry transaction", function () {
+    it("is successful with valid token details", function (done) {
+      let transactionParams = {
+        amount: "10.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "06/09",
+          networkTokenizationAttributes: {
+            cryptogram: "8F34DFB312DC79C24FD5320622F3E11682D79E6B0C0FD881",
+            ecommerceIndicator: "05",
+            tokenRequestorId: "123456",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, response) => {
+          assert.isTrue(response.success);
+          assert.isTrue(response.transaction.processedWithNetworkToken);
+          assert.isTrue(response.transaction.networkToken.isNetworkTokenized);
+          done();
+        }
+      );
+    });
+
+    it("is unsuccessful with invalid token details", function (done) {
+      let transactionParams = {
+        amount: "10.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "06/09",
+          networkTokenizationAttributes: {
+            ecommerceIndicator: "05",
+            tokenRequestorId: "123456",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, response) => {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("transaction")
+              .for("creditCard")
+              .on("networkTokenizationAttributes")[0].code,
+            ValidationErrorCodes.CreditCard
+              .NetworkTokenizationAttributeCryptogramIsRequired
           );
           done();
         }

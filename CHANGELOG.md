@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.25.0
+
+- Add `payerName`, `bic` and `iban_last_chars` to LocalPaymentCompleted webhook
+- Add `editPaypalVaultId` to PayPalAccount
+- Add `aniFirstNameResponseCode` and `aniLastNameResponseCode` to CreditCardVerificationGateway
+- Add `shippingTaxAmount` to Transaction
+- Add `networkTokenizationAttributes` to `Transaction.sale`
+- Add error code `NetworkTokenizationAttributeCryptogramIsRequired` for attribute `cryptogram` in `networkTokenizationAttributes`
+
 ## 3.24.0
 
 - Add `foreignRetailer` to Transaction

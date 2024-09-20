@@ -1,5 +1,7 @@
 "use strict";
 
+const { assert } = require("chai");
+
 let braintree = specHelper.braintree;
 let Config = require("../../../lib/braintree/config").Config;
 let Nonces = require("../../../lib/braintree/test_values/nonces").Nonces;
@@ -28,7 +30,7 @@ describe("PayPalGateway", function () {
                 assert.isString(paypalAccount.updatedAt);
                 assert.isNull(paypalAccount.revokedAt);
                 assert.isNull(paypalAccount.fundingSourceDescription);
-
+                assert.notExists(paypalAccount.editPaypalVaultId);
                 done();
               }
             );
