@@ -1023,7 +1023,7 @@ describe("CustomerGateway", function () {
               options: {
                 verifyCard: true,
                 verificationAccountType: "debit",
-                verificationMerchantAccountId: "hiper_brl",
+                verificationMerchantAccountId: "card_processor_brl",
               },
             },
           },
@@ -1733,6 +1733,43 @@ describe("CustomerGateway", function () {
                   .for("creditCard")
                   .on("number")[0].code,
                 "81724"
+              );
+
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("fails to add a new card to a customer with failOnDuplicatePaymentMethodForCustomer", function (done) {
+      let customerParams = {
+        creditCard: {
+          number: "5105105105105100",
+          expirationDate: "05/2014",
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, createResponse) {
+          assert.isTrue(createResponse.success);
+
+          customerParams.creditCard.options = {
+            failOnDuplicatePaymentMethodForCustomer: true,
+          };
+
+          specHelper.defaultGateway.customer.update(
+            createResponse.customer.id,
+            customerParams,
+            function (err, updateResponse) {
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("customer")
+                  .for("creditCard")
+                  .on("number")[0].code,
+                "81763"
               );
 
               done();

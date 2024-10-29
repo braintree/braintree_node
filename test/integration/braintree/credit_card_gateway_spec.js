@@ -400,7 +400,7 @@ describe("CreditCardGateway", function () {
         expirationDate: "05/2012",
         options: {
           verifyCard: true,
-          verificationMerchantAccountId: "hiper_brl",
+          verificationMerchantAccountId: "card_processor_brl",
           verificationAccountType: "debit",
         },
       };

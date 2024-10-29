@@ -241,6 +241,72 @@ describe("ClientTokenGateway", function () {
       );
     }));
 
+  it("can pass failOnDuplicatePaymentMethodForCustomer", (done) =>
+    specHelper.defaultGateway.customer.create({}, function (err, result) {
+      let myHttp = new specHelper.clientApiHttp(
+        new Config(specHelper.defaultConfig)
+      );
+
+      let customer = result.customer;
+
+      specHelper.defaultGateway.clientToken.generate(
+        {
+          customerId: customer.id,
+        },
+        function (err, result) {
+          let clientToken = JSON.parse(
+            specHelper.decodeClientToken(result.clientToken)
+          );
+          let authorizationFingerprint = clientToken.authorizationFingerprint;
+
+          let params = {
+            authorizationFingerprint,
+            sharedCustomerIdentifierType: "testing",
+            sharedCustomerIdentifier: "testing-identifier",
+            credit_card: {
+              number: "4111111111111111",
+              expiration_month: "11",
+              expiration_year: "2099",
+            },
+          };
+
+          return myHttp.post(
+            "/client_api/v1/payment_methods/credit_cards.json",
+            params,
+            function (statusCode) {
+              assert.equal(statusCode, 201);
+              specHelper.defaultGateway.clientToken.generate(
+                {
+                  customerId: customer.id,
+                  options: {
+                    failOnDuplicatePaymentMethodForCustomer: true,
+                  },
+                },
+                function (err, result) {
+                  clientToken = JSON.parse(
+                    specHelper.decodeClientToken(result.clientToken)
+                  );
+                  let authorizationFingerprint =
+                    clientToken.authorizationFingerprint;
+
+                  params.authorizationFingerprint = authorizationFingerprint;
+
+                  return myHttp.post(
+                    "/client_api/v1/payment_methods/credit_cards.json",
+                    params,
+                    function (statusCode) {
+                      assert.equal(statusCode, 422);
+                      done();
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }
+      );
+    }));
+
   it("can pass merchantAccountId", function (done) {
     let expectedMerchantAccountId = specHelper.nonDefaultMerchantAccountId;
     let clientTokenParams = {

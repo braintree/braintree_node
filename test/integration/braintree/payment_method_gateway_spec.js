@@ -730,7 +730,7 @@ describe("PaymentMethodGateway", function () {
                       paymentMethodNonce: nonce,
                       options: {
                         verifyCard: "true",
-                        verificationMerchantAccountId: "hiper_brl",
+                        verificationMerchantAccountId: "card_processor_brl",
                         verificationAccountType: "debit",
                       },
                     };
@@ -817,6 +817,78 @@ describe("PaymentMethodGateway", function () {
                       assert.equal(
                         response.errors.deepErrors()[0].code,
                         "81724"
+                      );
+
+                      done();
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }));
+
+      it("respects failOnDuplicatePaymentMethodForCustomer when included outside of the nonce", (done) =>
+        specHelper.defaultGateway.customer.create({}, function (err, response) {
+          customerId = response.customer.id;
+
+          let creditCardParams = {
+            customerId,
+            number: "4111111111111111",
+            expirationDate: "05/2012",
+          };
+
+          specHelper.defaultGateway.creditCard.create(
+            creditCardParams,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+            }
+          );
+
+          specHelper.defaultGateway.clientToken.generate(
+            {},
+            function (err, result) {
+              let clientToken = JSON.parse(
+                specHelper.decodeClientToken(result.clientToken)
+              );
+              let authorizationFingerprint =
+                clientToken.authorizationFingerprint;
+
+              let params = {
+                authorizationFingerprint,
+                creditCard: {
+                  number: "4111111111111111",
+                  expirationDate: "05/2012",
+                },
+              };
+
+              let myHttp = new specHelper.clientApiHttp(
+                new Config(specHelper.defaultConfig)
+              );
+
+              return myHttp.post(
+                "/client_api/v1/payment_methods/credit_cards.json",
+                params,
+                function (statusCode, body) {
+                  let nonce = JSON.parse(body).creditCards[0].nonce;
+
+                  creditCardParams = {
+                    customerId,
+                    paymentMethodNonce: nonce,
+                    options: {
+                      failOnDuplicatePaymentMethodForCustomer: "true",
+                    },
+                  };
+
+                  specHelper.defaultGateway.paymentMethod.create(
+                    creditCardParams,
+                    function (err, response) {
+                      assert.isNull(err);
+                      assert.isFalse(response.success);
+                      assert.equal(
+                        response.errors.deepErrors()[0].code,
+                        "81763"
                       );
 
                       done();
@@ -1211,6 +1283,7 @@ describe("PaymentMethodGateway", function () {
                     options: {
                       verifyCard: "true",
                       failOnDuplicatePaymentMethod: "true",
+                      failOnDuplicatePaymentMethodForCustomer: "true",
                       verificationMerchantAccountId:
                         "notARealMerchantAccountId",
                     },
@@ -2274,7 +2347,7 @@ describe("PaymentMethodGateway", function () {
                 expirationDate: "06/2013",
                 options: {
                   verifyCard: true,
-                  verificationMerchantAccountId: "hiper_brl",
+                  verificationMerchantAccountId: "card_processor_brl",
                   verificationAccountType: "debit",
                 },
               };

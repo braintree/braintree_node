@@ -1513,6 +1513,50 @@ describe("WebhookNotificationGateway", function () {
       );
     });
 
+    it("returns blik aliases for Local Payment Completed when funding source is blik one click", function (done) {
+      let notification =
+        specHelper.defaultGateway.webhookTesting.sampleNotification(
+          WebhookNotification.Kind.LocalPaymentCompleted,
+          "blik_one_click_id"
+        );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(
+        bt_signature,
+        bt_payload,
+        function (err, webhookNotification) {
+          assert.equal(
+            webhookNotification.kind,
+            WebhookNotification.Kind.LocalPaymentCompleted
+          );
+
+          let localPaymentCompleted = webhookNotification.localPaymentCompleted;
+
+          assert.equal("a-bic", localPaymentCompleted.bic);
+          assert.equal("1234", localPaymentCompleted.ibanLastChars);
+          assert.equal("a-payer-id", localPaymentCompleted.payerId);
+          assert.equal("a-payer-name", localPaymentCompleted.payerName);
+          assert.equal("a-payment-id", localPaymentCompleted.paymentId);
+          assert.equal(
+            "ee257d98-de40-47e8-96b3-a6954ea7a9a4",
+            localPaymentCompleted.paymentMethodNonce
+          );
+
+          assert.equal("alias-key-1", localPaymentCompleted.blikAliases[0].key);
+          assert.equal(
+            "alias-label-1",
+            localPaymentCompleted.blikAliases[0].label
+          );
+          assert.exists(localPaymentCompleted.transaction);
+          assert.equal("1", localPaymentCompleted.transaction.id);
+          assert.equal("authorizing", localPaymentCompleted.transaction.status);
+          assert.equal("order1234", localPaymentCompleted.transaction.orderId);
+          done();
+        }
+      );
+    });
+
     it("returns a parsable signature and payload for Local Payment Expired", function (done) {
       let notification =
         specHelper.defaultGateway.webhookTesting.sampleNotification(

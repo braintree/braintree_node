@@ -173,7 +173,7 @@ describe("CreditCardVerificationGateway", function () {
           expirationDate: "05/2014",
         },
         options: {
-          merchantAccountId: "hiper_brl",
+          merchantAccountId: "card_processor_brl",
           accountType: "debit",
         },
       };

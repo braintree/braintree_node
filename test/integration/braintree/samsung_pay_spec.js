@@ -4,7 +4,9 @@ let Nonces = require("../../../lib/braintree/test_values/nonces").Nonces;
 let PaymentInstrumentTypes =
   require("../../../lib/braintree/payment_instrument_types").PaymentInstrumentTypes;
 
-describe("Samsung Pay", function () {
+// NEXT_MAJOR_VERSION remove these tests
+// SamsungPayCard has been deprecated
+xdescribe("Samsung Pay", function () {
   it("can create from nonce", (done) =>
     specHelper.defaultGateway.customer.create({}, function (err, response) {
       let customerId = response.customer.id;

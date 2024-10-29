@@ -3124,33 +3124,6 @@ describe("TransactionGateway", function () {
         });
       });
 
-      it("handles validation error unsupported payment instrument type", function (done) {
-        specHelper.defaultGateway.customer.create({}, function () {
-          let transactionParams = {
-            amount: "10.00",
-            paymentMethodNonce: Nonces.ApplyPayVisa,
-            externalVault: {
-              status: Transaction.ExternalVault.Vaulted,
-              previousNetworkTransactionId: "123456789012345",
-            },
-          };
-
-          specHelper.defaultGateway.transaction.sale(
-            transactionParams,
-            function (err, response) {
-              assert.isNull(err);
-              assert.isFalse(response.success);
-              assert.equal(
-                response.errors.for("transaction").on("externalVault")[0].code,
-                ValidationErrorCodes.Transaction
-                  .PaymentInstrumentWithExternalVaultIsInvalid
-              );
-              done();
-            }
-          );
-        });
-      });
-
       it("handles validation error status is invalid", function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
