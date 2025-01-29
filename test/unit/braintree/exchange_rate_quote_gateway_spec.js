@@ -21,6 +21,10 @@ describe("ExchangeRateQuoteGateway", () =>
       },
     };
 
+    afterEach(() => {
+      sinon.restore();
+    });
+
     it("does not accept invalid key", function (done) {
       let exchangeRateQuoteGateway = new ExchangeRateQuoteGateway(fakeGateway);
       let exchangeRateQuoteRequest = {
