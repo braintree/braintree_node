@@ -801,6 +801,29 @@ describe("CreditCardGateway", function () {
           }
         );
       });
+
+      it("handles prepaid reloadable cards", function (done) {
+        let creditCardParams = {
+          customerId,
+          number: CreditCardNumbers.CardTypeIndicators.PrepaidReloadable,
+          expirationDate: "05/2012",
+          options: {
+            verifyCard: true,
+          },
+        };
+
+        specHelper.defaultGateway.creditCard.create(
+          creditCardParams,
+          function (err, response) {
+            assert.equal(
+              response.creditCard.prepaidReloadable,
+              CreditCard.PrepaidReloadable.Yes
+            );
+
+            done();
+          }
+        );
+      });
     });
 
     context("negative card type indicators", function () {
@@ -827,6 +850,12 @@ describe("CreditCardGateway", function () {
 
       it("sets the prepaid field to No", () =>
         assert.equal(createResponse.creditCard.prepaid, CreditCard.Prepaid.No));
+
+      it("sets the prepaid reloadable field to No", () =>
+        assert.equal(
+          createResponse.creditCard.prepaidReloadable,
+          CreditCard.PrepaidReloadable.No
+        ));
 
       it("sets the payroll field to No", () =>
         assert.equal(createResponse.creditCard.payroll, CreditCard.Payroll.No));
@@ -882,6 +911,12 @@ describe("CreditCardGateway", function () {
         assert.equal(
           createResponse.creditCard.prepaid,
           CreditCard.Prepaid.Unknown
+        ));
+
+      it("sets the prepaid reloadable field to Unknown", () =>
+        assert.equal(
+          createResponse.creditCard.prepaidReloadable,
+          CreditCard.PrepaidReloadable.Unknown
         ));
 
       it("sets the payroll field to Unknown", () =>

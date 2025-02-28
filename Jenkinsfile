@@ -1,4 +1,5 @@
 #!groovy
+
 def FAILED_STAGE
 
 pipeline {
@@ -12,9 +13,8 @@ pipeline {
   stages {
     stage("Audit") {
       parallel {
-
         // Runs a static code analysis scan and posts results to the PayPal Polaris server
-        stage("Polaris") {
+        stage("CodeQL") {
           agent {
             node {
               label ""
@@ -23,7 +23,7 @@ pipeline {
           }
 
           steps {
-            polarisAudit()
+            codeQLv2(javascript: true)
           }
 
           post {
@@ -33,32 +33,8 @@ pipeline {
               }
             }
           }
-        }
-
-
-        // Runs a software composition analysis scan and posts results to the PayPal Black Duck server
-        stage("Black Duck") {
-          agent {
-            node {
-              label ""
-              customWorkspace "workspace/${REPO_NAME}"
-            }
-          }
-
-          steps {
-            blackduckAudit(debug: "true")
-          }
-
-          post {
-            failure {
-              script {
-                FAILED_STAGE = env.STAGE_NAME
-              }
-            }
-          }         
         }
       }
-    } 
+    }
   }
 }
-

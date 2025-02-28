@@ -50,6 +50,7 @@ describe("Visa Checkout", function () {
           assert.isNotNull(visaCheckoutCard.maskedNumber);
           assert.isNotNull(visaCheckoutCard.payroll);
           assert.isNotNull(visaCheckoutCard.prepaid);
+          assert.isNotNull(visaCheckoutCard.prepaidReloadable);
           assert.isNotNull(visaCheckoutCard.productId);
           assert.isNotNull(visaCheckoutCard.subscriptions);
           assert.isNotNull(visaCheckoutCard.token);
@@ -177,6 +178,7 @@ describe("Visa Checkout", function () {
           assert.isNotNull(visaCheckoutCardDetails.maskedNumber);
           assert.isNotNull(visaCheckoutCardDetails.payroll);
           assert.isNotNull(visaCheckoutCardDetails.prepaid);
+          assert.isNotNull(visaCheckoutCardDetails.prepaidReloadable);
           assert.isNotNull(visaCheckoutCardDetails.productId);
           assert.isNotNull(visaCheckoutCardDetails.token);
 

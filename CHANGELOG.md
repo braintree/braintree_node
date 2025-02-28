@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.29.0
+
+- Fixes export for GraphQL classes
+- Updates comments for customer session
+- Add support for `PayPalPaymentResource` requests
+- Add prepaid_reloadable from bin data in credit card responses
+
 ## 3.28.0
 
 - Add support for creating and updating PayPal customer session

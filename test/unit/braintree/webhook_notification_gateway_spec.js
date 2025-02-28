@@ -1326,6 +1326,7 @@ describe("WebhookNotificationGateway", function () {
             <last-4>4444</last-4>
             <payroll>Unknown</payroll>
             <prepaid>Unknown</prepaid>
+            <prepaid-reloadable>Unknown</prepaid-reloadable>
             <product-id>Unknown</product-id>
             <subscriptions type="array"/>
             <token>credit_card_token</token>

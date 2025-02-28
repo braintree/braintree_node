@@ -33,6 +33,7 @@ describe("PaymentMethodGateway", function () {
               assert.isTrue(response.success);
               assert.isNotNull(response.paymentMethod.token);
               assert.isNotNull(response.paymentMethod.customerId);
+              assert.isNotNull(response.paymentMethod.prepaidReloadable);
 
               done();
             }
@@ -297,6 +298,7 @@ describe("PaymentMethodGateway", function () {
                 assert.isNotNull(response.paymentMethod.paymentInstrumentName);
                 assert.isNotNull(response.paymentMethod.sourceDescription);
                 assert.isNotNull(response.paymentMethod.customerId);
+                assert.isNotNull(response.paymentMethod.prepaidReloadable);
 
                 done();
               }
@@ -344,6 +346,7 @@ describe("PaymentMethodGateway", function () {
                   "Discover 1111"
                 );
                 assert.equal(response.paymentMethod.customerId, customerId);
+                assert.isNotNull(response.paymentMethod.prepaidReloadable);
 
                 done();
               }
@@ -389,6 +392,7 @@ describe("PaymentMethodGateway", function () {
                   "MasterCard 4444"
                 );
                 assert.equal(response.paymentMethod.customerId, customerId);
+                assert.isNotNull(response.paymentMethod.prepaidReloadable);
 
                 done();
               }
@@ -2102,6 +2106,7 @@ describe("PaymentMethodGateway", function () {
                     specHelper.braintree.CreditCard.CardType.Discover
                   );
                   assert.equal(androidPayCard.sourceCardLast4, "1111");
+                  assert.isNotNull(androidPayCard.prepaidReloadable);
 
                   done();
                 }

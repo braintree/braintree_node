@@ -606,5 +606,31 @@ describe("CreditCardVerificationGateway", function () {
         }
       );
     });
+
+    it("creates a verification and returns prepaid_reloadable in the response", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4229989900000002",
+          expirationDate: "05/2029",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+          assert.equal(verification.creditCard.prepaidReloadable, "Yes");
+          done();
+        }
+      );
+    });
   });
 });
