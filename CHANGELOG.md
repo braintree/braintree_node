@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.30.0
+
+- Removes marketplace features
+- Add support for capturing payment facilitator and sub-merchant details with transactions
+
 ## 3.29.0
 
 - Fixes export for GraphQL classes

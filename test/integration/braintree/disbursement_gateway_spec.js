@@ -8,14 +8,10 @@ describe("DisbursementGateway", () =>
       let disbursementParams = {
         id: "123456",
         merchantAccount: {
-          id: "sandbox_sub_merchant_account",
-          masterMerchantAccount: {
-            id: "sandbox_master_merchant_account",
-            status: "active",
-          },
+          id: "ma_card_processor_brazil",
           status: "active",
         },
-        transactionIds: ["sub_merchant_transaction"],
+        transactionIds: ["transaction_with_installments_and_adjustments"],
         amount: "100.00",
         disbursementDate: "2013-04-10",
         exceptionMessage: "invalid_account_number",
@@ -34,7 +30,10 @@ describe("DisbursementGateway", () =>
 
           return transactions.first(function (err, transaction) {
             assert.isNull(err);
-            assert.equal(transaction.id, "sub_merchant_transaction");
+            assert.equal(
+              transaction.id,
+              "transaction_with_installments_and_adjustments"
+            );
             done();
           });
         }

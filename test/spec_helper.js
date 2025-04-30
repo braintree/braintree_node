@@ -485,30 +485,6 @@ let createPayPalTransactionToRefund = function (callback) {
   });
 };
 
-let createEscrowedTransaction = function (callback) {
-  let transactionParams = {
-    merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
-    amount: "5.00",
-    serviceFeeAmount: "1.00",
-    creditCard: {
-      number: "5105105105105100",
-      expirationDate: "05/2012",
-    },
-    options: {
-      holdInEscrow: true,
-    },
-  };
-
-  specHelper.defaultGateway.transaction.sale(transactionParams, (err, result) =>
-    specHelper.escrowTransaction(result.transaction.id, () =>
-      specHelper.defaultGateway.transaction.find(
-        result.transaction.id,
-        (err, transaction) => callback(transaction)
-      )
-    )
-  );
-};
-
 let decodeClientToken = function (encodedClientToken) {
   let decodedClientToken = Buffer.from(encodedClientToken, "base64").toString(
     "utf8"
@@ -661,7 +637,6 @@ global.specHelper = {
   settlePayPalTransaction,
   defaultMerchantAccountId: "sandbox_credit_card",
   nonDefaultMerchantAccountId: "sandbox_credit_card_non_default",
-  nonDefaultSubMerchantAccountId: "sandbox_sub_merchant_account",
   threeDSecureMerchantAccountId: "three_d_secure_merchant_account",
   adyenMerchantAccountId: "adyen_ma",
   fakeAmexDirectMerchantAccountId: "fake_amex_direct_usd",
@@ -671,7 +646,6 @@ global.specHelper = {
   decodeClientToken,
   createTransactionToRefund,
   createPayPalTransactionToRefund,
-  createEscrowedTransaction,
   generateNonceForNewPaymentMethod,
   generateValidUsBankAccountNonce,
   generateInvalidUsBankAccountNonce,

@@ -29,8 +29,8 @@ describe("PayPalGateway", function () {
                 assert.isString(paypalAccount.createdAt);
                 assert.isString(paypalAccount.updatedAt);
                 assert.isNull(paypalAccount.revokedAt);
-                assert.isNull(paypalAccount.fundingSourceDescription);
-                assert.notExists(paypalAccount.editPaypalVaultId);
+                assert.isNotNull(paypalAccount.fundingSourceDescription);
+                assert.isNotNull(paypalAccount.editPaypalVaultId);
                 done();
               }
             );
