@@ -21,8 +21,12 @@ describe("Apple Pay", function () {
 
           assert.equal(response.paymentMethod.constructor.name, "ApplePayCard");
 
+          assert.isNotNull(applePayCard.business);
+          assert.isNotNull(applePayCard.consumer);
+          assert.isNotNull(applePayCard.corporate);
           assert.isNotNull(applePayCard.prepaid);
           assert.isNotNull(applePayCard.prepaidReloadable);
+          assert.isNotNull(applePayCard.purchase);
 
           specHelper.defaultGateway.customer.find(
             customerId,

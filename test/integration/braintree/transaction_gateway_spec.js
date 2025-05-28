@@ -3264,8 +3264,11 @@ describe("TransactionGateway", function () {
             );
 
             assert.isNotNull(response.transaction.applePayCard.bin);
+            assert.isNotNull(response.transaction.applePayCard.business);
             assert.isNotNull(response.transaction.applePayCard.cardType);
             assert.isNotNull(response.transaction.applePayCard.commercial);
+            assert.isNotNull(response.transaction.applePayCard.consumer);
+            assert.isNotNull(response.transaction.applePayCard.corporate);
             assert.isNotNull(
               response.transaction.applePayCard.countryOfIssuance
             );
@@ -3280,6 +3283,7 @@ describe("TransactionGateway", function () {
               response.transaction.applePayCard.prepaidReloadable
             );
             assert.isNotNull(response.transaction.applePayCard.productId);
+            assert.isNotNull(response.transaction.applePayCard.purchase);
 
             done();
           }
@@ -3314,8 +3318,11 @@ describe("TransactionGateway", function () {
             );
 
             assert.isNotNull(response.transaction.applePayCard.bin);
+            assert.isNotNull(response.transaction.applePayCard.business);
             assert.isNotNull(response.transaction.applePayCard.cardType);
             assert.isNotNull(response.transaction.applePayCard.commercial);
+            assert.isNotNull(response.transaction.applePayCard.consumer);
+            assert.isNotNull(response.transaction.applePayCard.corporate);
             assert.isNotNull(
               response.transaction.applePayCard.countryOfIssuance
             );
@@ -3330,6 +3337,7 @@ describe("TransactionGateway", function () {
               response.transaction.applePayCard.prepaidReloadable
             );
             assert.isNotNull(response.transaction.applePayCard.productId);
+            assert.isNotNull(response.transaction.applePayCard.purchase);
 
             done();
           }
@@ -3402,8 +3410,11 @@ describe("TransactionGateway", function () {
               );
 
               assert.isNotNull(response.transaction.androidPayCard.bin);
+              assert.isNotNull(response.transaction.androidPayCard.business);
               assert.isNotNull(response.transaction.androidPayCard.cardType);
               assert.isNotNull(response.transaction.androidPayCard.commercial);
+              assert.isNotNull(response.transaction.androidPayCard.consumer);
+              assert.isNotNull(response.transaction.androidPayCard.corporate);
               assert.isNotNull(
                 response.transaction.androidPayCard.countryOfIssuance
               );
@@ -3420,6 +3431,7 @@ describe("TransactionGateway", function () {
                 response.transaction.androidPayCard.prepaidReloadable
               );
               assert.isNotNull(response.transaction.androidPayCard.productId);
+              assert.isNotNull(response.transaction.androidPayCard.purchase);
 
               done();
             }
@@ -3470,6 +3482,10 @@ describe("TransactionGateway", function () {
               assert.equal(details.isNetworkTokenized, false);
               assert.equal(details.last4, "1881");
               assert.equal(details.prepaidReloadable, "Unknown");
+              assert.equal(details.business, "Unknown");
+              assert.equal(details.consumer, "Unknown");
+              assert.equal(details.corporate, "Unknown");
+              assert.equal(details.purchase, "Unknown");
 
               done();
             }
@@ -3524,6 +3540,10 @@ describe("TransactionGateway", function () {
               assert.equal(details.isNetworkTokenized, true);
               assert.equal(details.last4, "1881");
               assert.equal(details.prepaidReloadable, "Unknown");
+              assert.equal(details.business, "Unknown");
+              assert.equal(details.consumer, "Unknown");
+              assert.equal(details.corporate, "Unknown");
+              assert.equal(details.purchase, "Unknown");
 
               done();
             }
@@ -4749,8 +4769,20 @@ describe("TransactionGateway", function () {
       transactionParams,
       function (err, response) {
         assert.equal(
+          response.transaction.creditCard.business,
+          CreditCard.Business.Unknown
+        );
+        assert.equal(
           response.transaction.creditCard.commercial,
           CreditCard.Commercial.Unknown
+        );
+        assert.equal(
+          response.transaction.creditCard.consumer,
+          CreditCard.Consumer.Unknown
+        );
+        assert.equal(
+          response.transaction.creditCard.corporate,
+          CreditCard.Corporate.Unknown
         );
         assert.equal(
           response.transaction.creditCard.countryOfIssuance,
@@ -4787,6 +4819,10 @@ describe("TransactionGateway", function () {
         assert.equal(
           response.transaction.creditCard.productId,
           CreditCard.ProductId.Unknown
+        );
+        assert.equal(
+          response.transaction.creditCard.purchase,
+          CreditCard.Purchase.Unknown
         );
 
         done();

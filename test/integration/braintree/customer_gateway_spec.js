@@ -158,6 +158,39 @@ describe("CustomerGateway", function () {
       );
     });
 
+    it("includes ani response when accountInformationInquiry is present", function (done) {
+      let customerParams = {
+        // eslint-disable-next-line camelcase
+        credit_card: {
+          // eslint-disable-line camelcase
+          number: "4111111111111111",
+          expiration_month: "11", // eslint-disable-line camelcase
+          expiration_year: "2099", // eslint-disable-line camelcase
+          billingAddress: {
+            firstName: "Jon",
+            lastName: "Smith",
+          },
+          options: {
+            verifyCard: true,
+            accountInformationInquiry: "send_data",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          let verification = response.customer.creditCards[0].verification;
+
+          assert.isNotNull(verification.aniFirstNameResponseCode);
+          assert.isNotNull(verification.aniLastNameResponseCode);
+          done();
+        }
+      );
+    });
+
     it("creates a customer with tax identifiers", function (done) {
       let customerParams = {
         taxIdentifiers: [
@@ -1673,6 +1706,39 @@ describe("CustomerGateway", function () {
               done();
             }
           );
+        }
+      );
+    });
+
+    it("includes ani response when accountInformationInquiry is present", function (done) {
+      let customerParams = {
+        creditCard: {
+          number: "4111111111111111",
+          expiration_month: "11", // eslint-disable-line camelcase
+          expiration_year: "2099", // eslint-disable-line camelcase
+          billingAddress: {
+            firstName: "Jon",
+            lastName: "Smith",
+          },
+          options: {
+            verifyCard: true,
+            accountInformationInquiry: "send_data",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.update(
+        customerId,
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.customer.creditCards[0].verification;
+
+          assert.isNotNull(verification.aniFirstNameResponseCode);
+          assert.isNotNull(verification.aniLastNameResponseCode);
+          done();
         }
       );
     });

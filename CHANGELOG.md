@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.31.0
+
+- Add `accountInformationInquiry` to
+  - `Customer.create` and `Customer.update`
+  - `CreditCardVerificationGateway`
+- Enhancements to PayPal customer recommendations
+  - Create a session and get recommendations in one call
+  - Hash customer email and phone number
+- Add business, consumer, corporate, and purchase from bin data in credit card responses
+
 ## 3.30.0
 
 - Removes marketplace features

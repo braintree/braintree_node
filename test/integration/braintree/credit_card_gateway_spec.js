@@ -181,6 +181,35 @@ describe("CreditCardGateway", function () {
       );
     });
 
+    it("includes ani response when accountInformationInquiry is present", function (done) {
+      let creditCardParams = {
+        customerId,
+        number: "4111111111111111",
+        expirationDate: "05/2030",
+        billingAddress: {
+          firstName: "Jon",
+          lastName: "Smith",
+        },
+        options: {
+          verifyCard: "true",
+          accountInformationInquiry: "send_data",
+        },
+      };
+
+      specHelper.defaultGateway.creditCard.create(
+        creditCardParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          let verification = response.creditCard.verification;
+
+          assert.isNotNull(verification.aniFirstNameResponseCode);
+          assert.isNotNull(verification.aniLastNameResponseCode);
+          done();
+        }
+      );
+    });
+
     it("creates from three d secure pass thru parameters", function (done) {
       specHelper.defaultGateway.customer.create(
         { firstName: "John", lastName: "Smith" },
@@ -824,6 +853,89 @@ describe("CreditCardGateway", function () {
           }
         );
       });
+
+      it("handles business cards", function (done) {
+        let creditCardParams = {
+          customerId,
+          number: CreditCardNumbers.CardTypeIndicators.Business,
+          expirationDate: "05/2012",
+          options: {
+            verifyCard: true,
+          },
+        };
+
+        specHelper.defaultGateway.creditCard.create(
+          creditCardParams,
+          function (err, response) {
+            assert.equal(response.creditCard.business, CreditCard.Business.Yes);
+
+            done();
+          }
+        );
+      });
+
+      it("handles consumer cards", function (done) {
+        let creditCardParams = {
+          customerId,
+          number: CreditCardNumbers.CardTypeIndicators.Consumer,
+          expirationDate: "05/2012",
+          options: {
+            verifyCard: true,
+          },
+        };
+
+        specHelper.defaultGateway.creditCard.create(
+          creditCardParams,
+          function (err, response) {
+            assert.equal(response.creditCard.consumer, CreditCard.Consumer.Yes);
+
+            done();
+          }
+        );
+      });
+
+      it("handles corporate cards", function (done) {
+        let creditCardParams = {
+          customerId,
+          number: CreditCardNumbers.CardTypeIndicators.Corporate,
+          expirationDate: "05/2012",
+          options: {
+            verifyCard: true,
+          },
+        };
+
+        specHelper.defaultGateway.creditCard.create(
+          creditCardParams,
+          function (err, response) {
+            assert.equal(
+              response.creditCard.corporate,
+              CreditCard.Corporate.Yes
+            );
+
+            done();
+          }
+        );
+      });
+
+      it("handles purchase cards", function (done) {
+        let creditCardParams = {
+          customerId,
+          number: CreditCardNumbers.CardTypeIndicators.Purchase,
+          expirationDate: "05/2012",
+          options: {
+            verifyCard: true,
+          },
+        };
+
+        specHelper.defaultGateway.creditCard.create(
+          creditCardParams,
+          function (err, response) {
+            assert.equal(response.creditCard.purchase, CreditCard.Purchase.Yes);
+
+            done();
+          }
+        );
+      });
     });
 
     context("negative card type indicators", function () {
@@ -875,10 +987,34 @@ describe("CreditCardGateway", function () {
           CreditCard.DurbinRegulated.No
         ));
 
-      it("sets the heathcare field to No", () =>
+      it("sets the healthcare field to No", () =>
         assert.equal(
           createResponse.creditCard.healthcare,
           CreditCard.Healthcare.No
+        ));
+
+      it("sets the business field to No", () =>
+        assert.equal(
+          createResponse.creditCard.business,
+          CreditCard.Business.No
+        ));
+
+      it("sets the consumer field to No", () =>
+        assert.equal(
+          createResponse.creditCard.consumer,
+          CreditCard.Consumer.No
+        ));
+
+      it("sets the corporate field to No", () =>
+        assert.equal(
+          createResponse.creditCard.corporate,
+          CreditCard.Business.No
+        ));
+
+      it("sets the purchase field to No", () =>
+        assert.equal(
+          createResponse.creditCard.purchase,
+          CreditCard.Purchase.No
         ));
 
       it("sets the product id field to MSB", () =>
@@ -943,10 +1079,34 @@ describe("CreditCardGateway", function () {
           CreditCard.DurbinRegulated.Unknown
         ));
 
-      it("sets the heathcare field to Unknown", () =>
+      it("sets the healthcare field to Unknown", () =>
         assert.equal(
           createResponse.creditCard.healthcare,
           CreditCard.Healthcare.Unknown
+        ));
+
+      it("sets the business field to Unknown", () =>
+        assert.equal(
+          createResponse.creditCard.business,
+          CreditCard.Business.Unknown
+        ));
+
+      it("sets the consumer field to Unknown", () =>
+        assert.equal(
+          createResponse.creditCard.consumer,
+          CreditCard.Consumer.Unknown
+        ));
+
+      it("sets the corporate field to Unknown", () =>
+        assert.equal(
+          createResponse.creditCard.corporate,
+          CreditCard.Corporate.Unknown
+        ));
+
+      it("sets the purchase field to Unknown", () =>
+        assert.equal(
+          createResponse.creditCard.purchase,
+          CreditCard.Purchase.Unknown
         ));
 
       it("sets the country of issuance field to Unknown", () =>
@@ -1649,6 +1809,47 @@ describe("CreditCardGateway", function () {
               let riskData = response.creditCard.verification.riskData;
 
               assert.isUndefined(riskData);
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("includes ani response when accountInformationInquiry is present", function (done) {
+      let customerParams = {
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/2030",
+          billingAddress: {
+            firstName: "Jon",
+            lastName: "Smith",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          let creditCardToken = response.customer.creditCards[0].token;
+          let creditCardParams = {
+            expirationDate: "08/2025",
+            options: {
+              verifyCard: "true",
+              accountInformationInquiry: "send_data",
+            },
+          };
+
+          specHelper.defaultGateway.creditCard.update(
+            creditCardToken,
+            creditCardParams,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              let verification = response.creditCard.verification;
+
+              assert.isNotNull(verification.aniFirstNameResponseCode);
+              assert.isNotNull(verification.aniLastNameResponseCode);
               done();
             }
           );

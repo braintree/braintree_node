@@ -29,9 +29,12 @@ describe("Visa Checkout", function () {
           assert.equal(visaCheckoutCard.callId, "abc123");
           assert.isNotNull(visaCheckoutCard.billingAddress);
           assert.isNotNull(visaCheckoutCard.bin);
+          assert.isNotNull(visaCheckoutCard.business);
           assert.isNotNull(visaCheckoutCard.cardType);
           assert.isNotNull(visaCheckoutCard.cardholderName);
           assert.isNotNull(visaCheckoutCard.commercial);
+          assert.isNotNull(visaCheckoutCard.consumer);
+          assert.isNotNull(visaCheckoutCard.corporate);
           assert.isNotNull(visaCheckoutCard.countryOfIssuance);
           assert.isNotNull(visaCheckoutCard.createdAt);
           assert.isNotNull(visaCheckoutCard.customerId);
@@ -52,6 +55,7 @@ describe("Visa Checkout", function () {
           assert.isNotNull(visaCheckoutCard.prepaid);
           assert.isNotNull(visaCheckoutCard.prepaidReloadable);
           assert.isNotNull(visaCheckoutCard.productId);
+          assert.isNotNull(visaCheckoutCard.purchase);
           assert.isNotNull(visaCheckoutCard.subscriptions);
           assert.isNotNull(visaCheckoutCard.token);
           assert.isNotNull(visaCheckoutCard.uniqueNumberIdentifier);
@@ -161,9 +165,12 @@ describe("Visa Checkout", function () {
 
           assert.equal("abc123", visaCheckoutCardDetails.callId);
           assert.isNotNull(visaCheckoutCardDetails.bin);
+          assert.isNotNull(visaCheckoutCardDetails.business);
           assert.isNotNull(visaCheckoutCardDetails.cardType);
           assert.isNotNull(visaCheckoutCardDetails.cardholderName);
           assert.isNotNull(visaCheckoutCardDetails.commercial);
+          assert.isNotNull(visaCheckoutCardDetails.consumer);
+          assert.isNotNull(visaCheckoutCardDetails.corporate);
           assert.isNotNull(visaCheckoutCardDetails.countryOfIssuance);
           assert.isNotNull(visaCheckoutCardDetails.customerLocation);
           assert.isNotNull(visaCheckoutCardDetails.debit);
@@ -180,6 +187,7 @@ describe("Visa Checkout", function () {
           assert.isNotNull(visaCheckoutCardDetails.prepaid);
           assert.isNotNull(visaCheckoutCardDetails.prepaidReloadable);
           assert.isNotNull(visaCheckoutCardDetails.productId);
+          assert.isNotNull(visaCheckoutCardDetails.purchase);
           assert.isNotNull(visaCheckoutCardDetails.token);
 
           done();

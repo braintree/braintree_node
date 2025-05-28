@@ -34,6 +34,10 @@ describe("PaymentMethodGateway", function () {
               assert.isNotNull(response.paymentMethod.token);
               assert.isNotNull(response.paymentMethod.customerId);
               assert.isNotNull(response.paymentMethod.prepaidReloadable);
+              assert.isNotNull(response.paymentMethod.business);
+              assert.isNotNull(response.paymentMethod.consumer);
+              assert.isNotNull(response.paymentMethod.corporate);
+              assert.isNotNull(response.paymentMethod.purchase);
 
               done();
             }
@@ -276,6 +280,66 @@ describe("PaymentMethodGateway", function () {
         }
       ));
 
+    it("includes ani response when accountInformationInquiry is present", (done) =>
+      specHelper.defaultGateway.customer.create({}, function (err, response) {
+        customerId = response.customer.id;
+        specHelper.defaultGateway.clientToken.generate(
+          {},
+          function (err, result) {
+            let clientToken = JSON.parse(
+              specHelper.decodeClientToken(result.clientToken)
+            );
+            let authorizationFingerprint = clientToken.authorizationFingerprint;
+
+            let params = {
+              authorizationFingerprint,
+              creditCard: {
+                number: "4111111111111111",
+                expirationDate: "01/2033",
+                billingAddress: {
+                  firstName: "Jon",
+                  lastName: "Smith",
+                },
+              },
+            };
+
+            let myHttp = new specHelper.clientApiHttp(
+              new Config(specHelper.defaultConfig)
+            ); // eslint-disable-line new-cap
+
+            return myHttp.post(
+              "/client_api/v1/payment_methods/credit_cards.json",
+              params,
+              function (statusCode, body) {
+                let nonce = JSON.parse(body).creditCards[0].nonce;
+
+                let paymentMethodParams = {
+                  paymentMethodNonce: nonce,
+                  customerId,
+                  options: {
+                    verifyCard: "true",
+                    accountInformationInquiry: "send_data",
+                  },
+                };
+
+                specHelper.defaultGateway.paymentMethod.create(
+                  paymentMethodParams,
+                  function (err, response) {
+                    assert.isNull(err);
+                    assert.isTrue(response.success);
+                    let verification = response.creditCard.verification;
+
+                    assert.isNotNull(verification.aniFirstNameResponseCode);
+                    assert.isNotNull(verification.aniLastNameResponseCode);
+                    done();
+                  }
+                );
+              }
+            );
+          }
+        );
+      }));
+
     context("Apple Pay", () =>
       it("vaults an Apple Pay card from the nonce", (done) =>
         specHelper.defaultGateway.customer.create(
@@ -299,6 +363,10 @@ describe("PaymentMethodGateway", function () {
                 assert.isNotNull(response.paymentMethod.sourceDescription);
                 assert.isNotNull(response.paymentMethod.customerId);
                 assert.isNotNull(response.paymentMethod.prepaidReloadable);
+                assert.isNotNull(response.paymentMethod.business);
+                assert.isNotNull(response.paymentMethod.consumer);
+                assert.isNotNull(response.paymentMethod.corporate);
+                assert.isNotNull(response.paymentMethod.purchase);
 
                 done();
               }
@@ -347,6 +415,10 @@ describe("PaymentMethodGateway", function () {
                 );
                 assert.equal(response.paymentMethod.customerId, customerId);
                 assert.isNotNull(response.paymentMethod.prepaidReloadable);
+                assert.isNotNull(response.paymentMethod.business);
+                assert.isNotNull(response.paymentMethod.consumer);
+                assert.isNotNull(response.paymentMethod.corporate);
+                assert.isNotNull(response.paymentMethod.purchase);
 
                 done();
               }
@@ -393,6 +465,10 @@ describe("PaymentMethodGateway", function () {
                 );
                 assert.equal(response.paymentMethod.customerId, customerId);
                 assert.isNotNull(response.paymentMethod.prepaidReloadable);
+                assert.isNotNull(response.paymentMethod.business);
+                assert.isNotNull(response.paymentMethod.consumer);
+                assert.isNotNull(response.paymentMethod.corporate);
+                assert.isNotNull(response.paymentMethod.purchase);
 
                 done();
               }
@@ -2107,6 +2183,10 @@ describe("PaymentMethodGateway", function () {
                   );
                   assert.equal(androidPayCard.sourceCardLast4, "1111");
                   assert.isNotNull(androidPayCard.prepaidReloadable);
+                  assert.isNotNull(androidPayCard.business);
+                  assert.isNotNull(androidPayCard.consumer);
+                  assert.isNotNull(androidPayCard.corporate);
+                  assert.isNotNull(androidPayCard.purchase);
 
                   done();
                 }
@@ -2607,6 +2687,49 @@ describe("PaymentMethodGateway", function () {
                 let riskData = response.creditCard.verification.riskData;
 
                 assert.isUndefined(riskData);
+                done();
+              }
+            );
+          }
+        );
+      });
+
+      it("includes ani response when accountInformationInquiry is present", function (done) {
+        let customerParams = {
+          creditCard: {
+            number: "4111111111111111",
+            expirationDate: "06/2033",
+            billingAddress: {
+              firstName: "Jon",
+              lastName: "Smith",
+            },
+          },
+        };
+
+        specHelper.defaultGateway.customer.create(
+          customerParams,
+          function (err, response) {
+            let creditCard = response.customer.creditCards[0];
+
+            let paymentMethodParams = {
+              expirationDate: "09/2033",
+              options: {
+                verifyCard: "true",
+                accountInformationInquiry: "send_data",
+              },
+            };
+
+            specHelper.defaultGateway.paymentMethod.update(
+              creditCard.token,
+              paymentMethodParams,
+              function (err, response) {
+                assert.isNull(err);
+                assert.isTrue(response.success);
+
+                let verification = response.creditCard.verification;
+
+                assert.isNotNull(verification.aniFirstNameResponseCode);
+                assert.isNotNull(verification.aniLastNameResponseCode);
                 done();
               }
             );

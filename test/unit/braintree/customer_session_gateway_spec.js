@@ -10,7 +10,7 @@ const {
   UpdateCustomerSessionInput,
   RecommendedPaymentOption,
   CustomerRecommendationsPayload,
-  PaymentOptions,
+  PaymentRecommendation,
   CustomerRecommendations,
 } = require("../../../lib/braintree/graphql");
 const { assert } = require("chai");
@@ -168,12 +168,12 @@ describe("CustomerSessionGateway", () => {
   describe("getCustomerRecommendations", () => {
     it("should successfully retrieve customer recommendations", async () => {
       const input = CustomerRecommendationsInput.builder().build();
-      const paymentOptions = new PaymentOptions(
+      const paymentRecommendation = new PaymentRecommendation(
         RecommendedPaymentOption.PAYPAL,
         1
       );
       const customerRecommendations = new CustomerRecommendations([
-        paymentOptions,
+        paymentRecommendation,
       ]);
       const customerRecommendationsPayload = new CustomerRecommendationsPayload(
         true,
@@ -182,13 +182,11 @@ describe("CustomerSessionGateway", () => {
 
       graphQLClientMock.query.resolves({
         data: {
-          customerRecommendations: {
+          generateCustomerRecommendations: {
             isInPayPalNetwork: true,
-            recommendations: {
-              paymentOptions: [
-                { paymentOption: "PAYPAL", recommendedPriority: 1 },
-              ],
-            },
+            paymentRecommendations: [
+              { paymentOption: "PAYPAL", recommendedPriority: 1 },
+            ],
           },
         },
       });

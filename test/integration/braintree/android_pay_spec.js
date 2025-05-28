@@ -24,8 +24,12 @@ describe("Android Pay", function () {
             "AndroidPayCard"
           );
 
+          assert.isNotNull(androidPayCard.business);
+          assert.isNotNull(androidPayCard.consumer);
+          assert.isNotNull(androidPayCard.corporate);
           assert.isNotNull(androidPayCard.prepaid);
           assert.isNotNull(androidPayCard.prepaidReloadable);
+          assert.isNotNull(androidPayCard.purchase);
 
           specHelper.defaultGateway.customer.find(
             customerId,
