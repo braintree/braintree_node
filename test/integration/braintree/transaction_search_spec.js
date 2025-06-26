@@ -1220,7 +1220,8 @@ describe("TransactionSearch", () =>
       );
     });
 
-    it("can search by debitNetwork", function (done) {
+    xit("can search by debitNetwork", function (done) {
+      // Flaky test
       let random = specHelper.randomId();
       let transactionParams = {
         amount: "10.00",

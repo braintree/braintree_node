@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.32.0
+
+- Add Session Id to Customer Recommendations Payload
+
 ## 3.31.0
 
 - Add `accountInformationInquiry` to

@@ -176,6 +176,7 @@ describe("CustomerSessionGateway", () => {
         paymentRecommendation,
       ]);
       const customerRecommendationsPayload = new CustomerRecommendationsPayload(
+        "session-id",
         true,
         customerRecommendations
       );
@@ -183,6 +184,7 @@ describe("CustomerSessionGateway", () => {
       graphQLClientMock.query.resolves({
         data: {
           generateCustomerRecommendations: {
+            sessionId: "session-id",
             isInPayPalNetwork: true,
             paymentRecommendations: [
               { paymentOption: "PAYPAL", recommendedPriority: 1 },

@@ -187,6 +187,7 @@ describe("CustomerSessionGateway", () => {
       const payload = result.target;
 
       assert.isTrue(payload.isInPayPalNetwork);
+      assert.equal(payload.sessionId, "94f0b2db-5323-4d86-add3-paypal000000");
 
       const recommendation = payload.recommendations.paymentOptions[0];
 

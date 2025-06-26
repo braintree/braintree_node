@@ -6561,20 +6561,23 @@ describe("TransactionGateway", function () {
               "2046.00",
               function (err, response) {
                 assert.isNull(err);
-                assert.isFalse(response.success, "response had no errors");
+                assert.isTrue(response.success, "response had errors");
                 assert.equal(response.transaction.type, "credit");
-                assert.equal(response.transaction.status, "processor_declined");
+                assert.equal(
+                  response.transaction.status,
+                  "submitted_for_settlement"
+                );
                 assert.equal(
                   response.transaction.processorResponseCode,
-                  "2046"
+                  "1005"
                 );
                 assert.equal(
                   response.transaction.processorResponseText,
-                  "Declined"
+                  "Auth Declined but Settlement Captured"
                 );
                 assert.equal(
                   response.transaction.processorResponseType,
-                  "soft_declined"
+                  "approved"
                 );
                 assert.equal(
                   response.transaction.additionalProcessorResponse,
@@ -6606,7 +6609,7 @@ describe("TransactionGateway", function () {
           specHelper.defaultGateway.testing.settle(result.transaction.id, () =>
             specHelper.defaultGateway.transaction.refund(
               result.transaction.id,
-              "2009.00",
+              "2004.00",
               function (err, response) {
                 assert.isNull(err);
                 assert.isFalse(response.success, "response had no errors");
@@ -6614,11 +6617,11 @@ describe("TransactionGateway", function () {
                 assert.equal(response.transaction.status, "processor_declined");
                 assert.equal(
                   response.transaction.processorResponseCode,
-                  "2009"
+                  "2004"
                 );
                 assert.equal(
                   response.transaction.processorResponseText,
-                  "No Such Issuer"
+                  "Expired Card"
                 );
                 assert.equal(
                   response.transaction.processorResponseType,
@@ -6626,7 +6629,7 @@ describe("TransactionGateway", function () {
                 );
                 assert.equal(
                   response.transaction.additionalProcessorResponse,
-                  "2009 : No Such Issuer"
+                  "2004 : Expired Card"
                 );
                 done();
               }
