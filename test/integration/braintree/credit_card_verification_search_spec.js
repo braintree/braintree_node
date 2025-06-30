@@ -258,6 +258,22 @@ describe("CreditCardVerification", () =>
                   CreditCard.PrepaidReloadable.Unknown
                 );
                 assert.equal(
+                  verification.creditCard.business,
+                  CreditCard.Business.Unknown
+                );
+                assert.equal(
+                  verification.creditCard.consumer,
+                  CreditCard.Consumer.Unknown
+                );
+                assert.equal(
+                  verification.creditCard.corporate,
+                  CreditCard.Corporate.Unknown
+                );
+                assert.equal(
+                  verification.creditCard.purchase,
+                  CreditCard.Purchase.Unknown
+                );
+                assert.equal(
                   verification.creditCard.durbinRegulated,
                   CreditCard.DurbinRegulated.Unknown
                 );

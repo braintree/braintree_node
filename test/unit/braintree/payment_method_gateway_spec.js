@@ -94,4 +94,45 @@ describe("PaymentMethodGateway", function () {
       );
     });
   });
+
+  describe("accountInformationInquiry", function () {
+    let fakeGateway = {
+      config: {
+        baseMerchantPath() {
+          return "";
+        },
+      },
+      http: {
+        post(url, params) {
+          return Promise.resolve({
+            paymentMethod: {
+              options: {
+                accountInformationInquiry:
+                  params.paymentMethod.options.accountInformationInquiry,
+              },
+            },
+          });
+        },
+      },
+    };
+
+    it("handles accountInformationInquiry in payment method options", function (done) {
+      let paymentGateway = new PaymentMethodGateway(fakeGateway);
+      let paymentParams = {
+        options: {
+          accountInformationInquiry: "send_data",
+        },
+      };
+
+      paymentGateway.create(paymentParams, (err, params) => {
+        assert.isNull(err);
+        assert.exists(params);
+        assert.deepEqual(
+          params.paymentMethod.options.accountInformationInquiry,
+          "send_data"
+        );
+        done();
+      });
+    });
+  });
 });

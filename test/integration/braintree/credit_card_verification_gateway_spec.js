@@ -114,6 +114,36 @@ describe("CreditCardVerificationGateway", function () {
       );
     });
 
+    it("includes ani response when accountInformationInquiry is present", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4111111111111111",
+          expirationDate: "05/2014",
+        },
+        options: {
+          accountInformationInquiry: "send_data",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+          assert.equal(verification.aniFirstNameResponseCode, "I");
+          assert.equal(verification.aniLastNameResponseCode, "I");
+          done();
+        }
+      );
+    });
+
     it("handles processor declined verifications", function (done) {
       let params = {
         creditCard: {
@@ -628,6 +658,110 @@ describe("CreditCardVerificationGateway", function () {
           assert.equal(verification.processorResponseText, "Approved");
           assert.equal(verification.processorResponseType, "approved");
           assert.equal(verification.creditCard.prepaidReloadable, "Yes");
+          done();
+        }
+      );
+    });
+
+    it("creates a verification and returns business in the response", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4229989800000003",
+          expirationDate: "05/2029",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+          assert.equal(verification.creditCard.business, "Yes");
+          done();
+        }
+      );
+    });
+
+    it("creates a verification and returns consumer in the response", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4229989700000004",
+          expirationDate: "05/2029",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+          assert.equal(verification.creditCard.consumer, "Yes");
+          done();
+        }
+      );
+    });
+
+    it("creates a verification and returns corporate in the response", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4229989100000000",
+          expirationDate: "05/2029",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+          assert.equal(verification.creditCard.corporate, "Yes");
+          done();
+        }
+      );
+    });
+
+    it("creates a verification and returns purchase in the response", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4229989500000006",
+          expirationDate: "05/2029",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+          assert.equal(verification.creditCard.purchase, "Yes");
           done();
         }
       );

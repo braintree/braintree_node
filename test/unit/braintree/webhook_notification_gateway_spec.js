@@ -2,8 +2,6 @@
 /* eslint-disable camelcase */
 
 let Buffer = require("buffer").Buffer;
-let ValidationErrorCodes =
-  require("../../../lib/braintree/validation_error_codes").ValidationErrorCodes;
 let WebhookNotification = require("../../../lib/braintree").WebhookNotification;
 let Dispute = require("../../../lib/braintree/dispute").Dispute;
 let Transaction = require("../../../lib/braintree/transaction").Transaction;
@@ -288,59 +286,6 @@ describe("WebhookNotificationGateway", function () {
         function (err) {
           assert.equal(err.type, errorTypes.invalidSignatureError);
           assert.equal(err.message, "payload contains illegal characters");
-          done();
-        }
-      );
-    });
-    it("returns a parsable signature and payload for merchant account approvals", function (done) {
-      let notification =
-        specHelper.defaultGateway.webhookTesting.sampleNotification(
-          WebhookNotification.Kind.SubMerchantAccountApproved,
-          "my_id"
-        );
-      let bt_signature = notification.bt_signature;
-      let bt_payload = notification.bt_payload;
-
-      specHelper.defaultGateway.webhookNotification.parse(
-        bt_signature,
-        bt_payload,
-        function (err, webhookNotification) {
-          assert.equal(
-            webhookNotification.kind,
-            WebhookNotification.Kind.SubMerchantAccountApproved
-          );
-          assert.equal(webhookNotification.merchantAccount.id, "my_id");
-          assert.exists(webhookNotification.timestamp);
-          done();
-        }
-      );
-    });
-
-    it("returns a parsable signature and payload for merchant account declines", function (done) {
-      let notification =
-        specHelper.defaultGateway.webhookTesting.sampleNotification(
-          WebhookNotification.Kind.SubMerchantAccountDeclined,
-          "my_id"
-        );
-      let bt_signature = notification.bt_signature;
-      let bt_payload = notification.bt_payload;
-
-      specHelper.defaultGateway.webhookNotification.parse(
-        bt_signature,
-        bt_payload,
-        function (err, webhookNotification) {
-          assert.equal(
-            webhookNotification.kind,
-            WebhookNotification.Kind.SubMerchantAccountDeclined
-          );
-          assert.equal(webhookNotification.merchantAccount.id, "my_id");
-          assert.equal(
-            webhookNotification.errors.for("merchantAccount").on("base")[0]
-              .code,
-            ValidationErrorCodes.MerchantAccount.ApplicantDetails.DeclinedOFAC
-          );
-          assert.equal(webhookNotification.message, "Credit score is too low");
-          assert.exists(webhookNotification.timestamp);
           done();
         }
       );
@@ -805,73 +750,6 @@ describe("WebhookNotificationGateway", function () {
             "USD"
           );
           assert.equal(
-            webhookNotification.disbursement.merchantAccount.subMerchantAccount,
-            false
-          );
-          assert.equal(
-            webhookNotification.disbursement.merchantAccount.status,
-            "active"
-          );
-
-          done();
-        }
-      );
-    });
-
-    it("returns a parsable signature and payload for disbursement exception webhook", function (done) {
-      let notification =
-        specHelper.defaultGateway.webhookTesting.sampleNotification(
-          WebhookNotification.Kind.DisbursementException,
-          "my_id"
-        );
-      let bt_signature = notification.bt_signature;
-      let bt_payload = notification.bt_payload;
-
-      specHelper.defaultGateway.webhookNotification.parse(
-        bt_signature,
-        bt_payload,
-        function (err, webhookNotification) {
-          assert.equal(
-            webhookNotification.kind,
-            WebhookNotification.Kind.DisbursementException
-          );
-          assert.equal(webhookNotification.disbursement.id, "my_id");
-          assert.equal(webhookNotification.disbursement.amount, "100.00");
-          assert.equal(
-            webhookNotification.disbursement.transactionIds[0],
-            "afv56j"
-          );
-          assert.equal(
-            webhookNotification.disbursement.transactionIds[1],
-            "kj8hjk"
-          );
-          assert.equal(webhookNotification.disbursement.success, false);
-          assert.equal(webhookNotification.disbursement.retry, false);
-          assert.equal(
-            webhookNotification.disbursement.disbursementDate,
-            "2014-02-10"
-          );
-          assert.equal(
-            webhookNotification.disbursement.exceptionMessage,
-            "bank_rejected"
-          );
-          assert.equal(
-            webhookNotification.disbursement.followUpAction,
-            "update_funding_information"
-          );
-          assert.equal(
-            webhookNotification.disbursement.merchantAccount.id,
-            "merchant_account_token"
-          );
-          assert.equal(
-            webhookNotification.disbursement.merchantAccount.currencyIsoCode,
-            "USD"
-          );
-          assert.equal(
-            webhookNotification.disbursement.merchantAccount.subMerchantAccount,
-            false
-          );
-          assert.equal(
             webhookNotification.disbursement.merchantAccount.status,
             "active"
           );
@@ -1306,9 +1184,12 @@ describe("WebhookNotificationGateway", function () {
         <subject>
           <credit-card>
             <bin>555555</bin>
+            <business>Unknown</business>
             <card-type>MasterCard</card-type>
             <cardholder-name>Amber Ankunding</cardholder-name>
             <commercial>Unknown</commercial>
+            <consumer>Unknown</consumer>
+            <corporate>Unknown</corporate>
             <country-of-issuance>Unknown</country-of-issuance>
             <created-at type="datetime">2018-10-10T22:46:41Z</created-at>
             <customer-id>credit_card_customer_id</customer-id>
@@ -1328,6 +1209,7 @@ describe("WebhookNotificationGateway", function () {
             <prepaid>Unknown</prepaid>
             <prepaid-reloadable>Unknown</prepaid-reloadable>
             <product-id>Unknown</product-id>
+            <purchase>Unknown</purchase>
             <subscriptions type="array"/>
             <token>credit_card_token</token>
             <unique-number-identifier>08199d188e37460163207f714faf074a</unique-number-identifier>

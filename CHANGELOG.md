@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.32.0
+
+- Add Session Id to Customer Recommendations Payload
+
+## 3.31.0
+
+- Add `accountInformationInquiry` to
+  - `Customer.create` and `Customer.update`
+  - `CreditCardVerificationGateway`
+- Enhancements to PayPal customer recommendations
+  - Create a session and get recommendations in one call
+  - Hash customer email and phone number
+- Add business, consumer, corporate, and purchase from bin data in credit card responses
+
+## 3.30.0
+
+- Removes marketplace features
+- Add support for capturing payment facilitator and sub-merchant details with transactions
+
 ## 3.29.0
 
 - Fixes export for GraphQL classes

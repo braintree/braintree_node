@@ -3264,8 +3264,11 @@ describe("TransactionGateway", function () {
             );
 
             assert.isNotNull(response.transaction.applePayCard.bin);
+            assert.isNotNull(response.transaction.applePayCard.business);
             assert.isNotNull(response.transaction.applePayCard.cardType);
             assert.isNotNull(response.transaction.applePayCard.commercial);
+            assert.isNotNull(response.transaction.applePayCard.consumer);
+            assert.isNotNull(response.transaction.applePayCard.corporate);
             assert.isNotNull(
               response.transaction.applePayCard.countryOfIssuance
             );
@@ -3280,6 +3283,7 @@ describe("TransactionGateway", function () {
               response.transaction.applePayCard.prepaidReloadable
             );
             assert.isNotNull(response.transaction.applePayCard.productId);
+            assert.isNotNull(response.transaction.applePayCard.purchase);
 
             done();
           }
@@ -3314,8 +3318,11 @@ describe("TransactionGateway", function () {
             );
 
             assert.isNotNull(response.transaction.applePayCard.bin);
+            assert.isNotNull(response.transaction.applePayCard.business);
             assert.isNotNull(response.transaction.applePayCard.cardType);
             assert.isNotNull(response.transaction.applePayCard.commercial);
+            assert.isNotNull(response.transaction.applePayCard.consumer);
+            assert.isNotNull(response.transaction.applePayCard.corporate);
             assert.isNotNull(
               response.transaction.applePayCard.countryOfIssuance
             );
@@ -3330,6 +3337,7 @@ describe("TransactionGateway", function () {
               response.transaction.applePayCard.prepaidReloadable
             );
             assert.isNotNull(response.transaction.applePayCard.productId);
+            assert.isNotNull(response.transaction.applePayCard.purchase);
 
             done();
           }
@@ -3402,8 +3410,11 @@ describe("TransactionGateway", function () {
               );
 
               assert.isNotNull(response.transaction.androidPayCard.bin);
+              assert.isNotNull(response.transaction.androidPayCard.business);
               assert.isNotNull(response.transaction.androidPayCard.cardType);
               assert.isNotNull(response.transaction.androidPayCard.commercial);
+              assert.isNotNull(response.transaction.androidPayCard.consumer);
+              assert.isNotNull(response.transaction.androidPayCard.corporate);
               assert.isNotNull(
                 response.transaction.androidPayCard.countryOfIssuance
               );
@@ -3420,6 +3431,7 @@ describe("TransactionGateway", function () {
                 response.transaction.androidPayCard.prepaidReloadable
               );
               assert.isNotNull(response.transaction.androidPayCard.productId);
+              assert.isNotNull(response.transaction.androidPayCard.purchase);
 
               done();
             }
@@ -3470,6 +3482,10 @@ describe("TransactionGateway", function () {
               assert.equal(details.isNetworkTokenized, false);
               assert.equal(details.last4, "1881");
               assert.equal(details.prepaidReloadable, "Unknown");
+              assert.equal(details.business, "Unknown");
+              assert.equal(details.consumer, "Unknown");
+              assert.equal(details.corporate, "Unknown");
+              assert.equal(details.purchase, "Unknown");
 
               done();
             }
@@ -3524,6 +3540,10 @@ describe("TransactionGateway", function () {
               assert.equal(details.isNetworkTokenized, true);
               assert.equal(details.last4, "1881");
               assert.equal(details.prepaidReloadable, "Unknown");
+              assert.equal(details.business, "Unknown");
+              assert.equal(details.consumer, "Unknown");
+              assert.equal(details.corporate, "Unknown");
+              assert.equal(details.purchase, "Unknown");
 
               done();
             }
@@ -4749,8 +4769,20 @@ describe("TransactionGateway", function () {
       transactionParams,
       function (err, response) {
         assert.equal(
+          response.transaction.creditCard.business,
+          CreditCard.Business.Unknown
+        );
+        assert.equal(
           response.transaction.creditCard.commercial,
           CreditCard.Commercial.Unknown
+        );
+        assert.equal(
+          response.transaction.creditCard.consumer,
+          CreditCard.Consumer.Unknown
+        );
+        assert.equal(
+          response.transaction.creditCard.corporate,
+          CreditCard.Corporate.Unknown
         );
         assert.equal(
           response.transaction.creditCard.countryOfIssuance,
@@ -4787,6 +4819,10 @@ describe("TransactionGateway", function () {
         assert.equal(
           response.transaction.creditCard.productId,
           CreditCard.ProductId.Unknown
+        );
+        assert.equal(
+          response.transaction.creditCard.purchase,
+          CreditCard.Purchase.Unknown
         );
 
         done();
@@ -5536,295 +5572,6 @@ describe("TransactionGateway", function () {
         done();
       }
     );
-  });
-
-  context("with a service fee", function () {
-    it("persists the service fee", function (done) {
-      let transactionParams = {
-        merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
-        amount: "5.00",
-        creditCard: {
-          number: "5105105105105100",
-          expirationDate: "05/12",
-        },
-        serviceFeeAmount: "1.00",
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.equal(response.transaction.serviceFeeAmount, "1.00");
-
-          done();
-        }
-      );
-    });
-
-    it("handles validation errors on service fees", function (done) {
-      let transactionParams = {
-        merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
-        amount: "1.00",
-        creditCard: {
-          number: "5105105105105100",
-          expirationDate: "05/12",
-        },
-        serviceFeeAmount: "5.00",
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isFalse(response.success, "response had no errors");
-          assert.equal(
-            response.errors.for("transaction").on("serviceFeeAmount")[0].code,
-            ValidationErrorCodes.Transaction.ServiceFeeAmountIsTooLarge
-          );
-
-          done();
-        }
-      );
-    });
-
-    it("sub merchant accounts must provide a service fee", function (done) {
-      let transactionParams = {
-        merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
-        amount: "1.00",
-        creditCard: {
-          number: "5105105105105100",
-          expirationDate: "05/12",
-        },
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isFalse(response.success, "response had no errors");
-          assert.equal(
-            response.errors.for("transaction").on("merchantAccountId")[0].code,
-            ValidationErrorCodes.Transaction
-              .SubMerchantAccountRequiresServiceFeeAmount
-          );
-
-          done();
-        }
-      );
-    });
-  });
-
-  context("with escrow status", function () {
-    it("can specify transactions to be held for escrow", function (done) {
-      let transactionParams = {
-        merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
-        amount: "10.00",
-        serviceFeeAmount: "1.00",
-        creditCard: {
-          number: "4111111111111111",
-          expirationDate: "05/12",
-        },
-        options: {
-          holdInEscrow: true,
-        },
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-          assert.equal(
-            response.transaction.escrowStatus,
-            Transaction.EscrowStatus.HoldPending
-          );
-          done();
-        }
-      );
-    });
-
-    it("can not be held for escrow if not a submerchant", function (done) {
-      let transactionParams = {
-        merchantAccountId: specHelper.defaultMerchantAccountId,
-        amount: "10.00",
-        serviceFeeAmount: "1.00",
-        creditCard: {
-          number: "4111111111111111",
-          expirationDate: "05/12",
-        },
-        options: {
-          holdInEscrow: true,
-        },
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        function (err, response) {
-          assert.isNull(err);
-          assert.isFalse(response.success, "response had no errors");
-          assert.equal(
-            response.errors.for("transaction").on("base")[0].code,
-            ValidationErrorCodes.Transaction.CannotHoldInEscrow
-          );
-          done();
-        }
-      );
-    });
-  });
-
-  context("releaseFromEscrow", function () {
-    it("can release an escrowed transaction", (done) =>
-      specHelper.createEscrowedTransaction((transaction) =>
-        specHelper.defaultGateway.transaction.releaseFromEscrow(
-          transaction.id,
-          function (err, response) {
-            assert.isNull(err);
-            assert.isTrue(response.success);
-            assert.equal(
-              response.transaction.escrowStatus,
-              Transaction.EscrowStatus.ReleasePending
-            );
-            done();
-          }
-        )
-      ));
-
-    it("cannot submit a non-escrowed transaction for release", function (done) {
-      let transactionParams = {
-        merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
-        amount: "10.00",
-        serviceFeeAmount: "1.00",
-        creditCard: {
-          number: "4111111111111111",
-          expirationDate: "05/12",
-        },
-        options: {
-          holdInEscrow: true,
-        },
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        (err, response) =>
-          specHelper.defaultGateway.transaction.releaseFromEscrow(
-            response.transaction.id,
-            function (err, response) {
-              assert.isNull(err);
-              assert.isFalse(response.success, "response had no errors");
-              assert.equal(
-                response.errors.for("transaction").on("base")[0].code,
-                ValidationErrorCodes.Transaction.CannotReleaseFromEscrow
-              );
-              done();
-            }
-          )
-      );
-    });
-  });
-
-  context("cancelRelease", function () {
-    it("can cancel release for a transaction that has been submitted for release", (done) =>
-      specHelper.createEscrowedTransaction((transaction) =>
-        specHelper.defaultGateway.transaction.releaseFromEscrow(
-          transaction.id,
-          () =>
-            specHelper.defaultGateway.transaction.cancelRelease(
-              transaction.id,
-              function (err, response) {
-                assert.isNull(err);
-                assert.isTrue(response.success);
-                assert.equal(
-                  response.transaction.escrowStatus,
-                  Transaction.EscrowStatus.Held
-                );
-                done();
-              }
-            )
-        )
-      ));
-
-    it("cannot cancel release a transaction that has not been submitted for release", (done) =>
-      specHelper.createEscrowedTransaction((transaction) =>
-        specHelper.defaultGateway.transaction.cancelRelease(
-          transaction.id,
-          function (err, response) {
-            assert.isNull(err);
-            assert.isFalse(response.success, "response had no errors");
-            assert.equal(
-              response.errors.for("transaction").on("base")[0].code,
-              ValidationErrorCodes.Transaction.CannotCancelRelease
-            );
-            done();
-          }
-        )
-      ));
-  });
-
-  context("holdInEscrow", function () {
-    it("can hold authorized or submitted for settlement transactions for escrow", function (done) {
-      let transactionParams = {
-        merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
-        amount: "10.00",
-        serviceFeeAmount: "1.00",
-        creditCard: {
-          number: "4111111111111111",
-          expirationDate: "05/12",
-        },
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        (err, response) =>
-          specHelper.defaultGateway.transaction.holdInEscrow(
-            response.transaction.id,
-            function (err, response) {
-              assert.isNull(err);
-              assert.isTrue(response.success);
-              assert.equal(
-                response.transaction.escrowStatus,
-                Transaction.EscrowStatus.HoldPending
-              );
-              done();
-            }
-          )
-      );
-    });
-
-    it("cannot hold settled transactions for escrow", function (done) {
-      let transactionParams = {
-        merchantAccountId: specHelper.nonDefaultSubMerchantAccountId,
-        amount: "10.00",
-        serviceFeeAmount: "1.00",
-        creditCard: {
-          number: "4111111111111111",
-          expirationDate: "05/12",
-        },
-        options: {
-          submitForSettlement: true,
-        },
-      };
-
-      specHelper.defaultGateway.transaction.sale(
-        transactionParams,
-        (err, response) =>
-          specHelper.defaultGateway.testing.settle(
-            response.transaction.id,
-            (err, response) =>
-              specHelper.defaultGateway.transaction.holdInEscrow(
-                response.transaction.id,
-                function (err, response) {
-                  assert.isFalse(response.success, "response had no errors");
-                  assert.equal(
-                    response.errors.for("transaction").on("base")[0].code,
-                    ValidationErrorCodes.Transaction.CannotHoldInEscrow
-                  );
-                  done();
-                }
-              )
-          )
-      );
-    });
   });
 
   it("can use vaulted credit card nonce", function (done) {
@@ -6814,20 +6561,23 @@ describe("TransactionGateway", function () {
               "2046.00",
               function (err, response) {
                 assert.isNull(err);
-                assert.isFalse(response.success, "response had no errors");
+                assert.isTrue(response.success, "response had errors");
                 assert.equal(response.transaction.type, "credit");
-                assert.equal(response.transaction.status, "processor_declined");
+                assert.equal(
+                  response.transaction.status,
+                  "submitted_for_settlement"
+                );
                 assert.equal(
                   response.transaction.processorResponseCode,
-                  "2046"
+                  "1005"
                 );
                 assert.equal(
                   response.transaction.processorResponseText,
-                  "Declined"
+                  "Auth Declined but Settlement Captured"
                 );
                 assert.equal(
                   response.transaction.processorResponseType,
-                  "soft_declined"
+                  "approved"
                 );
                 assert.equal(
                   response.transaction.additionalProcessorResponse,
@@ -6859,7 +6609,7 @@ describe("TransactionGateway", function () {
           specHelper.defaultGateway.testing.settle(result.transaction.id, () =>
             specHelper.defaultGateway.transaction.refund(
               result.transaction.id,
-              "2009.00",
+              "2004.00",
               function (err, response) {
                 assert.isNull(err);
                 assert.isFalse(response.success, "response had no errors");
@@ -6867,11 +6617,11 @@ describe("TransactionGateway", function () {
                 assert.equal(response.transaction.status, "processor_declined");
                 assert.equal(
                   response.transaction.processorResponseCode,
-                  "2009"
+                  "2004"
                 );
                 assert.equal(
                   response.transaction.processorResponseText,
-                  "No Such Issuer"
+                  "Expired Card"
                 );
                 assert.equal(
                   response.transaction.processorResponseType,
@@ -6879,7 +6629,7 @@ describe("TransactionGateway", function () {
                 );
                 assert.equal(
                   response.transaction.additionalProcessorResponse,
-                  "2009 : No Such Issuer"
+                  "2004 : Expired Card"
                 );
                 done();
               }

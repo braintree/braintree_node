@@ -34,4 +34,35 @@ describe("CreditCardVerificationGateway", () =>
         done();
       });
     });
+
+    it("processes accountInformationInquiry in options", function (done) {
+      let gateway = new CreditCardVerificationGateway(
+        specHelper.defaultGateway
+      );
+      let verificationParams = {
+        options: {
+          accountInformationInquiry: "send_data",
+        },
+      };
+
+      gateway.create = (params, callback) => {
+        if (params.options.accountInformationInquiry === "send_data") {
+          callback(null, {
+            options: {
+              accountInformationInquiry:
+                params.options.accountInformationInquiry,
+            },
+          });
+        } else {
+          callback(new Error("Server Error"), null);
+        }
+      };
+
+      gateway.create(verificationParams, (err, result) => {
+        assert.isNull(err);
+        assert.exists(result);
+        assert.deepEqual(result.options.accountInformationInquiry, "send_data");
+        done();
+      });
+    });
   }));

@@ -1,16 +1,24 @@
 "use strict";
 
 const {
+  CustomerRecommendationsInput,
   CustomerSessionInput,
-  UpdateCustomerSessionInput,
+  MonetaryAmountInput,
+  PayPalPurchaseUnitInput,
 } = require("../../../../lib/braintree/graphql");
 
-describe("UpdateCustomerSessionInput", () => {
+describe("CustomerRecommendationsInput", () => {
   it("should correctly generate map for GraphQL variables", () => {
     const customerSessionInput = CustomerSessionInput.builder().build();
-    const input = UpdateCustomerSessionInput.builder("session-id")
+    const purchaseUnitInput = PayPalPurchaseUnitInput.builder(
+      new MonetaryAmountInput("10.00", "USD")
+    ).build();
+    const input = CustomerRecommendationsInput.builder()
+      .sessionId("session-id")
       .merchantAccountId("merchant-account-id")
       .customer(customerSessionInput)
+      .purchaseUnits([purchaseUnitInput])
+      .domain("a-domain")
       .build();
 
     const map = input.toGraphQLVariables();
@@ -21,5 +29,10 @@ describe("UpdateCustomerSessionInput", () => {
       map.customer,
       customerSessionInput.toGraphQLVariables()
     );
+    assert.deepStrictEqual(
+      map.purchaseUnits[0],
+      purchaseUnitInput.toGraphQLVariables()
+    );
+    assert.equal(map.domain, "a-domain");
   });
 });
