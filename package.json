@@ -1,6 +1,6 @@
 {
   "name": "braintree",
-  "version": "3.32.0",
+  "version": "3.33.0",
   "description": "A library for server-side integrating with Braintree.",
   "keywords": [
     "braintree",
@@ -23,6 +23,7 @@
   "dependencies": {
     "@braintree/wrap-promise": "2.1.0",
     "dateformat": "4.5.1",
+    "npm": "^11.5.2",
     "xml2js": "0.5.0"
   },
   "devDependencies": {

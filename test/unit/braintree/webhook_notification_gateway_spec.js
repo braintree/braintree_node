@@ -318,6 +318,38 @@ describe("WebhookNotificationGateway", function () {
       );
     });
 
+    it("returns a parsable signature and payload for retried transaction", function (done) {
+      let notification =
+        specHelper.defaultGateway.webhookTesting.sampleNotification(
+          WebhookNotification.Kind.TransactionRetried,
+          "my_id"
+        );
+      let bt_signature = notification.bt_signature;
+      let bt_payload = notification.bt_payload;
+
+      specHelper.defaultGateway.webhookNotification.parse(
+        bt_signature,
+        bt_payload,
+        function (err, webhookNotification) {
+          assert.equal(
+            webhookNotification.kind,
+            WebhookNotification.Kind.TransactionRetried
+          );
+          assert.equal(webhookNotification.transaction.id, "my_id");
+          assert.equal(webhookNotification.transaction.amount, "100");
+          assert.equal(
+            webhookNotification.transaction.retriedTransactionId,
+            "original_txn_id"
+          );
+          assert.equal(
+            webhookNotification.transaction.status,
+            Transaction.Status.SubmittedForSettlement
+          );
+          done();
+        }
+      );
+    });
+
     it("returns a parsable signature and payload for reviewed transaction", function (done) {
       let notification =
         specHelper.defaultGateway.webhookTesting.sampleNotification(

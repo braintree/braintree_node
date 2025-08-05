@@ -24,6 +24,7 @@ describe("Dispute", function () {
     reasonDescription: "Reason code 83 description",
     receivedDate: "2013-04-10",
     referenceNumber: "123456",
+    remainingFileEvidenceStorage: "3192019",
     replyByDate: "2013-04-17",
     status: "open",
     updatedAt: "2013-04-10",
@@ -139,6 +140,7 @@ describe("Dispute", function () {
       assert.equal("83", dispute.reasonCode);
       assert.equal("Reason code 83 description", dispute.reasonDescription);
       assert.equal("123456", dispute.referenceNumber);
+      assert.equal("3192019", dispute.remainingFileEvidenceStorage);
       assert.equal("2013-04-10", dispute.updatedAt);
       assert.equal(null, dispute.evidence[0].comment);
       assert.equal("2013-04-11", dispute.evidence[0].createdAt);

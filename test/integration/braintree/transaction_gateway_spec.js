@@ -6418,6 +6418,21 @@ describe("TransactionGateway", function () {
           }
         ));
     });
+
+    it("returns upcomingRetryDate", (done) => {
+      let tomorrow = new Date();
+
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      let tomorrowFormatted = tomorrow.toISOString().slice(0, 10);
+
+      specHelper.defaultGateway.transaction.find(
+        "first_attempted_ach_transaction",
+        function (err, transaction) {
+          assert.equal(transaction.upcomingRetryDate, tomorrowFormatted);
+          done();
+        }
+      );
+    });
   });
 
   describe("refund", function () {

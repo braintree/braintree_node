@@ -119,6 +119,31 @@ describe("DisputeGateway", () => {
         });
     });
 
+    it("updates remainingFileEvidenceStorage", () => {
+      let disputeId, initialStorage, updatedStorage;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          disputeId = dispute.id;
+          initialStorage = dispute.remainingFileEvidenceStorage;
+
+          assert.isNotNull(initialStorage);
+
+          return createEvidenceDocument();
+        })
+        .then((document) => {
+          return disputeGateway.addFileEvidence(disputeId, document.id);
+        })
+        .then(() => {
+          return disputeGateway.find(disputeId);
+        })
+        .then((response) => {
+          updatedStorage = response.dispute.remainingFileEvidenceStorage;
+
+          assert.ok(updatedStorage < initialStorage);
+        });
+    });
+
     it("adds file evidence with category", () => {
       let disputeId, evidenceId;
 
