@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.33.1
+
+- Remove unneeded npm dependency
+
 ## 3.33.0
 
 - Add `upcomingRetryDate` to `Transaction`
