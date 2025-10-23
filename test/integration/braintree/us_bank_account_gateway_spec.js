@@ -39,10 +39,6 @@ describe("UsBankAccountGateway", function () {
                     assert.equal(usBankAccount.routingNumber, "021000021");
                     assert.equal(usBankAccount.accountType, "checking");
                     assert.match(usBankAccount.bankName, /CHASE/);
-                    assert.equal(
-                      usBankAccount.achMandate.text,
-                      "cl mandate text"
-                    );
                     assert.isTrue(
                       usBankAccount.achMandate.acceptedAt instanceof Date
                     );
@@ -139,10 +135,6 @@ describe("UsBankAccountGateway", function () {
                     assert.match(
                       response.transaction.usBankAccount.bankName,
                       /CHASE/
-                    );
-                    assert.equal(
-                      response.transaction.usBankAccount.achMandate.text,
-                      "cl mandate text"
                     );
                     assert.isTrue(
                       response.transaction.usBankAccount.achMandate

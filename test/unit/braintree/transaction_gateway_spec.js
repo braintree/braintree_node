@@ -92,6 +92,24 @@ describe("TransactionGateway", () =>
         done();
       });
     });
+
+    it("accepts processingMerchantCategoryCode", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/28",
+        },
+        processingMerchantCategoryCode: "5411",
+      };
+
+      transactionGateway.sale(transactionParams, (err, params) => {
+        assert.notExists(err);
+        assert.equal("5411", params.transaction.processingMerchantCategoryCode);
+        done();
+      });
+    });
   }));
 
 describe("TransactionGateway", () =>

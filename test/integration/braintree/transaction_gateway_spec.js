@@ -351,6 +351,58 @@ describe("TransactionGateway", function () {
       );
     });
 
+    it("charges a card with valid processingMerchantCategoryCode", function (done) {
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/28",
+        },
+        processingMerchantCategoryCode: "5411",
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.type, "sale");
+          assert.equal(response.transaction.amount, "5.00");
+          done();
+        }
+      );
+    });
+
+    [
+      { label: "alphanumeric", code: "541A" },
+      { label: "too short", code: "541" },
+      { label: "too long", code: "54111" },
+    ].forEach(function (testCase) {
+      it(`handles an error when processingMerchantCategoryCode is ${testCase.label}`, function (done) {
+        let transactionParams = {
+          type: "sale",
+          amount: "64.05",
+          paymentMethodNonce: Nonces.AbstractTransactable,
+          processingMerchantCategoryCode: testCase.code,
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isFalse(response.success, "response had no errors");
+            assert.equal(
+              response.errors
+                .for("transaction")
+                .on("processingMerchantCategoryCode")[0].code,
+              ValidationErrorCodes.Transaction
+                .ProcessingMerchantCategoryCodeIsInvalid
+            );
+            done();
+          }
+        );
+      });
+    });
+
     it("handles an error when tax amount is not present for AIB:Domestic Sweden transactions", function (done) {
       let transactionParams = {
         type: "sale",
@@ -2956,7 +3008,7 @@ describe("TransactionGateway", function () {
           let transactionParams = {
             amount: "10.00",
             creditCard: {
-              number: "5555555555554444",
+              number: "5555555555550005",
               expirationDate: "05/12",
             },
           };
@@ -3275,6 +3327,7 @@ describe("TransactionGateway", function () {
             assert.isNotNull(response.transaction.applePayCard.debit);
             assert.isNotNull(response.transaction.applePayCard.durbinRegulated);
             assert.isNotNull(response.transaction.applePayCard.healthcare);
+            assert.isTrue(response.transaction.applePayCard.isDeviceToken);
             assert.isNotNull(response.transaction.applePayCard.issuingBank);
             assert.isNotNull(response.transaction.applePayCard.last4);
             assert.isNotNull(response.transaction.applePayCard.payroll);
@@ -3329,6 +3382,57 @@ describe("TransactionGateway", function () {
             assert.isNotNull(response.transaction.applePayCard.debit);
             assert.isNotNull(response.transaction.applePayCard.durbinRegulated);
             assert.isNotNull(response.transaction.applePayCard.healthcare);
+            assert.isNotNull(response.transaction.applePayCard.issuingBank);
+            assert.isNotNull(response.transaction.applePayCard.last4);
+            assert.isNotNull(response.transaction.applePayCard.payroll);
+            assert.isNotNull(response.transaction.applePayCard.prepaid);
+            assert.isNotNull(
+              response.transaction.applePayCard.prepaidReloadable
+            );
+            assert.isNotNull(response.transaction.applePayCard.productId);
+            assert.isNotNull(response.transaction.applePayCard.purchase);
+            assert.isNotNull(response.transaction.applePayCard.isDeviceToken);
+
+            done();
+          }
+        );
+      });
+
+      it("returns ApplePayCard for payment_instrument when Apple Pay mpan nonce is provided", (done) => {
+        let transactionParams = {
+          paymentMethodNonce: Nonces.ApplePayMpan,
+          amount: "100.00",
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal(
+              response.transaction.paymentInstrumentType,
+              PaymentInstrumentTypes.ApplePayCard
+            );
+            assert.isNotNull(
+              response.transaction.applePayCard.paymentInstrumentName
+            );
+
+            assert.isNotNull(response.transaction.applePayCard.bin);
+            assert.isNotNull(response.transaction.applePayCard.business);
+            assert.isNotNull(response.transaction.applePayCard.cardType);
+            assert.isNotNull(response.transaction.applePayCard.commercial);
+            assert.isNotNull(response.transaction.applePayCard.consumer);
+            assert.isNotNull(response.transaction.applePayCard.corporate);
+            assert.isNotNull(
+              response.transaction.applePayCard.countryOfIssuance
+            );
+            assert.isNotNull(response.transaction.applePayCard.debit);
+            assert.isNotNull(response.transaction.applePayCard.durbinRegulated);
+            assert.isNotNull(response.transaction.applePayCard.healthcare);
+            assert.isFalse(response.transaction.applePayCard.isDeviceToken);
+            assert.isNotNull(
+              response.transaction.applePayCard.merchantTokenIdentifier
+            );
             assert.isNotNull(response.transaction.applePayCard.issuingBank);
             assert.isNotNull(response.transaction.applePayCard.last4);
             assert.isNotNull(response.transaction.applePayCard.payroll);
@@ -3404,7 +3508,7 @@ describe("TransactionGateway", function () {
                 response.transaction.androidPayCard.cardType,
                 specHelper.braintree.CreditCard.CardType.MasterCard
               );
-              assert.equal(response.transaction.androidPayCard.last4, "4444");
+              assert.equal(response.transaction.androidPayCard.last4, "0005");
               assert.isTrue(
                 response.transaction.androidPayCard.isNetworkTokenized
               );
@@ -6433,6 +6537,20 @@ describe("TransactionGateway", function () {
         }
       );
     });
+
+    it("returns achReturnCode and achRejectReason", (done) => {
+      specHelper.defaultGateway.transaction.find(
+        "ach_txn_ret3",
+        function (err, transaction) {
+          assert.equal(transaction.achReturnCode, "RJCT");
+          assert.equal(
+            transaction.achRejectReason,
+            "Bank accounts located outside of the U.S. are not supported."
+          );
+          done();
+        }
+      );
+    });
   });
 
   describe("refund", function () {
@@ -8745,7 +8863,7 @@ describe("TransactionGateway", function () {
         merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
         amount: "75.50",
         creditCard: {
-          number: "5555555555554444",
+          number: "5555555555550005",
           expirationDate: "05/12",
         },
       };
@@ -8771,7 +8889,7 @@ describe("TransactionGateway", function () {
       merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
       amount: "75.50",
       creditCard: {
-        number: "5555555555554444",
+        number: "5555555555550005",
         expirationDate: "06/09",
       },
     };
@@ -8888,6 +9006,62 @@ describe("TransactionGateway", function () {
               done();
             }
           )
+      );
+    });
+  });
+
+  describe("find with payment account reference", function () {
+    it("returns a transaction with paymentAccountReference in creditCard", function (done) {
+      specHelper.defaultGateway.transaction.find(
+        "aft_txn",
+        function (err, transaction) {
+          assert.isNull(err);
+          assert.isDefined(transaction.creditCard);
+          assert.property(transaction.creditCard, "paymentAccountReference");
+          done();
+        }
+      );
+    });
+
+    it("returns a transaction with paymentAccountReference in applePayDetails", function (done) {
+      specHelper.defaultGateway.transaction.find(
+        "apple_pay_transaction",
+        function (err, transaction) {
+          assert.isNull(err);
+          assert.isDefined(transaction.applePayCard);
+          assert.property(transaction.applePayCard, "paymentAccountReference");
+          done();
+        }
+      );
+    });
+
+    it("returns a transaction with paymentAccountReference in androidPayDetails", function (done) {
+      specHelper.defaultGateway.transaction.find(
+        "android_pay_card_transaction",
+        function (err, transaction) {
+          assert.isNull(err);
+          assert.isDefined(transaction.androidPayCard);
+          assert.property(
+            transaction.androidPayCard,
+            "paymentAccountReference"
+          );
+          done();
+        }
+      );
+    });
+
+    it("returns a transaction with paymentAccountReference in googlePayDetails", function (done) {
+      specHelper.defaultGateway.transaction.find(
+        "android_pay_network_token_transaction",
+        function (err, transaction) {
+          assert.isNull(err);
+          assert.isDefined(transaction.androidPayCard);
+          assert.property(
+            transaction.androidPayCard,
+            "paymentAccountReference"
+          );
+          done();
+        }
       );
     });
   });

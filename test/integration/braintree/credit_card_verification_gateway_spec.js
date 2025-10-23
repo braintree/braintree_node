@@ -767,4 +767,18 @@ describe("CreditCardVerificationGateway", function () {
       );
     });
   });
+
+  describe("find with payment account reference", function () {
+    it("returns a verification with paymentAccountReference", function (done) {
+      specHelper.defaultGateway.creditCardVerification.find(
+        "threedsecuredverification",
+        function (err, verification) {
+          assert.isNull(err);
+          assert.isDefined(verification.creditCard);
+          assert.property(verification.creditCard, "paymentAccountReference");
+          done();
+        }
+      );
+    });
+  });
 });

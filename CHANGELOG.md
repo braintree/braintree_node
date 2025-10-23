@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.34.0
+
+- Add Bank Account Instant Verification functionality for Open Banking flow
+  - Add `BankAccountInstantVerificationGateway` with `createJwt()` method
+  - Add `BankAccountInstantVerificationJwt` and `BankAccountInstantVerificationJwtRequest` classes
+  - Add `bankAccountInstantVerification` gateway to main `BraintreeGateway`
+- Add ACH mandate support for US Bank Account transactions
+  - Add `achMandateText` and `achMandateAcceptedAt` parameters to transaction gateway
+  - Add `usBankAccount` parameters support in transaction creation
+- Add `InstantVerificationAccountValidation` method to `UsBankAccountVerification.VerificationMethod`
+- Add `achRejectReason` to `Transaction`
+- Add `sender` and `receiver` to `transfer` in `Transaction`
+- Add `isDeviceToken` to `ApplePayCard` and `ApplePayDetails`
+- Add `paymentAccountReference` to `CreditCard`, `ApplePayCard`, `AndroidPayCard`, and `CreditCardVerification`
+- Add missing `transfer` validation error codes in `Transaction`
+- Add `processingMerchantCategoryCode` to `TransactionRequest`
+
 ## 3.33.1
 
 - Remove unneeded npm dependency

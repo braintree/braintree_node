@@ -187,6 +187,16 @@ let generateNonceForNewPaymentMethod = function (
   specHelper.defaultGateway.clientToken.generate(
     clientTokenOptions,
     function (err, result) {
+      if (err) {
+        callback(err);
+
+        return;
+      }
+      if (!result.success || !result.clientToken) {
+        callback(new Error("Client token generation failed"));
+
+        return;
+      }
       let clientToken = JSON.parse(
         specHelper.decodeClientToken(result.clientToken)
       );
@@ -228,6 +238,16 @@ let generateValidUsBankAccountNonce = function (accountNumber, gw, callback) {
   }
   gw = gw || specHelper.defaultGateway;
   gw.clientToken.generate({}, function (err, result) {
+    if (err) {
+      callback(err);
+
+      return;
+    }
+    if (!result.success || !result.clientToken) {
+      callback(new Error("Client token generation failed"));
+
+      return;
+    }
     let clientToken = JSON.parse(
       specHelper.decodeClientToken(result.clientToken)
     );
@@ -314,7 +334,7 @@ let generateValidUsBankAccountNonce = function (accountNumber, gw, callback) {
 
     req.write(requestBody);
 
-    return req.end();
+    req.end();
   });
 };
 
@@ -325,6 +345,16 @@ let generatePlaidUsBankAccountNonce = function (gw, callback) {
   }
   gw = gw || specHelper.defaultGateway;
   gw.clientToken.generate({}, function (err, result) {
+    if (err) {
+      callback(err);
+
+      return;
+    }
+    if (!result.success || !result.clientToken) {
+      callback(new Error("Client token generation failed"));
+
+      return;
+    }
     let clientToken = JSON.parse(
       specHelper.decodeClientToken(result.clientToken)
     );
@@ -411,7 +441,7 @@ let generatePlaidUsBankAccountNonce = function (gw, callback) {
 
     req.write(requestBody);
 
-    return req.end();
+    req.end();
   });
 };
 

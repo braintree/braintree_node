@@ -1937,6 +1937,7 @@ describe("PaymentMethodGateway", function () {
                 function (err, applePayCard) {
                   assert.isNull(err);
                   assert.isTrue(applePayCard !== null);
+                  assert.isTrue(applePayCard.isDeviceToken);
 
                   done();
                 }
@@ -1981,6 +1982,7 @@ describe("PaymentMethodGateway", function () {
                   assert.isTrue(applePayCard !== null);
                   assert.isNotNull(applePayCard.merchantTokenIdentifier);
                   assert.isNotNull(applePayCard.sourceCardLast4);
+                  assert.isFalse(applePayCard.isDeviceToken);
 
                   done();
                 }
@@ -2265,7 +2267,7 @@ describe("PaymentMethodGateway", function () {
               let updateParams = {
                 cardholderName: "New Holder",
                 cvv: "456",
-                number: "5555555555554444",
+                number: "5555555555550005",
                 expirationDate: "06/2013",
                 threeDSecurePassThru: {
                   eciFlag: "02",
@@ -2321,7 +2323,7 @@ describe("PaymentMethodGateway", function () {
               let updateParams = {
                 cardholderName: "New Holder",
                 cvv: "456",
-                number: "5555555555554444",
+                number: "5555555555550005",
                 expirationDate: "06/2013",
                 threeDSecurePassThru: {
                   eciFlag: "02",
@@ -2349,7 +2351,7 @@ describe("PaymentMethodGateway", function () {
 
                   assert.equal(updatedCreditCard.cardholderName, "New Holder");
                   assert.equal(updatedCreditCard.bin, "555555");
-                  assert.equal(updatedCreditCard.last4, "4444");
+                  assert.equal(updatedCreditCard.last4, "0005");
                   assert.equal(updatedCreditCard.expirationDate, "06/2013");
 
                   done();
@@ -2381,7 +2383,7 @@ describe("PaymentMethodGateway", function () {
               let updateParams = {
                 cardholderName: "New Holder",
                 cvv: "456",
-                number: "5555555555554444",
+                number: "55555555555500005",
                 expirationDate: "06/2013",
               };
 
@@ -2396,7 +2398,7 @@ describe("PaymentMethodGateway", function () {
 
                   assert.equal(updatedCreditCard.cardholderName, "New Holder");
                   assert.equal(updatedCreditCard.bin, "555555");
-                  assert.equal(updatedCreditCard.last4, "4444");
+                  assert.equal(updatedCreditCard.last4, "0005");
                   assert.equal(updatedCreditCard.expirationDate, "06/2013");
 
                   done();
@@ -2515,7 +2517,7 @@ describe("PaymentMethodGateway", function () {
           let updateParams = {
             cardholderName: "New Holder",
             cvv: "456",
-            number: "5555555555554444",
+            number: "5555555555550005",
             expirationDate: "06/2013",
           };
 

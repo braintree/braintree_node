@@ -4,7 +4,7 @@
 let CreditCard = require("../../../lib/braintree/credit_card").CreditCard;
 
 describe("CreditCard", () =>
-  describe("constructor", () =>
+  describe("constructor", () => {
     it("initializes verification with the newest verification", function () {
       let verification1 = { id: "123", created_at: 123 };
       let verification2 = { id: "987", created_at: 987 };
@@ -14,4 +14,16 @@ describe("CreditCard", () =>
       });
 
       assert.equal(verification2.id, credit_card.verification.id);
-    })));
+    });
+
+    it("sets paymentAccountReference when present", function () {
+      let credit_card = new CreditCard({
+        paymentAccountReference: "V0010013019339005665779448477",
+      });
+
+      assert.equal(
+        "V0010013019339005665779448477",
+        credit_card.paymentAccountReference
+      );
+    });
+  }));

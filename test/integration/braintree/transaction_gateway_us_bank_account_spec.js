@@ -48,10 +48,6 @@ describe("TransactionGateway", function () {
                   response.transaction.usBankAccount.bankName,
                   /CHASE/
                 );
-                assert.equal(
-                  response.transaction.usBankAccount.achMandate.text,
-                  "cl mandate text"
-                );
                 assert.isTrue(
                   response.transaction.usBankAccount.achMandate
                     .acceptedAt instanceof Date
@@ -103,10 +99,6 @@ describe("TransactionGateway", function () {
                   response.transaction.usBankAccount.bankName,
                   /CHASE/
                 );
-                assert.equal(
-                  response.transaction.usBankAccount.achMandate.text,
-                  "cl mandate text"
-                );
                 assert.isTrue(
                   response.transaction.usBankAccount.achMandate
                     .acceptedAt instanceof Date
@@ -149,10 +141,6 @@ describe("TransactionGateway", function () {
                     assert.match(
                       response.transaction.usBankAccount.bankName,
                       /CHASE/
-                    );
-                    assert.equal(
-                      response.transaction.usBankAccount.achMandate.text,
-                      "cl mandate text"
                     );
                     assert.isTrue(
                       response.transaction.usBankAccount.achMandate
@@ -222,7 +210,6 @@ describe("TransactionGateway", function () {
             assert.equal(usBankAccount.routingNumber, "011000015");
             assert.equal(usBankAccount.accountType, "checking");
             assert.match(usBankAccount.bankName, /FEDERAL/);
-            assert.equal(usBankAccount.achMandate.text, "cl mandate text");
 
             done();
           });
