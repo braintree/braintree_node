@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.35.0
+
+- Add `middleName` to sender and receiver, and `dateOfBirth` to sender in transfer on Transaction
+- Change error path from authorizationAdjustment to transaction for authorization adjustment validation errors
+- Filter `CreditCardVerification.search()` to only return credit card verifications
+
 ## 3.34.0
 
 - Add Bank Account Instant Verification functionality for Open Banking flow

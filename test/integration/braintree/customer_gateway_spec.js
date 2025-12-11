@@ -774,7 +774,7 @@ describe("CustomerGateway", function () {
         firstName: "John",
         lastName: "Smith",
         creditCard: {
-          number: "5555555555550005",
+          number: "5555555555554444",
           expirationDate: "05/2012",
           options: {
             failOnDuplicatePaymentMethod: true,
@@ -804,7 +804,7 @@ describe("CustomerGateway", function () {
         firstName: "John",
         lastName: "Smith",
         creditCard: {
-          number: "5555555555550005",
+          number: "5555555555554444",
           expirationDate: "05/2012",
           options: {
             verifyCard: true,
@@ -828,7 +828,7 @@ describe("CustomerGateway", function () {
         firstName: "John",
         lastName: "Smith",
         creditCard: {
-          number: "5555555555550005",
+          number: "5555555555554444",
           expirationDate: "05/2012",
           options: {
             verifyCard: true,
@@ -1850,7 +1850,7 @@ describe("CustomerGateway", function () {
         firstName: "New First Name",
         lastName: "New Last Name",
         creditCard: {
-          number: "5555555555550005",
+          number: "5555555555554444",
           expirationDate: "05/2014",
           options: {
             verifyCard: true,

@@ -543,6 +543,47 @@ let createToken = (gateway, attributes, callback) =>
     gateway.oauth.createTokenFromCode({ code }, callback)
   );
 
+let getMerchant = (callback) => {
+  let gateway = new braintree.BraintreeGateway({
+    clientId: "client_id$development$integration_client_id",
+    clientSecret: "client_secret$development$integration_client_secret",
+  });
+
+  return createToken(
+    gateway,
+    { merchantPublicId: "partner_merchant_id", scope: "read_write" },
+    function (err, tokenResponse) {
+      if (err) {
+        return callback(err, null);
+      }
+
+      let merchantGateway = new braintree.BraintreeGateway({
+        accessToken: tokenResponse.credentials.accessToken,
+      });
+
+      return merchantGateway.merchantAccount.all(function (
+        err,
+        merchantAccounts
+      ) {
+        if (err) {
+          return callback(err, null);
+        }
+
+        let merchantObj = {
+          id: "partner_merchant_id",
+          merchantAccounts: merchantAccounts,
+        };
+
+        return callback(null, {
+          success: true,
+          credentials: tokenResponse.credentials,
+          merchant: merchantObj,
+        });
+      });
+    }
+  );
+};
+
 let createGrant = (gateway, attributes, callback) =>
   gateway.http.post(
     "/oauth_testing/grants",
@@ -684,6 +725,7 @@ global.specHelper = {
   createModificationForTests,
   createGrant,
   createToken,
+  getMerchant,
   fraudProtectionEnterpriseGateway,
   fraudProtectionEnterpriseConfig,
   effortlessChargebackProtectionGateway,

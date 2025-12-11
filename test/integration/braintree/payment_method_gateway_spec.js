@@ -458,10 +458,10 @@ describe("PaymentMethodGateway", function () {
                   response.paymentMethod.sourceCardType,
                   specHelper.braintree.CreditCard.CardType.MasterCard
                 );
-                assert.equal(response.paymentMethod.sourceCardLast4, "4444");
+                assert.equal(response.paymentMethod.sourceCardLast4, "0005");
                 assert.equal(
                   response.paymentMethod.sourceDescription,
-                  "MasterCard 4444"
+                  "MasterCard 0005"
                 );
                 assert.equal(response.paymentMethod.customerId, customerId);
                 assert.isNotNull(response.paymentMethod.prepaidReloadable);
@@ -2267,7 +2267,7 @@ describe("PaymentMethodGateway", function () {
               let updateParams = {
                 cardholderName: "New Holder",
                 cvv: "456",
-                number: "5555555555550005",
+                number: "5555555555554444",
                 expirationDate: "06/2013",
                 threeDSecurePassThru: {
                   eciFlag: "02",
@@ -2323,7 +2323,7 @@ describe("PaymentMethodGateway", function () {
               let updateParams = {
                 cardholderName: "New Holder",
                 cvv: "456",
-                number: "5555555555550005",
+                number: "5555555555554444",
                 expirationDate: "06/2013",
                 threeDSecurePassThru: {
                   eciFlag: "02",
@@ -2351,7 +2351,7 @@ describe("PaymentMethodGateway", function () {
 
                   assert.equal(updatedCreditCard.cardholderName, "New Holder");
                   assert.equal(updatedCreditCard.bin, "555555");
-                  assert.equal(updatedCreditCard.last4, "0005");
+                  assert.equal(updatedCreditCard.last4, "4444");
                   assert.equal(updatedCreditCard.expirationDate, "06/2013");
 
                   done();
@@ -2383,7 +2383,7 @@ describe("PaymentMethodGateway", function () {
               let updateParams = {
                 cardholderName: "New Holder",
                 cvv: "456",
-                number: "55555555555500005",
+                number: "5555555555554444",
                 expirationDate: "06/2013",
               };
 
@@ -2398,7 +2398,7 @@ describe("PaymentMethodGateway", function () {
 
                   assert.equal(updatedCreditCard.cardholderName, "New Holder");
                   assert.equal(updatedCreditCard.bin, "555555");
-                  assert.equal(updatedCreditCard.last4, "0005");
+                  assert.equal(updatedCreditCard.last4, "4444");
                   assert.equal(updatedCreditCard.expirationDate, "06/2013");
 
                   done();

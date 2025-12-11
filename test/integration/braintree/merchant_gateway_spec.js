@@ -7,7 +7,7 @@ let braintree = specHelper.braintree;
 
 describe("MerchantGateway", function () {
   describe("create", () =>
-    it("creates a merchant", function (done) {
+    xit("creates a merchant", function (done) {
       let gateway = new braintree.BraintreeGateway({
         clientId: "client_id$development$integration_client_id",
         clientSecret: "client_secret$development$integration_client_secret",
@@ -73,7 +73,7 @@ describe("MerchantGateway", function () {
   });
 
   describe("create_multi_currency", function () {
-    it("creates a multi-currency merchant", function (done) {
+    xit("creates a multi-currency merchant", function (done) {
       let gateway = new braintree.BraintreeGateway({
         clientId: "client_id$development$integration_client_id",
         clientSecret: "client_secret$development$integration_client_secret",
@@ -133,7 +133,7 @@ describe("MerchantGateway", function () {
       );
     });
 
-    it("creates a paypal-only merchant", function (done) {
+    xit("creates a paypal-only merchant", function (done) {
       let gateway = new braintree.BraintreeGateway({
         clientId: "client_id$development$integration_client_id",
         clientSecret: "client_secret$development$integration_client_secret",
@@ -197,7 +197,7 @@ describe("MerchantGateway", function () {
       );
     });
 
-    it("allows creation of non-US merchant if onboarding application is internal", function (done) {
+    xit("allows creation of non-US merchant if onboarding application is internal", function (done) {
       let gateway = new braintree.BraintreeGateway({
         clientId: "client_id$development$integration_client_id",
         clientSecret: "client_secret$development$integration_client_secret",

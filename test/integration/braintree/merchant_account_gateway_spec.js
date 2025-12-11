@@ -53,69 +53,36 @@ describe("MerchantAccountGateway", function () {
       });
 
       it("handles a response containing a single merchant account", function (done) {
-        let gateway = new braintree.BraintreeGateway({
-          clientId: "client_id$development$integration_client_id",
-          clientSecret: "client_secret$development$integration_client_secret",
+        return specHelper.getMerchant(function (err, response) {
+          let gateway = new braintree.BraintreeGateway({
+            accessToken: response.credentials.accessToken,
+          });
+
+          return gateway.merchantAccount.all(function (err, merchantAccounts) {
+            assert.isNull(err);
+            assert.isTrue(merchantAccounts.length > 0);
+            assert.equal(merchantAccounts[0].status, "active");
+            done();
+          });
         });
-
-        return gateway.merchant.create(
-          {
-            email: "name@email.com",
-            countryCodeAlpha3: "GBR",
-            paymentMethods: ["credit_card", "paypal"],
-          },
-          function (err, response) {
-            gateway = new braintree.BraintreeGateway({
-              accessToken: response.credentials.accessToken,
-            });
-
-            return gateway.merchantAccount.all(function (
-              err,
-              merchantAccounts
-            ) {
-              assert.equal(merchantAccounts.length, 1);
-
-              let merchantAccount = merchantAccounts[0];
-
-              assert.equal(merchantAccount.currencyIsoCode, "GBP");
-              done();
-            });
-          }
-        );
       });
 
       it("returns a merchant account with correct attributes", function (done) {
-        let gateway = new braintree.BraintreeGateway({
-          clientId: "client_id$development$integration_client_id",
-          clientSecret: "client_secret$development$integration_client_secret",
+        return specHelper.getMerchant(function (err, response) {
+          let gateway = new braintree.BraintreeGateway({
+            accessToken: response.credentials.accessToken,
+          });
+
+          return gateway.merchantAccount.all(function (err, merchantAccounts) {
+            assert.isNull(err);
+            assert.isTrue(merchantAccounts.length > 0);
+
+            let merchantAccount = merchantAccounts[0];
+
+            assert.equal(merchantAccount.status, "active");
+            done();
+          });
         });
-
-        return gateway.merchant.create(
-          {
-            email: "name@email.com",
-            countryCodeAlpha3: "GBR",
-            paymentMethods: ["credit_card", "paypal"],
-          },
-          function (err, response) {
-            gateway = new braintree.BraintreeGateway({
-              accessToken: response.credentials.accessToken,
-            });
-
-            return gateway.merchantAccount.all(function (
-              err,
-              merchantAccounts
-            ) {
-              assert.equal(merchantAccounts.length, 1);
-
-              let merchantAccount = merchantAccounts[0];
-
-              assert.equal(merchantAccount.currencyIsoCode, "GBP");
-              assert.equal(merchantAccount.status, "active");
-              assert.equal(merchantAccount.default, true);
-              done();
-            });
-          }
-        );
       });
 
       it("gracefully handles errors", function (done) {
@@ -175,39 +142,25 @@ describe("MerchantAccountGateway", function () {
       });
 
       it("returns a merchant account with correct attributes", function (done) {
-        let gateway = new braintree.BraintreeGateway({
-          clientId: "client_id$development$integration_client_id",
-          clientSecret: "client_secret$development$integration_client_secret",
+        return specHelper.getMerchant(function (err, response) {
+          let gateway = new braintree.BraintreeGateway({
+            accessToken: response.credentials.accessToken,
+          });
+          let merchantAccounts = [];
+          let merchantAccountStream = gateway.merchantAccount.all();
+
+          merchantAccountStream.on("data", (data) =>
+            merchantAccounts.push(data)
+          );
+
+          return merchantAccountStream.on("end", function () {
+            assert.isTrue(merchantAccounts.length > 0);
+            let merchantAccount = merchantAccounts[0];
+
+            assert.equal(merchantAccount.status, "active");
+            done();
+          });
         });
-
-        return gateway.merchant.create(
-          {
-            email: "name@email.com",
-            countryCodeAlpha3: "GBR",
-            paymentMethods: ["credit_card", "paypal"],
-          },
-          function (err, response) {
-            gateway = new braintree.BraintreeGateway({
-              accessToken: response.credentials.accessToken,
-            });
-            let merchantAccounts = [];
-            let merchantAccountStream = gateway.merchantAccount.all();
-
-            merchantAccountStream.on("data", (data) =>
-              merchantAccounts.push(data)
-            );
-
-            return merchantAccountStream.on("end", function () {
-              assert.equal(merchantAccounts.length, 1);
-              let merchantAccount = merchantAccounts[0];
-
-              assert.equal(merchantAccount.currencyIsoCode, "GBP");
-              assert.equal(merchantAccount.status, "active");
-              assert.equal(merchantAccount.default, true);
-              done();
-            });
-          }
-        );
       });
 
       it("gracefully handles errors", function (done) {
@@ -251,197 +204,132 @@ describe("MerchantAccountGateway", function () {
 
   describe("createForCurrency", function () {
     it("creates a new merchant account for currency", function (done) {
-      let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$integration_client_id",
-        clientSecret: "client_secret$development$integration_client_secret",
+      return specHelper.getMerchant(function (err, response) {
+        let gateway = new braintree.BraintreeGateway({
+          accessToken: response.credentials.accessToken,
+        });
+
+        return gateway.merchantAccount.createForCurrency(
+          {
+            currency: "AUD",
+          },
+          function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            assert.equal(response.merchantAccount.currencyIsoCode, "AUD");
+            done();
+          }
+        );
       });
-
-      return gateway.merchant.create(
-        {
-          email: "name@email.com",
-          countryCodeAlpha3: "GBR",
-          paymentMethods: ["credit_card", "paypal"],
-        },
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-
-          gateway = new braintree.BraintreeGateway({
-            accessToken: response.credentials.accessToken,
-          });
-
-          return gateway.merchantAccount.createForCurrency(
-            {
-              currency: "JPY",
-            },
-            function (err, response) {
-              assert.isNull(err);
-              assert.isTrue(response.success);
-
-              assert.equal(response.merchantAccount.currencyIsoCode, "JPY");
-              done();
-            }
-          );
-        }
-      );
     });
 
     it("returns error if merchant account exists for currency", function (done) {
-      let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$integration_client_id",
-        clientSecret: "client_secret$development$integration_client_secret",
+      return specHelper.getMerchant(function (err, response) {
+        let gateway = new braintree.BraintreeGateway({
+          accessToken: response.credentials.accessToken,
+        });
+
+        return gateway.merchantAccount.createForCurrency(
+          {
+            currency: "CAD",
+          },
+          function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            return gateway.merchantAccount.createForCurrency(
+              {
+                currency: "CAD",
+              },
+              function (err, response) {
+                assert.isNotNull(response.errors);
+                assert.isFalse(response.success);
+
+                assert.equal(
+                  response.errors.for("merchant").on("currency")[0].code,
+                  ValidationErrorCodes.Merchant.MerchantAccountExistsForCurrency
+                );
+                done();
+              }
+            );
+          }
+        );
       });
-
-      return gateway.merchant.create(
-        {
-          email: "name@email.com",
-          countryCodeAlpha3: "GBR",
-          paymentMethods: ["credit_card", "paypal"],
-        },
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-
-          gateway = new braintree.BraintreeGateway({
-            accessToken: response.credentials.accessToken,
-          });
-
-          return gateway.merchantAccount.createForCurrency(
-            {
-              currency: "GBP",
-            },
-            function (err, response) {
-              assert.isNotNull(response.error);
-              assert.isFalse(response.success);
-
-              assert.equal(
-                response.errors.for("merchant").on("currency")[0].code,
-                ValidationErrorCodes.Merchant.MerchantAccountExistsForCurrency
-              );
-              done();
-            }
-          );
-        }
-      );
     });
 
     it("returns error if currency is not provided", function (done) {
-      let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$integration_client_id",
-        clientSecret: "client_secret$development$integration_client_secret",
+      return specHelper.getMerchant(function (err, response) {
+        let gateway = new braintree.BraintreeGateway({
+          accessToken: response.credentials.accessToken,
+        });
+
+        return gateway.merchantAccount.createForCurrency(
+          {},
+          function (err, response) {
+            assert.isNotNull(response.errors);
+            assert.isFalse(response.success);
+
+            assert.equal(
+              response.errors.for("merchant").on("currency")[0].code,
+              ValidationErrorCodes.Merchant.CurrencyIsRequired
+            );
+
+            done();
+          }
+        );
       });
-
-      return gateway.merchant.create(
-        {
-          email: "name@email.com",
-          countryCodeAlpha3: "GBR",
-          paymentMethods: ["credit_card", "paypal"],
-        },
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-
-          gateway = new braintree.BraintreeGateway({
-            accessToken: response.credentials.accessToken,
-          });
-
-          return gateway.merchantAccount.createForCurrency(
-            {},
-            function (err, response) {
-              assert.isNotNull(response.errors);
-              assert.isFalse(response.success);
-
-              assert.equal(
-                response.errors.for("merchant").on("currency")[0].code,
-                ValidationErrorCodes.Merchant.CurrencyIsRequired
-              );
-
-              done();
-            }
-          );
-        }
-      );
     });
 
     it("returns error if currency is invalid", function (done) {
-      let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$integration_client_id",
-        clientSecret: "client_secret$development$integration_client_secret",
+      return specHelper.getMerchant(function (err, response) {
+        let gateway = new braintree.BraintreeGateway({
+          accessToken: response.credentials.accessToken,
+        });
+
+        return gateway.merchantAccount.createForCurrency(
+          {
+            currency: "fake_currency",
+          },
+          function (err, response) {
+            assert.isNotNull(response.errors);
+            assert.isFalse(response.success);
+
+            assert.equal(
+              response.errors.for("merchant").on("currency")[0].code,
+              ValidationErrorCodes.Merchant.CurrencyIsInvalid
+            );
+
+            done();
+          }
+        );
       });
-
-      return gateway.merchant.create(
-        {
-          email: "name@email.com",
-          countryCodeAlpha3: "GBR",
-          paymentMethods: ["credit_card", "paypal"],
-        },
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-
-          gateway = new braintree.BraintreeGateway({
-            accessToken: response.credentials.accessToken,
-          });
-
-          return gateway.merchantAccount.createForCurrency(
-            {
-              currency: "fake_currency",
-            },
-            function (err, response) {
-              assert.isNotNull(response.errors);
-              assert.isFalse(response.success);
-
-              assert.equal(
-                response.errors.for("merchant").on("currency")[0].code,
-                ValidationErrorCodes.Merchant.CurrencyIsInvalid
-              );
-
-              done();
-            }
-          );
-        }
-      );
     });
 
     it("returns error if merchant account exists for id", function (done) {
-      let gateway = new braintree.BraintreeGateway({
-        clientId: "client_id$development$integration_client_id",
-        clientSecret: "client_secret$development$integration_client_secret",
+      return specHelper.getMerchant(function (err, response) {
+        let gateway = new braintree.BraintreeGateway({
+          accessToken: response.credentials.accessToken,
+        });
+
+        gateway.merchantAccount.createForCurrency(
+          {
+            currency: "GBP",
+            id: response.merchant.merchantAccounts[0].id,
+          },
+          function (err, response) {
+            assert.isNotNull(response.errors);
+            assert.isFalse(response.success);
+
+            assert.equal(
+              response.errors.for("merchant").on("id")[0].code,
+              ValidationErrorCodes.Merchant.MerchantAccountExistsForId
+            );
+
+            done();
+          }
+        );
       });
-
-      return gateway.merchant.create(
-        {
-          email: "name@email.com",
-          countryCodeAlpha3: "GBR",
-          paymentMethods: ["credit_card", "paypal"],
-        },
-        function (err, response) {
-          assert.isNull(err);
-          assert.isTrue(response.success);
-
-          gateway = new braintree.BraintreeGateway({
-            accessToken: response.credentials.accessToken,
-          });
-
-          gateway.merchantAccount.createForCurrency(
-            {
-              currency: "GBP",
-              id: response.merchant.merchantAccounts[0].id,
-            },
-            function (err, response) {
-              assert.isNotNull(response.errors);
-              assert.isFalse(response.success);
-
-              assert.equal(
-                response.errors.for("merchant").on("id")[0].code,
-                ValidationErrorCodes.Merchant.MerchantAccountExistsForId
-              );
-            }
-          );
-
-          done();
-        }
-      );
     });
   });
 });

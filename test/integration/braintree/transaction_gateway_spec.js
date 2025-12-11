@@ -3008,7 +3008,7 @@ describe("TransactionGateway", function () {
           let transactionParams = {
             amount: "10.00",
             creditCard: {
-              number: "5555555555550005",
+              number: "5555555555554444",
               expirationDate: "05/12",
             },
           };
@@ -3508,7 +3508,7 @@ describe("TransactionGateway", function () {
                 response.transaction.androidPayCard.cardType,
                 specHelper.braintree.CreditCard.CardType.MasterCard
               );
-              assert.equal(response.transaction.androidPayCard.last4, "0005");
+              assert.equal(response.transaction.androidPayCard.last4, "4444");
               assert.isTrue(
                 response.transaction.androidPayCard.isNetworkTokenized
               );
@@ -8863,7 +8863,7 @@ describe("TransactionGateway", function () {
         merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
         amount: "75.50",
         creditCard: {
-          number: "5555555555550005",
+          number: "5555555555554444",
           expirationDate: "05/12",
         },
       };
@@ -8889,7 +8889,7 @@ describe("TransactionGateway", function () {
       merchantAccountId: specHelper.fakeFirstDataMerchantAccountId,
       amount: "75.50",
       creditCard: {
-        number: "5555555555550005",
+        number: "5555555555554444",
         expirationDate: "06/09",
       },
     };
@@ -8939,13 +8939,12 @@ describe("TransactionGateway", function () {
               assert.isFalse(response.success);
               assert.equal(response.transaction.amount, "75.50");
               let errorCode = response.errors
-                .for("authorizationAdjustment")
+                .for("transaction")
                 .on("amount")[0].code;
 
               assert.equal(
                 errorCode,
-                ValidationErrorCodes.Transaction
-                  .AdjustmentAmountMustBeGreaterThanZero
+                ValidationErrorCodes.Transaction.AmountMustBeGreaterThanZero
               );
               done();
             }
