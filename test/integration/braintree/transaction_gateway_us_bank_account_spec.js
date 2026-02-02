@@ -60,6 +60,109 @@ describe("TransactionGateway", function () {
         );
       });
 
+      it("succeeds with ach_type option and returns achType and requestedAchType", function (done) {
+        specHelper.generateValidUsBankAccountNonce(
+          "567891234",
+          function (nonce) {
+            let transactionParams = {
+              merchantAccountId: MerchantAccountTest.UsBankMerchantAccount,
+              amount: "10.00",
+              paymentMethodNonce: nonce,
+              options: {
+                submitForSettlement: true,
+                usBankAccount: {
+                  achType: "standard",
+                },
+              },
+            };
+
+            specHelper.defaultGateway.transaction.sale(
+              transactionParams,
+              function (err, response) {
+                assert.isTrue(response.success);
+                assert.equal(response.transaction.achType, "standard");
+                assert.equal(response.transaction.requestedAchType, "standard");
+
+                done();
+              }
+            );
+          }
+        );
+      });
+
+      it("returns achType and requestedAchType on transaction find", function (done) {
+        specHelper.generateValidUsBankAccountNonce(
+          "567891234",
+          function (nonce) {
+            let transactionParams = {
+              merchantAccountId: MerchantAccountTest.UsBankMerchantAccount,
+              amount: "10.00",
+              paymentMethodNonce: nonce,
+              options: {
+                submitForSettlement: true,
+                usBankAccount: {
+                  achType: "standard",
+                },
+              },
+            };
+
+            specHelper.defaultGateway.transaction.sale(
+              transactionParams,
+              function (err, response) {
+                assert.isTrue(response.success);
+
+                specHelper.defaultGateway.transaction.find(
+                  response.transaction.id,
+                  function (err, transaction) {
+                    assert.isNull(err);
+                    assert.equal(transaction.achType, "standard");
+                    assert.equal(transaction.requestedAchType, "standard");
+
+                    done();
+                  }
+                );
+              }
+            );
+          }
+        );
+      });
+
+      it("returns sameday achType and sameday requestedAchType on find", function (done) {
+        specHelper.defaultGateway.transaction.find(
+          "sameday_ach_sameday_requested",
+          function (err, transaction) {
+            assert.isNull(err);
+            assert.equal(transaction.achType, "same_day");
+            assert.equal(transaction.requestedAchType, "same_day");
+            done();
+          }
+        );
+      });
+
+      it("returns standard achType and sameday requestedAchType on find", function (done) {
+        specHelper.defaultGateway.transaction.find(
+          "standard_ach_sameday_requested",
+          function (err, transaction) {
+            assert.isNull(err);
+            assert.equal(transaction.achType, "standard");
+            assert.equal(transaction.requestedAchType, "same_day");
+            done();
+          }
+        );
+      });
+
+      it("returns standard achType and standard requestedAchType on find", function (done) {
+        specHelper.defaultGateway.transaction.find(
+          "standard_ach_standard_requested",
+          function (err, transaction) {
+            assert.isNull(err);
+            assert.equal(transaction.achType, "standard");
+            assert.equal(transaction.requestedAchType, "standard");
+            done();
+          }
+        );
+      });
+
       it("succeeds and vaults a us bank account nonce and can transact on vaulted token", (done) =>
         specHelper.generateValidUsBankAccountNonce(
           "567891234",

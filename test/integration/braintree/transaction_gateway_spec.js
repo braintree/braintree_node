@@ -47,6 +47,28 @@ describe("TransactionGateway", function () {
       );
     });
 
+    it("sets partiallyAuthorized to true if processorResponseCode is 1004", function (done) {
+      let transactionParams = {
+        amount: Braintree.Test.TransactionAmounts.PartiallyAuthorized,
+        acceptPartialAuthorization: true,
+        creditCard: {
+          number: "5105105105105100",
+          expirationDate: "05/12",
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.processorResponseCode, "1004");
+          assert.isTrue(response.transaction.partiallyAuthorized);
+          done();
+        }
+      );
+    });
+
     it("exposes MAC and MAC text", function (done) {
       let transactionParams = {
         amount: "2000.00",

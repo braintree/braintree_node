@@ -22,6 +22,17 @@ describe("Transaction", () => {
       assert.equal("reason text", transaction.achRejectReason);
     });
 
+    it("sets achType and requestedAchType when present", () => {
+      let transaction = new Transaction({
+        id: "abcdef",
+        achType: "standard",
+        requestedAchType: "standard",
+      });
+
+      assert.equal("standard", transaction.achType);
+      assert.equal("standard", transaction.requestedAchType);
+    });
+
     it("sets paymentAccountReference in applePayDetails when present", function () {
       let transaction = new Transaction({
         applePayDetails: {
@@ -59,6 +70,17 @@ describe("Transaction", () => {
         "V0010013019339005665779448477",
         transaction.creditCard.paymentAccountReference
       );
+    });
+
+    it("sets partiallyAuthorized to true when processorResponseCode is 1004", function () {
+      let transaction = new Transaction({
+        acceptPartialAuthorization: true,
+        processorResponseCode: "1004",
+      });
+
+      assert.equal(true, transaction.acceptPartialAuthorization);
+      assert.equal(1004, transaction.processorResponseCode);
+      assert.equal(true, transaction.partiallyAuthorized);
     });
   });
 });

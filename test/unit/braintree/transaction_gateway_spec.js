@@ -110,6 +110,28 @@ describe("TransactionGateway", () =>
         done();
       });
     });
+
+    it("accepts us_bank_account ach_type option", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+      let transactionParams = {
+        amount: "5.00",
+        paymentMethodNonce: "fake-us-bank-account-nonce",
+        options: {
+          usBankAccount: {
+            achType: "standard",
+          },
+        },
+      };
+
+      transactionGateway.sale(transactionParams, (err, params) => {
+        assert.notExists(err);
+        assert.equal(
+          "standard",
+          params.transaction.options.usBankAccount.achType
+        );
+        done();
+      });
+    });
   }));
 
 describe("TransactionGateway", () =>

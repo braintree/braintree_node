@@ -37,7 +37,7 @@ describe("UsBankAccountVerificationGateway", function () {
           assert.isTrue(usBankAccount.verified);
           assert.equal(usBankAccount.last4, "0000");
           assert.equal(usBankAccount.accountType, "checking");
-          assert.equal(usBankAccount.accountHolderName, "Dan Schulman");
+          assert.equal(usBankAccount.accountHolderName, "Marty McFly");
           assert.equal(usBankAccount.bankName, "Wells Fargo");
           assert.equal(usBankAccount.routingNumber, "123456789");
           assert.equal(usBankAccount.ownershipType, "personal");
@@ -83,7 +83,7 @@ describe("UsBankAccountVerificationGateway", function () {
           assert.isTrue(usBankAccount.verified);
           assert.equal(usBankAccount.last4, "0000");
           assert.equal(usBankAccount.accountType, "checking");
-          assert.equal(usBankAccount.accountHolderName, "Dan Schulman");
+          assert.equal(usBankAccount.accountHolderName, "Marty McFly");
           assert.equal(usBankAccount.bankName, "Wells Fargo");
           assert.equal(usBankAccount.routingNumber, "123456789");
           assert.equal(usBankAccount.ownershipType, "personal");
