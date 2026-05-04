@@ -132,6 +132,23 @@ describe("TransactionGateway", () =>
         done();
       });
     });
+
+    it("accepts surchargeAmount", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/28",
+        },
+        surchargeAmount: "1.00",
+      };
+
+      transactionGateway.sale(transactionParams, (err, params) => {
+        assert.equal("1.00", params.transaction.surchargeAmount);
+        done();
+      });
+    });
   }));
 
 describe("TransactionGateway", () =>

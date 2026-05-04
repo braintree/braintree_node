@@ -425,6 +425,26 @@ describe("TransactionGateway", function () {
       });
     });
 
+    it("accepts surchargeAmount", function (done) {
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/28",
+        },
+        surchargeAmount: "1.00",
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.surchargeAmount, "1.00");
+          done();
+        }
+      );
+    });
+
     it("handles an error when tax amount is not present for AIB:Domestic Sweden transactions", function (done) {
       let transactionParams = {
         type: "sale",
@@ -768,6 +788,146 @@ describe("TransactionGateway", function () {
               assert.equal(
                 response.transaction.creditCard.expirationDate,
                 "05/2014"
+              );
+
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("can create a transaction with customer internationalPhone", function (done) {
+      let customerParams = {
+        firstName: "Adam",
+        lastName: "Jones",
+        internationalPhone: {
+          countryCode: "1",
+          nationalNumber: "3121234567",
+        },
+        creditCard: {
+          cardholderName: "Adam Jones",
+          number: "5105105105105100",
+          expirationDate: "05/2014",
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          let transactionParams = {
+            customerId: response.customer.id,
+            amount: "100.00",
+          };
+
+          specHelper.defaultGateway.transaction.sale(
+            transactionParams,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              assert.equal(response.transaction.type, "sale");
+              assert.equal(response.transaction.customer.firstName, "Adam");
+              assert.equal(response.transaction.customer.lastName, "Jones");
+              assert.equal(
+                response.transaction.customer.internationalPhone.countryCode,
+                "1"
+              );
+              assert.equal(
+                response.transaction.customer.internationalPhone.nationalNumber,
+                "3121234567"
+              );
+
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("throws an error when a transaction has an invalid customer national number", function (done) {
+      let customerParams = {
+        firstName: "Adam",
+        lastName: "Jones",
+        creditCard: {
+          cardholderName: "Adam Jones",
+          number: "5105105105105100",
+          expirationDate: "05/2014",
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          let transactionParams = {
+            customerId: response.customer.id,
+            customer: {
+              internationalPhone: {
+                countryCode: "1",
+                nationalNumber: "3121234567890",
+              },
+            },
+            amount: "100.00",
+          };
+
+          specHelper.defaultGateway.transaction.sale(
+            transactionParams,
+            function (err, response) {
+              assert.isFalse(response.success);
+              let errors = response.errors.deepErrors();
+
+              let codes = errors.map((e) => e.code);
+
+              assert(
+                codes.includes(
+                  ValidationErrorCodes.Customer
+                    .InternationalPhoneNationalNumberIsInvalid
+                )
+              );
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("throws an error when a transaction has an invalid customer country code", function (done) {
+      let customerParams = {
+        firstName: "Adam",
+        lastName: "Jones",
+        creditCard: {
+          cardholderName: "Adam Jones",
+          number: "5105105105105100",
+          expirationDate: "05/2014",
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          let transactionParams = {
+            paymentMethodToken: response.customer.creditCards[0].token,
+            amount: "100.00",
+            customer: {
+              internationalPhone: {
+                countryCode: "1111",
+                nationalNumber: "3121234567890",
+              },
+            },
+          };
+
+          specHelper.defaultGateway.transaction.sale(
+            transactionParams,
+            function (err, response) {
+              assert.isFalse(response.success);
+              let errors = response.errors.deepErrors();
+
+              let codes = errors.map((e) => e.code);
+
+              assert(
+                codes.includes(
+                  ValidationErrorCodes.Customer
+                    .InternationalPhoneCountryCodeIsInvalid
+                )
               );
 
               done();
@@ -6567,7 +6727,7 @@ describe("TransactionGateway", function () {
           assert.equal(transaction.achReturnCode, "RJCT");
           assert.equal(
             transaction.achRejectReason,
-            "Bank accounts located outside of the U.S. are not supported."
+            "Bank accounts located outside of the U.S. are not supported"
           );
           done();
         }

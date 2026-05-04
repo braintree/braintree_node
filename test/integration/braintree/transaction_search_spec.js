@@ -74,6 +74,8 @@ describe("TransactionSearch", () =>
                 response.transaction.id,
                 function (err, transaction) {
                   let textCriteria = {
+                    acquirerReferenceNumber:
+                      transaction.acquirerReferenceNumber,
                     billingCompany: "Braintree",
                     billingCountryName: "United States of America",
                     billingExtendedAddress: "Apt B",

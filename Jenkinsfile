@@ -39,6 +39,31 @@ pipeline {
             }
           }
         }
+
+        stage("SonarQube") {
+          agent {
+            node {
+              label ""
+              customWorkspace "workspace/${REPO_NAME}-sonar"
+            }
+          }
+
+          steps {
+            script {
+              sh "docker build -t braintree-node ."
+              sh "docker run --rm -v \"\$(pwd):\$(pwd)\" -w \"\$(pwd)\" braintree-node /bin/bash -l -c 'npm install && npm run test:unit:coverage'"
+              executeSonarQubeScan()
+            }
+          }
+
+          post {
+            failure {
+              script {
+                FAILED_STAGE = env.STAGE_NAME
+              }
+            }
+          }
+        }
       }
     }
 

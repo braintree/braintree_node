@@ -10,6 +10,8 @@ let MerchantAccountTest =
   require("../../../lib/braintree/test_values/merchant_account").MerchantAccountTest;
 let CreditCardNumbers =
   require("../../../lib/braintree/test_values/credit_card_numbers").CreditCardNumbers;
+let ApplePayCard =
+  require("../../../lib/braintree/apple_pay_card").ApplePayCard;
 
 describe("CustomerGateway", function () {
   describe("create", function () {
@@ -1039,6 +1041,429 @@ describe("CustomerGateway", function () {
               done();
             }
           );
+        }
+      );
+    });
+
+    it("verifies the apple pay card with all verification options", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+            verificationMerchantAccountId:
+              specHelper.nonDefaultMerchantAccountId,
+            verificationAmount: "10.00",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.isNotNull(response.customer.applePayCards[0]);
+          assert.isTrue(
+            response.customer.paymentMethods[0] instanceof ApplePayCard
+          );
+
+          let verification = response.customer.paymentMethods[0].verification;
+
+          assert.isNotNull(verification);
+          assert.equal(verification.status, "verified");
+          assert.equal(
+            verification.merchantAccountId,
+            specHelper.nonDefaultMerchantAccountId
+          );
+          assert.equal(verification.amount, "10.00");
+
+          done();
+        }
+      );
+    });
+
+    it("verifies the apple pay card when only verify_card set to true is provided", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.isTrue(
+            response.customer.paymentMethods[0] instanceof ApplePayCard
+          );
+
+          let verification = response.customer.paymentMethods[0].verification;
+
+          assert.isNotNull(verification);
+
+          done();
+        }
+      );
+    });
+
+    it("does not verify the apple pay card when verify_card is false", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: false,
+            verificationMerchantAccountId:
+              specHelper.nonDefaultMerchantAccountId,
+            verificationAmount: "10.00",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.isTrue(
+            response.customer.paymentMethods[0] instanceof ApplePayCard
+          );
+
+          let verification = response.customer.paymentMethods[0].verification;
+
+          assert.isUndefined(verification);
+
+          done();
+        }
+      );
+    });
+
+    it("errors when verification amount is negative for apple pay", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+            verificationAmount: "-10.00",
+            verificationMerchantAccountId:
+              specHelper.nonDefaultMerchantAccountId,
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("applePay")
+              .for("options")
+              .on("verificationAmount")[0].code,
+            ValidationErrorCodes.ApplePayCard.Options
+              .VerificationAmountCannotBeNegative
+          );
+          done();
+        }
+      );
+    });
+
+    it("errors when verification amount format is invalid for apple pay", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+            verificationAmount: "0.001",
+            verificationMerchantAccountId:
+              specHelper.nonDefaultMerchantAccountId,
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("applePay")
+              .for("options")
+              .on("verificationAmount")[0].code,
+            ValidationErrorCodes.ApplePayCard.Options
+              .VerificationAmountFormatIsInvalid
+          );
+          done();
+        }
+      );
+    });
+
+    it("errors when verification amount is not supported for processor on apple pay", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+            verificationAmount: "0.01",
+            verificationMerchantAccountId:
+              specHelper.cardProcessorBRLMerchantAccountId,
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("applePay")
+              .for("options")
+              .on("verificationAmount")[0].code,
+            ValidationErrorCodes.ApplePayCard.Options
+              .VerificationAmountNotSupportedByProcessor
+          );
+          done();
+        }
+      );
+    });
+
+    it("errors when verification amount is too large on apple pay", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+            verificationAmount: (Math.pow(2, 31) / 100.0).toString(),
+            verificationMerchantAccountId:
+              specHelper.nonDefaultMerchantAccountId,
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("applePay")
+              .for("options")
+              .on("verificationAmount")[0].code,
+            ValidationErrorCodes.ApplePayCard.Options
+              .VerificationAmountIsTooLarge
+          );
+          done();
+        }
+      );
+    });
+
+    it("errors when verification merchant account is invalid", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+            verificationAmount: "10.00",
+            verificationMerchantAccountId: "BAD_MERCHANT_ACCOUNT",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("applePay")
+              .for("options")
+              .on("verificationMerchantAccountId")[0].code,
+            ValidationErrorCodes.ApplePayCard.Options
+              .VerificationMerchantAccountIdIsInvalid
+          );
+          done();
+        }
+      );
+    });
+
+    it("errors when verification merchant account is suspended", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+            verificationMerchantAccountId:
+              specHelper.suspendedMerchantAccountId,
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("applePay")
+              .for("options")
+              .on("verificationMerchantAccountId")[1].code,
+            ValidationErrorCodes.ApplePayCard.Options
+              .VerificationMerchantAccountIsSuspended
+          );
+          done();
+        }
+      );
+    });
+
+    it("errors when network_transaction_id is present for an apple pay verification", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          networkTransactionId: "test123",
+          options: {
+            verifyCard: true,
+            verificationAmount: "10.00",
+            verificationMerchantAccountId:
+              specHelper.nonDefaultMerchantAccountId,
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("applePay")
+              .on("networkTransactionIdNotAllowed")[0].code,
+            ValidationErrorCodes.ApplePayCard.NetworkTransactionIdNotAllowed
+          );
+          done();
+        }
+      );
+    });
+
+    it("errors with invalid account_type for apple pay", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+            verificationAmount: "10.00",
+            verificationMerchantAccountId:
+              specHelper.nonDefaultMerchantAccountId,
+            verificationAccountType: "ach",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for("applePay").on("verificationAccountType")[0]
+              .code,
+            ValidationErrorCodes.ApplePayCard.Options
+              .VerificationAccountTypeIsInvalid
+          );
+          done();
+        }
+      );
+    });
+
+    it("errors when account_type not supported by merchant on apple_pay", function (done) {
+      let customerParams = {
+        paymentMethodNonce: Nonces.ApplePayVisa,
+        applePayCard: {
+          options: {
+            verifyCard: true,
+            verificationAmount: "10.00",
+            verificationMerchantAccountId:
+              specHelper.nonDefaultMerchantAccountId,
+            verificationAccountType: "credit",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("applePay")
+              .for("options")
+              .on("verificationAccountType")[0].code,
+            ValidationErrorCodes.ApplePayCard.Options
+              .VerificationAccountTypeNotSupported
+          );
+          done();
+        }
+      );
+    });
+
+    it("creates customer with raw apple pay card parameters and verification", function (done) {
+      let customerParams = {
+        firstName: "Jane",
+        lastName: "Doe",
+        applePayCard: {
+          number: CreditCardNumbers.CardTypeIndicators.Visa,
+          expirationMonth: "10",
+          expirationYear: "2024",
+          cryptogram: "01010101010101010101",
+          eciIndicator: "5",
+          cardholderName: "Jane Doe",
+          billingAddress: {
+            postalCode: "98126",
+          },
+          options: {
+            verifyCard: true,
+            verificationMerchantAccountId:
+              specHelper.nonDefaultMerchantAccountId,
+            verificationAmount: "15.00",
+          },
+        },
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+          assert.equal(response.customer.firstName, "Jane");
+          assert.equal(response.customer.lastName, "Doe");
+
+          let applePayCard = response.customer.paymentMethods[0];
+
+          assert.isTrue(applePayCard instanceof ApplePayCard);
+          assert.isNotNull(applePayCard.token);
+
+          let verification = applePayCard.verification;
+
+          assert.isNotNull(verification);
+          assert.equal(
+            verification.merchantAccountId,
+            specHelper.nonDefaultMerchantAccountId
+          );
+          assert.equal(verification.amount, "15.00");
+
+          done();
         }
       );
     });
@@ -2364,6 +2789,587 @@ describe("CustomerGateway", function () {
           }
         );
       });
+    });
+
+    it("can update the customer with apple pay card verification", function (done) {
+      let customerParams = {
+        firstName: "Billy",
+        lastName: "Bob",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              expirationMonth: "10",
+              expirationYear: "2024",
+              cryptogram: "01010101010101010101",
+              eciIndicator: "5",
+              cardholderName: "Billy Bob",
+              billingAddress: {
+                postalCode: "98126",
+              },
+              options: {
+                verifyCard: true,
+                verificationAmount: "3.50",
+                verificationMerchantAccountId:
+                  specHelper.nonDefaultMerchantAccountId,
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isTrue(updateResponse.success);
+
+              let applePayCard = updateResponse.customer.applePayCards[0];
+              let verification = applePayCard.verification;
+
+              assert.isNotNull(verification);
+              assert.equal(verification.amount, "3.50");
+              assert.equal(
+                verification.merchantAccountId,
+                specHelper.nonDefaultMerchantAccountId
+              );
+
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("verifies the apple pay card when only verify_card set to true is provided during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              options: {
+                verifyCard: true,
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isTrue(updateResponse.success);
+
+              let verification =
+                updateResponse.customer.applePayCards[0].verification;
+
+              assert.isNotNull(verification);
+
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("does not verify the apple pay card when verify_card is false during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              options: {
+                verifyCard: false,
+                verificationAmount: "10.00",
+                verificationMerchantAccountId:
+                  specHelper.nonDefaultMerchantAccountId,
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isTrue(updateResponse.success);
+
+              let verification =
+                updateResponse.customer.applePayCards[0].verification;
+
+              assert.isUndefined(verification);
+
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("returns an error when verification_amount is negative during apple pay card update", function (done) {
+      let customerParams = {
+        firstName: "Billy",
+        lastName: "Bob",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              expirationMonth: "10",
+              expirationYear: "2024",
+              cryptogram: "01010101010101010101",
+              eciIndicator: "5",
+              cardholderName: "Billy Bob",
+              billingAddress: {
+                postalCode: "98126",
+              },
+              options: {
+                verifyCard: true,
+                verificationAmount: "-10.00",
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("applePay")
+                  .for("options")
+                  .on("verificationAmount")[0].code,
+                ValidationErrorCodes.ApplePayCard.Options
+                  .VerificationAmountCannotBeNegative
+              );
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("errors when verification amount format is invalid for apple pay during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              options: {
+                verifyCard: true,
+                verificationAmount: "0.001",
+                verificationMerchantAccountId:
+                  specHelper.nonDefaultMerchantAccountId,
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("applePay")
+                  .for("options")
+                  .on("verificationAmount")[0].code,
+                ValidationErrorCodes.ApplePayCard.Options
+                  .VerificationAmountFormatIsInvalid
+              );
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("errors when verification amount is not supported for processor on apple pay during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              options: {
+                verifyCard: true,
+                verificationAmount: "0.01",
+                verificationMerchantAccountId:
+                  specHelper.cardProcessorBRLMerchantAccountId,
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("applePay")
+                  .for("options")
+                  .on("verificationAmount")[0].code,
+                ValidationErrorCodes.ApplePayCard.Options
+                  .VerificationAmountNotSupportedByProcessor
+              );
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("errors when verification amount is too large on apple pay during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              options: {
+                verifyCard: true,
+                verificationAmount: (Math.pow(2, 31) / 100.0).toString(),
+                verificationMerchantAccountId:
+                  specHelper.nonDefaultMerchantAccountId,
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("applePay")
+                  .for("options")
+                  .on("verificationAmount")[0].code,
+                ValidationErrorCodes.ApplePayCard.Options
+                  .VerificationAmountIsTooLarge
+              );
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("errors when verification merchant account is invalid during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              options: {
+                verifyCard: true,
+                verificationAmount: "10.00",
+                verificationMerchantAccountId: "BAD_MERCHANT_ACCOUNT",
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("applePay")
+                  .for("options")
+                  .on("verificationMerchantAccountId")[0].code,
+                ValidationErrorCodes.ApplePayCard.Options
+                  .VerificationMerchantAccountIdIsInvalid
+              );
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("errors when verification merchant account is suspended during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              options: {
+                verifyCard: true,
+                verificationAmount: "10.00",
+                verificationMerchantAccountId:
+                  specHelper.suspendedMerchantAccountId,
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("applePay")
+                  .for("options")
+                  .on("verificationMerchantAccountId")[1].code,
+                ValidationErrorCodes.ApplePayCard.Options
+                  .VerificationMerchantAccountIsSuspended
+              );
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("errors when network_transaction_id is present for an apple pay verification during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              networkTransactionId: "test123",
+              options: {
+                verifyCard: true,
+                verificationAmount: "10.00",
+                verificationMerchantAccountId:
+                  specHelper.nonDefaultMerchantAccountId,
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("applePay")
+                  .on("networkTransactionIdNotAllowed")[0].code,
+                ValidationErrorCodes.ApplePayCard.NetworkTransactionIdNotAllowed
+              );
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("errors with invalid account_type for apple pay during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              options: {
+                verifyCard: true,
+                verificationAmount: "10.00",
+                verificationMerchantAccountId:
+                  specHelper.nonDefaultMerchantAccountId,
+                verificationAccountType: "ach",
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("applePay")
+                  .on("verificationAccountType")[0].code,
+                ValidationErrorCodes.ApplePayCard.Options
+                  .VerificationAccountTypeIsInvalid
+              );
+              done();
+            }
+          );
+        }
+      );
+    });
+
+    it("errors when account_type not supported by merchant on apple_pay during update", function (done) {
+      let customerParams = {
+        firstName: "Joe",
+      };
+
+      specHelper.defaultGateway.customer.create(
+        customerParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let customerId = response.customer.id;
+          let updateParams = {
+            applePayCard: {
+              cryptogram: "01010101010101010101",
+              expirationMonth: "10",
+              expirationYear: "2024",
+              number: CreditCardNumbers.CardTypeIndicators.Visa,
+              options: {
+                verifyCard: true,
+                verificationAmount: "10.00",
+                verificationMerchantAccountId:
+                  specHelper.nonDefaultMerchantAccountId,
+                verificationAccountType: "credit",
+              },
+            },
+          };
+
+          specHelper.defaultGateway.customer.update(
+            customerId,
+            updateParams,
+            function (err, updateResponse) {
+              assert.isNull(err);
+              assert.isFalse(updateResponse.success);
+              assert.equal(
+                updateResponse.errors
+                  .for("applePay")
+                  .for("options")
+                  .on("verificationAccountType")[0].code,
+                ValidationErrorCodes.ApplePayCard.Options
+                  .VerificationAccountTypeNotSupported
+              );
+              done();
+            }
+          );
+        }
+      );
     });
   });
 

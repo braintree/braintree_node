@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.37.0
+
+- Add Local Payment Context support with `LocalPaymentContextGateway.create` and `LocalPaymentContextGateway.find` methods
+- Add support for MBWAY and CRYPTO payment types
+- Add `acquirerReferenceNumber` to transaction search object
+- Add `internationalPhone` to `Customer` in `TransactionGateway`
+- Deprecate merchant create functionality
+- Remove `accountFundingTransaction` from `Transaction` request
+- Add `apiRequestKey` (idempotency) support for `transaction.sale()`, `transaction.credit()`, `transaction.submitForSettlement()`, `transaction.submitForPartialSettlement()`, `transaction.void()`, and `transaction.refund()`
+- Add `surchargeAmount` to transaction object
+- Add support for apple pay card verifications
+
 ## 3.36.0
 
 - Add `acceptPartialAuthorization` to `TransactionGateway` and `partiallyAuthorized` in `Transaction`

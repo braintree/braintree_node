@@ -82,5 +82,13 @@ describe("Transaction", () => {
       assert.equal(1004, transaction.processorResponseCode);
       assert.equal(true, transaction.partiallyAuthorized);
     });
+
+    it("sets surchargeAmount when present", function () {
+      let transaction = new Transaction({
+        surchargeAmount: "1.00",
+      });
+
+      assert.equal("1.00", transaction.surchargeAmount);
+    });
   });
 });
