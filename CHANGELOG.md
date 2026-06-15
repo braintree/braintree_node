@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.37.0
+## 3.38.0
 
 - Deprecate `debugId` on `PayPalAccount`, `LocalPayment`, and `SepaDirectDebitAccountDetails` transaction detail objects
 - Add `mastercardTransactionLinkId` to `Transaction` and `CreditCardVerification`
