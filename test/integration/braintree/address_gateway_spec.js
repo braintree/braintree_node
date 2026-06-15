@@ -186,6 +186,56 @@ describe("AddressGateway", function () {
           done();
         }
       ));
+
+    it("rejects path traversal in the address id without breaking customer scope", (done) =>
+      specHelper.defaultGateway.customer.create({}, (err, attackerResp) =>
+        specHelper.defaultGateway.address.create(
+          {
+            customerId: attackerResp.customer.id,
+            streetAddress: "Attacker St",
+            countryName: "United States of America",
+          },
+          () =>
+            specHelper.defaultGateway.customer.create({}, (err, victimResp) =>
+              specHelper.defaultGateway.address.create(
+                {
+                  customerId: victimResp.customer.id,
+                  streetAddress: "Victim St",
+                  countryName: "United States of America",
+                },
+                (err, victimAddrResp) => {
+                  let traversalId =
+                    "../../" +
+                    victimResp.customer.id +
+                    "/addresses/" +
+                    victimAddrResp.address.id;
+
+                  specHelper.defaultGateway.address.find(
+                    attackerResp.customer.id,
+                    traversalId,
+                    function (err, address) {
+                      assert.isUndefined(address);
+                      assert.equal(
+                        err.type,
+                        braintree.errorTypes.notFoundError
+                      );
+
+                      specHelper.defaultGateway.address.find(
+                        victimResp.customer.id,
+                        victimAddrResp.address.id,
+                        function (err, freshAddress) {
+                          assert.isNull(err);
+                          assert.equal(freshAddress.streetAddress, "Victim St");
+                          done();
+                        }
+                      );
+                    }
+                  );
+                }
+              )
+            )
+        )
+      ));
   });
 
   describe("update", function () {
@@ -300,6 +350,57 @@ describe("AddressGateway", function () {
               }
             );
           }
+        )
+      ));
+
+    it("rejects path traversal in the address id and does not mutate the victim", (done) =>
+      specHelper.defaultGateway.customer.create({}, (err, attackerResp) =>
+        specHelper.defaultGateway.address.create(
+          {
+            customerId: attackerResp.customer.id,
+            streetAddress: "Attacker St",
+            countryName: "United States of America",
+          },
+          () =>
+            specHelper.defaultGateway.customer.create({}, (err, victimResp) =>
+              specHelper.defaultGateway.address.create(
+                {
+                  customerId: victimResp.customer.id,
+                  streetAddress: "Victim St",
+                  countryName: "United States of America",
+                },
+                (err, victimAddrResp) => {
+                  let traversalId =
+                    "../../" +
+                    victimResp.customer.id +
+                    "/addresses/" +
+                    victimAddrResp.address.id;
+
+                  specHelper.defaultGateway.address.update(
+                    attackerResp.customer.id,
+                    traversalId,
+                    { streetAddress: "Owned by traversal 555" },
+                    function (err, response) {
+                      assert.isUndefined(response);
+                      assert.equal(
+                        err.type,
+                        braintree.errorTypes.notFoundError
+                      );
+
+                      specHelper.defaultGateway.address.find(
+                        victimResp.customer.id,
+                        victimAddrResp.address.id,
+                        function (err, freshAddress) {
+                          assert.isNull(err);
+                          assert.equal(freshAddress.streetAddress, "Victim St");
+                          done();
+                        }
+                      );
+                    }
+                  );
+                }
+              )
+            )
         )
       ));
   });

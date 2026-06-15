@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.38.0
+
+- Deprecate `debugId` on `PayPalAccount`, `LocalPayment`, and `SepaDirectDebitAccountDetails` transaction detail objects
+- Add `mastercardTransactionLinkId` to `Transaction` and `CreditCardVerification`
+- Resolve path traversal vulnerabilities in `AddressGateway` (`create`, `find`, `update`, `delete`) and `DisputeGateway.removeEvidence`
+- Add `accountReferenceNumberType` to sender and receiver in transfer on `Transaction`
+- Add `CannotCloneThirdPartyCofNetworkTokenTransaction (915274)` transaction validation error code
+
 ## 3.37.0
 
 - Add Local Payment Context support with `LocalPaymentContextGateway.create` and `LocalPaymentContextGateway.find` methods

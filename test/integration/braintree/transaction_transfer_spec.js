@@ -24,6 +24,7 @@ describe("TransactionGateway", function () {
           middleName: "A",
           lastName: "Silva",
           accountReferenceNumber: "1000012345",
+          accountReferenceNumberType: "OTHER",
           address: {
             streetAddress: "1st Main Road",
             locality: "Los Angeles",
@@ -36,6 +37,8 @@ describe("TransactionGateway", function () {
           firstName: "Bob",
           middleName: "A",
           lastName: "Souza",
+          accountReferenceNumber: "2000012345",
+          accountReferenceNumberType: "BIC_SWIFT_CODE",
           address: {
             streetAddress: "2nd Main Road",
             locality: "Los Angeles",
@@ -53,6 +56,98 @@ describe("TransactionGateway", function () {
           assert.isTrue(response.success);
           assert.isTrue(response.transaction.accountFundingTransaction);
           assert.equal(response.transaction.status, "authorized");
+          done();
+        }
+      );
+    });
+  });
+
+  describe("should not create a transaction", function () {
+    it("when sender account reference type is invalid", function (done) {
+      let transactionParams = {
+        type: "sale",
+        amount: "100.00",
+        merchantAccountId: "aft_first_data_wallet_transfer",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "06/2026",
+          cvv: "123",
+        },
+        transfer: {
+          type: "wallet_transfer",
+          sender: {
+            firstName: "Alice",
+            middleName: "A",
+            lastName: "Silva",
+            accountReferenceNumber: "1000012345",
+            accountReferenceNumberType: "INVALID_TYPE",
+            address: {
+              streetAddress: "1st Main Road",
+              locality: "Los Angeles",
+              region: "CA",
+              countryCodeAlpha2: "US",
+            },
+          },
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("accountFundingTransaction")
+              .on("senderAccountReferenceNumberType")[0].code,
+            ValidationErrorCodes.Transaction
+              .TransactionTransferSenderAccountReferenceNumberTypeInvalid
+          );
+          done();
+        }
+      );
+    });
+
+    it("when receiver account reference type is invalid", function (done) {
+      let transactionParams = {
+        type: "sale",
+        amount: "100.00",
+        merchantAccountId: "aft_first_data_wallet_transfer",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "06/2026",
+          cvv: "123",
+        },
+        transfer: {
+          type: "wallet_transfer",
+          receiver: {
+            firstName: "Alice",
+            middleName: "A",
+            lastName: "Silva",
+            accountReferenceNumber: "1000012345",
+            accountReferenceNumberType: "INVALID_TYPE",
+            address: {
+              streetAddress: "1st Main Road",
+              locality: "Los Angeles",
+              region: "CA",
+              countryCodeAlpha2: "US",
+            },
+          },
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("accountFundingTransaction")
+              .on("receiverAccountReferenceNumberType")[0].code,
+            ValidationErrorCodes.Transaction
+              .TransactionTransferReceiverAccountReferenceNumberTypeInvalid
+          );
           done();
         }
       );

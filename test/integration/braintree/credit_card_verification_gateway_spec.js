@@ -766,6 +766,60 @@ describe("CreditCardVerificationGateway", function () {
         }
       );
     });
+
+    it("creates a verification and returns mastercardTransactionLinkId in the response", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "5555555555554444",
+          expirationDate: "05/2029",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+          assert(
+            /^[a-zA-Z0-9]{22}$/.test(verification.mastercardTransactionLinkId)
+          );
+          done();
+        }
+      );
+    });
+
+    it("creates a verification and doesn't return mastercardTransactionLinkId in the response if its not mastercard", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "4111111111111111",
+          expirationDate: "05/2029",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+          assert.isNull(verification.mastercardTransactionLinkId);
+          done();
+        }
+      );
+    });
   });
 
   describe("find with payment account reference", function () {
