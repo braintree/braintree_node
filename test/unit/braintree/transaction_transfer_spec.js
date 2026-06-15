@@ -43,6 +43,7 @@ describe("TransactionGateway - Transfer Block", () => {
             middleName: "A",
             lastName: "Silva",
             accountReferenceNumber: "1000012345",
+            accountReferenceNumberType: "OTHER",
             address: {
               streetAddress: "1st Main Road",
               locality: "Los Angeles",
@@ -55,6 +56,8 @@ describe("TransactionGateway - Transfer Block", () => {
             firstName: "Bob",
             middleName: "A",
             lastName: "Souza",
+            accountReferenceNumber: "2000012345",
+            accountReferenceNumberType: "BIC_SWIFT_CODE",
             address: {
               streetAddress: "2nd Main Road",
               locality: "Los Angeles",
@@ -75,6 +78,7 @@ describe("TransactionGateway - Transfer Block", () => {
               middleName: "A",
               lastName: "Silva",
               accountReferenceNumber: "1000012345",
+              accountReferenceNumberType: "OTHER",
               address: {
                 streetAddress: "1st Main Road",
                 locality: "Los Angeles",
@@ -87,6 +91,8 @@ describe("TransactionGateway - Transfer Block", () => {
               firstName: "Bob",
               middleName: "A",
               lastName: "Souza",
+              accountReferenceNumber: "2000012345",
+              accountReferenceNumberType: "BIC_SWIFT_CODE",
               address: {
                 streetAddress: "2nd Main Road",
                 locality: "Los Angeles",

@@ -18,4 +18,15 @@ describe("CreditCardVerification", () =>
         verification.creditCard.paymentAccountReference
       );
     });
+
+    it("sets mastercardTransactionLinkId when present", function () {
+      let verification = new CreditCardVerification({
+        mastercardTransactionLinkId: "ZairABg6CIFekPMsnK0cJ2",
+      });
+
+      assert.equal(
+        "ZairABg6CIFekPMsnK0cJ2",
+        verification.mastercardTransactionLinkId
+      );
+    });
   }));

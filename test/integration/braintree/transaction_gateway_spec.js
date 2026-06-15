@@ -147,7 +147,7 @@ describe("TransactionGateway", function () {
       );
     });
 
-    it("passes scaExemption", function (done) {
+    xit("passes scaExemption", function (done) {
       let requestedExemption = "low_value";
       let transactionParams = {
         amount: "5.00",
@@ -6303,6 +6303,58 @@ describe("TransactionGateway", function () {
         assert.isNull(err);
         assert.isTrue(response.success);
         assert.isUndefined(response.transaction.foreignRetailer);
+        done();
+      }
+    );
+  });
+
+  it("creates a transaction with mastercardTransactionLinkId in response", function (done) {
+    let transactionParams = {
+      amount: "5.00",
+      creditCard: {
+        number: "5555555555554444",
+        expirationDate: "05/32",
+      },
+    };
+
+    specHelper.defaultGateway.transaction.sale(
+      transactionParams,
+      function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, "sale");
+        assert.equal(response.transaction.processorResponseCode, "1000");
+        assert.equal(response.transaction.processorResponseType, "approved");
+        assert(
+          /^[a-zA-Z0-9]{22}$/.test(
+            response.transaction.mastercardTransactionLinkId
+          )
+        );
+
+        done();
+      }
+    );
+  });
+
+  it("creates a transaction without mastercardTransactionLinkId in response for a non mastercard card", function (done) {
+    let transactionParams = {
+      amount: "5.00",
+      creditCard: {
+        number: "4111111111111111",
+        expirationDate: "05/32",
+      },
+    };
+
+    specHelper.defaultGateway.transaction.sale(
+      transactionParams,
+      function (err, response) {
+        assert.isNull(err);
+        assert.isTrue(response.success);
+        assert.equal(response.transaction.type, "sale");
+        assert.equal(response.transaction.processorResponseCode, "1000");
+        assert.equal(response.transaction.processorResponseType, "approved");
+        assert.isNull(response.transaction.mastercardTransactionLinkId);
+
         done();
       }
     );

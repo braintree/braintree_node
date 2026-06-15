@@ -674,6 +674,51 @@ describe("DisputeGateway", () => {
         });
     });
 
+    it("rejects path traversal in evidenceId and leaves the victim evidence intact", () => {
+      var attackerDisputeId, victimDisputeId, victimEvidenceId;
+
+      return createSampleDispute()
+        .then((dispute) => {
+          attackerDisputeId = dispute.id;
+
+          return createSampleDispute();
+        })
+        .then((dispute) => {
+          victimDisputeId = dispute.id;
+
+          return disputeGateway.addTextEvidence(
+            victimDisputeId,
+            "victim evidence"
+          );
+        })
+        .then((response) => {
+          victimEvidenceId = response.evidence.id;
+
+          let traversalId =
+            "../../" + victimDisputeId + "/evidence/" + victimEvidenceId;
+
+          return disputeGateway.removeEvidence(attackerDisputeId, traversalId);
+        })
+        .then(() => {
+          assert.fail("removeEvidence should have failed");
+        })
+        .catch((err) => {
+          assert.equal(err.type, "notFoundError");
+
+          return disputeGateway.find(victimDisputeId);
+        })
+        .then((response) => {
+          let stillPresent = response.dispute.evidence.some(
+            (e) => e.id === victimEvidenceId
+          );
+
+          assert.isTrue(
+            stillPresent,
+            "victim evidence should not have been removed"
+          );
+        });
+    });
+
     it("returns error when dispute not open", () => {
       var disputeId, evidenceId;
 

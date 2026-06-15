@@ -90,5 +90,16 @@ describe("Transaction", () => {
 
       assert.equal("1.00", transaction.surchargeAmount);
     });
+
+    it("sets mastercardTransactionLinkId when present", function () {
+      let transaction = new Transaction({
+        mastercardTransactionLinkId: "ZairABg6CIFekPMsnK0cJ2",
+      });
+
+      assert.equal(
+        "ZairABg6CIFekPMsnK0cJ2",
+        transaction.mastercardTransactionLinkId
+      );
+    });
   });
 });

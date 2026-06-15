@@ -33,6 +33,33 @@ describe("DisputeGateway", function () {
           assert.equal("dispute with id ' ' not found", e.message);
         });
     });
+
+    const traversalIds = [
+      "../../victim",
+      "foo/bar",
+      "foo\\bar",
+      "..%2f..%2fvictim",
+      "..",
+      ".",
+      123,
+      {},
+    ];
+
+    traversalIds.forEach((badId) => {
+      it(`rejects id ${JSON.stringify(badId)} as NotFoundError`, () => {
+        let httpStub = sinon.stub();
+
+        disputeGateway.gateway.http = { put: httpStub };
+
+        return disputeGateway
+          .accept(badId)
+          .then(assert.fail)
+          .catch((e) => {
+            assert.equal("notFoundError", e.type);
+            assert.isFalse(httpStub.called);
+          });
+      });
+    });
   });
 
   describe("addTextEvidence", () => {
@@ -144,6 +171,33 @@ describe("DisputeGateway", function () {
           assert.equal("category cannot be empty", e.message);
         });
     });
+
+    const traversalIds = [
+      "../../victim",
+      "foo/bar",
+      "foo\\bar",
+      "..%2f..%2fvictim",
+      "..",
+      ".",
+      123,
+      {},
+    ];
+
+    traversalIds.forEach((badId) => {
+      it(`rejects id ${JSON.stringify(badId)} as NotFoundError`, () => {
+        let httpStub = sinon.stub();
+
+        disputeGateway.gateway.http = { post: httpStub };
+
+        return disputeGateway
+          .addTextEvidence(badId, "text evidence")
+          .then(assert.fail)
+          .catch((e) => {
+            assert.equal("notFoundError", e.type);
+            assert.isFalse(httpStub.called);
+          });
+      });
+    });
   });
 
   describe("addFileEvidence", () => {
@@ -186,6 +240,33 @@ describe("DisputeGateway", function () {
           assert.equal("document with id ' ' not found", e.message);
         });
     });
+
+    const traversalIds = [
+      "../../victim",
+      "foo/bar",
+      "foo\\bar",
+      "..%2f..%2fvictim",
+      "..",
+      ".",
+      123,
+      {},
+    ];
+
+    traversalIds.forEach((badId) => {
+      it(`rejects disputeId ${JSON.stringify(badId)} as NotFoundError`, () => {
+        let httpStub = sinon.stub();
+
+        disputeGateway.gateway.http = { post: httpStub };
+
+        return disputeGateway
+          .addFileEvidence(badId, "document_id")
+          .then(assert.fail)
+          .catch((e) => {
+            assert.equal("notFoundError", e.type);
+            assert.isFalse(httpStub.called);
+          });
+      });
+    });
   });
 
   describe("finalize", () => {
@@ -208,6 +289,33 @@ describe("DisputeGateway", function () {
           assert.equal("dispute with id ' ' not found", e.message);
         });
     });
+
+    const traversalIds = [
+      "../../victim",
+      "foo/bar",
+      "foo\\bar",
+      "..%2f..%2fvictim",
+      "..",
+      ".",
+      123,
+      {},
+    ];
+
+    traversalIds.forEach((badId) => {
+      it(`rejects id ${JSON.stringify(badId)} as NotFoundError`, () => {
+        let httpStub = sinon.stub();
+
+        disputeGateway.gateway.http = { put: httpStub };
+
+        return disputeGateway
+          .finalize(badId)
+          .then(assert.fail)
+          .catch((e) => {
+            assert.equal("notFoundError", e.type);
+            assert.isFalse(httpStub.called);
+          });
+      });
+    });
   });
 
   describe("find", () => {
@@ -229,6 +337,33 @@ describe("DisputeGateway", function () {
           assert.equal("notFoundError", e.type);
           assert.equal("dispute with id ' ' not found", e.message);
         });
+    });
+
+    const traversalIds = [
+      "../../victim",
+      "foo/bar",
+      "foo\\bar",
+      "..%2f..%2fvictim",
+      "..",
+      ".",
+      123,
+      {},
+    ];
+
+    traversalIds.forEach((badId) => {
+      it(`rejects id ${JSON.stringify(badId)} as NotFoundError`, () => {
+        let httpStub = sinon.stub();
+
+        disputeGateway.gateway.http = { get: httpStub };
+
+        return disputeGateway
+          .find(badId)
+          .then(assert.fail)
+          .catch((e) => {
+            assert.equal("notFoundError", e.type);
+            assert.isFalse(httpStub.called);
+          });
+      });
     });
   });
 
@@ -283,6 +418,47 @@ describe("DisputeGateway", function () {
             e.message
           );
         });
+    });
+
+    const traversalIds = [
+      "../../victim_dispute_id/evidence/victim_evidence_id",
+      "foo/bar",
+      "foo\\bar",
+      "..%2f..%2fvictim",
+      "..",
+      ".",
+      123,
+      {},
+    ];
+
+    traversalIds.forEach((badId) => {
+      it(`rejects evidenceId ${JSON.stringify(badId)} as NotFoundError`, () => {
+        let httpStub = sinon.stub();
+
+        disputeGateway.gateway.http = { delete: httpStub };
+
+        return disputeGateway
+          .removeEvidence("dispute_id", badId)
+          .then(assert.fail)
+          .catch((e) => {
+            assert.equal("notFoundError", e.type);
+            assert.isFalse(httpStub.called);
+          });
+      });
+
+      it(`rejects disputeId ${JSON.stringify(badId)} as NotFoundError`, () => {
+        let httpStub = sinon.stub();
+
+        disputeGateway.gateway.http = { delete: httpStub };
+
+        return disputeGateway
+          .removeEvidence(badId, "evidence_id")
+          .then(assert.fail)
+          .catch((e) => {
+            assert.equal("notFoundError", e.type);
+            assert.isFalse(httpStub.called);
+          });
+      });
     });
   });
 });
