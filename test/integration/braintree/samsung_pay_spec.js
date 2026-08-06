@@ -6,7 +6,7 @@ let PaymentInstrumentTypes =
 
 // NEXT_MAJOR_VERSION remove these tests
 // SamsungPayCard has been deprecated
-xdescribe("Samsung Pay", function () {
+describe("Samsung Pay", function () {
   it("can create from nonce", (done) =>
     specHelper.defaultGateway.customer.create({}, function (err, response) {
       let customerId = response.customer.id;

@@ -637,6 +637,78 @@ describe("CreditCardVerificationGateway", function () {
       );
     });
 
+    it("creates a verification with a threeDSecurePassThru network specified", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: CreditCardNumbers.CardTypeIndicators.Visa,
+          expirationDate: "05/2029",
+        },
+        threeDSecurePassThru: {
+          eciFlag: "05",
+          cavv: "some_cavv",
+          xid: "some_xid",
+          threeDSecureVersion: "2.2.0",
+          authenticationResponse: "Y",
+          directoryResponse: "Y",
+          cavvAlgorithm: "2",
+          dsTransactionId: "some_ds_id",
+          network: braintree.ThreeDSecurePassThruNetwork.Visa,
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+
+          done();
+        }
+      );
+    });
+
+    it("rejects a verification where the threeDSecurePassThru network does not match the payment instrument (Visa card, Mastercard network)", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: CreditCardNumbers.CardTypeIndicators.Visa,
+          expirationDate: "05/2029",
+        },
+        threeDSecurePassThru: {
+          eciFlag: "05",
+          cavv: "some_cavv",
+          xid: "some_xid",
+          threeDSecureVersion: "2.2.0",
+          authenticationResponse: "Y",
+          directoryResponse: "Y",
+          cavvAlgorithm: "2",
+          dsTransactionId: "some_ds_id",
+          network: braintree.ThreeDSecurePassThruNetwork.MasterCard,
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors.for("verification").on("network")[0].code,
+            ValidationErrorCodes.Verification.ThreeDSecurePassThru
+              .NetworkDoesNotMatchPaymentInstrument
+          );
+
+          done();
+        }
+      );
+    });
+
     it("creates a verification and returns prepaid_reloadable in the response", function (done) {
       let params = {
         creditCard: {

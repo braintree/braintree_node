@@ -5219,7 +5219,7 @@ describe("TransactionGateway", function () {
     );
   });
 
-  xit("handles chargeback protection risk data returned by the gateway", function (done) {
+  it("handles chargeback protection risk data returned by the gateway", function (done) {
     let transactionParams = {
       amount: "10.0",
       creditCard: {
@@ -5239,7 +5239,7 @@ describe("TransactionGateway", function () {
     );
   });
 
-  xit("handles risk_threshold rejection (test credit card number)", function (done) {
+  it("handles risk_threshold rejection (test credit card number)", function (done) {
     let transactionParams = {
       amount: "10.0",
       creditCard: {
@@ -5265,7 +5265,7 @@ describe("TransactionGateway", function () {
     );
   });
 
-  xit("handles risk_threshold rejection (test nonce)", function (done) {
+  it("handles risk_threshold rejection (test nonce)", function (done) {
     let transactionParams = {
       amount: "10.0",
       paymentMethodNonce: Nonces.GatewayRejectedRiskThresholds,
@@ -5473,7 +5473,7 @@ describe("TransactionGateway", function () {
         expirationDate: "05/16",
       },
       descriptor: {
-        name: "abc",
+        name: "a".repeat(31),
         phone: "1234567",
         url: "12345678901234",
       },
@@ -5990,8 +5990,8 @@ describe("TransactionGateway", function () {
     );
   });
 
-  context.skip("amex rewards", function () {
-    it("succeeds", function (done) {
+  context("amex rewards", function () {
+    it("sale succeeds with amex rewards", function (done) {
       let transactionParams = {
         merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
         amount: "10.00",
@@ -6024,7 +6024,7 @@ describe("TransactionGateway", function () {
       );
     });
 
-    it("succeeds even if the card is ineligible", function (done) {
+    it("sale succeeds with amex rewards even if the card is ineligible", function (done) {
       let transactionParams = {
         merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
         amount: "10.00",
@@ -6057,7 +6057,7 @@ describe("TransactionGateway", function () {
       );
     });
 
-    it("succeeds even if the card's balance is insufficient", function (done) {
+    it("sale succeeds with amex rewards even if the card's balance is insufficient", function (done) {
       let transactionParams = {
         merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
         amount: "10.00",
@@ -6492,6 +6492,78 @@ describe("TransactionGateway", function () {
             assert.equal(
               response.transaction.status,
               Transaction.Status.Authorized
+            );
+
+            done();
+          }
+        );
+      });
+
+      it("can create a transaction with a threeDSecurePassThru network specified", function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+          amount: "5.00",
+          creditCard: {
+            number: CreditCardNumbers.CardTypeIndicators.Visa,
+            expirationDate: "05/2009",
+          },
+          threeDSecurePassThru: {
+            eciFlag: "05",
+            cavv: "some_cavv",
+            xid: "some_xid",
+            threeDSecureVersion: "2.2.0",
+            authenticationResponse: "Y",
+            directoryResponse: "Y",
+            cavvAlgorithm: "2",
+            network: Braintree.ThreeDSecurePassThruNetwork.Visa,
+          },
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isTrue(response.success);
+            assert.equal(
+              response.transaction.status,
+              Transaction.Status.Authorized
+            );
+
+            done();
+          }
+        );
+      });
+
+      it("rejects a transaction where the threeDSecurePassThru network does not match the payment instrument (Visa card, Mastercard network)", function (done) {
+        let transactionParams = {
+          merchantAccountId: specHelper.threeDSecureMerchantAccountId,
+          amount: "5.00",
+          creditCard: {
+            number: CreditCardNumbers.CardTypeIndicators.Visa,
+            expirationDate: "05/2009",
+          },
+          threeDSecurePassThru: {
+            eciFlag: "05",
+            cavv: "some_cavv",
+            xid: "some_xid",
+            threeDSecureVersion: "2.2.0",
+            authenticationResponse: "Y",
+            directoryResponse: "Y",
+            cavvAlgorithm: "2",
+            network: Braintree.ThreeDSecurePassThruNetwork.MasterCard,
+          },
+        };
+
+        specHelper.defaultGateway.transaction.sale(
+          transactionParams,
+          function (err, response) {
+            assert.isFalse(response.success);
+            assert.equal(
+              response.errors
+                .for("transaction")
+                .for("threeDSecurePassThru")
+                .on("network")[0].code,
+              ValidationErrorCodes.Transaction
+                .ThreeDSecureNetworkDoesNotMatchPaymentInstrument
             );
 
             done();
@@ -7512,8 +7584,8 @@ describe("TransactionGateway", function () {
       );
     });
 
-    context.skip("amex rewards", function () {
-      it("succeeds", function (done) {
+    context("amex rewards", function () {
+      it("submits for settlement succeeds with amex rewards", function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
           amount: "10.00",
@@ -7552,7 +7624,7 @@ describe("TransactionGateway", function () {
         );
       });
 
-      it("succeeds even if the card is ineligible", function (done) {
+      it("submits for settlement succeeds with amex rewards even if the card is ineligible", function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
           amount: "10.00",
@@ -7591,7 +7663,7 @@ describe("TransactionGateway", function () {
         );
       });
 
-      it("succeeds even if the card's balance is insufficient", function (done) {
+      it("submits for settlement succeeds with amex rewards even if the card's balance is insufficient", function (done) {
         let transactionParams = {
           merchantAccountId: specHelper.fakeAmexDirectMerchantAccountId,
           amount: "10.00",
@@ -7763,7 +7835,7 @@ describe("TransactionGateway", function () {
         amount: "4.00",
         orderId: "123",
         descriptor: {
-          name: "invalid name",
+          name: "a".repeat(31),
           phone: "invalid phone",
           url: "invalid url that is invalid because it is too long",
         },

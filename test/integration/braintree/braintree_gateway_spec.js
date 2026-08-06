@@ -4,8 +4,7 @@ let gateway = specHelper.defaultGateway;
 
 describe("Braintree Gateway", () =>
   describe("graphql requests", () => {
-    // skipping until CI is more stable
-    it.skip("can tokenize credit cards", (done) => {
+    it("can tokenize credit cards", (done) => {
       let definition = `mutation ExampleServerSideSingleUseToken($input: TokenizeCreditCardInput!) {
   tokenizeCreditCard(input: $input) {
     paymentMethod {

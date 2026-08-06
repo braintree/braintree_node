@@ -6,6 +6,7 @@ let PaymentInstrumentTypes =
 describe("Visa Checkout", function () {
   it("can search by payment instrument type", (done) => {
     function search(search) {
+      search.ids().in(["visacheckout_transaction"]);
       search
         .paymentInstrumentType()
         .is(PaymentInstrumentTypes.VisaCheckoutCard);

@@ -3,6 +3,8 @@
 let CustomerGateway =
   require("../../../lib/braintree/customer_gateway").CustomerGateway;
 let errorTypes = require("../../../lib/braintree/error_types").errorTypes;
+let ThreeDSecurePassThruNetwork =
+  require("../../../lib/braintree/three_d_secure_pass_thru_network").ThreeDSecurePassThruNetwork;
 
 describe("CustomerGateway", () => {
   let fakeGateway = {
@@ -88,6 +90,37 @@ describe("CustomerGateway", () => {
         assert.equal(
           params.customer.applePayCard.options.verificationAmount,
           "1.00"
+        );
+        done();
+      });
+    });
+  });
+
+  describe("threeDSecurePassThru", function () {
+    it("accepts a creditCard threeDSecurePassThru network", function (done) {
+      let customerGateway = new CustomerGateway(fakeGateway);
+      let customerParams = {
+        creditCard: {
+          threeDSecurePassThru: {
+            eciFlag: "05",
+            cavv: "some_cavv",
+            xid: "some_xid",
+            threeDSecureVersion: "2.2.0",
+            authenticationResponse: "Y",
+            directoryResponse: "Y",
+            cavvAlgorithm: "2",
+            dsTransactionId: "some_ds_transaction_id",
+            network: ThreeDSecurePassThruNetwork.Visa,
+          },
+        },
+      };
+
+      customerGateway.create(customerParams, (err, params) => {
+        assert.notExists(err);
+        assert.exists(params);
+        assert.equal(
+          params.customer.creditCard.threeDSecurePassThru.network,
+          "Visa"
         );
         done();
       });

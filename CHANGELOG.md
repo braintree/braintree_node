@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.39.0
+
+- Add `EmailFormatIsInvalid (92963)` and `EmailIsTooLong (92964)` validation error codes to `PayPalAccount`
+- Add `ThreeDSecurePassThruNetwork` enum and support for `network` on `threeDSecurePassThru` in `Transaction`, `Customer`, and `CreditCardVerification`
+- Add `preferredPaymentMethodToken` to `ClientToken.generate`
+
 ## 3.38.0
 
 - Deprecate `debugId` on `PayPalAccount`, `LocalPayment`, and `SepaDirectDebitAccountDetails` transaction detail objects

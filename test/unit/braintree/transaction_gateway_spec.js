@@ -2,6 +2,8 @@
 
 let TransactionGateway =
   require("../../../lib/braintree/transaction_gateway").TransactionGateway;
+let ThreeDSecurePassThruNetwork =
+  require("../../../lib/braintree/three_d_secure_pass_thru_network").ThreeDSecurePassThruNetwork;
 
 describe("TransactionGateway", () =>
   describe("sale", function () {
@@ -146,6 +148,34 @@ describe("TransactionGateway", () =>
 
       transactionGateway.sale(transactionParams, (err, params) => {
         assert.equal("1.00", params.transaction.surchargeAmount);
+        done();
+      });
+    });
+
+    it("accepts threeDSecurePassThru network", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/28",
+        },
+        threeDSecurePassThru: {
+          eciFlag: "05",
+          cavv: "some_cavv",
+          xid: "some_xid",
+          threeDSecureVersion: "2.2.0",
+          authenticationResponse: "Y",
+          directoryResponse: "Y",
+          cavvAlgorithm: "2",
+          dsTransactionId: "some_ds_transaction_id",
+          network: ThreeDSecurePassThruNetwork.Visa,
+        },
+      };
+
+      transactionGateway.sale(transactionParams, (err, params) => {
+        assert.notExists(err);
+        assert.equal("Visa", params.transaction.threeDSecurePassThru.network);
         done();
       });
     });

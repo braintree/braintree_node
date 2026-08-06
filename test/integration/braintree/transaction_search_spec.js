@@ -431,7 +431,7 @@ describe("TransactionSearch", () =>
       );
     });
 
-    xit("pages correctly (slow test)", function (done) {
+    it("pages correctly (slow test)", function (done) {
       let random = specHelper.randomId();
       let transactionParams = {
         amount: "13.19",
@@ -994,6 +994,8 @@ describe("TransactionSearch", () =>
 
       // eslint-disable-next-line func-style
       let search = function (s) {
+        s.ids().in(["ach_txn_ret1", "ach_txn_ret2"]);
+
         return s.reasonCode().is(reasonCode);
       };
 
@@ -1222,7 +1224,7 @@ describe("TransactionSearch", () =>
       );
     });
 
-    xit("can search by debitNetwork", function (done) {
+    it("can search by debitNetwork", function (done) {
       // Flaky test
       let random = specHelper.randomId();
       let transactionParams = {

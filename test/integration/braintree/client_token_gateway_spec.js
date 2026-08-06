@@ -307,6 +307,36 @@ describe("ClientTokenGateway", function () {
       );
     }));
 
+  it("can pass preferredPaymentMethodToken", (done) =>
+    specHelper.defaultGateway.customer.create({}, function (err, result) {
+      let customerId = result.customer.id;
+
+      specHelper.defaultGateway.clientToken.generate(
+        {
+          customerId,
+          preferredPaymentMethodToken: "a-pmt",
+        },
+        function (err, result) {
+          assert.isTrue(result.success);
+          let clientToken = JSON.parse(
+            specHelper.decodeClientToken(result.clientToken)
+          );
+
+          assert.isNotNull(clientToken.paymentMethodIdJwt);
+          let jwtSegment = clientToken.paymentMethodIdJwt.split(".")[1];
+          let padded = jwtSegment.replace(/-/g, "+").replace(/_/g, "/");
+
+          while (padded.length % 4) padded += "=";
+          let jwtPayload = JSON.parse(
+            Buffer.from(padded, "base64").toString("utf8")
+          );
+
+          assert.equal(jwtPayload.pmid, "a-pmt");
+          done();
+        }
+      );
+    }));
+
   it("can pass merchantAccountId", function (done) {
     let expectedMerchantAccountId = specHelper.nonDefaultMerchantAccountId;
     let clientTokenParams = {

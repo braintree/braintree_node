@@ -419,6 +419,75 @@ describe("CustomerGateway", function () {
         );
       });
 
+      it("creates a customer with a threeDSecurePassThru network specified", function (done) {
+        let customerParams = {
+          paymentMethodNonce: Nonces.TransactableVisa,
+          creditCard: {
+            threeDSecurePassThru: {
+              eciFlag: "05",
+              cavv: "some_cavv",
+              xid: "some_xid",
+              threeDSecureVersion: "2.2.0",
+              authenticationResponse: "Y",
+              directoryResponse: "Y",
+              cavvAlgorithm: "2",
+              dsTransactionId: "some_ds_transaction_id",
+              network: braintree.ThreeDSecurePassThruNetwork.Visa,
+            },
+            options: {
+              verifyCard: true,
+            },
+          },
+        };
+
+        specHelper.defaultGateway.customer.create(
+          customerParams,
+          function (err, response) {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+
+            done();
+          }
+        );
+      });
+
+      it("rejects a customer where the threeDSecurePassThru network does not match the payment instrument (Visa nonce, Mastercard network)", function (done) {
+        let customerParams = {
+          paymentMethodNonce: Nonces.TransactableVisa,
+          creditCard: {
+            threeDSecurePassThru: {
+              eciFlag: "05",
+              cavv: "some_cavv",
+              xid: "some_xid",
+              threeDSecureVersion: "2.2.0",
+              authenticationResponse: "Y",
+              directoryResponse: "Y",
+              cavvAlgorithm: "2",
+              dsTransactionId: "some_ds_transaction_id",
+              network: braintree.ThreeDSecurePassThruNetwork.MasterCard,
+            },
+            options: {
+              verifyCard: true,
+            },
+          },
+        };
+
+        specHelper.defaultGateway.customer.create(
+          customerParams,
+          function (err, response) {
+            assert.isNull(err);
+            assert.isFalse(response.success);
+
+            assert.equal(
+              response.errors.deepErrors()[0].code,
+              ValidationErrorCodes.Verification.ThreeDSecurePassThru
+                .NetworkDoesNotMatchPaymentInstrument
+            );
+            done();
+          }
+        );
+      });
+
       it("creates a customer with a Three D Seure payment method nonce", function (done) {
         let customerParams = {
           paymentMethodNonce: Nonces.ThreeDSecureVisaFullAuthentication,

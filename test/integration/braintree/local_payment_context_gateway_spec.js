@@ -7,7 +7,7 @@ let PayerInfoInput = require("../../../lib/braintree/graphql/inputs/payer_info_i
 let ShippingAddressInput = require("../../../lib/braintree/graphql/inputs/shipping_address_input");
 let { LocalPaymentType } = braintree;
 
-describe.skip("LocalPaymentContextGateway", function () {
+describe("LocalPaymentContextGateway", function () {
   let gateway;
 
   beforeEach(function () {
