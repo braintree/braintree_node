@@ -1292,6 +1292,108 @@ describe("TransactionSearch", () =>
         }
       );
     });
+
+    it("searches on achType", async () => {
+      let { SameDay, Standard } = Transaction.AchType;
+
+      // eslint-disable-next-line func-style
+      let searchByAchType = (id, achType) => (s) => {
+        s.id().is(id);
+
+        return s.achType().is(achType);
+      };
+      // eslint-disable-next-line func-style
+      let searchByAchTypes = (id, achTypes) => (s) => {
+        s.id().is(id);
+
+        return s.achType().in(achTypes);
+      };
+
+      // eslint-disable-next-line func-style
+      let runSearch = (searchFn) =>
+        new Promise((resolve, reject) => {
+          specHelper.defaultGateway.transaction.search(
+            searchFn,
+            (err, response) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(response);
+              }
+            }
+          );
+        });
+
+      // eslint-disable-next-line func-style
+      let firstId = (response) =>
+        new Promise((resolve, reject) => {
+          response.first((err, transaction) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(transaction.id);
+            }
+          });
+        });
+
+      // eslint-disable-next-line func-style
+      let assertSearch = async (searchFn, expectedLength, expectedId) => {
+        let response = await runSearch(searchFn);
+
+        assert.equal(response.length(), expectedLength);
+
+        if (expectedId != null) {
+          assert.equal(await firstId(response), expectedId);
+        }
+      };
+
+      let sameDay = await specHelper.defaultGateway.transaction.find(
+        "sameday_ach_sameday_requested"
+      );
+
+      await assertSearch(searchByAchType(sameDay.id, SameDay), 1, sameDay.id);
+      await assertSearch(
+        searchByAchTypes(sameDay.id, [SameDay, Standard]),
+        1,
+        sameDay.id
+      );
+      await assertSearch(searchByAchType(sameDay.id, Standard), 0, null);
+
+      let standard = await specHelper.defaultGateway.transaction.find(
+        "standard_ach_standard_requested"
+      );
+
+      await assertSearch(
+        searchByAchType(standard.id, Standard),
+        1,
+        standard.id
+      );
+      await assertSearch(searchByAchType(standard.id, SameDay), 0, null);
+      await assertSearch(
+        searchByAchTypes(standard.id, [SameDay, Standard]),
+        1,
+        standard.id
+      );
+
+      let divergent = await specHelper.defaultGateway.transaction.find(
+        "standard_ach_sameday_requested"
+      );
+
+      assert.equal(divergent.achType, Standard);
+      assert.equal(divergent.requestedAchType, SameDay);
+
+      await assertSearch(
+        searchByAchType(divergent.id, Standard),
+        1,
+        divergent.id
+      );
+      await assertSearch(searchByAchType(divergent.id, SameDay), 0, null);
+      await assertSearch(
+        searchByAchTypes(divergent.id, [SameDay, Standard]),
+        1,
+        divergent.id
+      );
+    });
   }));
 
 function __range__(left, right, inclusive) {

@@ -3472,4 +3472,75 @@ describe("CustomerGateway", function () {
         }
       ));
   });
+
+  describe("path traversal", function () {
+    it("rejects path traversal in customer.update and does not void the victim transaction", (done) =>
+      specHelper.defaultGateway.transaction.sale(
+        {
+          amount: "5.00",
+          creditCard: {
+            number: "4111111111111111",
+            expirationDate: "05/2030",
+          },
+          options: { submitForSettlement: false },
+        },
+        (err, saleResponse) => {
+          let transactionId = saleResponse.transaction.id;
+          let traversalId = "../transactions/" + transactionId + "/void";
+
+          specHelper.defaultGateway.customer.update(
+            traversalId,
+            { firstName: "HackerOne" },
+            function (updateErr) {
+              assert.equal(updateErr.type, braintree.errorTypes.notFoundError);
+
+              specHelper.defaultGateway.transaction.find(
+                transactionId,
+                function (findErr, transaction) {
+                  assert.isNull(findErr);
+                  assert.equal(transaction.status, "authorized");
+
+                  done();
+                }
+              );
+            }
+          );
+        }
+      ));
+
+    it("rejects path traversal in customer.delete and does not delete the victim payment method", (done) =>
+      specHelper.defaultGateway.customer.create({}, (err, customerResponse) =>
+        specHelper.defaultGateway.creditCard.create(
+          {
+            customerId: customerResponse.customer.id,
+            number: "4111111111111111",
+            expirationDate: "05/2030",
+          },
+          (creditCardErr, creditCardResponse) => {
+            let token = creditCardResponse.creditCard.token;
+            let traversalId = "../payment_methods/any/" + token;
+
+            specHelper.defaultGateway.customer.delete(
+              traversalId,
+              function (deleteErr) {
+                assert.equal(
+                  deleteErr.type,
+                  braintree.errorTypes.notFoundError
+                );
+
+                specHelper.defaultGateway.creditCard.find(
+                  token,
+                  function (findErr, creditCard) {
+                    assert.isNull(findErr);
+                    assert.equal(creditCard.token, token);
+
+                    done();
+                  }
+                );
+              }
+            );
+          }
+        )
+      ));
+  });
 });

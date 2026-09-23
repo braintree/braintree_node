@@ -1,5 +1,6 @@
 "use strict";
 
+let sinon = require("sinon");
 let TransactionGateway =
   require("../../../lib/braintree/transaction_gateway").TransactionGateway;
 let ThreeDSecurePassThruNetwork =
@@ -214,3 +215,113 @@ describe("TransactionGateway", () =>
       );
     });
   }));
+
+describe("TransactionGateway", () =>
+  describe("refund", function () {
+    let fakeGateway = {
+      config: {
+        baseMerchantPath() {
+          return "";
+        },
+      },
+      http: {
+        post(url, params) {
+          return Promise.resolve(params);
+        },
+      },
+    };
+
+    it("accepts surchargeAmount in refunds", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+      let refundOptions = {
+        surchargeAmount: "1.00",
+      };
+
+      transactionGateway.refund("fake_txn_id", refundOptions, (err, params) => {
+        assert.notExists(err);
+        assert.equal("1.00", params.transaction.surchargeAmount);
+        done();
+      });
+    });
+  }));
+
+describe("TransactionGateway", () => {
+  describe("path traversal", () => {
+    const traversalIds = [
+      "../../victim_customer/addresses/victim_address",
+      "foo/bar",
+      "foo\\bar",
+      "..%2f..%2fvictim",
+      "..",
+      ".",
+      "%2e%2e",
+      "",
+      "   ",
+      null,
+      123,
+      {},
+    ];
+
+    let httpStubs, transactionGateway;
+
+    beforeEach(() => {
+      httpStubs = {
+        get: sinon.stub(),
+        post: sinon.stub(),
+        put: sinon.stub(),
+        delete: sinon.stub(),
+      };
+      transactionGateway = new TransactionGateway({
+        config: { baseMerchantPath: () => "/merchants/m" },
+        http: httpStubs,
+      });
+    });
+
+    function assertNotFoundAndNoHttp(promise, stub) {
+      return promise.then(assert.fail).catch((e) => {
+        assert.equal("notFoundError", e.type);
+        assert.isFalse(stub.called);
+      });
+    }
+
+    const cases = [
+      {
+        method: "adjustAuthorization",
+        args: ["5.00"],
+        stub: () => httpStubs.put,
+      },
+      { method: "cancelRelease", args: [], stub: () => httpStubs.put },
+      { method: "cloneTransaction", args: [{}], stub: () => httpStubs.post },
+      { method: "find", args: [], stub: () => httpStubs.get },
+      { method: "refund", args: [{}], stub: () => httpStubs.post },
+      {
+        method: "submitForSettlement",
+        args: ["5.00", {}],
+        stub: () => httpStubs.put,
+      },
+      { method: "updateDetails", args: [{}], stub: () => httpStubs.put },
+      { method: "packageTracking", args: [{}], stub: () => httpStubs.post },
+      {
+        method: "submitForPartialSettlement",
+        args: ["5.00", {}],
+        stub: () => httpStubs.post,
+      },
+      { method: "void", args: [{}], stub: () => httpStubs.put },
+    ];
+
+    cases.forEach(({ method, args, stub }) => {
+      describe(method, () => {
+        traversalIds.forEach((badId) => {
+          it(`rejects transactionId ${JSON.stringify(
+            badId
+          )} without calling http`, () => {
+            return assertNotFoundAndNoHttp(
+              transactionGateway[method](badId, ...args),
+              stub()
+            );
+          });
+        });
+      });
+    });
+  });
+});

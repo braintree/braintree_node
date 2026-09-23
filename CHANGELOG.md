@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.40.0
+
+- Add `achType` to transaction search
+- Resolve path traversal vulnerabilities across `CustomerGateway`, `TransactionGateway`, `CreditCardGateway`, `PaymentMethodGateway`, `PaymentMethodNonceGateway`, `SubscriptionGateway`, `MerchantAccountGateway`, `PayPalAccountGateway`, `UsBankAccountGateway`, `UsBankAccountVerificationGateway`, `CreditCardVerificationGateway`, `PlanGateway`, `SepaDirectDebitAccountGateway`, and `TransactionLineItemGateway`, and tighten `Util.isInvalidPathSegment` from a denylist to an allowlist (`^[A-Za-z0-9_-]+$`), matching `AddressGateway`/`DisputeGateway` and the other Braintree server SDKs
+- Add support for `surchargeAmount` in `Transaction.refund()`
+
 ## 3.39.0
 
 - Add `EmailFormatIsInvalid (92963)` and `EmailIsTooLong (92964)` validation error codes to `PayPalAccount`

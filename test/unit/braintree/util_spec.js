@@ -691,4 +691,50 @@ describe("Util", function () {
       assert.equal(Util.zip(array2, array1)[3][0], "d");
     });
   });
+
+  describe("isInvalidPathSegment", () => {
+    const validSegments = [
+      "customer123",
+      "CUSTOMER_123",
+      "a-b_c-D9",
+      "1234567890",
+      "a",
+    ];
+
+    validSegments.forEach((segment) => {
+      it(`returns false for a valid segment: ${JSON.stringify(
+        segment
+      )}`, () => {
+        assert.isFalse(Util.isInvalidPathSegment(segment));
+      });
+    });
+
+    const invalidSegments = [
+      "",
+      "   ",
+      ".",
+      "..",
+      "foo/bar",
+      "foo\\bar",
+      "foo%bar",
+      "..%2f..%2fvictim",
+      "%2e%2e",
+      "../../victim_customer/addresses/victim_address",
+      "abc.def",
+      "abc def",
+      null,
+      undefined, // eslint-disable-line no-undefined
+      123,
+      {},
+      [],
+    ];
+
+    invalidSegments.forEach((segment) => {
+      it(`returns true for an invalid segment: ${JSON.stringify(
+        segment
+      )}`, () => {
+        assert.isTrue(Util.isInvalidPathSegment(segment));
+      });
+    });
+  });
 });

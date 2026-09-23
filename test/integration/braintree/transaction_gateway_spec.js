@@ -147,7 +147,7 @@ describe("TransactionGateway", function () {
       );
     });
 
-    xit("passes scaExemption", function (done) {
+    it("passes scaExemption", function (done) {
       let requestedExemption = "low_value";
       let transactionParams = {
         amount: "5.00",
@@ -6571,6 +6571,26 @@ describe("TransactionGateway", function () {
         );
       });
     });
+
+    it("accepts surchargeAmount", function (done) {
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/28",
+        },
+        surchargeAmount: "1.00",
+      };
+
+      specHelper.defaultGateway.transaction.credit(
+        transactionParams,
+        function (err, response) {
+          assert.isTrue(response.success);
+          assert.equal(response.transaction.surchargeAmount, "1.00");
+          done();
+        }
+      );
+    });
   });
 
   describe("find", function () {
@@ -7073,6 +7093,83 @@ describe("TransactionGateway", function () {
                 done();
               }
             )
+          )
+      );
+    });
+
+    it("allows full refund with surchargeAmount", function (done) {
+      let transactionParams = {
+        amount: "500.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/28",
+        },
+        surchargeAmount: "1.00",
+        options: {
+          submitForSettlement: true,
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, saleResponse) =>
+          specHelper.defaultGateway.testing.settle(
+            saleResponse.transaction.id,
+            () =>
+              specHelper.defaultGateway.transaction.refund(
+                saleResponse.transaction.id,
+                { surchargeAmount: "1.00" },
+                function (err, response) {
+                  assert.isNull(err);
+                  assert.isTrue(response.success);
+                  assert.equal(response.transaction.type, "credit");
+                  assert.equal(
+                    response.transaction.refundedTransactionId,
+                    saleResponse.transaction.id
+                  );
+                  assert.equal(response.transaction.surchargeAmount, "1.00");
+                  done();
+                }
+              )
+          )
+      );
+    });
+
+    it("allows partial refund with surchargeAmount", function (done) {
+      let transactionParams = {
+        amount: "500.00",
+        creditCard: {
+          number: "4111111111111111",
+          expirationDate: "05/28",
+        },
+        surchargeAmount: "1.00",
+        options: {
+          submitForSettlement: true,
+        },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, saleResponse) =>
+          specHelper.defaultGateway.testing.settle(
+            saleResponse.transaction.id,
+            () =>
+              specHelper.defaultGateway.transaction.refund(
+                saleResponse.transaction.id,
+                { amount: "200.00", surchargeAmount: "0.50" },
+                function (err, response) {
+                  assert.isNull(err);
+                  assert.isTrue(response.success);
+                  assert.equal(response.transaction.type, "credit");
+                  assert.equal(
+                    response.transaction.refundedTransactionId,
+                    saleResponse.transaction.id
+                  );
+                  assert.equal(response.transaction.amount, "200.00");
+                  assert.equal(response.transaction.surchargeAmount, "0.50");
+                  done();
+                }
+              )
           )
       );
     });
@@ -8083,6 +8180,44 @@ describe("TransactionGateway", function () {
                 }
               )
           )
+      );
+    });
+  });
+
+  describe("path traversal", function () {
+    it("rejects path traversal in transactionId and does not void the victim transaction", function (done) {
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "5105105105105100",
+          expirationDate: "05/12",
+        },
+        options: { submitForSettlement: false },
+      };
+
+      specHelper.defaultGateway.transaction.sale(
+        transactionParams,
+        (err, response) => {
+          let victimTransactionId = response.transaction.id;
+          let traversalId = "../transactions/" + victimTransactionId;
+
+          specHelper.defaultGateway.transaction.void(
+            traversalId,
+            function (voidErr) {
+              assert.equal(voidErr.type, braintree.errorTypes.notFoundError);
+
+              specHelper.defaultGateway.transaction.find(
+                victimTransactionId,
+                function (findErr, transaction) {
+                  assert.isNull(findErr);
+                  assert.equal(transaction.status, "authorized");
+
+                  done();
+                }
+              );
+            }
+          );
+        }
       );
     });
   });

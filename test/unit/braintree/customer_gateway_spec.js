@@ -1,5 +1,6 @@
 "use strict";
 
+let sinon = require("sinon");
 let CustomerGateway =
   require("../../../lib/braintree/customer_gateway").CustomerGateway;
 let errorTypes = require("../../../lib/braintree/error_types").errorTypes;
@@ -123,6 +124,84 @@ describe("CustomerGateway", () => {
           "Visa"
         );
         done();
+      });
+    });
+  });
+
+  describe("path traversal", () => {
+    const traversalIds = [
+      "../../victim_customer/addresses/victim_address",
+      "foo/bar",
+      "foo\\bar",
+      "..%2f..%2fvictim",
+      "..",
+      ".",
+      "%2e%2e",
+      "",
+      "   ",
+      null,
+      123,
+      {},
+    ];
+
+    let httpStubs, customerGateway;
+
+    beforeEach(() => {
+      httpStubs = {
+        get: sinon.stub(),
+        post: sinon.stub(),
+        put: sinon.stub(),
+        delete: sinon.stub(),
+      };
+      customerGateway = new CustomerGateway({
+        config: { baseMerchantPath: () => "/merchants/m" },
+        http: httpStubs,
+      });
+    });
+
+    function assertNotFoundAndNoHttp(promise, stub) {
+      return promise.then(assert.fail).catch((e) => {
+        assert.equal("notFoundError", e.type);
+        assert.isFalse(stub.called);
+      });
+    }
+
+    describe("delete", () => {
+      traversalIds.forEach((badId) => {
+        it(`rejects customerId ${JSON.stringify(
+          badId
+        )} without calling http`, () => {
+          return assertNotFoundAndNoHttp(
+            customerGateway.delete(badId),
+            httpStubs.delete
+          );
+        });
+      });
+    });
+
+    describe("find", () => {
+      traversalIds.forEach((badId) => {
+        it(`rejects customerId ${JSON.stringify(
+          badId
+        )} without calling http`, () => {
+          return assertNotFoundAndNoHttp(
+            customerGateway.find(badId),
+            httpStubs.get
+          );
+        });
+      });
+    });
+
+    describe("update", () => {
+      traversalIds.forEach((badId) => {
+        it(`rejects customerId ${JSON.stringify(
+          badId
+        )} without calling http`, () => {
+          return assertNotFoundAndNoHttp(
+            customerGateway.update(badId, {}),
+            httpStubs.put
+          );
+        });
       });
     });
   });
