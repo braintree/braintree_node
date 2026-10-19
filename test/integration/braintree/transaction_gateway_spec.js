@@ -3333,6 +3333,31 @@ describe("TransactionGateway", function () {
         });
       });
 
+      it("supports previousMastercardTransactionLinkId", function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: "10.00",
+            creditCard: {
+              number: "5555555555554444",
+              expirationDate: "05/12",
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.Vaulted,
+              previousMastercardTransactionLinkId: "1234567890123456789012",
+            },
+          };
+
+          specHelper.defaultGateway.transaction.sale(
+            transactionParams,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isTrue(response.success);
+              done();
+            }
+          );
+        });
+      });
+
       it("supports status vaulted without previousNetworkTransactionId", function (done) {
         specHelper.defaultGateway.customer.create({}, function () {
           let transactionParams = {
@@ -3415,6 +3440,72 @@ describe("TransactionGateway", function () {
                   .on("status")[0].code,
                 ValidationErrorCodes.Transaction.ExternalVault
                   .StatusWithPreviousNetworkTransactionIdIsInvalid
+              );
+              done();
+            }
+          );
+        });
+      });
+
+      it("handles validation error status with previous mastercard transaction link id is invalid", function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: "10.00",
+            creditCard: {
+              number: "5555555555554444",
+              expirationDate: "05/12",
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.WillVault,
+              previousMastercardTransactionLinkId: "1234567890123456789012",
+            },
+          };
+
+          specHelper.defaultGateway.transaction.sale(
+            transactionParams,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isFalse(response.success);
+              assert.equal(
+                response.errors
+                  .for("transaction")
+                  .for("externalVault")
+                  .on("status")[0].code,
+                ValidationErrorCodes.Transaction.ExternalVault
+                  .StatusWithPreviousMastercardTransactionLinkIdIsInvalid
+              );
+              done();
+            }
+          );
+        });
+      });
+
+      it("handles validation error previous mastercard transaction link id is invalid", function (done) {
+        specHelper.defaultGateway.customer.create({}, function () {
+          let transactionParams = {
+            amount: "10.00",
+            creditCard: {
+              number: "5555555555554444",
+              expirationDate: "05/12",
+            },
+            externalVault: {
+              status: Transaction.ExternalVault.Vaulted,
+              previousMastercardTransactionLinkId: "1234567890123456789012123",
+            },
+          };
+
+          specHelper.defaultGateway.transaction.sale(
+            transactionParams,
+            function (err, response) {
+              assert.isNull(err);
+              assert.isFalse(response.success);
+              assert.equal(
+                response.errors
+                  .for("transaction")
+                  .for("externalVault")
+                  .on("previousMastercardTransactionLinkId")[0].code,
+                ValidationErrorCodes.Transaction.ExternalVault
+                  .PreviousMastercardTransactionLinkIdIsInvalid
               );
               done();
             }
@@ -6877,6 +6968,120 @@ describe("TransactionGateway", function () {
         }
       );
     });
+  });
+
+  describe("reverse", function () {
+    it("voids a voidable transaction", (done) =>
+      specHelper.defaultGateway.transaction.sale(
+        {
+          amount: "5.00",
+          creditCard: {
+            number: "5105105105105100",
+            expirationDate: "05/2035",
+          },
+        },
+        (err, saleResponse) => {
+          assert.isNull(err);
+
+          specHelper.defaultGateway.transaction.reverse(
+            saleResponse.transaction.id,
+            (reverseErr, reverseResponse) => {
+              assert.isNull(reverseErr);
+              assert.isTrue(reverseResponse.success);
+              assert.equal(
+                saleResponse.transaction.id,
+                reverseResponse.transaction.id
+              );
+              assert.equal("voided", reverseResponse.transaction.status);
+              assert.isNull(reverseResponse.transaction.refundedTransactionId);
+              done();
+            }
+          );
+        }
+      ));
+
+    it("returns an error when reversing twice without an api request key", (done) =>
+      specHelper.defaultGateway.transaction.sale(
+        {
+          amount: "5.00",
+          creditCard: {
+            number: "5105105105105100",
+            expirationDate: "05/2035",
+          },
+        },
+        (saleErr, saleResponse) => {
+          assert.isNull(saleErr);
+
+          specHelper.defaultGateway.transaction.reverse(
+            saleResponse.transaction.id,
+            (firstReverseErr, firstReverseResponse) => {
+              assert.isNull(firstReverseErr);
+              assert.isTrue(firstReverseResponse.success);
+
+              specHelper.defaultGateway.transaction.reverse(
+                saleResponse.transaction.id,
+                (secondReverseErr, secondReverseResponse) => {
+                  assert.isNull(secondReverseErr);
+                  assert.isFalse(secondReverseResponse.success);
+                  assert.equal(
+                    secondReverseResponse.errors
+                      .for("transaction")
+                      .on("base")[0].code,
+                    "91506"
+                  );
+                  done();
+                }
+              );
+            }
+          );
+        }
+      ));
+
+    it("voids an explicitly created voidable refund", (done) =>
+      specHelper.createTransactionToRefund((transaction) =>
+        specHelper.defaultGateway.transaction.refund(
+          transaction.id,
+          (refundErr, refundResponse) => {
+            assert.isNull(refundErr);
+            assert.isTrue(refundResponse.success);
+
+            specHelper.defaultGateway.transaction.reverse(
+              refundResponse.transaction.id,
+              (reverseErr, reverseResponse) => {
+                assert.isNull(reverseErr);
+                assert.isTrue(reverseResponse.success);
+                assert.equal(
+                  refundResponse.transaction.id,
+                  reverseResponse.transaction.id
+                );
+                assert.equal("voided", reverseResponse.transaction.status);
+                assert.equal(
+                  transaction.id,
+                  reverseResponse.transaction.refundedTransactionId
+                );
+                done();
+              }
+            );
+          }
+        )
+      ));
+
+    it("refunds a settled transaction", (done) =>
+      specHelper.createTransactionToRefund((transaction) =>
+        specHelper.defaultGateway.transaction.reverse(
+          transaction.id,
+          (err, response) => {
+            assert.isNull(err);
+            assert.isTrue(response.success);
+            assert.equal("credit", response.transaction.type);
+            assert.equal(
+              transaction.id,
+              response.transaction.refundedTransactionId
+            );
+            done();
+          }
+        )
+      ));
   });
 
   describe("refund", function () {

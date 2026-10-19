@@ -462,6 +462,100 @@ describe("CreditCardVerificationGateway", function () {
       );
     });
 
+    it("creates a verification with externalVault previousMastercardTransactionLinkId", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "5555555555554444",
+          expirationDate: "05/2029",
+        },
+        externalVault: {
+          status: "vaulted",
+          previousMastercardTransactionLinkId: "1234567890123456789012",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isTrue(response.success);
+
+          let verification = response.verification;
+
+          assert.equal(verification.processorResponseCode, "1000");
+          assert.equal(verification.processorResponseText, "Approved");
+          assert.equal(verification.processorResponseType, "approved");
+
+          done();
+        }
+      );
+    });
+
+    it("handles validation error status with previous mastercard transaction link id is invalid", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "5555555555554444",
+          expirationDate: "05/2029",
+        },
+        externalVault: {
+          status: "will_vault",
+          previousMastercardTransactionLinkId: "1234567890123456789012",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("verification")
+              .for("externalVault")
+              .on("status")[0].code,
+            ValidationErrorCodes.Verification.ExternalVault
+              .StatusWithPreviousMastercardTransactionLinkIdIsInvalid
+          );
+
+          done();
+        }
+      );
+    });
+
+    it("handles validation error previous mastercard transaction link id is invalid", function (done) {
+      let params = {
+        creditCard: {
+          cardholderName: "John Smith",
+          number: "5555555555554444",
+          expirationDate: "05/2029",
+        },
+        externalVault: {
+          status: "vaulted",
+          previousMastercardTransactionLinkId: "1234567890123456789012123",
+        },
+      };
+
+      specHelper.defaultGateway.creditCardVerification.create(
+        params,
+        function (err, response) {
+          assert.isNull(err);
+          assert.isFalse(response.success);
+          assert.equal(
+            response.errors
+              .for("verification")
+              .for("externalVault")
+              .on("previousMastercardTransactionLinkId")[0].code,
+            ValidationErrorCodes.Verification.ExternalVault
+              .PreviousMastercardTransactionLinkIdIsInvalid
+          );
+
+          done();
+        }
+      );
+    });
+
     it("supports intendedTransactionSource", function (done) {
       let params = {
         creditCard: {

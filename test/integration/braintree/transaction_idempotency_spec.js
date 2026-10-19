@@ -492,4 +492,50 @@ describe("TransactionIdempotency", function () {
       );
     });
   });
+
+  describe("reverse", function () {
+    it("returns the original reversal on duplicate request with the same api request key", function (done) {
+      let apiRequestKey =
+        "reverse-idempotency-key-" + Math.floor(Math.random() * 1000000);
+
+      specHelper.defaultGateway.transaction.sale(
+        {
+          amount: TransactionAmounts.Authorize,
+          creditCard: {
+            number: "4111111111111111",
+            expirationDate: "05/2035",
+          },
+        },
+        function (err, saleResult) {
+          assert.isNull(err);
+          assert.isTrue(saleResult.success);
+
+          let reverseRequest = { apiRequestKey: apiRequestKey };
+
+          specHelper.defaultGateway.transaction.reverse(
+            saleResult.transaction.id,
+            reverseRequest,
+            function (firstErr, firstResult) {
+              assert.isNull(firstErr);
+              assert.isTrue(firstResult.success);
+
+              specHelper.defaultGateway.transaction.reverse(
+                saleResult.transaction.id,
+                reverseRequest,
+                function (secondErr, secondResult) {
+                  assert.isNull(secondErr);
+                  assert.isTrue(secondResult.success);
+                  assert.equal(
+                    firstResult.transaction.id,
+                    secondResult.transaction.id
+                  );
+                  done();
+                }
+              );
+            }
+          );
+        }
+      );
+    });
+  });
 });

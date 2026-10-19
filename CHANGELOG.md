@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.41.0
+
+- Add `Transaction.reverse()` to automatically void or fully refund a transaction
+- Add `previousMastercardTransactionLinkId` to `externalVault` on `Transaction` and `CreditCardVerification.create`
+
 ## 3.40.0
 
 - Add `achType` to transaction search

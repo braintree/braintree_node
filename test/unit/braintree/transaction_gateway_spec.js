@@ -180,6 +180,29 @@ describe("TransactionGateway", () =>
         done();
       });
     });
+
+    it("accepts externalVault previousMastercardTransactionLinkId", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+      let transactionParams = {
+        amount: "5.00",
+        creditCard: {
+          number: "5555555555554444",
+          expirationDate: "05/12",
+        },
+        externalVault: {
+          previousMastercardTransactionLinkId: "1234567890123456789012",
+        },
+      };
+
+      transactionGateway.sale(transactionParams, (err, params) => {
+        assert.notExists(err);
+        assert.equal(
+          "1234567890123456789012",
+          params.transaction.externalVault.previousMastercardTransactionLinkId
+        );
+        done();
+      });
+    });
   }));
 
 describe("TransactionGateway", () =>
@@ -245,6 +268,50 @@ describe("TransactionGateway", () =>
     });
   }));
 
+describe("TransactionGateway", () =>
+  describe("reverse", function () {
+    let fakeGateway = {
+      config: {
+        baseMerchantPath() {
+          return "";
+        },
+      },
+      http: {
+        post(url, params) {
+          return Promise.resolve(params || {});
+        },
+      },
+    };
+
+    it("posts an empty body when no reverse options are supplied", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+      let post = sinon.spy(fakeGateway.http, "post");
+
+      transactionGateway.reverse("fake_txn_id", (err) => {
+        assert.notExists(err);
+        assert.isTrue(
+          post.calledWith("/transactions/fake_txn_id/reverse", null)
+        );
+        post.restore();
+        done();
+      });
+    });
+
+    it("accepts apiRequestKey for idempotent reversals", function (done) {
+      let transactionGateway = new TransactionGateway(fakeGateway);
+
+      transactionGateway.reverse(
+        "fake_txn_id",
+        { apiRequestKey: "reverse-key-789" },
+        (err, params) => {
+          assert.notExists(err);
+          assert.equal("reverse-key-789", params.transaction.apiRequestKey);
+          done();
+        }
+      );
+    });
+  }));
+
 describe("TransactionGateway", () => {
   describe("path traversal", () => {
     const traversalIds = [
@@ -294,6 +361,7 @@ describe("TransactionGateway", () => {
       { method: "cloneTransaction", args: [{}], stub: () => httpStubs.post },
       { method: "find", args: [], stub: () => httpStubs.get },
       { method: "refund", args: [{}], stub: () => httpStubs.post },
+      { method: "reverse", args: [{}], stub: () => httpStubs.post },
       {
         method: "submitForSettlement",
         args: ["5.00", {}],

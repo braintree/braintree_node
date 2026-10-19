@@ -96,6 +96,29 @@ describe("CreditCardVerificationGateway", () =>
         done();
       });
     });
+
+    it("accepts externalVault previousMastercardTransactionLinkId", function (done) {
+      let verificationGateway = new CreditCardVerificationGateway(fakeGateway);
+      let verificationParams = {
+        creditCard: {
+          number: "5555555555554444",
+          expirationDate: "05/2029",
+        },
+        externalVault: {
+          previousMastercardTransactionLinkId: "1234567890123456789012",
+        },
+      };
+
+      verificationGateway.create(verificationParams, (err, params) => {
+        assert.notExists(err);
+        assert.exists(params);
+        assert.equal(
+          params.verification.externalVault.previousMastercardTransactionLinkId,
+          "1234567890123456789012"
+        );
+        done();
+      });
+    });
   }));
 
 describe("CreditCardVerificationGateway - path traversal", () => {
